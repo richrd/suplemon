@@ -5,6 +5,7 @@ import sys
 import time
 import curses
 
+from config import *
 from editor import *
 from helpers import *
 
@@ -13,9 +14,10 @@ class App:
         self.running = 0
         self.filename = None
         self.last_key = None
-        self.status_msg = ""    
+        self.status_msg = ""
+        #self.config = Config()
+        #self.config.load()
         self.screen = curses.initscr()
-        #original_state = 
         curses.def_shell_mode()
         curses.start_color()
         curses.use_default_colors()
@@ -23,10 +25,10 @@ class App:
         curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(2,curses.COLOR_WHITE, curses.COLOR_BLUE)
 
-
         curses.cbreak()
         curses.noecho()
-        curses.curs_set(False)
+        #curses.curs_set(0)
+        #curses.mousemask(curses.ALL_MOUSE_EVENTS)
         #self.screen.nodelay(1)
         self.screen.keypad(1)
 
@@ -69,6 +71,9 @@ class App:
         self.status_msg = s
         self.status()
 
+    def query(self, text):
+        return ""
+    
     def status(self):
         data = "key:"+str(self.last_key)+\
             " size:"+str(self.editor.size())+\
@@ -77,8 +82,10 @@ class App:
             " y:"+str(self.editor.y_scroll)+\
             " status:"+self.status_msg
         self.header_win.clear()
-        
-        head = "Suplime Editor v0.1 - "+curr_time()+" - "+self.filename
+    
+        head = "Suplime Editor v0.1 - "+curr_time()
+        if self.filename != None:
+            head += " - "+self.filename
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         self.header_win.addstr(0,0, head, curses.color_pair(1))
 
@@ -97,10 +104,15 @@ class App:
         data = f.read()
         f.close()
         self.editor.load(data)
+        #self.config["files"][filename] = []
 
     def load(self):
         if len(sys.argv) > 1:
+            self.msg("Loading!")
+            #try:
             self.read_file(sys.argv[1])
+            #except:
+            #    pass
             
     def reload(self):
         self.read_file(self.filename)        
@@ -110,6 +122,7 @@ class App:
         f = open("#"+self.filename+"."+str(time.time()), "w")
         f.write(data)
         f.close()
+        
         f = open(self.filename, "w")
         f.write(data)
         f.close()
@@ -119,13 +132,20 @@ class App:
         if char == 265:             # F1
             self.save()             
         elif char == 266:           # F2
-            self.reload()           
+            self.reload()
+        elif char == curses.KEY_MOUSE:
+            event = curses.getmouse()
+            #self.msg(str(event))
+            #offset = self.line_offset()
+            #cur = [event[1]+offset,self.y_scroll+event[2]]
+            #self.cursors = [cur]
+            #self.refresh()
 
     def keyboard_interrupt(self):
         #self.query_exit()
         curses.reset_shell_mode()
         curses.endwin()
-        self.running=0
+        self.running = 0
         sys.exit(1)
         return True
 
@@ -136,21 +156,18 @@ class App:
         self.status()
         self.refresh()
         while self.running:
-            self.editor.loop()
+            self.check_resize()
             try:
                 char = self.screen.getch()
             except KeyboardInterrupt:
                 if self.keyboard_interrupt():
                     break
                 
-            self.check_resize()
-            if char != -1:
-                if not self.handle_char(char):
-                    self.editor.got_chr(char)
-                self.last_key = char
-                self.status()
-                self.refresh()
-            #time.sleep(000000.1)
+            if not self.handle_char(char):
+                self.editor.got_chr(char)
+            self.last_key = char
+            self.status()
+            self.refresh()
 
         curses.endwin()
 

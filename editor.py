@@ -254,12 +254,13 @@ class Editor:
     def jump_right(self):
         for cursor in self.cursors:
             line = self.lines[cursor[1]]
-            while cursor[0] < len(line):
-                cursor[0]+=1
-                if line[cursor[0]] == " ":
+            new = cursor[0]
+            while new < len(line):
+                new+=1
+                if line[new] == " ":
                     break
-                #cursor[0]+=1
-#            cursor[0]+=1
+            cursor[0] = new
+            
             if cursor[0] >= len(line):
                 cursor[0] = len(line)-1
         self.move_cursors()

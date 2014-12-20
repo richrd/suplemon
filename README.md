@@ -22,6 +22,12 @@ Command line text editor with multicursor support. The goal is to replicate subl
    
  * Ctrl + X
    > Delete line(s)
+   
+ * Ctrl + F
+   > Find text.
+   
+ * Ctrl + D
+   > Add a new cursor at the next occurance.
  
  * F1
    > Save current file
