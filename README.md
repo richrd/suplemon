@@ -44,9 +44,11 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # To-Do
  * Nano-like menu and keyboard shortcuts
  * Proper status bar information
+ * Jump to end of whitespace with home key 
+ * Command line for getting input
  * Line number toggling
  * Loading multiple files and switching between them
+ * Config and storing open cursor positions for restoring later
  * Syntax higlighting
  * Editor plugins
  * ...
- 

@@ -9,12 +9,51 @@ from config import *
 from editor import *
 from helpers import *
 
+quick_help = """
+Welcome to suplemon!
+====================
+
+Usage: python main.py [filename]
+
+Warning: beta software, bugs may occur.
+
+# Keyboard shortcuts:
+ * Alt + Arrow Keys
+   > Add new curors in arrow direction
+ 
+ * ESC
+   > Revert to a single cursor
+   
+ * Ctrl + X
+   > Delete line(s)
+   
+ * Ctrl + F
+   > Find text.
+   
+ * Ctrl + D
+   > Add a new cursor at the next occurance.
+ 
+ * F1
+   > Save current file
+   
+ * F2
+   > Reload current file
+ 
+ * Alt + Page Up
+   > Move line(s) up
+ 
+ * Alt + Page Down
+   > Move line(s) down
+
+"""
+
 class App:
     def __init__(self):
         self.running = 0
         self.filename = None
         self.last_key = None
         self.status_msg = ""
+        self.capturing = 0
         #self.config = Config()
         #self.config.load()
         self.screen = curses.initscr()
@@ -24,12 +63,10 @@ class App:
         
         curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(2,curses.COLOR_WHITE, curses.COLOR_BLUE)
+        curses.init_pair(3,curses.COLOR_RED, curses.COLOR_BLUE)
 
         curses.cbreak()
         curses.noecho()
-        #curses.curs_set(0)
-        #curses.mousemask(curses.ALL_MOUSE_EVENTS)
-        #self.screen.nodelay(1)
         self.screen.keypad(1)
 
         self.current_yx = self.screen.getmaxyx()
@@ -40,8 +77,10 @@ class App:
         self.status_win = curses.newwin(1, yx[1], yx[0]-1, 0)
 
         self.editor = Editor(self, self.editor_win)
-        #self.editor.load(thedata)
         self.refresh()
+
+    def capture(self, yes=1):
+        self.capturing = yes
 
     def log(self, s):
         log.log(s)
@@ -83,14 +122,13 @@ class App:
             " status:"+self.status_msg
         self.header_win.clear()
     
-        head = "Suplime Editor v0.1 - "+curr_time()
+        head = "Suplemon Editor v0.1 - "+curr_time()
         if self.filename != None:
             head += " - "+self.filename
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         self.header_win.addstr(0,0, head, curses.color_pair(1))
 
         self.status_win.clear()
-        #self.status_win.addstr(0,0, "MAXYX:"+str(self.screen.getmaxyx())+"LAST:"+str(self.last_key)+" "+str(self.editor.cursors))
         if len(data)>self.screen.getmaxyx()[0]:
             data = data[:self.screen.getmaxyx()[1]-1]
         self.status_win.addstr(0,0,data)
@@ -104,15 +142,13 @@ class App:
         data = f.read()
         f.close()
         self.editor.load(data)
-        #self.config["files"][filename] = []
 
     def load(self):
         if len(sys.argv) > 1:
             self.msg("Loading!")
-            #try:
             self.read_file(sys.argv[1])
-            #except:
-            #    pass
+        else:
+            self.editor.set_data(quick_help)
             
     def reload(self):
         self.read_file(self.filename)        
@@ -128,26 +164,26 @@ class App:
         f.close()
         self.msg("Saved to "+self.filename)
 
-    def handle_char(self, char):
+    def handle_char(self, char):       
         if char == 265:             # F1
-            self.save()             
+            self.save()
+            return True             
         elif char == 266:           # F2
             self.reload()
-        elif char == curses.KEY_MOUSE:
-            event = curses.getmouse()
-            #self.msg(str(event))
-            #offset = self.line_offset()
-            #cur = [event[1]+offset,self.y_scroll+event[2]]
-            #self.cursors = [cur]
-            #self.refresh()
-
+            return True
+        if self.capturing:
+            return True
+        return False
+        
     def keyboard_interrupt(self):
-        #self.query_exit()
-        curses.reset_shell_mode()
-        curses.endwin()
-        self.running = 0
-        sys.exit(1)
-        return True
+        #yes = self.query("Exit?")
+        yes = True
+        if yes:
+            curses.reset_shell_mode()
+            curses.endwin()
+            self.running = 0
+            sys.exit(1)
+            return True
 
     def run(self):
         self.load()

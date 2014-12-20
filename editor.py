@@ -5,6 +5,20 @@ import sys
 import time
 import curses
 
+# try:
+# from pygments import highlight
+# from pygments.lexers import PythonLexer
+# from pygments.formatters import TerminalFormatter
+# from pygments.formatters import Terminal256Formatter
+# from formatter import *
+
+# from cursesextras import safescreen, log
+# from cursespygments import CursesFormatter
+
+# pygments = True
+# except:
+#     pygments = False
+
 class Line:
     def __init__(self, data):
         self.data = data
@@ -34,16 +48,24 @@ class Editor:
         self.window = window
         self.data = ""
         self.lines = [""]
+        self.show_linenums = True
+        self.highlighting = False
+        #if pygments != False:
+            #self.highlighting = True
+            #self.lexer = PythonLexer()
+            #self.term_fmt = BPythonFormatter()
+            #self.term_fmt = CursesFormatter(usebg=True, defaultbg=-2, defaultfg = -2)
+            #self.term_fmt = TerminalFormatter()
         self.y_scroll = 0
         self.x_scroll = 0
         self.cursors = [
             [0,0],
-            [4,0],
         ]
         #elf.cursor_style = curses.A_UNDERLINE
         self.cursor_style = curses.A_REVERSE
         self.selection_style = curses.A_REVERSE
         self.tab_width = 4
+        self.punctuation = ["(", ")", "{", "}", "[", "]", "'", "\"", "=", "+", "-", ".", ",", "_"]
 
     def log(self, s):
         self.parent.log(s)
@@ -74,6 +96,10 @@ class Editor:
         """Return the main cursor."""
         return self.cursors[0]
 
+    def toggle_linenums(self):
+        self.show_linenums = not self.show_linenums
+        self.render()
+
     def pad_lnum(self, n):
         s = str(n)
         while len(s) < self.line_offset()-1:
@@ -84,6 +110,8 @@ class Editor:
         return self.size()[0]-self.line_offset()
 
     def line_offset(self):
+        if not self.show_linenums:
+            return 0
         return len(str(len(self.lines)))+1
 
     def whitespace(self, line):
@@ -113,10 +141,13 @@ class Editor:
             line = self.lines[lnum]
             line_part = line[min(self.x_scroll, len(line)):]
             if len(line_part) >= max_len: line_part = line_part[:max_len-1]
-            self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(2))
+            if self.show_linenums:
+                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(2))
+            if self.highlighting:
+                self.parent.msg("Hlighting!...")
+                line_part = highlight(line_part, self.lexer, self.term_fmt)
             self.window.addstr(i, x_offset, line_part)
             #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" "+line_part, curses.color_pair(2))
-#            self.window.chgat(i, 0, x_offset-1, curses.A_STANDOUT)
             i += 1
         self.render_cursors()
         self.window.refresh()
@@ -244,6 +275,7 @@ class Editor:
         self.move_cursors((0 ,1))
 
     def jump_left(self):
+        chars = self.punctuation
         for cursor in self.cursors:
             line = self.lines[cursor[1]]
             while line[cursor[0]-1] != " ":
@@ -252,17 +284,29 @@ class Editor:
         self.move_cursors()
     
     def jump_right(self):
+        chars = self.punctuation
         for cursor in self.cursors:
             line = self.lines[cursor[1]]
+            cur_chr = line[cursor[0]]
             new = cursor[0]
             while new < len(line):
-                new+=1
-                if line[new] == " ":
-                    break
+                next = cursor[0]+1
+                if next == len(line):next-=1
+                if cur_chr == " ":
+                    #self.parent.msg("NXT:"+line[next])
+                    if line[next] == " ":
+                        new += 1
+                    else:
+                        new += 1
+                        break
+                else:
+                    new+=1
+                    if line[next] in chars:
+                        break
+                cursor[0] = new
+                self.render()
+                time.sleep(0.05)
             cursor[0] = new
-            
-            if cursor[0] >= len(line):
-                cursor[0] = len(line)-1
         self.move_cursors()
 
     def new_cursor_up(self):
@@ -294,7 +338,6 @@ class Editor:
 
     def new_cursor_right(self):
         new = []
-        self.parent.msg("right!!!!!")
         for cursor in self.cursors:
             if cursor[0]+1 > len(self.lines[cursor[1]]): continue
             new.append( [cursor[0]+1, cursor[1]] )
@@ -304,16 +347,20 @@ class Editor:
         self.move_cursors()
 
     def page_up(self):
-        for i in range(self.size()[1]/2):
+        for i in range(int(self.size()[1]/2)):
             self.move_cursors((0 ,1))
 
     def page_down(self):
-        for i in range(self.size()[1]/2):
+        for i in range(int(self.size()[1]/2)):
             self.move_cursors((0, -1))
 
     def home(self):
         for cursor in self.cursors:
-            cursor[0] = 0
+            wspace = self.whitespace(self.lines[cursor[1]])
+            if cursor[0] == wspace:
+                cursor[0] = 0
+            else:
+                cursor[0] = wspace
         self.move_cursors()
 
     def end(self):
@@ -397,7 +444,6 @@ class Editor:
             self.lines[cursor[1]] = old
             cursor[1] -= 1
         self.move_cursors()
-
         
     def push_down(self):
         used_y = []
@@ -427,8 +473,6 @@ class Editor:
                 linenums.append(cursor[1])
                 cursor[0] = 0
                 self.lines[cursor[1]] = line[self.tab_width:]
-        #for i in range(self.tab_width):
-        #    self.type(" ")
 
     def cut(self):
         for cursor in self.cursors:
@@ -459,10 +503,12 @@ class Editor:
         elif char == curses.KEY_NPAGE: self.page_up()
         elif char == curses.KEY_PPAGE: self.page_down()
 
-        elif char == 563: self.new_cursor_up()                   #Alt + up
-        elif char == 522: self.new_cursor_down()                 #Alt + down
-        elif char == 542: self.new_cursor_left()                 #Alt + left
-        elif char == 557: self.new_cursor_right()                #Alt + right
+        elif char == 273: self.toggle_linenums()                 # F9
+
+        elif char == 563: self.new_cursor_up()                   # Alt + up
+        elif char == 522: self.new_cursor_down()                 # Alt + down
+        elif char == 542: self.new_cursor_left()                 # Alt + left
+        elif char == 557: self.new_cursor_right()                # Alt + right
         elif char == 24: self.cut()                              # Ctrl + X
         elif char == 544:           # Ctrl + Left
             self.jump_left()
