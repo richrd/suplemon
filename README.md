@@ -4,10 +4,10 @@ suplemon
 Command line text editor with multicursor support. The goal is to replicate sublimetext style functionality in the terminal.
 
 #Goals:
-1. Create a command line text editor with built in multi cursor support
-2. Usability should be as good and easy as nano.
-3. Multi cursor and multi selection should be comparable to sublimetext.
-4. Develope suplemon with suplemon!!!
+ 1. Create a command line text editor with built in multi cursor support
+ 2. Usability should be as good and easy as nano.
+ 3. Multi cursor and multi selection should be comparable to sublimetext.
+ 4. Develope suplemon with suplemon!!!
 
 #Usage:
 
@@ -23,8 +23,15 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * Ctrl + X
    > Delete line(s)
  
+ * F1
+   > Save current file
+   
+ * F2
+   > Reload current file
+ 
  * Alt + Page Up
    > Move line(s) up
  
  * Alt + Page Down
    > Move line(s) down
+   
