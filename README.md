@@ -35,3 +35,12 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * Alt + Page Down
    > Move line(s) down
    
+# To-Do
+ * Nano-like menu and keyboard shortcuts
+ * Proper status bar information
+ * Line number toggling
+ * Loading multiple files and switching between them
+ * Syntax higlighting
+ * Editor plugins
+ * ...
+ 

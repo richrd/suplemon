@@ -15,11 +15,14 @@ class App:
         self.last_key = None
         self.status_msg = ""    
         self.screen = curses.initscr()
+        #original_state = 
+        curses.def_shell_mode()
         curses.start_color()
         curses.use_default_colors()
         
         curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(2,curses.COLOR_WHITE, curses.COLOR_BLUE)
+
 
         curses.cbreak()
         curses.noecho()
@@ -119,7 +122,12 @@ class App:
             self.reload()           
 
     def keyboard_interrupt(self):
-        self.query_exit()
+        #self.query_exit()
+        curses.reset_shell_mode()
+        curses.endwin()
+        self.running=0
+        sys.exit(1)
+        return True
 
     def run(self):
         self.load()
@@ -129,10 +137,12 @@ class App:
         self.refresh()
         while self.running:
             self.editor.loop()
-            # try:
-            char = self.screen.getch()
-            # except Exception, e:
-            #     self.keyboard_interrupt()
+            try:
+                char = self.screen.getch()
+            except KeyboardInterrupt:
+                if self.keyboard_interrupt():
+                    break
+                
             self.check_resize()
             if char != -1:
                 if not self.handle_char(char):
