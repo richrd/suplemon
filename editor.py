@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #-*- coding:utf-8
 import os
+import re
 import sys
 import time
 import curses
@@ -42,6 +43,9 @@ class Line:
     def __len__(self):
         return len(self.data)
 
+    def find(self, what):
+        return self.data.find(what)
+
 class Editor:
     def __init__(self, parent, window):
         self.parent = parent
@@ -49,6 +53,7 @@ class Editor:
         self.data = ""
         self.lines = [""]
         self.show_linenums = True
+        self.last_find = ""
         self.highlighting = False
         #if pygments != False:
             #self.highlighting = True
@@ -61,11 +66,12 @@ class Editor:
         self.cursors = [
             [0,0],
         ]
-        #elf.cursor_style = curses.A_UNDERLINE
+        self.buffer = []
         self.cursor_style = curses.A_REVERSE
-        self.selection_style = curses.A_REVERSE
+        #self.selection_style = curses.A_REVERSE # Unused...
+
         self.tab_width = 4
-        self.punctuation = ["(", ")", "{", "}", "[", "]", "'", "\"", "=", "+", "-", ".", ",", "_"]
+        self.punctuation = ["(", ")", "{", "}", "[", "]", "'", "\"", "=", "+", "-", "/", "*", ".", ":", ",", ";", "_", " "]
 
     def log(self, s):
         self.parent.log(s)
@@ -83,6 +89,9 @@ class Editor:
         lines = self.data.split("\n")
         for line in lines:
             self.lines.append(Line(line))
+
+    def set_tab_width(self, w):
+        self.tab_width = w
 
     def get_data(self):
         data = "\n".join(map(str,self.lines))
@@ -143,9 +152,9 @@ class Editor:
             if len(line_part) >= max_len: line_part = line_part[:max_len-1]
             if self.show_linenums:
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(2))
-            if self.highlighting:
-                self.parent.msg("Hlighting!...")
-                line_part = highlight(line_part, self.lexer, self.term_fmt)
+            #if self.highlighting:
+            #    self.parent.status("Hlighting!...")
+            #    line_part = highlight(line_part, self.lexer, self.term_fmt)
             self.window.addstr(i, x_offset, line_part)
             #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" "+line_part, curses.color_pair(2))
             i += 1
@@ -166,22 +175,11 @@ class Editor:
                 #self.window.addstr(">", curses.color_pair(1))
                 #self.window.chgat(y, cursor[0]+3, 1, self.cursor_style)
 
-    def escape(self):
-        self.cursors = [self.cursors[0]]
-        self.render()
-
-    def relative_cursors(self):
-        pass
-
     def refresh(self):
         self.window.refresh()
 
     def resize(self, yx = None):
-        self.parent.msg("resize")
-        #c = self.cursor()
-        #self.parent.msg("")
-        #if c[1]-self.y_scroll+self.size()[1] >= self.size()[1]:
-        #    self.y_scroll = c[1]+self.size()[1]-1
+        self.parent.status("Resize")
         self.move_cursors()
         self.refresh()
 
@@ -205,12 +203,13 @@ class Editor:
         size = self.size()
         offset = self.line_offset()
         if c[1]-self.y_scroll >= size[1]:
-            self.y_scroll += 1
+            self.y_scroll = c[1]-size[1]+1
         elif c[1]-self.y_scroll < 0:
-            self.y_scroll -= 1
-        #self.parent.msg(str(c[0]-self.x_scroll))
+            #self.y_scroll -= 1
+            self.y_scroll = c[1]
         if c[0]-self.x_scroll+offset > size[0]-1:
             self.x_scroll = len(self.lines[c[1]])-size[0]+offset+1
+            s#elf.x_scroll = len(self.lines[c[1]])-size[0]+offset
         if c[0]-self.x_scroll < 0:
             self.x_scroll -= abs(c[0]-self.x_scroll) # FIXME
         if c[0]-self.x_scroll+offset < offset:
@@ -255,18 +254,18 @@ class Editor:
     def arrow_right(self):
         for cursor in self.cursors:
             if cursor[1] != len(self.lines)-1 and cursor[0] == len(self.lines[cursor[1]]):
-                cursor[1]+=1
+                cursor[1] += 1
                 cursor[0] = 0
-        self.move_cursors((1 ,0))
+            else:
+                cursor[0] += 1
+        self.move_cursors()
 
     def arrow_left(self):
-        #self.move_cursors((-1 ,0))
         for cursor in self.cursors:
             if cursor[1] != 0 and cursor[0] == 0:
                 cursor[1]-=1
                 cursor[0] = len(self.lines[cursor[1]])+1
         self.move_cursors((-1 ,0))
-        
 
     def arrow_up(self):
         self.move_cursors((0 ,-1))
@@ -278,43 +277,54 @@ class Editor:
         chars = self.punctuation
         for cursor in self.cursors:
             line = self.lines[cursor[1]]
-            while line[cursor[0]-1] != " ":
-                if cursor[0] == 0:break
-                cursor[0]-=1
+            if cursor[0] == 0:
+                continue
+            if cursor[0] <= len(line):
+                cur_chr = line[cursor[0]-1]
+            else:
+                cur_chr = line[cursor[0]]
+            while cursor[0] > 0:
+                next = cursor[0]-2
+                if next < 0: next = 0
+                if cur_chr == " ":
+                    cursor[0] -= 1
+                    if line[next] != " ":
+                        break
+                else:
+                    cursor[0] -= 1
+                    if line[next] in chars:
+                        break
+                    #self.move_cursors()
+                    #self.parent.status("next:"+line[next]+" cur:"+cur_chr)
+                    #self.render()
+                    #time.sleep(.5)
         self.move_cursors()
     
     def jump_right(self):
         chars = self.punctuation
         for cursor in self.cursors:
             line = self.lines[cursor[1]]
+            if cursor[0] == len(line):
+                continue
             cur_chr = line[cursor[0]]
-            new = cursor[0]
-            while new < len(line):
+            while cursor[0] < len(line):
                 next = cursor[0]+1
                 if next == len(line):next-=1
                 if cur_chr == " ":
-                    #self.parent.msg("NXT:"+line[next])
-                    if line[next] == " ":
-                        new += 1
-                    else:
-                        new += 1
+                    cursor[0] += 1
+                    if line[next] != " ":
                         break
                 else:
-                    new+=1
+                    cursor[0] += 1
                     if line[next] in chars:
                         break
-                cursor[0] = new
-                self.render()
-                time.sleep(0.05)
-            cursor[0] = new
-        self.move_cursors()
+        self.move_cursors()   
 
     def new_cursor_up(self):
         cursor = self.get_first_cursor()
         if cursor[1] == 0: return
         new = [cursor[0], cursor[1]-1]
         self.cursors.append(new)
-        #self.purge_cursors()
         self.move_cursors()
 
     def new_cursor_down(self):
@@ -322,18 +332,15 @@ class Editor:
         if cursor[1] == len(self.lines)-1: return
         new = [cursor[0], cursor[1]+1]
         self.cursors.append(new)
-        #self.purge_cursors()
         self.move_cursors()
 
     def new_cursor_left(self):
         new = []
         for cursor in self.cursors:
-            #if len(self.lines[cursor[1]]) == 0: continue
             if cursor[0] == 0: continue
             new.append( [cursor[0]-1, cursor[1]] )
         for c in new:
             self.cursors.append(c)
-        #self.purge_cursors()
         self.move_cursors()
 
     def new_cursor_right(self):
@@ -343,8 +350,11 @@ class Editor:
             new.append( [cursor[0]+1, cursor[1]] )
         for c in new:
             self.cursors.append(c)
-        #self.purge_cursors()
         self.move_cursors()
+
+    def escape(self):
+        self.cursors = [self.cursors[0]]
+        self.render()
 
     def page_up(self):
         for i in range(int(self.size()[1]/2)):
@@ -375,12 +385,13 @@ class Editor:
             end = line[cursor[0]+1:]
             self.lines[cursor[1]] = start+end
             self.move_x_cursors(cursor[1], cursor[0], -1)
-        self.purge_cursors()
+        self.move_cursors()
 
-    def backspace(self):
-        for cursor in self.cursors:
+    def backspace(self):        
+        curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
+        for cursor in curs: # order?
             if cursor[0] == 0 and cursor[1] == 0:
-                return
+                continue
             if cursor[0] == 0 and cursor[1] != 0:
                 prev_line = self.lines[cursor[1]-1]
                 line = self.lines[cursor[1]]
@@ -401,7 +412,6 @@ class Editor:
                 self.move_x_cursors(cursor[1], cursor[0], -1)
         # Ensure we keep the view scrolled
         self.move_cursors()
-        self.purge_cursors()
 
     def enter(self):
         # We sort the cursors, and loop through them from last to first
@@ -421,16 +431,33 @@ class Editor:
             self.lines[cursor[1]] = start
 
             wspace = self.whitespace(self.lines[cursor[1]])*" "
-            self.parent.msg("wspace:"+str(wspace))
-            #self.parent.msg(start+" - "+end+"->"+str(cursor))
             self.lines.insert(cursor[1]+1, wspace+end)
             self.move_y_cursors(cursor[1], 1)
             cursor[0] = len(wspace)
             cursor[1] += 1
-            #self.move_y_cursors(0, 1)
             self.render()
         self.move_cursors()
 
+    def insert(self):
+        cur = self.cursor()
+        buffer = list(self.buffer)
+        if len(self.buffer) == len(self.cursors):
+            curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
+            for cursor in curs:
+                line = self.lines[cursor[1]]
+                buf = buffer[0]
+                line = line[:cursor[0]]+buf+line[cursor[0]:]
+                self.lines[cursor[1]] = line
+                buffer.pop(0)
+                self.move_x_cursors(cursor[1], cursor[0]-1, len(buf))
+        else:
+            for buf in self.buffer:
+                y = cur[1]
+                if y < 0: y = 0
+                self.lines.insert(y, buf)
+                self.move_y_cursors(cur[1]-1, 1)
+        self.move_cursors()
+            
     def push_up(self):
         used_y = []
         curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
@@ -457,7 +484,7 @@ class Editor:
             self.lines[cursor[1]] = old
             cursor[1] += 1
         self.move_cursors()
-            
+
     def tab(self):
         for i in range(self.tab_width):
             self.type(" ")
@@ -475,14 +502,18 @@ class Editor:
                 self.lines[cursor[1]] = line[self.tab_width:]
 
     def cut(self):
+        buf = []
         for cursor in self.cursors:
             if len(self.lines) == 1:
+                buf.append(self.lines[0])
                 self.lines[0] = ""
                 break
+            buf.append(self.lines[cursor[1]])
             self.lines.pop(cursor[1])
             self.move_y_cursors(cursor[1],-1)
             if cursor[1] > len(self.lines)-1:
                 cursor[1] = len(self.lines)-1
+        self.buffer = buf
         self.move_cursors()
 
     def type(self, letter):
@@ -495,6 +526,64 @@ class Editor:
             cursor[0] += 1
         self.move_cursors()
 
+    def go_to_pos(self, line, col = 0):
+        try:
+            line = abs(int(line)-1)
+        except:
+            pass
+
+        cur = self.cursor()
+        if col != None:
+            cur[0] = col
+        cur[1] = line
+        self.move_cursors()
+
+    def click(self, x, y):
+        x = x - self.line_offset()
+        self.go_to_pos(self.y_scroll+y+1, x)
+
+    def find(self, what, findall = False):
+        self.last_find = what
+        y = 0
+        ncursors = len(self.cursors)
+        cur = []
+        found = False
+        for line in self.lines:
+            indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
+            for i in indices:
+                new = [i, y]
+                if not new in self.cursors:
+                    found = True
+                    cur.append(new)
+                    if not findall:
+                        break
+                if not new in cur:
+                    cur.append(new)
+            if found and not findall: break
+            y += 1
+        if not found:
+            self.parent.status("Can't find '"+what+"'")
+            return
+        self.cursors = cur
+        self.move_cursors()
+
+    def find_next(self):
+        what = self.last_find
+        if what == "":
+            cursor = self.cursor()
+            search = "^([\w\-]+)"
+            line = self.lines[cursor[1]][cursor[0]:]
+            matches = re.match(search, line)
+            if matches == None: return
+            what = matches.group(0)
+            self.last_find = what
+            #self.parent.msg("matches:"+str(matches))
+        self.parent.status("Finding '"+what+"'")
+        self.find(what)
+
+    def find_all(self):
+        self.find(self.last_find, True)
+
     def got_chr(self, char):
         if char == curses.KEY_RIGHT: self.arrow_right()
         elif char == curses.KEY_LEFT: self.arrow_left()
@@ -504,20 +593,20 @@ class Editor:
         elif char == curses.KEY_PPAGE: self.page_down()
 
         elif char == 273: self.toggle_linenums()                 # F9
+        elif char == 331: self.insert()                          # Insert
 
         elif char == 563: self.new_cursor_up()                   # Alt + up
         elif char == 522: self.new_cursor_down()                 # Alt + down
         elif char == 542: self.new_cursor_left()                 # Alt + left
         elif char == 557: self.new_cursor_right()                # Alt + right
+
+        elif char == 4: self.find_next()                         # Ctrl + D
+        elif char == 1: self.find_all()                          # Ctrl + D
         elif char == 24: self.cut()                              # Ctrl + X
-        elif char == 544:           # Ctrl + Left
-            self.jump_left()
-        elif char == 559:            # Ctrl + Right
-            self.jump_right()
-        elif char == 552:            # Ctrl + Page Up
-            self.push_up()
-        elif char == 547:
-            self.push_down()        # Ctrl + Down
+        elif char == 544: self.jump_left()                       # Ctrl + Left
+        elif char == 559: self.jump_right()                      # Ctrl + Right
+        elif char == 552: self.push_up()                         # Ctrl + Page Up
+        elif char == 547: self.push_down()                       # Ctrl + Down
 
         elif char == curses.KEY_HOME: self.home()
         elif char == curses.KEY_END: self.end()
@@ -525,7 +614,7 @@ class Editor:
         elif char == curses.KEY_DC: self.delete()
         elif char == curses.KEY_ENTER: self.enter()
         elif char == 9: self.tab()                              # Tab
-        elif char == 353: self.untab()                            # Shift + Tab
+        elif char == 353: self.untab()                          # Shift + Tab
         elif char == 10: self.enter()                           # Enter
         elif char == 27: self.escape()                          # Escape
         else:
