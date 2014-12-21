@@ -4,7 +4,8 @@ class Config:
     def __init__(self):
         self.filename = "config.txt"
         self.config = {
-            "files":{}
+            "files":{},
+            "tab_width":4
         }
         
     def load(self):

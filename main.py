@@ -48,6 +48,9 @@ Warning: beta software, bugs may occur.
 
 """
 
+
+
+
 class App:
     def __init__(self):
         self.running = 0
@@ -60,7 +63,6 @@ class App:
         #self.config.load()
 
         self.screen = curses.initscr()
-        curses.def_shell_mode()
 
         curses.start_color()
         curses.use_default_colors()
@@ -70,7 +72,7 @@ class App:
 
         curses.cbreak()
         curses.noecho()
-        curses.mousemask(curses.BUTTON1_CLICKED)
+        #curses.mousemask(curses.BUTTON1_CLICKED)
         self.screen.keypad(1)
 
         self.current_yx = self.screen.getmaxyx()
@@ -125,7 +127,9 @@ class App:
         if len(out) >= len(text):
             if out[:len(text)] == text:
                 out = out[len(text):]
-        self.status(out)
+        if out[-1] == " ": out = out[:-1]
+        out = out.rstrip("\r\n")
+        #self.status(out)
         return out
 
     def show_top_status(self):
@@ -143,18 +147,23 @@ class App:
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(self.editor.cursors))+" "+\
             "buf:"+str(len(self.editor.buffer))+" "+\
-            "["+str(size[0])+"x"+str(size[1])+"] "+\
-            "key:"+str(self.last_key)
+            "key:"+str(self.last_key)+" "+\
+            "["+str(size[0])+"x"+str(size[1])+"]"
+
         if self.editor.last_find:
-            data = "find:"+self.editor.last_find+" " + data
+            find = self.editor.last_find
+            if len(find) > 10:find = find[:10]+"..."
+            data = "find:'"+find+"' " + data
 
         self.status_win.clear()
-        if len(data)>self.screen.getmaxyx()[0]:
-            data = data[:self.screen.getmaxyx()[1]-1]
-        status = self.status_msg
 
+        status = self.status_msg
         extra = size[0] - len(status+data)-1
         line = status+(" "*extra)+data
+
+        if len(line)>self.screen.getmaxyx()[0]:
+            line = line[:self.screen.getmaxyx()[1]-1]
+
         self.status_win.addstr(0, 0, line)
         self.status_win.refresh()
 
@@ -208,9 +217,14 @@ class App:
         elif char == 266:           # F2
             self.reload()
             return True
+        #elif char == 51:            # Ctrl + Del
+        # Testing query method. Has problems with undetected trailing whitespace :(
+        # elif char == 7:             # AltGr + Insert
+        #     what = self.query("Echo:")
+        #     self.status("'"+what+"'")
+        #     return True
         elif char == 6:             # Ctrl + F
             what = self.query("Find:")
-            what = what.strip()
             self.editor.find(what)
             return True
         elif char == 7:             # Ctrl + G
@@ -230,14 +244,11 @@ class App:
         return False
         
     def keyboard_interrupt(self):
-        #yes = self.query("Exit?")
-        yes = True
+        yes = self.query("Exit?")
         if yes:
-            curses.reset_shell_mode()
-            curses.endwin()
             self.running = 0
-            sys.exit(1)
             return True
+        return False
 
     def run(self):
         self.load()
@@ -249,17 +260,23 @@ class App:
             self.check_resize()
             try:
                 char = self.screen.getch()
+                self.last_key = char
             except KeyboardInterrupt:
                 if self.keyboard_interrupt():
                     break
+                continue
                 
             if not self.handle_char(char):
                 self.editor.got_chr(char)
-            self.last_key = char
+            #time.sleep(1)
             self.refresh_status()
             self.refresh()
 
         curses.endwin()
 
-a = App()
-a.run()
+def main(*args):
+    a = App()
+    a.run()
+
+if __name__ == "__main__":
+    curses.wrapper(main)

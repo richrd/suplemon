@@ -162,7 +162,7 @@ class Editor:
         self.window.refresh()
 
     def render_cursors(self):
-        max_y = self.size()[1]
+        max_x, max_y = self.size()
         main = self.cursor()
         for cursor in self.cursors:
             x = cursor[0] - self.x_scroll + self.line_offset()
@@ -170,6 +170,7 @@ class Editor:
             if y < 0: continue
             if y >= max_y: break
             if x < self.line_offset(): continue 
+            if x > max_x-1: continue 
             self.window.chgat(y, cursor[0]+self.line_offset()-self.x_scroll, 1, self.cursor_style)
             #if cursor == main:
                 #self.window.addstr(">", curses.color_pair(1))
@@ -179,7 +180,6 @@ class Editor:
         self.window.refresh()
 
     def resize(self, yx = None):
-        self.parent.status("Resize")
         self.move_cursors()
         self.refresh()
 
@@ -208,8 +208,8 @@ class Editor:
             #self.y_scroll -= 1
             self.y_scroll = c[1]
         if c[0]-self.x_scroll+offset > size[0]-1:
-            self.x_scroll = len(self.lines[c[1]])-size[0]+offset+1
-            s#elf.x_scroll = len(self.lines[c[1]])-size[0]+offset
+            #self.x_scroll = len(self.lines[c[1]])-size[0]+offset+1
+            self.x_scroll = len(self.lines[c[1]])-size[0]+offset
         if c[0]-self.x_scroll < 0:
             self.x_scroll -= abs(c[0]-self.x_scroll) # FIXME
         if c[0]-self.x_scroll+offset < offset:
@@ -319,6 +319,12 @@ class Editor:
                     if line[next] in chars:
                         break
         self.move_cursors()   
+
+    def jump_up(self):
+        self.move_cursors((0, -3))
+
+    def jump_down(self):
+        self.move_cursors((0, 3))
 
     def new_cursor_up(self):
         cursor = self.get_first_cursor()
@@ -530,12 +536,14 @@ class Editor:
         try:
             line = abs(int(line)-1)
         except:
-            pass
+            return False
 
         cur = self.cursor()
         if col != None:
             cur[0] = col
         cur[1] = line
+        if cur[1] >= len(self.lines):
+            cur[1] = len(self.lines)-1
         self.move_cursors()
 
     def click(self, x, y):
@@ -549,6 +557,7 @@ class Editor:
         cur = []
         found = False
         for line in self.lines:
+            #indices = find_all_indices(line)
             indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
                 new = [i, y]
@@ -577,8 +586,8 @@ class Editor:
             if matches == None: return
             what = matches.group(0)
             self.last_find = what
-            #self.parent.msg("matches:"+str(matches))
-        self.parent.status("Finding '"+what+"'")
+            #self.parent.status("what:"+str(what))
+        #self.parent.status("Finding '"+what+"'")
         self.find(what)
 
     def find_all(self):
@@ -605,6 +614,8 @@ class Editor:
         elif char == 24: self.cut()                              # Ctrl + X
         elif char == 544: self.jump_left()                       # Ctrl + Left
         elif char == 559: self.jump_right()                      # Ctrl + Right
+        elif char == 565: self.jump_up()                       # Ctrl + Up
+        elif char == 524: self.jump_down()                      # Ctrl + Down
         elif char == 552: self.push_up()                         # Ctrl + Page Up
         elif char == 547: self.push_down()                       # Ctrl + Down
 
