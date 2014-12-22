@@ -19,36 +19,47 @@ Usage: python main.py [filename]
 Warning: beta software, bugs may occur.
 
 # Keyboard shortcuts:
+
  * Alt + Arrow Keys
    > Add new curors in arrow direction
- 
+
+ * Ctrl + Left / Right
+   > Jump to previous or next word
+
  * ESC
    > Revert to a single cursor
-   
+
  * Ctrl + X
-   > Delete line(s)
-   
+   > Cut line(s) to buffer
+
+ * Insert
+   > Insert buffer
+
+ * Ctrl + G
+   > Go to line number
+
  * Ctrl + F
-   > Find text.
-   
+   > Find text
+
  * Ctrl + D
-   > Add a new cursor at the next occurance.
- 
- * F1
-   > Save current file
-   
- * F2
-   > Reload current file
- 
+   > Add a new cursor at the next occurance
+
  * Alt + Page Up
    > Move line(s) up
- 
+
  * Alt + Page Down
    > Move line(s) down
 
+ * F1
+   > Save current file
+
+ * F2
+   > Reload current file
+
+ * F9
+   > Toggle line numbers
+
 """
-
-
 
 
 class App:
@@ -164,7 +175,8 @@ class App:
         if len(line)>self.screen.getmaxyx()[0]:
             line = line[:self.screen.getmaxyx()[1]-1]
 
-        self.status_win.addstr(0, 0, line)
+        #self.status_win.addstr(0, 0, line)
+        self.status_win.addstr(0, 0, line, curses.color_pair(1))
         self.status_win.refresh()
 
     def show_capture_status(self, s=""):
