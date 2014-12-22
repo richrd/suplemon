@@ -5,6 +5,8 @@ import sys
 import time
 import curses
 import curses.textpad
+#import locale
+#locale.setlocale(locale.LC_ALL, "")
 
 from config import *
 from editor import *
@@ -74,20 +76,40 @@ class App:
         #self.config.load()
 
         self.screen = curses.initscr()
-
         curses.start_color()
         curses.use_default_colors()
 
-        curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_WHITE)
-        curses.init_pair(2,curses.COLOR_WHITE, curses.COLOR_BLUE)
-        curses.init_pair(3,curses.COLOR_RED, curses.COLOR_BLUE)
-        curses.init_pair(4,curses.COLOR_WHITE, -1)
+        if curses.can_change_color(): # Can't get these to work :(
+            pass
+            #curses.init_color(curses.COLOR_YELLOW, 1000, 0, 0)
+            #curses.init_color(11, 254, 0, 1000)
         
+        # This only works with: TERM=xterm-256color ./main.py
+        #curses.init_pair(1, curses.COLOR_BLACK, 91) # Black on yellow
 
+        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
+        curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
+        curses.init_pair(4, curses.COLOR_WHITE, -1)
+
+        # Higlight colors:
+        #curses.init_pair(10, curses.COLOR_BLACK, curses.COLOR_BLACK)
+        curses.init_pair(10, -1, -1)
+        curses.init_pair(11, curses.COLOR_BLUE, curses.COLOR_BLACK)
+        curses.init_pair(12, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        curses.init_pair(13, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(14, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+        curses.init_pair(15, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(16, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        curses.init_pair(17, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        
         curses.cbreak()
         curses.noecho()
-        #curses.mousemask(curses.BUTTON1_CLICKED)
+        curses.curs_set(0)
         self.screen.keypad(1)
+        
+        # Mouse mode kills scroll wheel...
+        #curses.mousemask(curses.BUTTON1_CLICKED)
 
         self.current_yx = self.screen.getmaxyx()
         yx = self.screen.getmaxyx()

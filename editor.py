@@ -6,15 +6,17 @@ import sys
 import time
 import curses
 
-#try:
-#    from pygments import highlight
-#    from pygments.lexers import PythonLexer
-#    from pygments.formatters import TerminalFormatter
-#    from pygments.formatters import Terminal256Formatter
-#    from curses_formatter import * 
-#    pygments = True
-#except:
-pygments = False
+try:
+    from pygments import highlight
+    from pygments.lexers import PythonLexer
+    from pygments.formatters import TerminalFormatter
+    from pygments.formatters import Terminal256Formatter
+    from curses_formatter import * 
+    from term_colors import *
+    pygments = True
+except:
+    pygments = False
+
 
 class Line:
     def __init__(self, data):
@@ -39,6 +41,12 @@ class Line:
     def __len__(self):
         return len(self.data)
 
+    def decode(self, enc):
+        return self.data.decode(enc)
+
+    def encode(self, enc):
+        return self.data.encode(enc)
+
     def find(self, what):
         return self.data.find(what)
 
@@ -52,24 +60,29 @@ class Editor:
         self.show_line_ends = False
         self.line_end_char = "<"
         self.last_find = ""
-        self.highlighting = False
+        self.show_highlighting = False
         if pygments != False:
-            #self.highlighting = True
-            self.lexer = PythonLexer()
-            self.term_fmt = CursesFormatter()
-            #self.term_fmt = CursesFormatter(usebg=True, defaultbg=-2, defaultfg = -2)
-            #self.term_fmt = TerminalFormatter()
+            self.setup_highlighting()
         self.y_scroll = 0
         self.x_scroll = 0
         self.cursors = [
             [0,0],
         ]
         self.buffer = []
-        self.cursor_style = curses.A_REVERSE
+        #self.cursor_style = curses.A_REVERSE
+        self.cursor_style = curses.A_UNDERLINE
         #self.selection_style = curses.A_REVERSE # Unused...
 
         self.tab_width = 4
         self.punctuation = ["(", ")", "{", "}", "[", "]", "'", "\"", "=", "+", "-", "/", "*", ".", ":", ",", ";", "_", " "]
+
+    def setup_highlighting(self):
+        return # Incomplete implementation
+        self.show_highlighting = True
+        self.lexer = PythonLexer(encoding = 'utf-8')
+        self.term_fmt = CursesFormatter(encoding = 'utf-8')
+        self.outfile = HighlightFile()
+        self.colors = Colors()
 
     def log(self, s):
         self.parent.log(s)
@@ -111,6 +124,10 @@ class Editor:
         self.show_line_ends = not self.show_line_ends
         self.render()
 
+    def toggle_highlight(self):
+        self.show_highlighting = not self.show_highlighting
+        self.render()
+
     def pad_lnum(self, n):
         s = str(n)
         while len(s) < self.line_offset()-1:
@@ -130,38 +147,52 @@ class Editor:
         for char in line:
             if char != " ":
                 break
-            i+=1
+            i += 1
         return i
 
     def render(self):
-        """
-        TODO
-        - FULL SCREEN X_SCROLL!? ftw
-        - Use line.x_scroll to position line
-        - Remove excess characters
-        - Reposition cursors accordingly
-        """
         self.window.clear()
         max_y = self.size()[1]
         i = 0
         x_offset = self.line_offset()
         max_len = self.max_line_length()
         while i < max_y:
-            lnum = i+self.y_scroll
+            lnum = i + self.y_scroll
             if lnum == len(self.lines): break
+
             line = self.lines[lnum]
-            line_part = line[min(self.x_scroll, len(line)):]
-            if self.show_line_ends:
-                line_part+=self.line_end_char
-            #if len(line_part) >= max_len: line_part = line_part[:max_len-1]
-            if len(line_part) >= max_len: line_part = line_part[:max_len]
+
             if self.show_line_nums:
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
-            #if self.highlighting:
-            #    self.parent.status("Hlighting!...")
-            #    line_part = highlight(line_part, self.lexer, self.term_fmt)
-            self.window.addstr(i, x_offset, line_part)
-            #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" "+line_part, curses.color_pair(2))
+
+            # Higlight rendering
+            if self.show_highlighting:
+                self.outfile.clear()
+
+                highlight(line, self.lexer, self.term_fmt, self.outfile)
+                items = self.outfile.get(self.x_scroll, max_len)
+                part_offset = x_offset
+                for item in items:
+                    text = item[0]
+                    color = self.colors.get(item[1])
+                    self.window.addstr(i, part_offset, text, curses.color_pair(color))
+                    part_offset += len(text)
+                    #if len(s)+part_offset > max_len:
+                    #    s = s[:max_len+part_offset-len(s)-1]
+                    #if part_offset > 20:
+                    #    break
+                #self.window.addstr(i, x_offset, line_part)
+
+            # Normal rendering
+            else:
+                line_part = line[min(self.x_scroll, len(line)):]
+                if self.show_line_ends:
+                    line_part += self.line_end_char
+                if len(line_part) >= max_len:
+                    line_part = line_part[:max_len]
+#                if self.show_line_nums:
+#                    self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
+                self.window.addstr(i, x_offset, line_part)
             i += 1
         self.render_cursors()
         self.window.refresh()
@@ -562,14 +593,11 @@ class Editor:
         self.last_find = what
         ncursors = len(self.cursors)
         last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c[1], c[0]))))[-1]
-        #y = 0
         y = last_cursor[1]
         cur = []
         found = False
-        #for line in self.lines:
         while y < len(self.lines):
             line = self.lines[y]
-            #indices = find_all_indices(line)
             indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
                 new = [i, y]
@@ -613,8 +641,9 @@ class Editor:
         elif char == curses.KEY_NPAGE: self.page_up()
         elif char == curses.KEY_PPAGE: self.page_down()
 
-        elif char == 273: self.toggle_line_nums()                 # F9
-        elif char == 274: self.toggle_line_ends()                 # F10
+        elif char == 273: self.toggle_line_nums()                # F9
+        elif char == 274: self.toggle_line_ends()                # F10
+        elif char == 275: self.toggle_highlight()                # F11
         elif char == 331: self.insert()                          # Insert
 
         elif char == 563: self.new_cursor_up()                   # Alt + up
