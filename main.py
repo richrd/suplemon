@@ -148,6 +148,7 @@ class App:
             self.resize(yx)
 
     def refresh(self):
+        self.editor.render()
         self.screen.refresh()
 
     def status(self, s):
@@ -169,11 +170,14 @@ class App:
         return out
 
     def show_top_status(self):
+        size = self.editor.size()
         self.header_win.clear()
         head = "Suplemon Editor v0.1 - "+curr_time()
         if self.filename != None:
             head += " - "+self.filename
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
+        if len(head) >= size[0]:
+            head = head[:size[0]-1]
         self.header_win.addstr(0,0, head, curses.color_pair(1))
         self.header_win.refresh()
 
