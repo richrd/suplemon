@@ -191,7 +191,7 @@ class Editor:
     def move_y_scroll(self, delta):
         self.y_scroll += delta
 
-    def move_cursors(self, delta=None):
+    def move_cursors(self, delta=None, noupdate=False):
         if delta != None:
             for cursor in self.cursors:
                 if delta[0] != 0 and cursor[0] >= 0:
@@ -219,7 +219,8 @@ class Editor:
             self.x_scroll -= abs(c[0]-self.x_scroll) # FIXME
         if c[0]-self.x_scroll+offset < offset:
             self.x_scroll -= 1
-        self.purge_cursors()
+        if not noupdate:
+            self.purge_cursors()
 
     def move_x_cursors(self, line, col, delta):
         for cursor in self.cursors:
@@ -369,11 +370,13 @@ class Editor:
 
     def page_up(self):
         for i in range(int(self.size()[1]/2)):
-            self.move_cursors((0 ,1))
+            self.move_cursors((0 ,1), noupdate = True)
+        self.move_cursors()
 
     def page_down(self):
         for i in range(int(self.size()[1]/2)):
-            self.move_cursors((0, -1))
+            self.move_cursors((0, -1), noupdate = True)
+        self.move_cursors()
 
     def home(self):
         for cursor in self.cursors:
