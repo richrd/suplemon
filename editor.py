@@ -77,7 +77,7 @@ class Editor:
         self.punctuation = ["(", ")", "{", "}", "[", "]", "'", "\"", "=", "+", "-", "/", "*", ".", ":", ",", ";", "_", " "]
 
     def setup_highlighting(self):
-        #return # Incomplete implementation
+        return # Incomplete implementation
         self.show_highlighting = True
         self.lexer = PythonLexer(encoding = 'utf-8')
         self.term_fmt = CursesFormatter(encoding = 'utf-8')
