@@ -77,9 +77,12 @@ class App:
 
         curses.start_color()
         curses.use_default_colors()
+
         curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(2,curses.COLOR_WHITE, curses.COLOR_BLUE)
         curses.init_pair(3,curses.COLOR_RED, curses.COLOR_BLUE)
+        curses.init_pair(4,curses.COLOR_WHITE, -1)
+        
 
         curses.cbreak()
         curses.noecho()
@@ -138,7 +141,7 @@ class App:
         if len(out) >= len(text):
             if out[:len(text)] == text:
                 out = out[len(text):]
-        if out[-1] == " ": out = out[:-1]
+        if len(out) > 0 and out[-1] == " ": out = out[:-1]
         out = out.rstrip("\r\n")
         #self.status(out)
         return out
@@ -181,10 +184,11 @@ class App:
 
     def show_capture_status(self, s=""):
         self.status_win.clear()
-        self.status_win.addstr(0, 0, s)
+        self.status_win.addstr(0, 0, s, curses.color_pair(1))
         self.status_win.refresh()
 
     def refresh_status(self):
+        
         self.show_top_status()
         if self.capturing:
             self.show_capture_status()
@@ -213,7 +217,8 @@ class App:
 
     def save(self):
         data = self.editor.get_data()
-        f = open("#"+self.filename+"."+str(time.time()), "w")
+        # Safety save
+        f = open(".#"+self.filename+"."+str(time.time()), "w")
         f.write(data)
         f.close()
         

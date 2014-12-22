@@ -6,19 +6,15 @@ import sys
 import time
 import curses
 
-# try:
-# from pygments import highlight
-# from pygments.lexers import PythonLexer
-# from pygments.formatters import TerminalFormatter
-# from pygments.formatters import Terminal256Formatter
-# from formatter import *
-
-# from cursesextras import safescreen, log
-# from cursespygments import CursesFormatter
-
-# pygments = True
-# except:
-#     pygments = False
+#try:
+#    from pygments import highlight
+#    from pygments.lexers import PythonLexer
+#    from pygments.formatters import TerminalFormatter
+#    from pygments.formatters import Terminal256Formatter
+#    from curses_formatter import * 
+#    pygments = True
+#except:
+pygments = False
 
 class Line:
     def __init__(self, data):
@@ -52,13 +48,15 @@ class Editor:
         self.window = window
         self.data = ""
         self.lines = [""]
-        self.show_linenums = True
+        self.show_line_nums = True
+        self.show_line_ends = False
+        self.line_end_char = "<"
         self.last_find = ""
         self.highlighting = False
-        #if pygments != False:
+        if pygments != False:
             #self.highlighting = True
-            #self.lexer = PythonLexer()
-            #self.term_fmt = BPythonFormatter()
+            self.lexer = PythonLexer()
+            self.term_fmt = CursesFormatter()
             #self.term_fmt = CursesFormatter(usebg=True, defaultbg=-2, defaultfg = -2)
             #self.term_fmt = TerminalFormatter()
         self.y_scroll = 0
@@ -105,8 +103,12 @@ class Editor:
         """Return the main cursor."""
         return self.cursors[0]
 
-    def toggle_linenums(self):
-        self.show_linenums = not self.show_linenums
+    def toggle_line_nums(self):
+        self.show_line_nums = not self.show_line_nums
+        self.render()
+
+    def toggle_line_ends(self):
+        self.show_line_ends = not self.show_line_ends
         self.render()
 
     def pad_lnum(self, n):
@@ -119,7 +121,7 @@ class Editor:
         return self.size()[0]-self.line_offset()
 
     def line_offset(self):
-        if not self.show_linenums:
+        if not self.show_line_nums:
             return 0
         return len(str(len(self.lines)))+1
 
@@ -149,9 +151,12 @@ class Editor:
             if lnum == len(self.lines): break
             line = self.lines[lnum]
             line_part = line[min(self.x_scroll, len(line)):]
-            if len(line_part) >= max_len: line_part = line_part[:max_len-1]
-            if self.show_linenums:
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(2))
+            if self.show_line_ends:
+                line_part+=self.line_end_char
+            #if len(line_part) >= max_len: line_part = line_part[:max_len-1]
+            if len(line_part) >= max_len: line_part = line_part[:max_len]
+            if self.show_line_nums:
+                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
             #if self.highlighting:
             #    self.parent.status("Hlighting!...")
             #    line_part = highlight(line_part, self.lexer, self.term_fmt)
@@ -552,11 +557,15 @@ class Editor:
 
     def find(self, what, findall = False):
         self.last_find = what
-        y = 0
         ncursors = len(self.cursors)
+        last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c[1], c[0]))))[-1]
+        #y = 0
+        y = last_cursor[1]
         cur = []
         found = False
-        for line in self.lines:
+        #for line in self.lines:
+        while y < len(self.lines):
+            line = self.lines[y]
             #indices = find_all_indices(line)
             indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
@@ -601,7 +610,8 @@ class Editor:
         elif char == curses.KEY_NPAGE: self.page_up()
         elif char == curses.KEY_PPAGE: self.page_down()
 
-        elif char == 273: self.toggle_linenums()                 # F9
+        elif char == 273: self.toggle_line_nums()                 # F9
+        elif char == 274: self.toggle_line_ends()                 # F10
         elif char == 331: self.insert()                          # Insert
 
         elif char == 563: self.new_cursor_up()                   # Alt + up
