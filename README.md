@@ -78,6 +78,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
    
 # To-Do
  * [ ] Nano-like menu and keyboard shortcuts with legend
+ * [ ] Undo / Redo
  * [X] Copy / Paste buffer
  * [X] Proper status bar information
  * [X] Jump to end of whitespace with home key 
