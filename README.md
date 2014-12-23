@@ -29,8 +29,8 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * Proper multi cursor editing, Sublime Text style. Blessed!
  * Copy & Paste, with multi line support
  * Find and Find next
+ * Multiple files
  * Comming later:
-     * Multiple files
      * Selections
      * Extensions
 
@@ -74,17 +74,25 @@ Command line text editor with multicursor support. The goal is to replicate subl
    
  * F9
    > Toggle line numbers
+ 
+ * Ctrl + Page Up
+   > Switch to next file
+ 
+ * Ctrl + Page Down
+   > Switch to previous file
    
    
-# To-Do
+# Todo
  * [ ] Nano-like menu and keyboard shortcuts with legend
  * [ ] Undo / Redo
+ * [ ] Auto complete
+ * [ ] Show if file is edited
  * [X] Copy / Paste buffer
  * [X] Proper status bar information
  * [X] Jump to end of whitespace with home key 
  * [X] Command line for getting input
  * [X] Line number toggling
- * [ ] Loading multiple files and switching between them
+ * [X] Loading multiple files and switching between them
  * [ ] Config and storing open cursor positions for restoring later
  * [ ] Syntax higlighting
  * [ ] Editor plugins
@@ -94,7 +102,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Fixed: Find starts at top of file instead of current cursor
  * [ ] Delete key when cursor at line end
  * [ ] Add 'remove previous cursor' function
- * [ ] Make editor white color brighter (not gray)
+ * [X] Make editor white color brighter (not gray)
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  
  

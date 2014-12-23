@@ -91,8 +91,9 @@ class Editor:
         if data:
             self.set_data(data)
             self.cursors = [ [0,0] ]
-        self.render()
-        self.refresh()
+            self.move_cursors()
+        #self.render()
+        #self.refresh()
 
     def set_data(self, data):
         self.data = data
@@ -135,7 +136,8 @@ class Editor:
         return s
 
     def max_line_length(self):
-        return self.size()[0]-self.line_offset()
+        return self.size()[0]-self.line_offset()-1
+
 
     def line_offset(self):
         if not self.show_line_nums:
@@ -216,6 +218,7 @@ class Editor:
         self.window.refresh()
 
     def resize(self, yx = None):
+        self.window.resize(yx[0], yx[1])
         self.move_cursors()
         self.refresh()
 
