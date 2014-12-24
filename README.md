@@ -83,17 +83,19 @@ Command line text editor with multicursor support. The goal is to replicate subl
    
    
 # Todo
+ * [ ] Close files one at a time with 'save?' promt
  * [ ] Nano-like menu and keyboard shortcuts with legend
  * [ ] Undo / Redo
  * [ ] Auto complete
- * [ ] Show if file is edited
+ * [X] Show if file is edited
  * [X] Copy / Paste buffer
  * [X] Proper status bar information
  * [X] Jump to end of whitespace with home key 
  * [X] Command line for getting input
  * [X] Line number toggling
  * [X] Loading multiple files and switching between them
- * [ ] Config and storing open cursor positions for restoring later
+ * [ ] Live config reloading when it's modified
+ * [ ] Storing files and cursor positions for restoring later
  * [ ] Syntax higlighting
  * [ ] Editor plugins
  * ...
@@ -104,6 +106,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Add 'remove previous cursor' function
  * [X] Make editor white color brighter (not gray)
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
- 
+ * [ ] Show editor at top of terminal when show_top_bar == False 
  
  

@@ -1,37 +1,43 @@
 import json
 
 class Config:
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.filename = "config.json"
         self.defaults = {
-            "files":{},
-            "tab_width":4,
+            "files": {},
+            "editor": {
+                "tab_width": 4,
+                "cursor": "reverse",
+            },
             "display": {
                 "show_top_bar": True,
                 "show_bottom_bar": True,
                 "show_line_nums": True,
                 "show_highlighting": False,
+                "show_clock": True
             },
         }
 
         self.config = dict(self.defaults)
 
     def log(self, s):
+        self.parent.logger.log(s)
         # FIXME: Pipe logging to app instance
         pass
 
     def load(self):
-        try:
+        #try:
             f = open(self.filename)
             data = f.read()
             f.close()
-            self.config = eval(data)
-        except:
-            self.log("Failed to load config file!")
-            pass
+            self.config = json.loads(data)
+        #except:
+        #    self.log("Failed to load config file!")
+        #    pass
         
     def store(self):
-        data = str(self.config)
+        data = json.dumps(self.config)
         f = open(self.filename)
         f.write(data)
         f.close()

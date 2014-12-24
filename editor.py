@@ -50,6 +50,23 @@ class Line:
     def find(self, what):
         return self.data.find(what)
 
+class Cursor:
+    def __init__(self,x=0,y=0):
+        self.x = x
+        self.y = y
+        
+    def __getitem__(self, i):
+        if i == 0:
+            return self.x
+        elif i == 1:
+            return self.y
+
+    def __setitem__(self, i, v):
+        if i == 0:
+            self.x = v
+        elif i == 1:
+            self.y = v
+
 class Editor:
     def __init__(self, parent, window):
         self.parent = parent
@@ -65,11 +82,11 @@ class Editor:
             self.setup_highlighting()
         self.y_scroll = 0
         self.x_scroll = 0
-        self.cursors = [
-            [0,0],
-        ]
+        #self.cursors = [
+        #    [0,0],
+        #]
+        self.cursors = [Cursor()]
         self.buffer = []
-        #self.cursor_style = curses.A_REVERSE
         self.cursor_style = curses.A_UNDERLINE
         #self.selection_style = curses.A_REVERSE # Unused...
 
@@ -105,6 +122,15 @@ class Editor:
     def set_tab_width(self, w):
         self.tab_width = w
 
+    def set_cursor(self, cursor):
+        if cursor == "underline":
+            self.cursor_style = curses.A_UNDERLINE
+        elif cursor == "reverse":
+            self.cursor_style = curses.A_REVERSE
+        else:
+            return False
+        return True
+
     def get_data(self):
         data = "\n".join(map(str,self.lines))
         return data
@@ -137,7 +163,6 @@ class Editor:
 
     def max_line_length(self):
         return self.size()[0]-self.line_offset()-1
-
 
     def line_offset(self):
         if not self.show_line_nums:
@@ -192,8 +217,6 @@ class Editor:
                     line_part += self.line_end_char
                 if len(line_part) >= max_len:
                     line_part = line_part[:max_len]
-#                if self.show_line_nums:
-#                    self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
                 self.window.addstr(i, x_offset, line_part)
             i += 1
         self.render_cursors()
@@ -369,14 +392,14 @@ class Editor:
     def new_cursor_up(self):
         cursor = self.get_first_cursor()
         if cursor[1] == 0: return
-        new = [cursor[0], cursor[1]-1]
+        new = Cursor(cursor[0], cursor[1]-1)
         self.cursors.append(new)
         self.move_cursors()
 
     def new_cursor_down(self):
         cursor = self.get_last_cursor()
         if cursor[1] == len(self.lines)-1: return
-        new = [cursor[0], cursor[1]+1]
+        new = Cursor(cursor[0], cursor[1]+1)
         self.cursors.append(new)
         self.move_cursors()
 
@@ -384,7 +407,7 @@ class Editor:
         new = []
         for cursor in self.cursors:
             if cursor[0] == 0: continue
-            new.append( [cursor[0]-1, cursor[1]] )
+            new.append( Cursor(cursor[0]-1, cursor[1]) )
         for c in new:
             self.cursors.append(c)
         self.move_cursors()
@@ -393,7 +416,7 @@ class Editor:
         new = []
         for cursor in self.cursors:
             if cursor[0]+1 > len(self.lines[cursor[1]]): continue
-            new.append( [cursor[0]+1, cursor[1]] )
+            new.append( Cursor(cursor[0]+1, cursor[1]) )
         for c in new:
             self.cursors.append(c)
         self.move_cursors()
@@ -637,42 +660,42 @@ class Editor:
         self.find(self.last_find, True)
 
     def got_chr(self, char):
-        if char == curses.KEY_RIGHT: self.arrow_right()
-        elif char == curses.KEY_LEFT: self.arrow_left()
-        elif char == curses.KEY_UP: self.arrow_up()
-        elif char == curses.KEY_DOWN: self.arrow_down()
-        elif char == curses.KEY_NPAGE: self.page_up()
-        elif char == curses.KEY_PPAGE: self.page_down()
+        if char == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
+        elif char == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
+        elif char == curses.KEY_UP: self.arrow_up()            # Arrow Up
+        elif char == curses.KEY_DOWN: self.arrow_down()        # Arrow Down
+        elif char == curses.KEY_NPAGE: self.page_up()          # Page Up    
+        elif char == curses.KEY_PPAGE: self.page_down()        # Page Down
 
-        elif char == 273: self.toggle_line_nums()                # F9
-        elif char == 274: self.toggle_line_ends()                # F10
-        elif char == 275: self.toggle_highlight()                # F11
-        elif char == 331: self.insert()                          # Insert
+        elif char == 273: self.toggle_line_nums()              # F9
+        elif char == 274: self.toggle_line_ends()              # F10
+        elif char == 275: self.toggle_highlight()              # F11
+        elif char == 331: self.insert()                        # Insert
 
-        elif char == 563: self.new_cursor_up()                   # Alt + up
-        elif char == 522: self.new_cursor_down()                 # Alt + down
-        elif char == 542: self.new_cursor_left()                 # Alt + left
-        elif char == 557: self.new_cursor_right()                # Alt + right
+        elif char == 563: self.new_cursor_up()                 # Alt + up
+        elif char == 522: self.new_cursor_down()               # Alt + down
+        elif char == 542: self.new_cursor_left()               # Alt + left
+        elif char == 557: self.new_cursor_right()              # Alt + right
 
-        elif char == 4: self.find_next()                         # Ctrl + D
-        elif char == 1: self.find_all()                          # Ctrl + D
-        elif char == 24: self.cut()                              # Ctrl + X
-        elif char == 544: self.jump_left()                       # Ctrl + Left
-        elif char == 559: self.jump_right()                      # Ctrl + Right
+        elif char == 4: self.find_next()                       # Ctrl + D
+        elif char == 1: self.find_all()                        # Ctrl + D
+        elif char == 24: self.cut()                            # Ctrl + X
+        elif char == 544: self.jump_left()                     # Ctrl + Left
+        elif char == 559: self.jump_right()                    # Ctrl + Right
         elif char == 565: self.jump_up()                       # Ctrl + Up
-        elif char == 524: self.jump_down()                      # Ctrl + Down
-        elif char == 552: self.push_up()                         # Ctrl + Page Up
-        elif char == 547: self.push_down()                       # Ctrl + Down
+        elif char == 524: self.jump_down()                     # Ctrl + Down
+        elif char == 552: self.push_up()                       # Ctrl + Page Up
+        elif char == 547: self.push_down()                     # Ctrl + Down
 
-        elif char == curses.KEY_HOME: self.home()
-        elif char == curses.KEY_END: self.end()
-        elif char == curses.KEY_BACKSPACE: self.backspace()
-        elif char == curses.KEY_DC: self.delete()
-        elif char == curses.KEY_ENTER: self.enter()
-        elif char == 9: self.tab()                              # Tab
-        elif char == 353: self.untab()                          # Shift + Tab
-        elif char == 10: self.enter()                           # Enter
-        elif char == 27: self.escape()                          # Escape
+        elif char == curses.KEY_HOME: self.home()              # Home
+        elif char == curses.KEY_END: self.end()                # End
+        elif char == curses.KEY_BACKSPACE: self.backspace()    # Backspace
+        elif char == curses.KEY_DC: self.delete()              # Delete
+        elif char == curses.KEY_ENTER: self.enter()            # Enter
+        elif char == 9: self.tab()                             # Tab
+        elif char == 353: self.untab()                         # Shift + Tab
+        elif char == 10: self.enter()                          # Enter
+        elif char == 27: self.escape()                         # Escape
         else:
             try:
                 letter = chr(char)
