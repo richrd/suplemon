@@ -68,27 +68,66 @@ class File:
         self.path = ""
         self.data = ""
         self.last_save = None
-        self.opened = None
+        self.opened = time.time()
         self.editor = None
-        
-    def save(self):
-        # FIXME: Do writing to file here, and return success flag
-        data = self.editor.get_data()
+
+    def _path(self):
+        return os.path.join(self.path, self.name)
+
+    def log(self, s):
+        app.logger.log(s)
+
+    def set_data(self, data):
         self.data = data
-        return True
+        if self.editor:
+            self.editor.set_data(data)
         
-    def reload(self):
-        f = open(self.name)
-        data = f.read()
-        f.close()
+    def set_path(self, path):
+        ab = os.path.abspath(path)
+        self.path, self.name = os.path.split(ab)
+        
+    def set_editor(self, editor):
+        self.editor = editor
+
+    def set_saved(self, m):
+         self.last_save = time.time()
+
+    def save(self):
+        self.log("Saving: "+self._path())
+        path = self._path()
+        data = self.editor.get_data()
+        try:
+            f = open(self._path())
+            f.write(data)
+            f.close()
+        except:
+            return False
+        self.data = data
+        self.last_save = time.time()
+        return True
+
+    def load(self):
+        self.log("loading: "+self._path())
+        path = self._path()
+        try:
+            f = open(self._path())
+            data = f.read()
+            f.close()
+        except:
+            return False
         self.data = data
         self.editor.set_data(data)
+        return True
+
+    def reload(self):
+        return self.load()
         
     def is_changed(self):
         return self.editor.get_data() != self.data
 
 class App:
     def __init__(self):
+        self.inited = 0
         self.running = 0
         self.last_key = None
         self.status_msg = ""
@@ -152,8 +191,11 @@ class App:
         self.editor_win = curses.newwin(yx[0]-y_sub, yx[1], y_start, 0)
         self.status_win = curses.newwin(1, yx[1], yx[0]-y_sub+1, 0)
 
+        self.inited = 1 # Indicate that windows etc. have been created.
+        
     def log(self, s):
         self.logger.log(s)
+        self.parent.status(s)
 
     def size(self):
         y, x = self.screen.getmaxyx()
@@ -177,9 +219,6 @@ class App:
         self.editor().resize( (yx[0]-y_sub, yx[1]) )
         self.status_win = curses.newwin(1, yx[1], yx[0]-y_sub+1, 0)
         self.screen.refresh()
-        
-        #self.header_win = curses.newwin(1, yx[1], 0, 0)
-        ##self.status_win = curses.newwin(1, yx[1]-y_sub+2, yx[0]-1, 0)
 
     def check_resize(self):
         yx = self.screen.getmaxyx()
@@ -219,7 +258,7 @@ class App:
 
         # If input begins with prompt, remove the prompt text
         if len(out) >= len(text):
-            if out[:len(text)] == text:
+           if out[:len(text)] == text:
                 out = out[len(text):]
         if len(out) > 0 and out[-1] == " ": out = out[:-1]
         out = out.rstrip("\r\n")
@@ -296,6 +335,7 @@ class App:
         self.status_win.refresh()
 
     def refresh_status(self):
+        if not self.inited: return False
         if self.config["display"]["show_top_bar"]:
             self.show_top_status()
         if self.capturing:
@@ -311,20 +351,14 @@ class App:
         if not self.open_file(name):
             self.status("Failed to load '"+name+"'")
 
-    def open_file(self, filename):
-        # TODO: Get path,name from filename
-        result = self.read_file(filename)
-        if not result:
-            return False
+    def open_file(self, filename, new = False):
+        result = ""
         file = File()
-        file.name = filename
-        file.data = result
-        file.editor = self.new_editor()
-        file.editor.set_data(result)
-        file.opened = time.time()        
+        file.set_path(filename)
+        file.set_editor(self.new_editor())
+        loaded = file.load()
         self.files.append(file)
-        self.refresh()
-        return True
+        return loaded
 
     def read_file(self, filename):
         try:
@@ -336,41 +370,31 @@ class App:
             return False
 
     def load(self):
-        loaded = False
+        loaded = True
         if len(sys.argv) > 1:
             names = sys.argv[1:]
             for name in names:
                 if self.open_file(name):
                     loaded = True
-        if not loaded:
+        else:
             self.load_default()
         
     def save(self):
         fi = self.file()
-        data = fi.editor.get_data()        
-        f = open(fi.name, "w")
-        f.write(data)
-        f.close()
-        fi.save()
-        self.status("Saved '" + fi.name + "'")
-        # Safety save
-        #f = open(".#"+self.filename+"."+str(time.time()), "w")
-        #f.write(data)
-        #f.close()
+        if fi.save():
+            self.status("Saved '" + fi.name + "'")
+            return True
+        self.status("Couldn't write to '" + fi.name + "'")
+        return False
 
     def load_default(self):
         file = self.default_file()
         self.files.append(file)
-        #self.render()
 
     def default_file(self):
         file = File()
-        file.opened = time.time()
-        file.editor = self.new_editor()
-        file.data = quick_help
-        file.path = ""
-        file.name = ""
-        file.editor.set_data(quick_help)
+        file.set_editor(self.new_editor())
+        file.set_data(quick_help)
         return file
 
     def reload(self):
@@ -403,9 +427,12 @@ class App:
             cur = len(self.files)-1
         self.switch_to_file(cur)
 
+    def last_file(self):
+        cur = len(self.files)-1
+        self.switch_to_file(cur)
+
     def handle_char(self, char):
         editor = self.editor()
-        #if char == 265 or char == 15: # F1 / Ctrl + O
         if char == 265: # F1
             self.save()
             return True
@@ -417,8 +444,6 @@ class App:
             self.config["display"]["show_bottom_bar"] = not self.config["display"]["show_bottom_bar"]
             self.resize()
             self.refresh()
-        #elif char == 51:            # Ctrl + Del
-        # Testing query method. Has problems with undetected trailing whitespace :(
         elif char == 12:
             # TODO: Replace this with command modules
             data = self.query("Eval:")
@@ -429,10 +454,6 @@ class App:
                 res = "[ERROR]"
             self.status(res)
             return True
-        #elif char == 7:             # AltGr + Insert
-         #   what = self.query("Echo:")
-         #   self.status("'"+what+"'")
-         #   return True
         elif char == 6:             # Ctrl + F
             what = self.query("Find:")
             if what != -1:

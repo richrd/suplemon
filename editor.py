@@ -17,7 +17,6 @@ try:
 except:
     pygments = False
 
-
 class Line:
     def __init__(self, data):
         self.data = data
@@ -41,17 +40,17 @@ class Line:
     def __len__(self):
         return len(self.data)
 
-    def decode(self, enc):
-        return self.data.decode(enc)
+    #def decode(self, enc):
+    #    return self.data.decode(enc)
 
-    def encode(self, enc):
-        return self.data.encode(enc)
+    #def encode(self, enc):
+    #    return self.data.encode(enc)
 
     def find(self, what):
         return self.data.find(what)
 
 class Cursor:
-    def __init__(self,x=0,y=0):
+    def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
         
@@ -66,6 +65,21 @@ class Cursor:
             self.x = v
         elif i == 1:
             self.y = v
+
+    def __eq__(self, item):
+        if isinstance(item, Cursor):
+            if item.x == self.x and item.y == self.x:
+                return True
+        return False
+
+    def __ne__(self, item):
+        if isinstance(item, Cursor):
+            if item.x != self.x and item.y != self.x:
+                return False
+
+    def tuple(self):
+        return (self.x, self.y)
+
 
 class Editor:
     def __init__(self, parent, window):
@@ -82,9 +96,6 @@ class Editor:
             self.setup_highlighting()
         self.y_scroll = 0
         self.x_scroll = 0
-        #self.cursors = [
-        #    [0,0],
-        #]
         self.cursors = [Cursor()]
         self.buffer = []
         self.cursor_style = curses.A_UNDERLINE
@@ -107,10 +118,8 @@ class Editor:
     def load(self, data=None):
         if data:
             self.set_data(data)
-            self.cursors = [ [0,0] ]
+            self.cursors = [ Cursor() ]
             self.move_cursors()
-        #self.render()
-        #self.refresh()
 
     def set_data(self, data):
         self.data = data
@@ -226,13 +235,14 @@ class Editor:
         max_x, max_y = self.size()
         main = self.cursor()
         for cursor in self.cursors:
-            x = cursor[0] - self.x_scroll + self.line_offset()
-            y = cursor[1] - self.y_scroll
+            x = cursor.x - self.x_scroll + self.line_offset()
+            y = cursor.y - self.y_scroll
             if y < 0: continue
             if y >= max_y: break
             if x < self.line_offset(): continue 
             if x > max_x-1: continue 
-            self.window.chgat(y, cursor[0]+self.line_offset()-self.x_scroll, 1, self.cursor_style)
+            self.window.chgat(y, cursor.x+self.line_offset()-self.x_scroll, 1, self.cursor_style)
+            # Modify main cursor?
             #if cursor == main:
                 #self.window.addstr(">", curses.color_pair(1))
                 #self.window.chgat(y, cursor[0]+3, 1, self.cursor_style)
@@ -251,45 +261,43 @@ class Editor:
     def move_cursors(self, delta=None, noupdate=False):
         if delta != None:
             for cursor in self.cursors:
-                if delta[0] != 0 and cursor[0] >= 0:
-                    cursor[0] += delta[0]
-                if delta[1] != 0 and cursor[1] >= 0:
-                    cursor[1] += delta[1]
+                if delta[0] != 0 and cursor.x >= 0:
+                    cursor.x += delta[0]
+                if delta[1] != 0 and cursor.y >= 0:
+                    cursor.y += delta[1]
 
-                if cursor[0] < 0: cursor[0] = 0
-                if cursor[1] < 0: cursor[1] = 0
-                if cursor[1] >= len(self.lines)-1: cursor[1] = len(self.lines)-1
-                if cursor[0] >= len(self.lines[cursor[1]]): cursor[0] = len(self.lines[cursor[1]])
+                if cursor.x < 0: cursor.x = 0
+                if cursor.y < 0: cursor.y = 0
+                if cursor.y >= len(self.lines)-1: cursor.y = len(self.lines)-1
+                if cursor.x >= len(self.lines[cursor.y]): cursor.x = len(self.lines[cursor.y])
 
-        c = self.cursor()
+        cur = self.cursor() # Main cursor
         size = self.size()
         offset = self.line_offset()
-        if c[1]-self.y_scroll >= size[1]:
-            self.y_scroll = c[1]-size[1]+1
-        elif c[1]-self.y_scroll < 0:
-            #self.y_scroll -= 1
-            self.y_scroll = c[1]
-        if c[0]-self.x_scroll+offset > size[0]-1:
-            #self.x_scroll = len(self.lines[c[1]])-size[0]+offset+1
-            self.x_scroll = len(self.lines[c[1]])-size[0]+offset
-        if c[0]-self.x_scroll < 0:
-            self.x_scroll -= abs(c[0]-self.x_scroll) # FIXME
-        if c[0]-self.x_scroll+offset < offset:
+        if cur.y - self.y_scroll >= size[1]:
+            self.y_scroll = cur.y - size[1]+1
+        elif cur.y - self.y_scroll < 0:
+            self.y_scroll = cur.y
+        if cur.x - self.x_scroll+offset > size[0] - 1:
+            self.x_scroll = len(self.lines[cur.y]) - size[0]+offset
+        if cur.x - self.x_scroll < 0:
+            self.x_scroll  -= abs(cur.x - self.x_scroll) # FIXME
+        if cur.x - self.x_scroll+offset < offset:
             self.x_scroll -= 1
         if not noupdate:
             self.purge_cursors()
 
     def move_x_cursors(self, line, col, delta):
         for cursor in self.cursors:
-            if cursor[1] == line:
-                if cursor[0] > col:
-                    cursor[0] += delta
+            if cursor.y == line:
+                if cursor.x > col:
+                    cursor.x += delta
 
     def move_y_cursors(self, line, delta, exclude = None):
         for cursor in self.cursors:
             if cursor == exclude: continue
-            if cursor[1] > line:
-                    cursor[1] += delta
+            if cursor.y > line:
+                    cursor.y += delta
 
     def get_first_cursor(self):
         highest = None
@@ -301,14 +309,21 @@ class Editor:
     def get_last_cursor(self):
         lowest = None
         for cursor in self.cursors:
-            if lowest == None or cursor[1] > lowest[1]:
+            if lowest == None or cursor.y > lowest[1]:
                 lowest = cursor
         return lowest
 
+    def cursor_exists(self, cursor):
+        return cursor.tuple() in [cursor.tuple() for cursor in self.cursors]
+
     def purge_cursors(self):
         new = []
+        # This sucks: can't use "in" for different instances (?)
+        # Use a reference list instead. FIXME: use a generator
+        ref = []
         for cursor in self.cursors:
-            if not cursor in new:
+            if not cursor.tuple() in ref:
+                ref.append( cursor.tuple() )
                 new.append(cursor)
         self.cursors = new
         self.render()
@@ -316,18 +331,18 @@ class Editor:
 
     def arrow_right(self):
         for cursor in self.cursors:
-            if cursor[1] != len(self.lines)-1 and cursor[0] == len(self.lines[cursor[1]]):
-                cursor[1] += 1
-                cursor[0] = 0
+            if cursor.y != len(self.lines)-1 and cursor[0] == len(self.lines[cursor.y]):
+                cursor.y += 1
+                cursor.x = 0
             else:
-                cursor[0] += 1
+                cursor.x += 1
         self.move_cursors()
 
     def arrow_left(self):
         for cursor in self.cursors:
-            if cursor[1] != 0 and cursor[0] == 0:
-                cursor[1]-=1
-                cursor[0] = len(self.lines[cursor[1]])+1
+            if cursor.y != 0 and cursor.x == 0:
+                cursor.y-=1
+                cursor.x = len(self.lines[cursor.y])+1
         self.move_cursors((-1 ,0))
 
     def arrow_up(self):
@@ -339,46 +354,42 @@ class Editor:
     def jump_left(self):
         chars = self.punctuation
         for cursor in self.cursors:
-            line = self.lines[cursor[1]]
-            if cursor[0] == 0:
+            line = self.lines[cursor.y]
+            if cursor.x == 0:
                 continue
-            if cursor[0] <= len(line):
-                cur_chr = line[cursor[0]-1]
+            if cursor.x <= len(line):
+                cur_chr = line[cursor.x-1]
             else:
-                cur_chr = line[cursor[0]]
-            while cursor[0] > 0:
-                next = cursor[0]-2
+                cur_chr = line[cursor.x]
+            while cursor.x > 0:
+                next = cursor.x-2
                 if next < 0: next = 0
                 if cur_chr == " ":
-                    cursor[0] -= 1
+                    cursor.x -= 1
                     if line[next] != " ":
                         break
                 else:
-                    cursor[0] -= 1
+                    cursor.x -= 1
                     if line[next] in chars:
                         break
-                    #self.move_cursors()
-                    #self.parent.status("next:"+line[next]+" cur:"+cur_chr)
-                    #self.render()
-                    #time.sleep(.5)
         self.move_cursors()
     
     def jump_right(self):
         chars = self.punctuation
         for cursor in self.cursors:
-            line = self.lines[cursor[1]]
-            if cursor[0] == len(line):
+            line = self.lines[cursor.y]
+            if cursor.x == len(line):
                 continue
-            cur_chr = line[cursor[0]]
-            while cursor[0] < len(line):
-                next = cursor[0]+1
+            cur_chr = line[cursor.x]
+            while cursor.x < len(line):
+                next = cursor.x+1
                 if next == len(line):next-=1
                 if cur_chr == " ":
-                    cursor[0] += 1
+                    cursor.x += 1
                     if line[next] != " ":
                         break
                 else:
-                    cursor[0] += 1
+                    cursor.x += 1
                     if line[next] in chars:
                         break
         self.move_cursors()   
@@ -398,16 +409,16 @@ class Editor:
 
     def new_cursor_down(self):
         cursor = self.get_last_cursor()
-        if cursor[1] == len(self.lines)-1: return
-        new = Cursor(cursor[0], cursor[1]+1)
+        if cursor.y == len(self.lines)-1: return
+        new = Cursor(cursor.x, cursor.y+1)
         self.cursors.append(new)
         self.move_cursors()
 
     def new_cursor_left(self):
         new = []
         for cursor in self.cursors:
-            if cursor[0] == 0: continue
-            new.append( Cursor(cursor[0]-1, cursor[1]) )
+            if cursor.x == 0: continue
+            new.append( Cursor(cursor.x-1, cursor.y) )
         for c in new:
             self.cursors.append(c)
         self.move_cursors()
@@ -415,14 +426,15 @@ class Editor:
     def new_cursor_right(self):
         new = []
         for cursor in self.cursors:
-            if cursor[0]+1 > len(self.lines[cursor[1]]): continue
-            new.append( Cursor(cursor[0]+1, cursor[1]) )
+            if cursor.x+1 > len(self.lines[cursor.y]): continue
+            new.append( Cursor(cursor.x+1, cursor.y) )
         for c in new:
             self.cursors.append(c)
         self.move_cursors()
 
     def escape(self):
         self.cursors = [self.cursors[0]]
+        self.move_cursors()
         self.render()
 
     def page_up(self):
@@ -458,7 +470,7 @@ class Editor:
             self.move_x_cursors(cursor[1], cursor[0], -1)
         self.move_cursors()
 
-    def backspace(self):        
+    def backspace(self):
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs: # order?
             if cursor[0] == 0 and cursor[1] == 0:
@@ -618,7 +630,7 @@ class Editor:
     def find(self, what, findall = False):
         self.last_find = what
         ncursors = len(self.cursors)
-        last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c[1], c[0]))))[-1]
+        last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
         y = last_cursor[1]
         cur = []
         found = False
@@ -626,8 +638,8 @@ class Editor:
             line = self.lines[y]
             indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
-                new = [i, y]
-                if not new in self.cursors:
+                new = Cursor(i, y)
+                if not self.cursor_exists(new):
                     found = True
                     cur.append(new)
                     if not findall:
@@ -652,8 +664,6 @@ class Editor:
             if matches == None: return
             what = matches.group(0)
             self.last_find = what
-            #self.parent.status("what:"+str(what))
-        #self.parent.status("Finding '"+what+"'")
         self.find(what)
 
     def find_all(self):

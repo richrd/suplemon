@@ -1,9 +1,11 @@
+import os
 import json
 
 class Config:
     def __init__(self, parent):
         self.parent = parent
         self.filename = "config.json"
+        self.path = os.path.dirname(os.path.realpath(__file__))
         self.defaults = {
             "files": {},
             "editor": {
@@ -27,14 +29,15 @@ class Config:
         pass
 
     def load(self):
-        #try:
-            f = open(self.filename)
+        try:
+            path = os.path.join(self.path, self.filename)
+            f = open(path)
             data = f.read()
             f.close()
             self.config = json.loads(data)
-        #except:
-        #    self.log("Failed to load config file!")
-        #    pass
+        except:
+            self.log("Failed to load config file!")
+            pass
         
     def store(self):
         data = json.dumps(self.config)

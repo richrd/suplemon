@@ -101,7 +101,8 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
  
 # Fix / Defects
- * [X] Fixed: Find starts at top of file instead of current cursor
+ * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
+ * [ ] Start find at current line AND column
  * [ ] Delete key when cursor at line end
  * [ ] Add 'remove previous cursor' function
  * [X] Make editor white color brighter (not gray)
