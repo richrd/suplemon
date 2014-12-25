@@ -161,8 +161,9 @@ class Editor:
         self.render()
 
     def toggle_highlight(self):
-        self.show_highlighting = not self.show_highlighting
-        self.render()
+        return False
+        #self.show_highlighting = not self.show_highlighting
+        #self.render()
 
     def pad_lnum(self, n):
         s = str(n)
@@ -202,7 +203,7 @@ class Editor:
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
 
             # Higlight rendering
-            if self.show_highlighting:
+            if self.show_highlighting and pygments:
                 self.outfile.clear()
 
                 highlight(line, self.lexer, self.term_fmt, self.outfile)
@@ -245,7 +246,7 @@ class Editor:
             # Modify main cursor?
             #if cursor == main:
                 #self.window.addstr(">", curses.color_pair(1))
-                #self.window.chgat(y, cursor[0]+3, 1, self.cursor_style)
+                #self.window.chgat(y, cursor.x+3, 1, self.cursor_style)
 
     def refresh(self):
         self.window.refresh()
@@ -254,6 +255,9 @@ class Editor:
         self.window.resize(yx[0], yx[1])
         self.move_cursors()
         self.refresh()
+
+    def move_win(self, yx):
+        self.window.mvwin( yx[0], yx[1] )
 
     def move_y_scroll(self, delta):
         self.y_scroll += delta
@@ -302,7 +306,7 @@ class Editor:
     def get_first_cursor(self):
         highest = None
         for cursor in self.cursors:
-            if highest == None or highest[1] > cursor[1]:
+            if highest == None or highest[1] > cursor.y:
                 highest = cursor
         return highest
 
@@ -331,7 +335,7 @@ class Editor:
 
     def arrow_right(self):
         for cursor in self.cursors:
-            if cursor.y != len(self.lines)-1 and cursor[0] == len(self.lines[cursor.y]):
+            if cursor.y != len(self.lines)-1 and cursor.x == len(self.lines[cursor.y]):
                 cursor.y += 1
                 cursor.x = 0
             else:
@@ -402,8 +406,8 @@ class Editor:
 
     def new_cursor_up(self):
         cursor = self.get_first_cursor()
-        if cursor[1] == 0: return
-        new = Cursor(cursor[0], cursor[1]-1)
+        if cursor.y == 0: return
+        new = Cursor(cursor.x, cursor.y-1)
         self.cursors.append(new)
         self.move_cursors()
 
@@ -449,50 +453,50 @@ class Editor:
 
     def home(self):
         for cursor in self.cursors:
-            wspace = self.whitespace(self.lines[cursor[1]])
-            if cursor[0] == wspace:
-                cursor[0] = 0
+            wspace = self.whitespace(self.lines[cursor.y])
+            if cursor.x == wspace:
+                cursor.x = 0
             else:
-                cursor[0] = wspace
+                cursor.x = wspace
         self.move_cursors()
 
     def end(self):
         for cursor in self.cursors:
-            cursor[0] = len(self.lines[cursor[1]])
+            cursor.x = len(self.lines[cursor.y])
         self.move_cursors()
 
     def delete(self):
         for cursor in self.cursors:
-            line = self.lines[cursor[1]]
-            start = line[:cursor[0]]
-            end = line[cursor[0]+1:]
-            self.lines[cursor[1]] = start+end
-            self.move_x_cursors(cursor[1], cursor[0], -1)
+            line = self.lines[cursor.y]
+            start = line[:cursor.x]
+            end = line[cursor.x+1:]
+            self.lines[cursor.y] = start+end
+            self.move_x_cursors(cursor.y, cursor.x, -1)
         self.move_cursors()
 
     def backspace(self):
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs: # order?
-            if cursor[0] == 0 and cursor[1] == 0:
+            if cursor.x == 0 and cursor.y == 0:
                 continue
-            if cursor[0] == 0 and cursor[1] != 0:
-                prev_line = self.lines[cursor[1]-1]
-                line = self.lines[cursor[1]]
-                self.lines.pop(cursor[1])
-                self.lines[cursor[1]-1]+=line
-                length = len(self.lines[cursor[1]-1])
-                cursor[1] -= 1
-                cursor[0] = len(prev_line)
-                self.move_y_cursors(cursor[1], -1)
+            if cursor.x == 0 and cursor.y != 0:
+                prev_line = self.lines[cursor.y-1]
+                line = self.lines[cursor.y]
+                self.lines.pop(cursor.y)
+                self.lines[cursor.y-1]+=line
+                length = len(self.lines[cursor.y-1])
+                cursor.y -= 1
+                cursor.x = len(prev_line)
+                self.move_y_cursors(cursor.y, -1)
             else:
                 # TODO: tab backspace
-                line = self.lines[cursor[1]]
-                #if cursor[0] >=
-                start = line[:cursor[0]-1]
-                end = line[cursor[0]:]
-                self.lines[cursor[1]] = start+end
-                cursor[0] -= 1
-                self.move_x_cursors(cursor[1], cursor[0], -1)
+                line = self.lines[cursor.y]
+                #if cursor.x >=
+                start = line[:cursor.x-1]
+                end = line[cursor.x:]
+                self.lines[cursor.y] = start+end
+                cursor.x -= 1
+                self.move_x_cursors(cursor.y, cursor.x, -1)
         # Ensure we keep the view scrolled
         self.move_cursors()
 
@@ -502,22 +506,22 @@ class Editor:
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs: # order?
             # The current line this cursor is on
-            line = self.lines[cursor[1]]
+            line = self.lines[cursor.y]
             
             # Start of the line
-            start = line[:cursor[0]]
+            start = line[:cursor.x]
 
             # End of the line
-            end = line[cursor[0]:]
+            end = line[cursor.x:]
 
             # Leave the beginning of the line
-            self.lines[cursor[1]] = start
+            self.lines[cursor.y] = start
 
-            wspace = self.whitespace(self.lines[cursor[1]])*" "
-            self.lines.insert(cursor[1]+1, wspace+end)
-            self.move_y_cursors(cursor[1], 1)
-            cursor[0] = len(wspace)
-            cursor[1] += 1
+            wspace = self.whitespace(self.lines[cursor.y])*" "
+            self.lines.insert(cursor.y+1, wspace+end)
+            self.move_y_cursors(cursor.y, 1)
+            cursor.x = len(wspace)
+            cursor.y += 1
             self.render()
         self.move_cursors()
 
@@ -527,12 +531,12 @@ class Editor:
         if len(self.buffer) == len(self.cursors):
             curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
             for cursor in curs:
-                line = self.lines[cursor[1]]
+                line = self.lines[cursor.y]
                 buf = buffer[0]
-                line = line[:cursor[0]]+buf+line[cursor[0]:]
-                self.lines[cursor[1]] = line
+                line = line[:cursor.x]+buf+line[cursor.x:]
+                self.lines[cursor.y] = line
                 buffer.pop(0)
-                self.move_x_cursors(cursor[1], cursor[0]-1, len(buf))
+                self.move_x_cursors(cursor.y, cursor.x-1, len(buf))
         else:
             for buf in self.buffer:
                 y = cur[1]
@@ -545,27 +549,27 @@ class Editor:
         used_y = []
         curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
         for cursor in curs:
-            if cursor[1] in used_y: continue
-            used_y.append(cursor[1])
+            if cursor.y in used_y: continue
+            used_y.append(cursor.y)
             
-            if cursor[1] == 0: break
-            old = self.lines[cursor[1]-1]
-            self.lines[cursor[1]-1] = self.lines[cursor[1]]
-            self.lines[cursor[1]] = old
-            cursor[1] -= 1
+            if cursor.y == 0: break
+            old = self.lines[cursor.y-1]
+            self.lines[cursor.y-1] = self.lines[cursor.y]
+            self.lines[cursor.y] = old
+            cursor.y -= 1
         self.move_cursors()
         
     def push_down(self):
         used_y = []
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs:
-            if cursor[1] in used_y: continue
-            if cursor[1] >= len(self.lines)-1:break
-            used_y.append(cursor[1])
-            old = self.lines[cursor[1]+1]
-            self.lines[cursor[1]+1] = self.lines[cursor[1]]
-            self.lines[cursor[1]] = old
-            cursor[1] += 1
+            if cursor.y in used_y: continue
+            if cursor.y >= len(self.lines)-1:break
+            used_y.append(cursor.y)
+            old = self.lines[cursor.y+1]
+            self.lines[cursor.y+1] = self.lines[cursor.y]
+            self.lines[cursor.y] = old
+            cursor.y += 1
         self.move_cursors()
 
     def tab(self):
@@ -575,14 +579,14 @@ class Editor:
     def untab(self):  
         linenums = []
         for cursor in self.cursors:
-            if cursor[1] in linenums:
-                cursor[0] = 0
+            if cursor.y in linenums:
+                cursor.x = 0
                 continue
-            line = self.lines[cursor[1]]
+            line = self.lines[cursor.y]
             if line[:self.tab_width] == " "*self.tab_width:
-                linenums.append(cursor[1])
-                cursor[0] = 0
-                self.lines[cursor[1]] = line[self.tab_width:]
+                linenums.append(cursor.y)
+                cursor.x = 0
+                self.lines[cursor.y] = line[self.tab_width:]
 
     def cut(self):
         buf = []
@@ -591,36 +595,37 @@ class Editor:
                 buf.append(self.lines[0])
                 self.lines[0] = ""
                 break
-            buf.append(self.lines[cursor[1]])
-            self.lines.pop(cursor[1])
-            self.move_y_cursors(cursor[1],-1)
-            if cursor[1] > len(self.lines)-1:
-                cursor[1] = len(self.lines)-1
+            buf.append(self.lines[cursor.y])
+            self.lines.pop(cursor.y)
+            self.move_y_cursors(cursor.y,-1)
+            if cursor.y > len(self.lines)-1:
+                cursor.y = len(self.lines)-1
         self.buffer = buf
         self.move_cursors()
 
     def type(self, letter):
         for cursor in self.cursors:
-            line = self.lines[cursor[1]]
-            start = line[:cursor[0]]
-            end = line[cursor[0]:]
-            self.lines[cursor[1]] = start+letter+end
-            self.move_x_cursors(cursor[1], cursor[0], 1)
-            cursor[0] += 1
+            line = self.lines[cursor.y]
+            start = line[:cursor.x]
+            end = line[cursor.x:]
+            self.lines[cursor.y] = start+letter+end
+            self.move_x_cursors(cursor.y, cursor.x, 1)
+            cursor.x += 1
         self.move_cursors()
 
     def go_to_pos(self, line, col = 0):
         try:
-            line = abs(int(line)-1)
+            line = int(line)-1
+            if line < 0: line = 0
         except:
             return False
 
         cur = self.cursor()
         if col != None:
-            cur[0] = col
-        cur[1] = line
-        if cur[1] >= len(self.lines):
-            cur[1] = len(self.lines)-1
+            cur.x = col
+        cur.y = line
+        if cur.y >= len(self.lines):
+            cur.y = len(self.lines)-1
         self.move_cursors()
 
     def click(self, x, y):
@@ -631,7 +636,7 @@ class Editor:
         self.last_find = what
         ncursors = len(self.cursors)
         last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
-        y = last_cursor[1]
+        y = last_cursor.y
         cur = []
         found = False
         while y < len(self.lines):
@@ -659,7 +664,7 @@ class Editor:
         if what == "":
             cursor = self.cursor()
             search = "^([\w\-]+)"
-            line = self.lines[cursor[1]][cursor[0]:]
+            line = self.lines[cursor.y][cursor.x:]
             matches = re.match(search, line)
             if matches == None: return
             what = matches.group(0)

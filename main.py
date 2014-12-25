@@ -97,7 +97,7 @@ class File:
         path = self._path()
         data = self.editor.get_data()
         try:
-            f = open(self._path())
+            f = open(self._path(), "w")
             f.write(data)
             f.close()
         except:
@@ -215,8 +215,10 @@ class App:
             y_start = 1
         if self.config["display"]["show_bottom_bar"]:
             y_sub +=1
-        self.editor_win = curses.newwin(yx[0]-y_sub, yx[1], y_start, 0)
+        #self.editor_win = curses.newwin(yx[0], yx[1], y_start, 0)
         self.editor().resize( (yx[0]-y_sub, yx[1]) )
+        self.editor().move_win( (y_start, 0) )
+        #self.editor().window.mvwin(y_start, 0)
         self.status_win = curses.newwin(1, yx[1], yx[0]-y_sub+1, 0)
         self.screen.refresh()
 
@@ -308,9 +310,12 @@ class App:
         cur = editor.cursor()
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(editor.cursors))+" "+\
-            "buf:"+str(len(editor.buffer))+" "+\
-            "key:"+str(self.last_key)+" "+\
-            "["+str(size[0])+"x"+str(size[1])+"]"
+            "buf:"+str(len(editor.buffer))+""
+
+        if self.config["display"]["show_last_key"]:
+            data += " key:"+str(self.last_key)
+        if self.config["display"]["show_term_size"]:
+            data += " ["+str(size[0])+"x"+str(size[1])+"]"
 
         if editor.last_find:
             find = editor.last_find

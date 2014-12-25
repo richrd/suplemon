@@ -1,6 +1,4 @@
 
-
-
 class Logger:
     def __init__(self, filename="log.txt"):
         self.filename = "filename"
@@ -12,3 +10,4 @@ class Logger:
     def output(self):
         for line in self.lines:
             print line
+            

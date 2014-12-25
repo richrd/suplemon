@@ -17,7 +17,9 @@ class Config:
                 "show_bottom_bar": True,
                 "show_line_nums": True,
                 "show_highlighting": False,
-                "show_clock": True
+                "show_clock": True,
+                "show_last_key": True,
+                "show_term_size": True
             },
         }
 
