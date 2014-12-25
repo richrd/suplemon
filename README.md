@@ -85,7 +85,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
    
 # Todo
  * [ ] Use semver 
- * [ ] Close files one at a time with 'save?' prompt
+ * [ ] Close files one at a time with 'save?' prompt.
  * [ ] Nano-like menu and keyboard shortcuts with legend
  * [ ] Undo / Redo
  * [ ] Auto complete
@@ -104,12 +104,10 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
  
 # Fix / Defects
+ * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
+ * [ ] Add 'remove previous cursor' function
+ * [ ] Delete key when cursor at line end; add dedicated setting.
  * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
  * [X] Start find at current line AND column
- * [ ] Delete key when cursor at line end
- * [ ] Add 'remove previous cursor' function
  * [X] Make editor white color brighter (not gray)
- * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [X] Show editor at top of terminal when show_top_bar == False 
- 
- 

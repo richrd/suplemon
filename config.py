@@ -12,6 +12,7 @@ class Config:
                 "tab_width": 4,
                 "cursor": "reverse",
                 "default_encoding": "utf-8",
+                "punctuation": " (){}[]'\"=+-/*.:,;_",
             },
             "display": {
                 "show_top_bar": True,

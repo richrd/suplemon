@@ -102,7 +102,7 @@ class Editor:
         #self.selection_style = curses.A_REVERSE # Unused...
 
         self.tab_width = 4
-        self.punctuation = ["(", ")", "{", "}", "[", "]", "'", "\"", "=", "+", "-", "/", "*", ".", ":", ",", ";", "_", " "]
+        self.punctuation = ""
 
     def setup_highlighting(self):
         return # Incomplete implementation
@@ -130,6 +130,9 @@ class Editor:
 
     def set_tab_width(self, w):
         self.tab_width = w
+
+    def set_punctuation(self, p):
+        self.punctuation = p
 
     def set_cursor(self, cursor):
         if cursor == "underline":
@@ -466,6 +469,7 @@ class Editor:
         self.move_cursors()
 
     def delete(self):
+        # FIXME: delete empty line
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             start = line[:cursor.x]
@@ -647,6 +651,7 @@ class Editor:
                 indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
             else:
                 indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
+            #indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
                 new = Cursor(i+x_offset, y)
                 if not self.cursor_exists(new):

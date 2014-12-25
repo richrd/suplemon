@@ -152,10 +152,9 @@ class App:
             #curses.init_color(11, 254, 0, 1000)
         
         # This only works with: TERM=xterm-256color ./main.py
-        #curses.init_pair(1, curses.COLOR_BLACK, 91) # Black on yellow
-
-        #curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        # curses.init_pair(1, curses.COLOR_BLACK, 91) # Black on yellow
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
         curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
         curses.init_pair(4, curses.COLOR_WHITE, -1)
@@ -256,6 +255,7 @@ class App:
         editor = Editor(self, self.editor_win)
         editor.set_tab_width(self.config["editor"]["tab_width"])
         editor.set_cursor(self.config["editor"]["cursor"])
+        editor.set_punctuation(self.config["editor"]["punctuation"])
         editor.show_line_nums = self.config["display"]["show_line_nums"]
         return editor
 
@@ -366,10 +366,12 @@ class App:
         if exists:
             self.switch_to_file(self.files.index(exists))
             return True
+
         if not self.open_file(name):
             self.status("Failed to load '"+name+"'")
             return False
         self.switch_to_file(self.last_file())
+        return True
 
     def open_file(self, filename, new = False):
         #exists = self.file_exists(filename)
@@ -457,6 +459,7 @@ class App:
     def last_file(self):
         cur = len(self.files)-1
         return cur
+        #self.switch_to_file(cur)
 
     def handle_char(self, char):
         editor = self.editor()
