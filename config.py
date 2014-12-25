@@ -11,6 +11,7 @@ class Config:
             "editor": {
                 "tab_width": 4,
                 "cursor": "reverse",
+                "default_encoding": "utf-8",
             },
             "display": {
                 "show_top_bar": True,

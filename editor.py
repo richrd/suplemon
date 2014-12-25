@@ -641,9 +641,14 @@ class Editor:
         found = False
         while y < len(self.lines):
             line = self.lines[y]
-            indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
+            x_offset = 0
+            if last_cursor.y == y:
+                x_offset = last_cursor.x
+                indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
+            else:
+                indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
-                new = Cursor(i, y)
+                new = Cursor(i+x_offset, y)
                 if not self.cursor_exists(new):
                     found = True
                     cur.append(new)

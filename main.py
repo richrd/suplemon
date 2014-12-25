@@ -65,14 +65,17 @@ Warning: beta software, bugs may occur.
 class File:
     def __init__(self):
         self.name = ""
-        self.path = ""
+        self.fpath = ""
         self.data = ""
         self.last_save = None
         self.opened = time.time()
         self.editor = None
 
     def _path(self):
-        return os.path.join(self.path, self.name)
+        return os.path.join(self.fpath, self.name)
+
+    def path(self):
+        return self._path()
 
     def log(self, s):
         app.logger.log(s)
@@ -84,7 +87,7 @@ class File:
         
     def set_path(self, path):
         ab = os.path.abspath(path)
-        self.path, self.name = os.path.split(ab)
+        self.fpath, self.name = os.path.split(ab)
         
     def set_editor(self, editor):
         self.editor = editor
@@ -240,6 +243,12 @@ class App:
     def file(self):
         return self.files[self.current_file]
 
+    def file_exists(self, path):
+        for file in self.files:
+            if file.path() == os.path.abspath(path):
+                return file
+        return False
+
     def editor(self):
         return self.files[self.current_file].editor
         
@@ -353,15 +362,27 @@ class App:
         name = self.query("Filename:")
         if not name:
             return False
+        exists = self.file_exists(name)
+        if exists:
+            self.switch_to_file(self.files.index(exists))
+            return True
         if not self.open_file(name):
             self.status("Failed to load '"+name+"'")
+            return False
+        self.switch_to_file(self.last_file())
 
     def open_file(self, filename, new = False):
+        #exists = self.file_exists(filename)
+        #if exists:
+        #    self.switch_to_file(self.files.index(exists))
+        #    return False
         result = ""
         file = File()
         file.set_path(filename)
         file.set_editor(self.new_editor())
         loaded = file.load()
+        if not loaded and not new:
+            return False
         self.files.append(file)
         return loaded
 
@@ -379,6 +400,7 @@ class App:
         if len(sys.argv) > 1:
             names = sys.argv[1:]
             for name in names:
+                if self.file_exists(name): continue
                 if self.open_file(name):
                     loaded = True
         else:
@@ -434,7 +456,7 @@ class App:
 
     def last_file(self):
         cur = len(self.files)-1
-        self.switch_to_file(cur)
+        return cur
 
     def handle_char(self, char):
         editor = self.editor()
