@@ -472,10 +472,16 @@ class Editor:
         # FIXME: delete empty line
         for cursor in self.cursors:
             line = self.lines[cursor.y]
-            start = line[:cursor.x]
-            end = line[cursor.x+1:]
-            self.lines[cursor.y] = start+end
-            self.move_x_cursors(cursor.y, cursor.x, -1)
+            if len(self.lines) and not len(line):
+                self.lines.pop(cursor.y)
+                self.move_x_cursors(cursor.y, cursor.x, -1)
+            #elif len(self.lines) and not len(line):
+            #    
+            else:
+                start = line[:cursor.x]
+                end = line[cursor.x+1:]
+                self.lines[cursor.y] = start+end
+                self.move_x_cursors(cursor.y, cursor.x, -1)
         self.move_cursors()
 
     def backspace(self):

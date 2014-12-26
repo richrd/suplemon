@@ -28,8 +28,8 @@ class Config:
         self.config = dict(self.defaults)
 
     def log(self, s):
-        self.parent.logger.log(s)
-        # FIXME: Pipe logging to app instance
+        #self.parent.logger.log(s)
+        self.parent.status(s)
         pass
 
     def load(self):

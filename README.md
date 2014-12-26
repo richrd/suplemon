@@ -89,7 +89,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Nano-like menu and keyboard shortcuts with legend
  * [ ] Undo / Redo
  * [ ] Auto complete
- * [ ] Go to file as well as line number 
+ * [X] Go to file as well as line number 
  * [X] Show if file is edited
  * [X] Copy / Paste buffer
  * [X] Proper status bar information

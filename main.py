@@ -15,7 +15,8 @@ quick_help = """
 Welcome to suplemon!
 ====================
 
-Usage: python main.py [filename]
+Usage: ```python main.py [filename]```
+
 
 Warning: beta software, bugs may occur.
 
@@ -248,6 +249,15 @@ class App:
                 return file
         return False
 
+    def find_file(self, s):
+        i = 0
+        for file in self.files:
+            if file.name[:len(s)] == s:
+                #return file
+                return i
+            i += 1
+        return -1
+
     def editor(self):
         return self.files[self.current_file].editor
         
@@ -374,10 +384,6 @@ class App:
         return True
 
     def open_file(self, filename, new = False):
-        #exists = self.file_exists(filename)
-        #if exists:
-        #    self.switch_to_file(self.files.index(exists))
-        #    return False
         result = ""
         file = File()
         file.set_path(filename)
@@ -490,8 +496,15 @@ class App:
                 editor.find(what)
             return True
         elif char == 7:             # Ctrl + G
-            lineno = self.query("Go:")
-            editor.go_to_pos(lineno)
+            #lineno = self.query("Go:")
+            result = self.query("Go:")
+            try:
+                result = int(result)
+                editor.go_to_pos(result)
+            except:
+                index = self.find_file(result)
+                if index != -1:
+                    self.switch_to_file(index)
             return True
         elif char == 15:             # Ctrl + O
             self.open()
@@ -505,9 +518,9 @@ class App:
             editor.click(x, y-1)
             return True
         elif char == 554:
-            self.next_file()
-        elif char == 549:
             self.prev_file()
+        elif char == 549:
+            self.next_file()
         return False
         
     def keyboard_interrupt(self):
