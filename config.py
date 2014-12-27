@@ -22,7 +22,7 @@ class Config:
                 "show_bottom_bar": True,
                 "show_line_nums": True,
                 "show_line_colors": True,
-                "line_end_char": "-",
+                "line_end_char": "",
                 "show_highlighting": False,
                 "show_clock": True,
                 "show_last_key": True,
@@ -36,7 +36,6 @@ class Config:
         return os.path.join(self.fpath, self.filename)
 
     def log(self, s):
-        #self.parent.logger.log(s)
         self.parent.status(s)
 
     def err(self, s):

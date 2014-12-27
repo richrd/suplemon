@@ -398,7 +398,7 @@ class App:
             ("^X", "Cut"),
             ("INS", "Paste"),
             ("ESC", "Single cursor"),
-            ("^G", "Go to")
+            ("^G", "Go to"),
             ("^C", "Exit"),
         ]
         x = 0
