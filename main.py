@@ -1,5 +1,8 @@
 #!/usr/bin/python
 #-*- coding:utf-8
+
+__version__ = "0.0.1"
+
 import os
 import sys
 import time
@@ -98,7 +101,6 @@ class File:
          self.last_save = time.time()
 
     def save(self):
-        #self.log("Saving: "+self._path())
         path = self._path()
         data = self.editor.get_data()
         try:
@@ -112,7 +114,6 @@ class File:
         return True
 
     def load(self):
-        #self.log("loading: "+self._path())
         path = self._path()
         try:
             f = open(self._path())
@@ -132,6 +133,7 @@ class File:
 
 class App:
     def __init__(self):
+        self.version = __version__
         self.inited = 0
         self.running = 0
         self.last_key = None
@@ -318,39 +320,37 @@ class App:
     def show_top_status(self):
         self.header_win.clear()
         size = self.size()
-        head = "Suplemon Editor v0.1 "
-        if self.config["display"]["show_clock"]:
-            head += "- " + curr_time()
+        display = self.config["display"]
 
-        filenames = ""
-        
-        # Weird looping for warping current file to first index
-        # FIXME: Move to dedicated method
-        cur = self.current_file
-        target = cur-1
-        if target < 0:
-            target = len(self.files)-self.current_file-1
-        f_ind = 0    # File count index
-        while f_ind < len(self.files):
-            f = self.files[cur]
-            if f_ind == 0:
-                filenames += "["+f.name
-                if f.is_changed():
-                    filenames += "*"
-                filenames += "] "
-            else:
-                filenames += f.name+(["","*"][f.is_changed()])+" "
-            cur += 1
-            if cur >= len(self.files):
-                cur = 0
-            f_ind += 1
-        
-        head += " - "+filenames
+        head_parts = []
+
+        if display["show_app_name"]:
+            head_parts.append("Suplemon Editor v"+self.version)
+            
+        if display["show_clock"]:
+            head_parts.append(curr_time())
+
+        if display["show_file_list"]:
+            head_parts.append(self.file_list_str())
+
+        head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
             head = head[:size[0]-1]
         self.header_win.addstr(0,0, head, curses.color_pair(0) | curses.A_REVERSE)
         self.header_win.refresh()
+
+    def file_list_str(self):
+        # Rotate file list to begin at current file
+        file_list = self.files[self.current_file:] + self.files[:self.current_file]
+        str_list = []
+        for f in file_list:
+            fname = f.name + (["", "*"][f.is_changed()])
+            if not str_list:
+                str_list.append("[" + fname + "]")
+            else:
+                str_list.append(fname)
+        return " ".join(str_list)
 
     def show_bottom_status(self):
         # FIXME: Seems to write to max_y+1 line and crash
@@ -428,7 +428,7 @@ class App:
             self.show_bottom_status()
 
     def open(self):
-        name = self.query("Filename:")
+        name = self.query("Open:")
         if not name or name == -1:
             return False
         exists = self.file_exists(name)

@@ -9,22 +9,26 @@ class Config:
         self.filename = "config.json"
         self.fpath = os.path.dirname(os.path.realpath(__file__))
         self.defaults = {
-            "files": {},
+            "app": {
+                "remember_open_files": False
+            },
             "editor": {
                 "tab_width": 4,
-                "cursor": "reverse",
+                "cursor": "reverse", # reverse or underline
                 "default_encoding": "utf-8",
-                "punctuation": " (){}[]'\"=+-/*.:,;_",
+                "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
             },
             "display": {
                 "show_top_bar": True,
+                "show_app_name": True,
+                "show_clock": True,
+                "show_file_list": True,
                 "show_legend": False,
                 "show_bottom_bar": True,
                 "show_line_nums": True,
                 "show_line_colors": True,
                 "line_end_char": "",
                 "show_highlighting": False,
-                "show_clock": True,
                 "show_last_key": True,
                 "show_term_size": True
             },

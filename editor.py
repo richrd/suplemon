@@ -487,15 +487,25 @@ class Editor:
     def delete(self):
         for cursor in self.cursors:
             line = self.lines[cursor.y]
-            if len(self.lines)>1 and cursor.y == len(line)-1:
+            if len(self.lines)>1 and cursor.x == len(line):
+                data = self.lines[cursor.y]
                 self.lines.pop(cursor.y)
+                self.lines[cursor.y] = data+self.lines[cursor.y]
                 self.move_x_cursors(cursor.y, cursor.x, -1)
-            #elif curlen(self.lines) and not len(line):
             else:
                 start = line[:cursor.x]
                 end = line[cursor.x+1:]
                 self.lines[cursor.y] = start+end
                 self.move_x_cursors(cursor.y, cursor.x, -1)
+
+            # if len(self.lines)>1 and cursor.y == len(self.lines)-1: # Special case
+            #     self.lines.pop(cursor.y)
+            #     self.move_x_cursors(cursor.y, cursor.x, -1)
+            # else: # Default
+            #     start = line[:cursor.x]
+            #     end = line[cursor.x+1:]
+            #     self.lines[cursor.y] = start+end
+            #     self.move_x_cursors(cursor.y, cursor.x, -1)
         self.move_cursors()
 
     def backspace(self):

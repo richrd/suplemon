@@ -14,7 +14,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Goals:
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
- 3. [X] Multi cursor and multi selection should be comparable to sublimetext.
+ 3. [X] Multi cursor ~~and multi selection~~ should be comparable to sublimetext.
  4. [X] Develop suplemon with suplemon!!!
  5. [ ] World domination!
 
@@ -23,7 +23,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
     python main.py [filename]
 
 # Suplemon multicursor editing:
-![Suplemon in action](http://bittemple.org/misc/suplemon/digits1.gif)
+![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
 # Features
  * Terminal text editing with style
@@ -84,14 +84,18 @@ Command line text editor with multicursor support. The goal is to replicate subl
    
    
 # Todo
- * [ ] Use semver 
+ * [ ] Custom key bindings
  * [ ] Close files one at a time with 'save?' prompt.
+ * [ ] Duplicate line (without clipboard)
  * [ ] Undo / Redo
  * [ ] Auto complete
+ * [ ] Selections
  * [ ] Storing files and cursor positions for restoring later
  * [ ] Proper syntax higlighting
- * [ ] Editor plugins
+ * [ ] Editor plugins/extensions/macros
+ * [ ] Move config file to user home directory
  * ...
+ * [X] Use semver 
  * [X] Nano-like menu and keyboard shortcuts with legend
  * [X] Go to file as well as line number 
  * [X] Show if file is edited
