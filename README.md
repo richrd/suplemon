@@ -11,6 +11,9 @@ suplemon
 
 Command line text editor with multicursor support. The goal is to replicate sublimetext style functionality in the terminal.
 
+# Suplemon multicursor editing:
+![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
+
 # Goals:
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
@@ -21,9 +24,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Usage:
 
     python main.py [filename]
-
-# Suplemon multicursor editing:
-![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
 # Features
  * Terminal text editing with style
