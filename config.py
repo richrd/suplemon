@@ -1,11 +1,13 @@
+#-*- encoding: utf-8
 import os
 import json
+from helpers import *
 
 class Config:
     def __init__(self, parent):
         self.parent = parent
         self.filename = "config.json"
-        self.path = os.path.dirname(os.path.realpath(__file__))
+        self.fpath = os.path.dirname(os.path.realpath(__file__))
         self.defaults = {
             "files": {},
             "editor": {
@@ -16,8 +18,11 @@ class Config:
             },
             "display": {
                 "show_top_bar": True,
+                "show_legend": False,
                 "show_bottom_bar": True,
                 "show_line_nums": True,
+                "show_line_colors": True,
+                "line_end_char": "-",
                 "show_highlighting": False,
                 "show_clock": True,
                 "show_last_key": True,
@@ -27,21 +32,31 @@ class Config:
 
         self.config = dict(self.defaults)
 
+    def path(self):
+        return os.path.join(self.fpath, self.filename)
+
     def log(self, s):
         #self.parent.logger.log(s)
         self.parent.status(s)
-        pass
+
+    def err(self, s):
+        self.parent.logger.log(s)
 
     def load(self):
         try:
-            path = os.path.join(self.path, self.filename)
+            path = self.path()
             f = open(path)
             data = f.read()
             f.close()
             self.config = json.loads(data)
+            return True
         except:
+            self.err(get_error_info())
             self.log("Failed to load config file!")
-            pass
+        return False
+
+    def reload(self):
+        return self.load()
         
     def store(self):
         data = json.dumps(self.config)

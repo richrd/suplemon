@@ -13,7 +13,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Goals:
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
- 2. [ ] Usability should be as good and easy as nano. TODO: add keyboard legend.
+ 2. [X] Usability should be as good and easy as nano.
  3. [X] Multi cursor and multi selection should be comparable to sublimetext.
  4. [X] Develop suplemon with suplemon!!!
  5. [ ] World domination!
@@ -53,7 +53,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
    > Insert buffer
 
  * Ctrl + G
-   > Go to line number
+   > Go to line number or file
    
  * Ctrl + F
    > Find text
@@ -86,9 +86,13 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Todo
  * [ ] Use semver 
  * [ ] Close files one at a time with 'save?' prompt.
- * [ ] Nano-like menu and keyboard shortcuts with legend
  * [ ] Undo / Redo
  * [ ] Auto complete
+ * [ ] Storing files and cursor positions for restoring later
+ * [ ] Proper syntax higlighting
+ * [ ] Editor plugins
+ * ...
+ * [X] Nano-like menu and keyboard shortcuts with legend
  * [X] Go to file as well as line number 
  * [X] Show if file is edited
  * [X] Copy / Paste buffer
@@ -97,11 +101,8 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Command line for getting input
  * [X] Line number toggling
  * [X] Loading multiple files and switching between them
- * [ ] Live config reloading when it's modified
- * [ ] Storing files and cursor positions for restoring later
- * [ ] Syntax higlighting
- * [ ] Editor plugins
- * ...
+ * [X] Live config reloading when it's modified
+ * [X] Line based syntax highlighting
  
 # Fix / Defects
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)

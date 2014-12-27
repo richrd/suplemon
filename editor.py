@@ -5,6 +5,7 @@ import re
 import sys
 import time
 import curses
+from helpers import *
 
 try:
     from pygments import highlight
@@ -40,14 +41,11 @@ class Line:
     def __len__(self):
         return len(self.data)
 
-    #def decode(self, enc):
-    #    return self.data.decode(enc)
-
-    #def encode(self, enc):
-    #    return self.data.encode(enc)
-
     def find(self, what):
         return self.data.find(what)
+
+    def strip(self, *args):
+        return self.data.strip(*args)
 
 class Cursor:
     def __init__(self, x=0, y=0):
@@ -88,8 +86,9 @@ class Editor:
         self.data = ""
         self.lines = [""]
         self.show_line_nums = True
-        self.show_line_ends = False
+        self.show_line_ends = True
         self.line_end_char = "<"
+        self.show_line_colors = True
         self.last_find = ""
         self.show_highlighting = False
         if pygments != False:
@@ -99,7 +98,6 @@ class Editor:
         self.cursors = [Cursor()]
         self.buffer = []
         self.cursor_style = curses.A_UNDERLINE
-        #self.selection_style = curses.A_REVERSE # Unused...
 
         self.tab_width = 4
         self.punctuation = ""
@@ -111,6 +109,25 @@ class Editor:
         self.term_fmt = CursesFormatter(encoding = 'utf-8')
         self.outfile = HighlightFile()
         self.colors = Colors()
+
+    def line_color(self, raw_line):
+        color = 0
+        line = raw_line.strip()
+        if starts(line, ["import", "from"]):
+            color = 11
+        elif starts(line, "class"):
+            color = 13    # Green
+        elif starts(line, "def"):
+            color = 12    # Cyan
+        elif starts(line, ["return", "yield"]):
+            color = 15    # Red
+        elif starts(line, "self."):
+            color = 13    # Cyan
+        elif starts(line, ["#", "//", "\"", "'"]):
+            color = 14    # Magenta
+        elif starts(line, ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue"]):
+            color = 17    # Yellow
+        return color
 
     def log(self, s):
         self.parent.log(s)
@@ -221,7 +238,6 @@ class Editor:
                     #    s = s[:max_len+part_offset-len(s)-1]
                     #if part_offset > 20:
                     #    break
-                #self.window.addstr(i, x_offset, line_part)
 
             # Normal rendering
             else:
@@ -230,7 +246,10 @@ class Editor:
                     line_part += self.line_end_char
                 if len(line_part) >= max_len:
                     line_part = line_part[:max_len]
-                self.window.addstr(i, x_offset, line_part)
+                if self.show_line_colors:
+                    self.window.addstr(i, x_offset, line_part, curses.color_pair(self.line_color(line)))
+                else:
+                    self.window.addstr(i, x_offset, line_part)
             i += 1
         self.render_cursors()
         self.window.refresh()
@@ -246,10 +265,6 @@ class Editor:
             if x < self.line_offset(): continue 
             if x > max_x-1: continue 
             self.window.chgat(y, cursor.x+self.line_offset()-self.x_scroll, 1, self.cursor_style)
-            # Modify main cursor?
-            #if cursor == main:
-                #self.window.addstr(">", curses.color_pair(1))
-                #self.window.chgat(y, cursor.x+3, 1, self.cursor_style)
 
     def refresh(self):
         self.window.refresh()
@@ -338,10 +353,11 @@ class Editor:
 
     def arrow_right(self):
         for cursor in self.cursors:
-            if cursor.y != len(self.lines)-1 and cursor.x == len(self.lines[cursor.y]):
+            line = self.lines[cursor.y]
+            if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0 ):
                 cursor.y += 1
                 cursor.x = 0
-            else:
+            elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:
                 cursor.x += 1
         self.move_cursors()
 
@@ -469,14 +485,12 @@ class Editor:
         self.move_cursors()
 
     def delete(self):
-        # FIXME: delete empty line
         for cursor in self.cursors:
             line = self.lines[cursor.y]
-            if len(self.lines) and not len(line):
+            if len(self.lines)>1 and cursor.y == len(line)-1:
                 self.lines.pop(cursor.y)
                 self.move_x_cursors(cursor.y, cursor.x, -1)
-            #elif len(self.lines) and not len(line):
-            #    
+            #elif curlen(self.lines) and not len(line):
             else:
                 start = line[:cursor.x]
                 end = line[cursor.x+1:]
@@ -501,7 +515,6 @@ class Editor:
             else:
                 # TODO: tab backspace
                 line = self.lines[cursor.y]
-                #if cursor.x >=
                 start = line[:cursor.x-1]
                 end = line[cursor.x:]
                 self.lines[cursor.y] = start+end
@@ -657,7 +670,6 @@ class Editor:
                 indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
             else:
                 indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
-            #indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
                 new = Cursor(i+x_offset, y)
                 if not self.cursor_exists(new):

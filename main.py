@@ -67,7 +67,8 @@ class File:
     def __init__(self):
         self.name = ""
         self.fpath = ""
-        self.data = ""
+        self.data = None
+        self.read_only = False
         self.last_save = None
         self.opened = time.time()
         self.editor = None
@@ -97,7 +98,7 @@ class File:
          self.last_save = time.time()
 
     def save(self):
-        self.log("Saving: "+self._path())
+        #self.log("Saving: "+self._path())
         path = self._path()
         data = self.editor.get_data()
         try:
@@ -111,7 +112,7 @@ class File:
         return True
 
     def load(self):
-        self.log("loading: "+self._path())
+        #self.log("loading: "+self._path())
         path = self._path()
         try:
             f = open(self._path())
@@ -145,57 +146,92 @@ class App:
         self.config.load()
 
         self.screen = curses.initscr()
+        self.setup_colors()
+
+        curses.cbreak()
+        curses.noecho()
+        curses.curs_set(0)
+        self.screen.keypad(1)
+        # Mouse mode kills scroll wheel...
+        #curses.mousemask(curses.BUTTON1_CLICKED)
+
+        self.current_yx = self.screen.getmaxyx() # For checking resize
+        self.setup_windows()
+        self.inited = 1 # Indicate that windows etc. have been created.
+
+    def setup_colors(self):
         curses.start_color()
         curses.use_default_colors()
 
         if curses.can_change_color(): # Can't get these to work :(
-            pass
             #curses.init_color(11, 254, 0, 1000)
-        
+            pass
+
         # This only works with: TERM=xterm-256color ./main.py
-        # curses.init_pair(1, curses.COLOR_BLACK, 91) # Black on yellow
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
         curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
         curses.init_pair(4, curses.COLOR_WHITE, -1)
-        #curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
         # Higlight colors:
+        black = curses.COLOR_BLACK
         curses.init_pair(10, -1, -1) # Default (white on black)
-        curses.init_pair(11, curses.COLOR_BLUE, curses.COLOR_BLACK)
-        curses.init_pair(12, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(13, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(14, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-        curses.init_pair(15, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(16, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        curses.init_pair(17, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        
-        curses.cbreak()
-        curses.noecho()
-        curses.curs_set(0)
-        self.screen.keypad(1)
-        
-        # Mouse mode kills scroll wheel...
-        #curses.mousemask(curses.BUTTON1_CLICKED)
 
-        self.current_yx = self.screen.getmaxyx()
+        curses.init_pair(11, curses.COLOR_BLUE, black)
+        curses.init_pair(12, curses.COLOR_CYAN, black)
+        curses.init_pair(13, curses.COLOR_GREEN, black)
+        curses.init_pair(14, curses.COLOR_MAGENTA, black)
+        curses.init_pair(15, curses.COLOR_RED, black)
+        curses.init_pair(17, curses.COLOR_YELLOW, black)
+        curses.init_pair(16, curses.COLOR_WHITE, black)
+
+        # Better colors
+        try:
+            curses.init_pair(11, 69, black) # blue
+            curses.init_pair(12, 81, black) # cyan
+            curses.init_pair(13, 119, black) # green
+            curses.init_pair(14, 171, black) # magenta
+            curses.init_pair(15, 197, black) # red
+            curses.init_pair(17, 221, black) # yellow
+            # curses.init_pair(17, 202, curses.COLOR_BLACK) #orange
+        except:
+            self.logger.log("Better colors failed to load.")
+
+    def setup_windows(self, resize=False):
         yx = self.screen.getmaxyx()
         self.text_input = None
-
         self.header_win = curses.newwin(1, yx[1], 0, 0)
+        self.status_win = curses.newwin(1, yx[1], yx[0]-1, 0)
         y_sub = 0
         y_start = 0
         if self.config["display"]["show_top_bar"]:
-            y_sub +=1
+            y_sub += 1
             y_start = 1
         if self.config["display"]["show_bottom_bar"]:
-            y_sub +=1
-        self.editor_win = curses.newwin(yx[0]-y_sub, yx[1], y_start, 0)
-        self.status_win = curses.newwin(1, yx[1], yx[0]-y_sub+1, 0)
+            y_sub += 1
+        if self.config["display"]["show_legend"]:
+            y_sub += 2
+        self.editor_win = curses.newwin(yx[0]-y_sub-1, yx[1], y_start, 0)
+        self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub+1, 0)
 
-        self.inited = 1 # Indicate that windows etc. have been created.
+        if resize:
+            self.editor().resize( (yx[0]-y_sub, yx[1]) )
+            self.editor().move_win( (y_start, 0) )
+
+    def reload_config(self):
+        self.config.reload()
+        for f in self.files:
+            self.setup_editor(f.editor)
         
+        self.resize()
+        self.refresh()
+
+    def max_editor_height(self):
+        d = self.config["display"]
+        subtract = int(d["show_top_bar"]) + int(d["show_bottom_bar"]) + [0,2][d["show_legend"]]
+        return self.size()[1] - subtract
+
     def log(self, s):
         self.logger.log(s)
         self.parent.status(s)
@@ -209,20 +245,7 @@ class App:
             yx = self.screen.getmaxyx()
         self.screen.clear()
         curses.resizeterm(yx[0], yx[1])
-                
-        self.header_win = curses.newwin(1, yx[1], 0, 0)
-        y_sub = 0
-        y_start = 0
-        if self.config["display"]["show_top_bar"]:
-            y_sub +=1
-            y_start = 1
-        if self.config["display"]["show_bottom_bar"]:
-            y_sub +=1
-        #self.editor_win = curses.newwin(yx[0], yx[1], y_start, 0)
-        self.editor().resize( (yx[0]-y_sub, yx[1]) )
-        self.editor().move_win( (y_start, 0) )
-        #self.editor().window.mvwin(y_start, 0)
-        self.status_win = curses.newwin(1, yx[1], yx[0]-y_sub+1, 0)
+        self.setup_windows(resize = True)
         self.screen.refresh()
 
     def check_resize(self):
@@ -253,20 +276,27 @@ class App:
         i = 0
         for file in self.files:
             if file.name[:len(s)] == s:
-                #return file
                 return i
             i += 1
         return -1
 
     def editor(self):
         return self.files[self.current_file].editor
+
+    def setup_editor(self, editor):
+        ed = self.config["editor"]
+        editor.set_tab_width(ed["tab_width"])
+        editor.set_cursor(ed["cursor"])
+        editor.set_punctuation(ed["punctuation"])
+        
+        display = self.config["display"]
+        editor.show_line_colors = display["show_line_colors"]
+        editor.show_line_nums = display["show_line_nums"]
+        editor.line_end_char = display["line_end_char"]
         
     def new_editor(self):
         editor = Editor(self, self.editor_win)
-        editor.set_tab_width(self.config["editor"]["tab_width"])
-        editor.set_cursor(self.config["editor"]["cursor"])
-        editor.set_punctuation(self.config["editor"]["punctuation"])
-        editor.show_line_nums = self.config["display"]["show_line_nums"]
+        self.setup_editor(editor)
         return editor
 
     def query(self, text):
@@ -358,19 +388,48 @@ class App:
         self.status_win.addstr(0, 0, s, curses.color_pair(1))
         self.status_win.refresh()
 
+    def show_legend(self):
+        self.legend_win.clear()
+        keys = [
+            ("F1", "Save"),
+            ("F2", "Reload"),
+            ("^O", "Open"),
+            ("^F", "Find next"),
+            ("^X", "Cut"),
+            ("INS", "Paste"),
+            ("ESC", "Single cursor"),
+            ("^G", "Go to")
+            ("^C", "Exit"),
+        ]
+        x = 0
+        y = 0
+        max_y = 1
+        for key in keys:
+            if x+len(" ".join(key)) >= self.size()[0]:
+                x = 0
+                y += 1
+                if y > max_y:
+                    break
+            self.legend_win.addstr(y, x, key[0], curses.A_REVERSE)
+            x += len(key[0])
+            self.legend_win.addstr(y, x, " "+key[1])
+            x += len(key[1])+2
+        self.legend_win.refresh()
+
     def refresh_status(self):
         if not self.inited: return False
         if self.config["display"]["show_top_bar"]:
             self.show_top_status()
         if self.capturing:
             self.show_capture_status()
-        else:
-            if self.config["display"]["show_bottom_bar"]:
-                self.show_bottom_status()
+        if self.config["display"]["show_legend"]:
+            self.show_legend()
+        if self.config["display"]["show_bottom_bar"]:
+            self.show_bottom_status()
 
     def open(self):
         name = self.query("Filename:")
-        if not name:
+        if not name or name == -1:
             return False
         exists = self.file_exists(name)
         if exists:
@@ -394,15 +453,6 @@ class App:
         self.files.append(file)
         return loaded
 
-    def read_file(self, filename):
-        try:
-            f = open(filename)
-            data = f.read()
-            f.close()
-            return data
-        except:
-            return False
-
     def load(self):
         loaded = True
         if len(sys.argv) > 1:
@@ -411,37 +461,41 @@ class App:
                 if self.file_exists(name): continue
                 if self.open_file(name):
                     loaded = True
+                else:
+                    self.open_file(name, new=True)
         else:
             self.load_default()
         
     def save(self):
         fi = self.file()
         if fi.save():
-            self.status("Saved '" + fi.name + "'")
+            self.status("Saved [" + curr_time_sec() + "] '" + fi.name + "'")
+            if fi.path() == self.config.path():
+                self.reload_config()
             return True
         self.status("Couldn't write to '" + fi.name + "'")
         return False
 
     def load_default(self):
         file = self.default_file()
+        file.set_data(quick_help)
         self.files.append(file)
 
     def default_file(self):
         file = File()
         file.set_editor(self.new_editor())
-        file.set_data(quick_help)
         return file
 
     def reload(self):
-        data = self.read_file(self.file().name)
-        if self.file().reload(data):
+        if self.file().reload():
             return True
         return False
 
     def switch_to_file(self, index):
         self.current_file = index
         yx = self.screen.getmaxyx()
-        self.editor().resize( (yx[0]-2, yx[1]) )
+        height = self.max_editor_height()
+        self.editor().resize( (height, yx[1]) )
         self.refresh()
 
     def next_file(self):
@@ -465,8 +519,13 @@ class App:
     def last_file(self):
         cur = len(self.files)-1
         return cur
-        #self.switch_to_file(cur)
-
+        
+    def help(self):
+        f = self.default_file()
+        f.set_data(quick_help)
+        self.files.append(f)
+        self.switch_to_file(self.last_file())
+    
     def handle_char(self, char):
         editor = self.editor()
         if char == 265: # F1
@@ -475,12 +534,15 @@ class App:
         elif char == 266:           # F2
             self.reload()
             return True
-        elif char == 276:
-            self.config["display"]["show_top_bar"] = not self.config["display"]["show_top_bar"]
-            self.config["display"]["show_bottom_bar"] = not self.config["display"]["show_bottom_bar"]
+        elif char == 276:           # F12
+            display = self.config["display"]
+            display["show_top_bar"] = not display["show_top_bar"]
+            display["show_bottom_bar"] = not display["show_bottom_bar"]
             self.resize()
             self.refresh()
-        elif char == 12:
+        elif char == 8:
+            self.help()
+        elif char == 5:
             # TODO: Replace this with command modules
             data = self.query("Eval:")
             res = ""
@@ -496,8 +558,7 @@ class App:
                 editor.find(what)
             return True
         elif char == 7:             # Ctrl + G
-            #lineno = self.query("Go:")
-            result = self.query("Go:")
+            result = self.query("Go to:")
             try:
                 result = int(result)
                 editor.go_to_pos(result)
