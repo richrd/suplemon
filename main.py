@@ -14,6 +14,8 @@ from config import *
 from editor import *
 from helpers import *
 
+from file import *
+
 quick_help = """
 Welcome to suplemon!
 ====================
@@ -65,71 +67,6 @@ Warning: beta software, bugs may occur.
    > Toggle line numbers
 
 """
-
-class File:
-    def __init__(self):
-        self.name = ""
-        self.fpath = ""
-        self.data = None
-        self.read_only = False
-        self.last_save = None
-        self.opened = time.time()
-        self.editor = None
-
-    def _path(self):
-        return os.path.join(self.fpath, self.name)
-
-    def path(self):
-        return self._path()
-
-    def log(self, s):
-        app.logger.log(s)
-
-    def set_data(self, data):
-        self.data = data
-        if self.editor:
-            self.editor.set_data(data)
-        
-    def set_path(self, path):
-        ab = os.path.abspath(path)
-        self.fpath, self.name = os.path.split(ab)
-        
-    def set_editor(self, editor):
-        self.editor = editor
-
-    def set_saved(self, m):
-         self.last_save = time.time()
-
-    def save(self):
-        path = self._path()
-        data = self.editor.get_data()
-        try:
-            f = open(self._path(), "w")
-            f.write(data)
-            f.close()
-        except:
-            return False
-        self.data = data
-        self.last_save = time.time()
-        return True
-
-    def load(self):
-        path = self._path()
-        try:
-            f = open(self._path())
-            data = f.read()
-            f.close()
-        except:
-            return False
-        self.data = data
-        self.editor.set_data(data)
-        return True
-
-    def reload(self):
-        return self.load()
-        
-    def is_changed(self):
-        return self.editor.get_data() != self.data
 
 class App:
     def __init__(self):
@@ -214,7 +151,7 @@ class App:
             y_sub += 1
         if self.config["display"]["show_legend"]:
             y_sub += 2
-        self.editor_win = curses.newwin(yx[0]-y_sub-1, yx[1], y_start, 0)
+        self.editor_win = curses.newwin(yx[0]-y_sub, yx[1], y_start, 0)
         self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub+1, 0)
 
         if resize:
@@ -236,7 +173,7 @@ class App:
 
     def log(self, s):
         self.logger.log(s)
-        self.parent.status(s)
+        self.status(s)
 
     def size(self):
         y, x = self.screen.getmaxyx()
@@ -262,7 +199,7 @@ class App:
         self.screen.refresh()
 
     def status(self, s):
-        self.status_msg = s
+        self.status_msg = str(s)
         self.refresh_status()
 
     def file(self):

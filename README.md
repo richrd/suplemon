@@ -59,7 +59,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
    > Find text
    
  * Ctrl + D
-   > Add a new cursor at the next occurance
+   > Find next (add a new cursor at the next occurance)
  
  * Alt + Page Up
    > Move line(s) up
@@ -76,6 +76,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * F9
    > Toggle line numbers
  
+ * Ctrl + O
+   > Open file
+   
  * Ctrl + Page Up
    > Switch to next file
  
@@ -86,7 +89,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Todo
  * [ ] Custom key bindings
  * [ ] Close files one at a time with 'save?' prompt.
- * [ ] Duplicate line (without clipboard)
  * [ ] Undo / Redo
  * [ ] Auto complete
  * [ ] Selections
@@ -94,7 +96,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Proper syntax higlighting
  * [ ] Editor plugins/extensions/macros
  * [ ] Move config file to user home directory
+ * [ ] File type detection for highlighting
  * ...
+ * [X] Duplicate line (without clipboard)
  * [X] Use semver 
  * [X] Nano-like menu and keyboard shortcuts with legend
  * [X] Go to file as well as line number 
@@ -107,7 +111,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Loading multiple files and switching between them
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
- 
+  
 # Fix / Defects
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Add 'remove previous cursor' function

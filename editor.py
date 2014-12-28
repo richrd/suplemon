@@ -5,6 +5,9 @@ import re
 import sys
 import time
 import curses
+
+from line import *
+from cursor import *
 from helpers import *
 
 try:
@@ -17,67 +20,6 @@ try:
     pygments = True
 except:
     pygments = False
-
-class Line:
-    def __init__(self, data):
-        self.data = data
-        self.x_scroll = 0
-
-    def __getitem__(self, i):
-        return self.data[i]
-
-    def __setitem__(self, i, v):
-        self.data[i] = v
-
-    def __str__(self):
-        return self.data
-
-    def __add__(self, other):
-        return str(self) + other
-    
-    def __radd__(self, other):
-        return other + str(self)
-
-    def __len__(self):
-        return len(self.data)
-
-    def find(self, what):
-        return self.data.find(what)
-
-    def strip(self, *args):
-        return self.data.strip(*args)
-
-class Cursor:
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
-        
-    def __getitem__(self, i):
-        if i == 0:
-            return self.x
-        elif i == 1:
-            return self.y
-
-    def __setitem__(self, i, v):
-        if i == 0:
-            self.x = v
-        elif i == 1:
-            self.y = v
-
-    def __eq__(self, item):
-        if isinstance(item, Cursor):
-            if item.x == self.x and item.y == self.x:
-                return True
-        return False
-
-    def __ne__(self, item):
-        if isinstance(item, Cursor):
-            if item.x != self.x and item.y != self.x:
-                return False
-
-    def tuple(self):
-        return (self.x, self.y)
-
 
 class Editor:
     def __init__(self, parent, window):
@@ -712,6 +654,17 @@ class Editor:
     def find_all(self):
         self.find(self.last_find, True)
 
+    def duplicate_line(self):
+        #reverse(sorted(self.cursors, key = lambda c: (c.y, c.x)))
+        curs = sorted(self.cursors, key = lambda c: (c.y, c.x))
+        self.parent.log(curs)
+        #cur_y = []
+        for cursor in curs:
+            line = self.lines[cursor.y]
+            self.lines.insert(cursor.y+1, line)
+            self.move_y_cursors(cursor.y+1, 1)
+        self.move_cursors()
+        
     def got_chr(self, char):
         if char == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
         elif char == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
@@ -749,6 +702,7 @@ class Editor:
         elif char == 353: self.untab()                         # Shift + Tab
         elif char == 10: self.enter()                          # Enter
         elif char == 27: self.escape()                         # Escape
+        elif char == 23: self.duplicate_line()                 # Ctrl + W
         else:
             try:
                 letter = chr(char)
