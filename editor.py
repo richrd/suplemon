@@ -49,18 +49,13 @@ class Editor:
 
         self.tab_width = 4
         self.punctuation = ""
-
-    def set_file_extension(self, ext):
-        """Set the file extension."""
-        self.file_extension = ext.lower()
-        self.setup_linelight()
-
+        self.auto_indent_newline = 1
     def setup_linelight(self):
         """Setup line based highlighting."""
         filename = self.file_extension + ".py"
         try:
             mod = imp.load_source(self.file_extension, "linelight/" + filename)
-        except Exception, e:
+        except:
             self.parent.logger.log(get_error_info())
             self.parent.logger.log("no linelight found")
             return False
@@ -78,6 +73,7 @@ class Editor:
         #self.colors = Colors()
 
     def line_color(self, raw_line):
+        """Return a color based on line contents."""
         try:
             return self.linelighter(raw_line)
         except:
@@ -86,13 +82,6 @@ class Editor:
     def log(self, s):
         """Log to the app."""
         self.parent.log(s)
-
-    #def load(self, data=None):
-    #    """Load data."""
-    #    if data:
-    #        self.set_data(data)
-    #        self.cursors = [ Cursor() ]
-    #        self.move_cursors()
 
     def set_data(self, data):
         """Set editor data or contents."""
@@ -104,8 +93,14 @@ class Editor:
 
     def get_data(self):
         """Get editor contents."""
-        data = "\n".join(map(str,self.lines))
+        #data = u"\n".join(map(str,self.lines))
+        data = u"\n".join(map(lambda line: line.data ,self.lines))
         return data
+        
+    def set_file_extension(self, ext):
+        """Set the file extension."""
+        self.file_extension = ext.lower()
+        self.setup_linelight()
 
     def set_tab_width(self, w):
         """Set how many spaces are inserted with tab key."""
@@ -125,6 +120,9 @@ class Editor:
             return False
         return True
 
+    def set_auto_indent_newline(self, value):
+        self.auto_indent_newline = value
+        
     def size(self):
         """Get editor size (x,y)."""
         y,x = self.window.getmaxyx()
@@ -216,6 +214,9 @@ class Editor:
                     line_part += self.line_end_char
                 if len(line_part) >= max_len:
                     line_part = line_part[:max_len]
+
+                line_part = line_part.encode("UTF-8")
+                #line_part = line_part.decode("utf-8")
                 if self.show_line_colors:
                     self.window.addstr(i, x_offset, line_part, curses.color_pair(self.line_color(line)))
                 else:
@@ -277,7 +278,8 @@ class Editor:
         elif cur.y - self.y_scroll < 0:
             self.y_scroll = cur.y
         if cur.x - self.x_scroll+offset > size[0] - 1:
-            self.x_scroll = len(self.lines[cur.y]) - size[0]+offset
+            # +1 to allow space for cursor at line end
+            self.x_scroll = len(self.lines[cur.y]) - size[0]+offset+1
         if cur.x - self.x_scroll < 0:
             self.x_scroll  -= abs(cur.x - self.x_scroll) # FIXME
         if cur.x - self.x_scroll+offset < offset:
@@ -488,25 +490,16 @@ class Editor:
         """Delete the next character."""
         for cursor in self.cursors:
             line = self.lines[cursor.y]
-            if len(self.lines)>1 and cursor.x == len(line):
+            if len(self.lines)>1 and cursor.x == len(line) and cursor.y != len(self.lines)-1:
                 data = self.lines[cursor.y]
                 self.lines.pop(cursor.y)
-                self.lines[cursor.y] = data+self.lines[cursor.y]
+                self.lines[cursor.y] = Line(data+self.lines[cursor.y])
                 self.move_x_cursors(cursor.y, cursor.x, -1)
             else:
                 start = line[:cursor.x]
                 end = line[cursor.x+1:]
-                self.lines[cursor.y] = start+end
+                self.lines[cursor.y] = Line(start+end)
                 self.move_x_cursors(cursor.y, cursor.x, -1)
-
-            # if len(self.lines)>1 and cursor.y == len(self.lines)-1: # Special case
-            #     self.lines.pop(cursor.y)
-            #     self.move_x_cursors(cursor.y, cursor.x, -1)
-            # else: # Default
-            #     start = line[:cursor.x]
-            #     end = line[cursor.x+1:]
-            #     self.lines[cursor.y] = start+end
-            #     self.move_x_cursors(cursor.y, cursor.x, -1)
         self.move_cursors()
 
     def backspace(self):
@@ -529,7 +522,7 @@ class Editor:
                 line = self.lines[cursor.y]
                 start = line[:cursor.x-1]
                 end = line[cursor.x:]
-                self.lines[cursor.y] = start+end
+                self.lines[cursor.y] = Line(start+end)
                 cursor.x -= 1
                 self.move_x_cursors(cursor.y, cursor.x, -1)
         # Ensure we keep the view scrolled
@@ -551,14 +544,14 @@ class Editor:
             end = line[cursor.x:]
 
             # Leave the beginning of the line
-            self.lines[cursor.y] = start
-
-            wspace = self.whitespace(self.lines[cursor.y])*" "
-            self.lines.insert(cursor.y+1, wspace+end)
+            self.lines[cursor.y] = Line(start)
+            wspace = ""
+            if self.auto_indent_newline:
+                wspace = self.whitespace(self.lines[cursor.y])*" "
+            self.lines.insert(cursor.y+1, Line(wspace+end))
             self.move_y_cursors(cursor.y, 1)
             cursor.x = len(wspace)
             cursor.y += 1
-            self.render()
         self.move_cursors()
 
     def insert(self):
@@ -571,14 +564,14 @@ class Editor:
                 line = self.lines[cursor.y]
                 buf = buffer[0]
                 line = line[:cursor.x]+buf+line[cursor.x:]
-                self.lines[cursor.y] = line
+                self.lines[cursor.y] = Line(line)
                 buffer.pop(0)
                 self.move_x_cursors(cursor.y, cursor.x-1, len(buf))
         else:
             for buf in self.buffer:
                 y = cur[1]
                 if y < 0: y = 0
-                self.lines.insert(y, buf)
+                self.lines.insert(y, Line(buf))
                 self.move_y_cursors(cur[1]-1, 1)
         self.move_cursors()
             
@@ -592,8 +585,8 @@ class Editor:
             
             if cursor.y == 0: break
             old = self.lines[cursor.y-1]
-            self.lines[cursor.y-1] = self.lines[cursor.y]
-            self.lines[cursor.y] = old
+            self.lines[cursor.y-1] = Line(self.lines[cursor.y])
+            self.lines[cursor.y] = Line(old)
             cursor.y -= 1
         self.move_cursors()
         
@@ -606,8 +599,8 @@ class Editor:
             if cursor.y >= len(self.lines)-1:break
             used_y.append(cursor.y)
             old = self.lines[cursor.y+1]
-            self.lines[cursor.y+1] = self.lines[cursor.y]
-            self.lines[cursor.y] = old
+            self.lines[cursor.y+1] = Line(self.lines[cursor.y])
+            self.lines[cursor.y] = Line(old)
             cursor.y += 1
         self.move_cursors()
 
@@ -627,7 +620,7 @@ class Editor:
             if line[:self.tab_width] == " "*self.tab_width:
                 linenums.append(cursor.y)
                 cursor.x = 0
-                self.lines[cursor.y] = line[self.tab_width:]
+                self.lines[cursor.y] = Line(line[self.tab_width:])
 
     def cut(self):
         """Cut lines to buffer."""
@@ -651,7 +644,7 @@ class Editor:
             line = self.lines[cursor.y]
             start = line[:cursor.x]
             end = line[cursor.x:]
-            self.lines[cursor.y] = start+letter+end
+            self.lines[cursor.y] = Line(start + letter + end)
             self.move_x_cursors(cursor.y, cursor.x, 1)
             cursor.x += 1
         self.move_cursors()
@@ -759,7 +752,7 @@ class Editor:
         elif char == 22: self.insert()                         # Ctrl + V
 
         elif char == 4: self.find_next()                       # Ctrl + D
-        elif char == 1: self.find_all()                        # Ctrl + D
+        elif char == 1: self.find_all()                        # Ctrl + A
         elif char == 24: self.cut()                            # Ctrl + X
         elif char == 544: self.jump_left()                     # Ctrl + Left
         elif char == 559: self.jump_right()                    # Ctrl + Right
@@ -781,6 +774,8 @@ class Editor:
         else:
             try:
                 letter = chr(char)
+                #letter = unichr(char)
+                #letter = curses.keyname(char)
                 self.type(letter)
             except:
                 pass

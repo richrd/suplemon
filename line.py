@@ -1,7 +1,8 @@
 
-
 class Line:
     def __init__(self, data):
+        if isinstance(data, Line):
+            data = data.data
         self.data = data
         self.x_scroll = 0
 
@@ -15,10 +16,10 @@ class Line:
         return self.data
 
     def __add__(self, other):
-        return str(self) + other
+        return self.data + other
     
     def __radd__(self, other):
-        return other + str(self)
+        return other + self.data
 
     def __len__(self):
         return len(self.data)

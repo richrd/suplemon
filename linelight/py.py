@@ -15,6 +15,6 @@ def parse(raw_line):
         color = 13    # Cyan
     elif starts(line, ["#", "//", "\"", "'"]):
         color = 14    # Magenta
-    elif starts(line, ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue"]):
+    elif starts(line, ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue", "pass", "break"]):
         color = 17    # Yellow
     return color

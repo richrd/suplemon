@@ -2,7 +2,8 @@ import os
 import time
 
 class File:
-    def __init__(self):
+    def __init__(self, parent = None):
+        self.parent = parent
         self.name = ""
         self.fpath = ""
         self.data = None
@@ -18,20 +19,23 @@ class File:
         return self._path()
 
     def log(self, s):
-        try:
-            app.logger.log(s)
-        except:
-            print s
+        self.parent.logger.log(s)
+            
+    def set_name(self, name):
+        # TODO: sanitize
+        self.name = name
+        
+    def set_path(self, path):
+        ab = os.path.abspath(path)
+        self.log(str(ab))
+        self.fpath, self.name = os.path.split(ab)
+        self.log(str([self.fpath, self.name]))
 
     def set_data(self, data):
         self.data = data
         if self.editor:
             self.editor.set_data(data)
-        
-    def set_path(self, path):
-        ab = os.path.abspath(path)
-        self.fpath, self.name = os.path.split(ab)
-        
+                
     def set_editor(self, editor):
         self.editor = editor
         ext = self.name.split(".")

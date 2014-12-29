@@ -9,5 +9,8 @@ class Logger:
 
     def output(self):
         for line in self.lines:
-            print line
+            try:
+                print(line)
+            except:
+                pass
             

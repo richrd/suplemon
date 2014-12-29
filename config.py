@@ -6,8 +6,9 @@ from helpers import *
 class Config:
     def __init__(self, parent):
         self.parent = parent
-        self.filename = "config.json"
-        self.fpath = os.path.dirname(os.path.realpath(__file__))
+        self.filename = ".suplemon-config.json"
+        self.fpath = os.path.expanduser("~")
+        #self.fpath = os.path.dirname(os.path.realpath(__file__))
         self.defaults = {
             "app": {
                 "remember_open_files": False
@@ -36,14 +37,14 @@ class Config:
 
         self.config = dict(self.defaults)
 
-    def path(self):
-        return os.path.join(self.fpath, self.filename)
-
     def log(self, s):
         self.parent.status(s)
 
     def err(self, s):
         self.parent.logger.log(s)
+
+    def path(self):
+        return os.path.join(self.fpath, self.filename)
 
     def load(self):
         try:
@@ -78,4 +79,3 @@ class Config:
 
     def __len__(self):
         return len(self.config)
-

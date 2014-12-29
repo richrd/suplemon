@@ -22,7 +22,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Usage:
 
-    python main.py [filename]...
+    python3 main.py [filename]...
+
+Must use python3 for proper character encoding support.
 
 # Features
  * Terminal text editing with style
@@ -86,6 +88,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
+ * [ ] New file and close file
  * [ ] Custom key bindings
  * [ ] Close files one at a time with 'save?' prompt.
  * [ ] Undo / Redo
@@ -94,9 +97,10 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Storing files and cursor positions for restoring later
  * [ ] Proper syntax higlighting
  * [ ] Editor plugins/extensions/macros
- * [ ] Move config file to user home directory
- * [ ] File type detection for highlighting
- * ...
+ * [ ] Read only viewer
+ * [X] ...
+ * [X] Move config file to user home directory
+ * [X] File type detection for highlighting
  * [X] Duplicate line (without clipboard)
  * [X] Use semver 
  * [X] Nano-like menu and keyboard shortcuts with legend
@@ -115,6 +119,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
+ * [ ] Can't open files like '~/.suplemon-config.json'
+ * [ ] Encoding errors
+ * [X] Cursor invisible when at end of scrolled line
  * [X] Esc key effect is delayed
  * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
  * [X] Start find at current line AND column
