@@ -20,7 +20,7 @@ quick_help = """
 Welcome to suplemon!
 ====================
 
-Usage: ```python main.py [filename]```
+Usage: ```python main.py [filename]...```
 
 
 Warning: beta software, bugs may occur.
@@ -32,39 +32,48 @@ Warning: beta software, bugs may occur.
 
  * Ctrl + Left / Right
    > Jump to previous or next word
-
+ 
  * ESC
    > Revert to a single cursor
-
+   
  * Ctrl + X
    > Cut line(s) to buffer
-
+   
  * Insert
    > Insert buffer
 
  * Ctrl + G
-   > Go to line number
-
+   > Go to line number or file
+   
  * Ctrl + F
    > Find text
-
+   
  * Ctrl + D
-   > Add a new cursor at the next occurance
-
+   > Find next (add a new cursor at the next occurance)
+ 
  * Alt + Page Up
    > Move line(s) up
-
+ 
  * Alt + Page Down
    > Move line(s) down
-
+   
  * F1
    > Save current file
-
+   
  * F2
    > Reload current file
-
+   
  * F9
    > Toggle line numbers
+ 
+ * Ctrl + O
+   > Open file
+   
+ * Ctrl + Page Up
+   > Switch to next file
+ 
+ * Ctrl + Page Down
+   > Switch to previous file
 
 """
 
@@ -99,6 +108,7 @@ class App:
         self.inited = 1 # Indicate that windows etc. have been created.
 
     def setup_colors(self):
+        """Initialize color support and define colors."""
         curses.start_color()
         curses.use_default_colors()
 
@@ -138,6 +148,7 @@ class App:
             self.logger.log("Better colors failed to load.")
 
     def setup_windows(self, resize=False):
+        """Initialize windows."""
         yx = self.screen.getmaxyx()
         self.text_input = None
         self.header_win = curses.newwin(1, yx[1], 0, 0)
@@ -158,70 +169,6 @@ class App:
             self.editor().resize( (yx[0]-y_sub, yx[1]) )
             self.editor().move_win( (y_start, 0) )
 
-    def reload_config(self):
-        self.config.reload()
-        for f in self.files:
-            self.setup_editor(f.editor)
-        
-        self.resize()
-        self.refresh()
-
-    def max_editor_height(self):
-        d = self.config["display"]
-        subtract = int(d["show_top_bar"]) + int(d["show_bottom_bar"]) + [0,2][d["show_legend"]]
-        return self.size()[1] - subtract
-
-    def log(self, s):
-        self.logger.log(s)
-        self.status(s)
-
-    def size(self):
-        y, x = self.screen.getmaxyx()
-        return (x, y)
-
-    def resize(self, yx=None):
-        if yx == None:
-            yx = self.screen.getmaxyx()
-        self.screen.clear()
-        curses.resizeterm(yx[0], yx[1])
-        self.setup_windows(resize = True)
-        self.screen.refresh()
-
-    def check_resize(self):
-        yx = self.screen.getmaxyx()
-        if self.current_yx != yx:
-            self.current_yx = yx
-            self.resize(yx)
-
-    def refresh(self):
-        self.editor().render()
-        self.refresh_status()
-        self.screen.refresh()
-
-    def status(self, s):
-        self.status_msg = str(s)
-        self.refresh_status()
-
-    def file(self):
-        return self.files[self.current_file]
-
-    def file_exists(self, path):
-        for file in self.files:
-            if file.path() == os.path.abspath(path):
-                return file
-        return False
-
-    def find_file(self, s):
-        i = 0
-        for file in self.files:
-            if file.name[:len(s)] == s:
-                return i
-            i += 1
-        return -1
-
-    def editor(self):
-        return self.files[self.current_file].editor
-
     def setup_editor(self, editor):
         ed = self.config["editor"]
         editor.set_tab_width(ed["tab_width"])
@@ -232,27 +179,6 @@ class App:
         editor.show_line_colors = display["show_line_colors"]
         editor.show_line_nums = display["show_line_nums"]
         editor.line_end_char = display["line_end_char"]
-        
-    def new_editor(self):
-        editor = Editor(self, self.editor_win)
-        self.setup_editor(editor)
-        return editor
-
-    def query(self, text):
-        self.show_capture_status(text)
-        self.text_input = curses.textpad.Textbox(self.status_win)
-        try:
-            out = self.text_input.edit()
-        except:
-            return -1
-
-        # If input begins with prompt, remove the prompt text
-        if len(out) >= len(text):
-           if out[:len(text)] == text:
-                out = out[len(text):]
-        if len(out) > 0 and out[-1] == " ": out = out[:-1]
-        out = out.rstrip("\r\n")
-        return out
 
     def show_top_status(self):
         self.header_win.clear()
@@ -354,7 +280,8 @@ class App:
         self.legend_win.refresh()
 
     def refresh_status(self):
-        if not self.inited: return False
+        if not self.inited: 
+            return False
         if self.config["display"]["show_top_bar"]:
             self.show_top_status()
         if self.capturing:
@@ -364,7 +291,108 @@ class App:
         if self.config["display"]["show_bottom_bar"]:
             self.show_bottom_status()
 
+    def reload_config(self):
+        """Reload configuration."""
+        self.config.reload()
+        for f in self.files:
+            self.setup_editor(f.editor)
+        
+        self.resize()
+        self.refresh()
+
+    def max_editor_height(self):
+        """Get maximum height of editor window."""
+        d = self.config["display"]
+        subtract = int(d["show_top_bar"]) + int(d["show_bottom_bar"]) + [0,2][d["show_legend"]]
+        return self.size()[1] - subtract
+
+    def check_resize(self):
+        """Check if terminal has resized."""
+        yx = self.screen.getmaxyx()
+        if self.current_yx != yx:
+            self.current_yx = yx
+            self.resize(yx)
+
+    def log(self, text):
+        """Add text to log."""
+        self.logger.log(text)
+        self.status(text)
+
+    def size(self):
+        """Get terminal size."""
+        y, x = self.screen.getmaxyx()
+        return (x, y)
+
+    def resize(self, yx=None):
+        """Resize UI to yx."""
+        if yx == None:
+            yx = self.screen.getmaxyx()
+        self.screen.clear()
+        curses.resizeterm(yx[0], yx[1])
+        self.setup_windows(resize = True)
+        self.screen.refresh()
+
+    def refresh(self):
+        """Refresh the UI."""
+        self.editor().render()
+        self.refresh_status()
+        self.screen.refresh()
+
+    def status(self, s):
+        """Set the status message."""
+        self.status_msg = str(s)
+        self.refresh_status()
+
+    def file(self):
+        """Return the current file."""
+        return self.files[self.current_file]
+
+    def editor(self):
+        """Return the current editor."""
+        return self.files[self.current_file].editor
+
+    def file_exists(self, path):
+        """Check if file is open."""
+        for file in self.files:
+            if file.path() == os.path.abspath(path):
+                return file
+        return False
+
+    def find_file(self, s):
+        """Find index of file matching string."""
+        i = 0
+        for file in self.files:
+            if file.name[:len(s)] == s:
+                return i
+            i += 1
+        return -1
+        
+    def new_editor(self):
+        """Create a new editor instance."""
+        editor = Editor(self, self.editor_win)
+        self.setup_editor(editor)
+        return editor
+
+    def query(self, text):
+        """Ask for text input via the status bar."""
+        self.show_capture_status(text)
+        self.text_input = curses.textpad.Textbox(self.status_win)
+        try:
+            out = self.text_input.edit()
+        except:
+            return -1
+
+        # If input begins with prompt, remove the prompt text
+        if len(out) >= len(text):
+           if out[:len(text)] == text:
+                out = out[len(text):]
+        if len(out) > 0 and out[-1] == " ": out = out[:-1]
+        out = out.rstrip("\r\n")
+        return out
+
+
     def open(self):
+        """Ask for file name and try to open it."""
         name = self.query("Open:")
         if not name or name == -1:
             return False
@@ -379,7 +407,19 @@ class App:
         self.switch_to_file(self.last_file())
         return True
 
+    def save(self):
+        """Save current file app."""
+        fi = self.file()
+        if fi.save():
+            self.status("Saved [" + curr_time_sec() + "] '" + fi.name + "'")
+            if fi.path() == self.config.path():
+                self.reload_config()
+            return True
+        self.status("Couldn't write to '" + fi.name + "'")
+        return False
+
     def open_file(self, filename, new = False):
+        """Open a file."""
         result = ""
         file = File()
         file.set_path(filename)
@@ -391,6 +431,7 @@ class App:
         return loaded
 
     def load(self):
+        """Load the app."""
         loaded = True
         if len(sys.argv) > 1:
             names = sys.argv[1:]
@@ -402,33 +443,27 @@ class App:
                     self.open_file(name, new=True)
         else:
             self.load_default()
-        
-    def save(self):
-        fi = self.file()
-        if fi.save():
-            self.status("Saved [" + curr_time_sec() + "] '" + fi.name + "'")
-            if fi.path() == self.config.path():
-                self.reload_config()
-            return True
-        self.status("Couldn't write to '" + fi.name + "'")
-        return False
 
     def load_default(self):
+        """Load a default file if no files specified."""
         file = self.default_file()
         file.set_data(quick_help)
         self.files.append(file)
 
     def default_file(self):
+        """Create the default file."""
         file = File()
         file.set_editor(self.new_editor())
         return file
 
     def reload(self):
+        """Reload the current file."""
         if self.file().reload():
             return True
         return False
 
     def switch_to_file(self, index):
+        """Load a default file if no files specified."""
         self.current_file = index
         yx = self.screen.getmaxyx()
         height = self.max_editor_height()
@@ -436,7 +471,8 @@ class App:
         self.refresh()
 
     def next_file(self):
-        self.status("Next file...")
+        """Switch to next file."""
+        #self.status("Next file...")
         if len(self.files) < 2: return
         cur = self.current_file
         cur += 1
@@ -445,7 +481,8 @@ class App:
         self.switch_to_file(cur)
 
     def prev_file(self):
-        self.status("Previous file...")
+        """Switch to previous file."""
+        #self.status("Previous file...")
         if len(self.files) < 2: return
         cur = self.current_file
         cur -= 1
@@ -454,16 +491,19 @@ class App:
         self.switch_to_file(cur)
 
     def last_file(self):
+        """Get index of last file."""
         cur = len(self.files)-1
         return cur
         
     def help(self):
+        """Open help file."""
         f = self.default_file()
         f.set_data(quick_help)
         self.files.append(f)
         self.switch_to_file(self.last_file())
     
     def handle_char(self, char):
+        """Handle a character from curses."""
         editor = self.editor()
         if char == 265: # F1
             self.save()
@@ -522,6 +562,7 @@ class App:
         return False
         
     def keyboard_interrupt(self):
+        """Handle a keyboard interrupt."""
         try:
             yes = self.query("Exit?")
         except:
@@ -533,6 +574,7 @@ class App:
         return False
 
     def run(self):
+        """Run the app."""
         self.load()
         self.running = 1
         self.refresh()
@@ -562,4 +604,5 @@ def main(*args):
 if __name__ == "__main__":
     curses.wrapper(main)
 
+# Output log info
 app.logger.output()

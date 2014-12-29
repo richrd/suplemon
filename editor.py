@@ -1,10 +1,12 @@
 #!/usr/bin/python
 #-*- coding:utf-8
+
 import os
 import re
 import sys
 import time
 import curses
+import imp
 
 from line import *
 from cursor import *
@@ -27,6 +29,9 @@ class Editor:
         self.window = window
         self.data = ""
         self.lines = [""]
+        self.file_extension = ""
+        self.linelighter = lambda line: 0
+
         self.show_line_nums = True
         self.show_line_ends = True
         self.line_end_char = "<"
@@ -35,6 +40,7 @@ class Editor:
         self.show_highlighting = False
         if pygments != False:
             self.setup_highlighting()
+
         self.y_scroll = 0
         self.x_scroll = 0
         self.cursors = [Cursor()]
@@ -44,56 +50,73 @@ class Editor:
         self.tab_width = 4
         self.punctuation = ""
 
+    def set_file_extension(self, ext):
+        """Set the file extension."""
+        self.file_extension = ext.lower()
+        self.setup_linelight()
+
+    def setup_linelight(self):
+        """Setup line based highlighting."""
+        filename = self.file_extension + ".py"
+        try:
+            mod = imp.load_source(self.file_extension, "linelight/" + filename)
+        except Exception, e:
+            self.parent.logger.log(get_error_info())
+            self.parent.logger.log("no linelight found")
+            return False
+        if not "parse" in dir(mod):
+            return False
+        self.linelighter = mod.parse
+
     def setup_highlighting(self):
+        """Setup pygments syntax highlighting."""
         return # Incomplete implementation
-        self.show_highlighting = True
-        self.lexer = PythonLexer(encoding = 'utf-8')
-        self.term_fmt = CursesFormatter(encoding = 'utf-8')
-        self.outfile = HighlightFile()
-        self.colors = Colors()
+        #self.show_highlighting = True
+        #self.lexer = PythonLexer(encoding = 'utf-8')
+        #self.term_fmt = CursesFormatter(encoding = 'utf-8')
+        #self.outfile = HighlightFile()
+        #self.colors = Colors()
 
     def line_color(self, raw_line):
-        color = 0
-        line = raw_line.strip()
-        if starts(line, ["import", "from"]):
-            color = 11
-        elif starts(line, "class"):
-            color = 13    # Green
-        elif starts(line, "def"):
-            color = 12    # Cyan
-        elif starts(line, ["return", "yield"]):
-            color = 15    # Red
-        elif starts(line, "self."):
-            color = 13    # Cyan
-        elif starts(line, ["#", "//", "\"", "'"]):
-            color = 14    # Magenta
-        elif starts(line, ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue"]):
-            color = 17    # Yellow
-        return color
+        try:
+            return self.linelighter(raw_line)
+        except:
+            return 0
 
     def log(self, s):
+        """Log to the app."""
         self.parent.log(s)
 
-    def load(self, data=None):
-        if data:
-            self.set_data(data)
-            self.cursors = [ Cursor() ]
-            self.move_cursors()
+    #def load(self, data=None):
+    #    """Load data."""
+    #    if data:
+    #        self.set_data(data)
+    #        self.cursors = [ Cursor() ]
+    #        self.move_cursors()
 
     def set_data(self, data):
+        """Set editor data or contents."""
         self.data = data
         self.lines = []
         lines = self.data.split("\n")
         for line in lines:
             self.lines.append(Line(line))
 
+    def get_data(self):
+        """Get editor contents."""
+        data = "\n".join(map(str,self.lines))
+        return data
+
     def set_tab_width(self, w):
+        """Set how many spaces are inserted with tab key."""
         self.tab_width = w
 
     def set_punctuation(self, p):
+        """Set string of punctuation characters used to jump between words."""
         self.punctuation = p
 
     def set_cursor(self, cursor):
+        """Set cursor style."""
         if cursor == "underline":
             self.cursor_style = curses.A_UNDERLINE
         elif cursor == "reverse":
@@ -102,11 +125,8 @@ class Editor:
             return False
         return True
 
-    def get_data(self):
-        data = "\n".join(map(str,self.lines))
-        return data
-
     def size(self):
+        """Get editor size (x,y)."""
         y,x = self.window.getmaxyx()
         return (x,y)
 
@@ -115,33 +135,40 @@ class Editor:
         return self.cursors[0]
 
     def toggle_line_nums(self):
+        """Toggle display of line numbers."""
         self.show_line_nums = not self.show_line_nums
         self.render()
 
     def toggle_line_ends(self):
+        """Toggle display of line ends."""
         self.show_line_ends = not self.show_line_ends
         self.render()
 
     def toggle_highlight(self):
+        """Toggle syntax highlighting."""
         return False
         #self.show_highlighting = not self.show_highlighting
         #self.render()
 
     def pad_lnum(self, n):
+        """Pad line number with zeroes."""
         s = str(n)
         while len(s) < self.line_offset()-1:
             s = "0" + s
         return s
 
     def max_line_length(self):
+        """Get maximum line length that fits in the editor."""
         return self.size()[0]-self.line_offset()-1
 
     def line_offset(self):
+        """Get the x coordinate of beginning of line."""
         if not self.show_line_nums:
             return 0
         return len(str(len(self.lines)))+1
 
     def whitespace(self, line):
+        """Return index of first non whitespace character on a line."""
         i = 0
         for char in line:
             if char != " ":
@@ -150,6 +177,7 @@ class Editor:
         return i
 
     def render(self):
+        """Render the editor curses window."""
         self.window.clear()
         max_y = self.size()[1]
         i = 0
@@ -197,6 +225,7 @@ class Editor:
         self.window.refresh()
 
     def render_cursors(self):
+        """Render editor window cursors."""
         max_x, max_y = self.size()
         main = self.cursor()
         for cursor in self.cursors:
@@ -209,20 +238,25 @@ class Editor:
             self.window.chgat(y, cursor.x+self.line_offset()-self.x_scroll, 1, self.cursor_style)
 
     def refresh(self):
+        """Refresh the editor curses window."""
         self.window.refresh()
 
     def resize(self, yx = None):
+        """Resize the UI."""
         self.window.resize(yx[0], yx[1])
         self.move_cursors()
         self.refresh()
 
     def move_win(self, yx):
+        """Move the editor window to position yx."""
         self.window.mvwin( yx[0], yx[1] )
 
     def move_y_scroll(self, delta):
+        """Add delta the y scroll axis scroll"""
         self.y_scroll += delta
 
     def move_cursors(self, delta=None, noupdate=False):
+        """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
         if delta != None:
             for cursor in self.cursors:
                 if delta[0] != 0 and cursor.x >= 0:
@@ -252,18 +286,22 @@ class Editor:
             self.purge_cursors()
 
     def move_x_cursors(self, line, col, delta):
+        """Move all cursors starting at line and col with delta on the x axis."""
         for cursor in self.cursors:
             if cursor.y == line:
                 if cursor.x > col:
                     cursor.x += delta
 
     def move_y_cursors(self, line, delta, exclude = None):
+        """Move all cursors starting at line and col with delta on the y axis.
+        Exlude a cursor by passing it via the exclude argument."""
         for cursor in self.cursors:
             if cursor == exclude: continue
             if cursor.y > line:
                     cursor.y += delta
 
     def get_first_cursor(self):
+        """Get the first (primary) cursor."""
         highest = None
         for cursor in self.cursors:
             if highest == None or highest[1] > cursor.y:
@@ -271,6 +309,7 @@ class Editor:
         return highest
 
     def get_last_cursor(self):
+        """Get the last cursor."""
         lowest = None
         for cursor in self.cursors:
             if lowest == None or cursor.y > lowest[1]:
@@ -278,9 +317,11 @@ class Editor:
         return lowest
 
     def cursor_exists(self, cursor):
+        """Check if a given cursor exists."""
         return cursor.tuple() in [cursor.tuple() for cursor in self.cursors]
 
     def purge_cursors(self):
+        """Remove duplicate cursors that have the same position."""
         new = []
         # This sucks: can't use "in" for different instances (?)
         # Use a reference list instead. FIXME: use a generator
@@ -294,6 +335,7 @@ class Editor:
         self.refresh()
 
     def arrow_right(self):
+        """Move cursors right."""
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0 ):
@@ -304,6 +346,7 @@ class Editor:
         self.move_cursors()
 
     def arrow_left(self):
+        """Move cursors left."""
         for cursor in self.cursors:
             if cursor.y != 0 and cursor.x == 0:
                 cursor.y-=1
@@ -311,12 +354,15 @@ class Editor:
         self.move_cursors((-1 ,0))
 
     def arrow_up(self):
+        """Move cursors up."""
         self.move_cursors((0 ,-1))
 
     def arrow_down(self):
+        """Move cursors down."""
         self.move_cursors((0 ,1))
 
     def jump_left(self):
+        """Jump one 'word' to the left."""
         chars = self.punctuation
         for cursor in self.cursors:
             line = self.lines[cursor.y]
@@ -340,6 +386,7 @@ class Editor:
         self.move_cursors()
     
     def jump_right(self):
+        """Jump one 'word' to the right."""
         chars = self.punctuation
         for cursor in self.cursors:
             line = self.lines[cursor.y]
@@ -360,12 +407,15 @@ class Editor:
         self.move_cursors()   
 
     def jump_up(self):
+        """Jump up 3 lines."""
         self.move_cursors((0, -3))
 
     def jump_down(self):
+        """Jump down 3 lines."""
         self.move_cursors((0, 3))
 
     def new_cursor_up(self):
+        """Add a new cursor one line up."""
         cursor = self.get_first_cursor()
         if cursor.y == 0: return
         new = Cursor(cursor.x, cursor.y-1)
@@ -373,6 +423,7 @@ class Editor:
         self.move_cursors()
 
     def new_cursor_down(self):
+        """Add a new cursor one line down."""
         cursor = self.get_last_cursor()
         if cursor.y == len(self.lines)-1: return
         new = Cursor(cursor.x, cursor.y+1)
@@ -380,6 +431,7 @@ class Editor:
         self.move_cursors()
 
     def new_cursor_left(self):
+        """Add a new cursor one character left."""
         new = []
         for cursor in self.cursors:
             if cursor.x == 0: continue
@@ -389,6 +441,7 @@ class Editor:
         self.move_cursors()
 
     def new_cursor_right(self):
+        """Add a new cursor one character right."""
         new = []
         for cursor in self.cursors:
             if cursor.x+1 > len(self.lines[cursor.y]): continue
@@ -398,21 +451,25 @@ class Editor:
         self.move_cursors()
 
     def escape(self):
+        """Handle escape key. Removes all except primary cursor."""
         self.cursors = [self.cursors[0]]
         self.move_cursors()
         self.render()
 
     def page_up(self):
+        """Move half a page up."""
         for i in range(int(self.size()[1]/2)):
             self.move_cursors((0 ,1), noupdate = True)
         self.move_cursors()
 
     def page_down(self):
+        """Move half a page down."""
         for i in range(int(self.size()[1]/2)):
             self.move_cursors((0, -1), noupdate = True)
         self.move_cursors()
 
     def home(self):
+        """Move to start of line or text on that line."""
         for cursor in self.cursors:
             wspace = self.whitespace(self.lines[cursor.y])
             if cursor.x == wspace:
@@ -422,11 +479,13 @@ class Editor:
         self.move_cursors()
 
     def end(self):
+        """Move to end of line."""
         for cursor in self.cursors:
             cursor.x = len(self.lines[cursor.y])
         self.move_cursors()
 
     def delete(self):
+        """Delete the next character."""
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if len(self.lines)>1 and cursor.x == len(line):
@@ -451,6 +510,7 @@ class Editor:
         self.move_cursors()
 
     def backspace(self):
+        """Delete the previous character."""
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs: # order?
             if cursor.x == 0 and cursor.y == 0:
@@ -476,6 +536,7 @@ class Editor:
         self.move_cursors()
 
     def enter(self):
+        """Insert a new line."""
         # We sort the cursors, and loop through them from last to first
         # That way we avoid messing with the relative positions of the higher cursors
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
@@ -501,6 +562,7 @@ class Editor:
         self.move_cursors()
 
     def insert(self):
+        """Insert buffer data at cursor(s)."""
         cur = self.cursor()
         buffer = list(self.buffer)
         if len(self.buffer) == len(self.cursors):
@@ -521,6 +583,7 @@ class Editor:
         self.move_cursors()
             
     def push_up(self):
+        """Move current lines up by one line."""
         used_y = []
         curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
         for cursor in curs:
@@ -535,6 +598,7 @@ class Editor:
         self.move_cursors()
         
     def push_down(self):
+        """Move current lines down by one line."""
         used_y = []
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs:
@@ -548,10 +612,12 @@ class Editor:
         self.move_cursors()
 
     def tab(self):
+        """Indent lines."""
         for i in range(self.tab_width):
             self.type(" ")
 
-    def untab(self):  
+    def untab(self):
+        """Unindent lines."""
         linenums = []
         for cursor in self.cursors:
             if cursor.y in linenums:
@@ -564,6 +630,7 @@ class Editor:
                 self.lines[cursor.y] = line[self.tab_width:]
 
     def cut(self):
+        """Cut lines to buffer."""
         buf = []
         for cursor in self.cursors:
             if len(self.lines) == 1:
@@ -579,6 +646,7 @@ class Editor:
         self.move_cursors()
 
     def type(self, letter):
+        """Insert a character."""
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             start = line[:cursor.x]
@@ -589,6 +657,7 @@ class Editor:
         self.move_cursors()
 
     def go_to_pos(self, line, col = 0):
+        """Move primary cursor to line, col=0."""
         try:
             line = int(line)-1
             if line < 0: line = 0
@@ -604,10 +673,12 @@ class Editor:
         self.move_cursors()
 
     def click(self, x, y):
+        """Handle a click at x, y."""
         x = x - self.line_offset()
         self.go_to_pos(self.y_scroll+y+1, x)
 
     def find(self, what, findall = False):
+        """Find what in data. Adds a cursor when found."""
         self.last_find = what
         ncursors = len(self.cursors)
         last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
@@ -640,6 +711,7 @@ class Editor:
         self.move_cursors()
 
     def find_next(self):
+        """Find next occurance."""
         what = self.last_find
         if what == "":
             cursor = self.cursor()
@@ -652,10 +724,11 @@ class Editor:
         self.find(what)
 
     def find_all(self):
+        """Find all occurances."""
         self.find(self.last_find, True)
 
     def duplicate_line(self):
-        #reverse(sorted(self.cursors, key = lambda c: (c.y, c.x)))
+        """Copy current line and add it below as a new line."""
         curs = sorted(self.cursors, key = lambda c: (c.y, c.x))
         self.parent.log(curs)
         #cur_y = []
@@ -666,6 +739,7 @@ class Editor:
         self.move_cursors()
         
     def got_chr(self, char):
+        """Handle character input."""
         if char == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
         elif char == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
         elif char == curses.KEY_UP: self.arrow_up()            # Arrow Up
@@ -712,6 +786,3 @@ class Editor:
 
         self.render()
         self.refresh()
-
-    def loop(self):
-        pass

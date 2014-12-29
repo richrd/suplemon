@@ -34,6 +34,9 @@ class File:
         
     def set_editor(self, editor):
         self.editor = editor
+        ext = self.name.split(".")
+        if len(ext) > 1:
+            editor.set_file_extension(ext[-1])
 
     def set_saved(self, m):
          self.last_save = time.time()

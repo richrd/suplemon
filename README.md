@@ -23,7 +23,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Usage:
 
-    python main.py [filename]
+    python main.py [filename]...
 
 # Features
  * Terminal text editing with style
@@ -42,50 +42,50 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
  * Ctrl + Left / Right
    > Jump to previous or next word
- 
+
  * ESC
    > Revert to a single cursor
-   
+
  * Ctrl + X
    > Cut line(s) to buffer
-   
+
  * Insert
    > Insert buffer
 
  * Ctrl + G
    > Go to line number or file
-   
+
  * Ctrl + F
    > Find text
-   
+
  * Ctrl + D
    > Find next (add a new cursor at the next occurance)
- 
+
  * Alt + Page Up
    > Move line(s) up
- 
+
  * Alt + Page Down
    > Move line(s) down
-   
+
  * F1
    > Save current file
-   
+
  * F2
    > Reload current file
-   
+
  * F9
    > Toggle line numbers
- 
+
  * Ctrl + O
    > Open file
-   
+
  * Ctrl + Page Up
    > Switch to next file
- 
+
  * Ctrl + Page Down
    > Switch to previous file
-   
-   
+
+
 # Todo
  * [ ] Custom key bindings
  * [ ] Close files one at a time with 'save?' prompt.
@@ -111,11 +111,12 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Loading multiple files and switching between them
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
-  
+
 # Fix / Defects
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
+ * [ ] Esc key effect is delayed
  * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
  * [X] Start find at current line AND column
  * [X] Make editor white color brighter (not gray)
