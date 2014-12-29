@@ -6,6 +6,12 @@ __version__ = "0.0.1"
 import os
 import sys
 import time
+
+# Force enabling colors
+os.environ["TERM"] = "xterm-256color"
+# Reduce ESC detection time to 50ms
+os.environ["ESCDELAY"] = "50"
+# Now import curses
 import curses
 import curses.textpad
 
@@ -39,7 +45,7 @@ Warning: beta software, bugs may occur.
  * Ctrl + X
    > Cut line(s) to buffer
    
- * Insert
+ * Ctrl + V
    > Insert buffer
 
  * Ctrl + G

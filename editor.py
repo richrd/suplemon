@@ -747,15 +747,16 @@ class Editor:
         elif char == curses.KEY_NPAGE: self.page_up()          # Page Up    
         elif char == curses.KEY_PPAGE: self.page_down()        # Page Down
 
-        elif char == 273: self.toggle_line_nums()              # F9
-        elif char == 274: self.toggle_line_ends()              # F10
-        elif char == 275: self.toggle_highlight()              # F11
-        elif char == 331: self.insert()                        # Insert
-
         elif char == 563: self.new_cursor_up()                 # Alt + up
         elif char == 522: self.new_cursor_down()               # Alt + down
         elif char == 542: self.new_cursor_left()               # Alt + left
         elif char == 557: self.new_cursor_right()              # Alt + right
+
+        elif char == 273: self.toggle_line_nums()              # F9
+        elif char == 274: self.toggle_line_ends()              # F10
+        elif char == 275: self.toggle_highlight()              # F11
+        elif char == 331: self.insert()                        # Insert
+        elif char == 22: self.insert()                         # Ctrl + V
 
         elif char == 4: self.find_next()                       # Ctrl + D
         elif char == 1: self.find_all()                        # Ctrl + D

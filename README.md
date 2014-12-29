@@ -1,4 +1,3 @@
-
 suplemon
 ========
           ___________   _________  ___     ______________________________   ___ 
@@ -49,7 +48,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * Ctrl + X
    > Cut line(s) to buffer
 
- * Insert
+ * Ctrl + V
    > Insert buffer
 
  * Ctrl + G
@@ -116,7 +115,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
- * [ ] Esc key effect is delayed
+ * [X] Esc key effect is delayed
  * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
  * [X] Start find at current line AND column
  * [X] Make editor white color brighter (not gray)
