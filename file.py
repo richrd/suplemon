@@ -18,6 +18,14 @@ class File:
     def path(self):
         return self._path()
 
+    def parse_path(self, path):
+        if path[:2] == "~"+os.sep:
+            p  = os.path.expanduser("~")
+            path = os.path.join(p+os.sep, path[2:])
+        ab = os.path.abspath(path)
+        parts = os.path.split(ab)
+        return parts
+
     def log(self, s):
         self.parent.logger.log(s)
             
@@ -26,10 +34,7 @@ class File:
         self.name = name
         
     def set_path(self, path):
-        ab = os.path.abspath(path)
-        self.log(str(ab))
-        self.fpath, self.name = os.path.split(ab)
-        self.log(str([self.fpath, self.name]))
+        self.fpath, self.name = self.parse_path(path)
 
     def set_data(self, data):
         self.data = data

@@ -119,8 +119,8 @@ Must use python3 for proper character encoding support.
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
- * [ ] Can't open files like '~/.suplemon-config.json'
  * [ ] Encoding errors
+ * [X] Can't open files like '~/.suplemon-config.json'
  * [X] Cursor invisible when at end of scrolled line
  * [X] Esc key effect is delayed
  * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
