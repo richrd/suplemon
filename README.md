@@ -120,6 +120,7 @@ Must use python3 for proper character encoding support.
  * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
  * [ ] Encoding errors
+ * [ ] Finish refactoring viewer.py and editor.py
  * [X] Can't open files like '~/.suplemon-config.json'
  * [X] Cursor invisible when at end of scrolled line
  * [X] Esc key effect is delayed
