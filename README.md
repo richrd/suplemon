@@ -47,6 +47,11 @@ Must use python3 for proper character encoding support.
  * ESC
    > Revert to a single cursor
 
+
+ * Ctrl + W
+   > Duplicate line
+ 
+ 
  * Ctrl + X
    > Cut line(s) to buffer
 
@@ -98,6 +103,7 @@ Must use python3 for proper character encoding support.
  * [ ] Proper syntax higlighting
  * [ ] Editor plugins/extensions/macros
  * [ ] Read only viewer
+ * [ ] File selector, kind of like what nano has
  * [X] ...
  * [X] Move config file to user home directory
  * [X] File type detection for highlighting
