@@ -1,6 +1,6 @@
 
 class Line:
-    def __init__(self, data):
+    def __init__(self, data=""):
         if isinstance(data, Line):
             data = data.data
         self.data = data
@@ -16,10 +16,10 @@ class Line:
         return self.data
 
     def __add__(self, other):
-        return self.data + other
+        return Line(self.data + other)
     
     def __radd__(self, other):
-        return other + self.data
+        return Line(other + self.data)
 
     def __len__(self):
         return len(self.data)
