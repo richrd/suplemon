@@ -47,11 +47,9 @@ Must use python3 for proper character encoding support.
  * ESC
    > Revert to a single cursor
 
-
  * Ctrl + W
    > Duplicate line
- 
- 
+  
  * Ctrl + X
    > Cut line(s) to buffer
 
@@ -78,6 +76,12 @@ Must use python3 for proper character encoding support.
 
  * F2
    > Reload current file
+   
+ * F5
+   > Undo
+   
+ * F6
+   > Redo
 
  * F9
    > Toggle line numbers
@@ -94,22 +98,23 @@ Must use python3 for proper character encoding support.
 
 # Todo
  * [ ] New file and close file
+ * [ ] Read only viewer
  * [ ] Custom key bindings
- * [ ] Close files one at a time with 'save?' prompt.
- * [ ] Undo / Redo
+ * [ ] Setting for enabling undo for cursor changes
+ * [ ] File selector, kind of like what nano has
+ * [ ] EITHER Close files one at a time with 'save?' prompt.
+ * [ ] OR     Store files and cursor positions for restoring later
  * [ ] Auto complete
  * [ ] Selections
- * [ ] Storing files and cursor positions for restoring later
  * [ ] Proper syntax higlighting
  * [ ] Editor plugins/extensions/macros
- * [ ] Read only viewer
- * [ ] File selector, kind of like what nano has
- * [X] ...
+ * [ ] ...
+ * [X] Undo / Redo
  * [X] Move config file to user home directory
  * [X] File type detection for highlighting
  * [X] Duplicate line (without clipboard)
  * [X] Use semver 
- * [X] Nano-like menu and keyboard shortcuts with legend
+ * [X] Nano-like menu and keyboard shortcuts with legend. TODO: respect future custom bindings
  * [X] Go to file as well as line number 
  * [X] Show if file is edited
  * [X] Copy / Paste buffer
@@ -122,6 +127,8 @@ Must use python3 for proper character encoding support.
  * [X] Line based syntax highlighting
 
 # Fix / Defects
+ * [ ] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
+ * [ ] Fill in incomplete config file with defaults
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
