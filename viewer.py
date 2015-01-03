@@ -28,7 +28,7 @@ class Viewer:
         self.parent = parent
         self.window = window
         self.data = ""
-        self.lines = [""]
+        self.lines = [Line()]
         self.file_extension = ""
         self.show_line_colors = True
         self.linelighter = lambda line: 0 # Dummy linelighter returns default color
@@ -48,8 +48,10 @@ class Viewer:
     def setup_linelight(self):
         """Setup line based highlighting."""
         filename = self.file_extension + ".py"
+        curr_path = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(curr_path, "linelight", filename)
         try:
-            mod = imp.load_source(self.file_extension, "linelight/" + filename)
+            mod = imp.load_source(self.file_extension, path)
         except:
             self.parent.logger.log(get_error_info())
             self.parent.logger.log("no linelight found")
@@ -97,7 +99,15 @@ class Viewer:
 
     def get_data(self):
         """Get editor contents."""
-        data = u"\n".join(map(lambda line: line.data ,self.lines))
+        # FIXME: Unify storing lines as Line instances
+        str_lines = []
+        for line in self.lines:
+            if type(line) == type(""):
+                str_lines.append(line)
+            else:
+                str_lines.append(line.data)
+        #data = u"\n".join(map(lambda line: line.data, self.lines))
+        data = u"\n".join(str_lines)
         return data
 
     def set_cursor(self, cursor):
