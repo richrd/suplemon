@@ -172,6 +172,8 @@ class UI:
             data += " key:"+str(self.last_key)
         if self.config["display"]["show_term_size"]:
             data += " ["+str(size[0])+"x"+str(size[1])+"]"
+        if self.config["app"]["debug"]:
+            data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
         if editor.last_find:
             find = editor.last_find
             if len(find) > 10:find = find[:10]+"..."
