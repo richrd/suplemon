@@ -20,3 +20,15 @@ def starts(s, what):
 def get_error_info():
     msg = str(traceback.format_exc()) + "\n" + str(sys.exc_info())
     return msg
+
+# Get a substring of a string with two delimeters
+def get_string_between(start, stop, s):
+        i1 = s.find(start)
+        if i1 == -1:
+            return False
+        s = s[i1 + len(start):]
+        i2 = s.find(stop)
+        if i2 == -1:
+            return False
+        s = s[:i2]
+        return s
