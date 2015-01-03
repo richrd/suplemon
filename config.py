@@ -33,8 +33,8 @@ class Config:
                 "show_line_colors": True,
                 "line_end_char": "",
                 "show_highlighting": False,
-                "show_last_key": True,
-                "show_term_size": True
+                "show_last_key": False,
+                "show_term_size": False
             },
         }
 
