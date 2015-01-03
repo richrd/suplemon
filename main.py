@@ -262,8 +262,9 @@ class App(ui.UI):
 
     def reload(self):
         """Reload the current file."""
-        if self.file().reload():
-            return True
+        if self.query("Reload '"+self.file().name+"'?"):
+            if self.file().reload():
+                return True
         return False
 
     def switch_to_file(self, index):
