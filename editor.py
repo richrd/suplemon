@@ -13,15 +13,90 @@ from cursor import *
 from helpers import *
 from viewer import *
 
+class State:
+    """Store editor state for undo/redo."""
+    def __init__(self, editor=None):
+        self.cursors = []
+        self.lines = []
+        self.y_scroll = 0
+        self.x_scroll = 0
+        self.last_find = ""
+        if editor != None:
+            self.store(editor)
+
+    def store(self, editor):
+        self.cursors = [cursor.tuple() for cursor in editor.cursors]
+        self.lines = [line.data for line in editor.lines]
+        self.y_scroll = editor.y_scroll
+        self.x_scroll = editor.x_scroll
+        self.last_find = editor.last_find
+
+    def restore(self, editor):
+        editor.cursors = [Cursor(cursor) for cursor in self.cursors]
+        editor.lines = [Line(line) for line in self.lines]
+        editor.y_scroll = self.y_scroll
+        editor.x_scroll = self.x_scroll
+        editor.last_find = self.last_find
+
 class Editor(Viewer):
+    """Extends Viewer with editing capabilities."""
     def __init__(self, parent, window):
         Viewer.__init__(self, parent, window)
+        self.buffer = []               # Copy/paste buffer
+        self.last_find = ""            # Last search used in 'find'
+        self.tab_width = 4             # Amount of spaces to insert with a tab
+        self.punctuation = ""          # Characters to separate words with
+        self.auto_indent_newline = 1   # Automatically indent new line
+        self.history = []              # History of editor states for undo/redo
+        self.max_history = 10          # Max number of states to store
+        self.current_state = -1        # Current state index of the editor
+        self.last_action = None        # Last editor action that was used (for undo/redo)
 
-        self.buffer = [] # Copy/paste
-        self.last_find = ""
-        self.tab_width = 4
-        self.punctuation = ""
-        self.auto_indent_newline = 1
+    def set_data(self, data):
+        Viewer.set_data(self, data)
+        self.store_state()
+
+    def store_action_state(self, action, state = None):
+        if self.last_action != action:
+            self.last_action = action
+            self.store_state(state)
+
+    def store_state(self, state = None, action = None):
+        """Store the current editor state for undo/redo."""
+        if not state:
+            state = State()
+        state.store(self)
+        if self.current_state < len(self.history)-1:
+            #self.parent.status("Shiet!")
+            self.history = self.history[:self.current_state+1]
+        self.history.append(state)
+        if len(self.history) > self.max_history:
+            self.history.pop(0)
+        if self.current_state < self.max_history-1:
+            self.current_state += 1
+
+    def restore_state(self, index=None):
+        """Restore an editor state."""
+        if len(self.history) == 0:
+            return False
+        if index == None:
+            if self.current_state > 0:
+                index = self.current_state
+                self.current_state -= 1 
+            else:
+                return False
+
+        self.last_action = None
+        state = self.history[index]
+        state.restore(self)
+        self.refresh()
+
+    def undo(self):
+        self.restore_state()
+        
+    def redo(self):
+        pass
+        #self.restore_state()
 
     def arrow_right(self):
         """Move cursors right."""
@@ -93,7 +168,7 @@ class Editor(Viewer):
                     cursor.x += 1
                     if line[next] in chars:
                         break
-        self.move_cursors()   
+        self.move_cursors()
 
     def jump_up(self):
         """Jump up 3 lines."""
@@ -175,6 +250,8 @@ class Editor(Viewer):
 
     def delete(self):
         """Delete the next character."""
+        # Add a restore point if previous action != delete
+        self.store_action_state("delete")
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if len(self.lines)>1 and cursor.x == len(line) and cursor.y != len(self.lines)-1:
@@ -191,6 +268,8 @@ class Editor(Viewer):
 
     def backspace(self):
         """Delete the previous character."""
+        # Add a restore point if previous action != backspace
+        self.store_action_state("backspace")
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs: # order?
             if cursor.x == 0 and cursor.y == 0:
@@ -217,6 +296,8 @@ class Editor(Viewer):
 
     def enter(self):
         """Insert a new line."""
+        # Add a restore point if previous action != enter
+        self.store_action_state("enter")
         # We sort the cursors, and loop through them from last to first
         # That way we avoid messing with the relative positions of the higher cursors
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
@@ -243,6 +324,8 @@ class Editor(Viewer):
 
     def insert(self):
         """Insert buffer data at cursor(s)."""
+        # Add a restore point if previous action != insert
+        self.store_action_state("insert")
         cur = self.cursor()
         buffer = list(self.buffer)
         if len(self.buffer) == len(self.cursors):
@@ -264,6 +347,8 @@ class Editor(Viewer):
             
     def push_up(self):
         """Move current lines up by one line."""
+        # Add a restore point if previous action != push_up
+        self.store_action_state("push_up")
         used_y = []
         curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
         for cursor in curs:
@@ -279,6 +364,8 @@ class Editor(Viewer):
         
     def push_down(self):
         """Move current lines down by one line."""
+        # Add a restore point if previous action != push_down
+        self.store_action_state("push_down")
         used_y = []
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
         for cursor in curs:
@@ -293,11 +380,15 @@ class Editor(Viewer):
 
     def tab(self):
         """Indent lines."""
+        # Add a restore point if previous action != tab
+        self.store_action_state("tab")
         for i in range(self.tab_width):
             self.type(" ")
 
     def untab(self):
         """Unindent lines."""
+        # Add a restore point if previous action != untab
+        self.store_action_state("untab")
         linenums = []
         for cursor in self.cursors:
             if cursor.y in linenums:
@@ -311,11 +402,13 @@ class Editor(Viewer):
 
     def cut(self):
         """Cut lines to buffer."""
+        # Add a restore point if previous action != cut
+        self.store_action_state("cut")
         buf = []
         for cursor in self.cursors:
             if len(self.lines) == 1:
                 buf.append(self.lines[0])
-                self.lines[0] = ""
+                self.lines[0] = Line()
                 break
             buf.append(self.lines[cursor.y])
             self.lines.pop(cursor.y)
@@ -327,6 +420,8 @@ class Editor(Viewer):
 
     def type(self, letter):
         """Insert a character."""
+        # Add a restore point if previous action != type
+        self.store_action_state("type")
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             start = line[:cursor.x]
@@ -344,6 +439,7 @@ class Editor(Viewer):
         except:
             return False
 
+        self.store_state()
         cur = self.cursor()
         if col != None:
             cur.x = col
@@ -352,13 +448,9 @@ class Editor(Viewer):
             cur.y = len(self.lines)-1
         self.move_cursors()
 
-    def click(self, x, y):
-        """Handle a click at x, y."""
-        x = x - self.line_offset()
-        self.go_to_pos(self.y_scroll+y+1, x)
-
     def find(self, what, findall = False):
         """Find what in data. Adds a cursor when found."""
+        state = State(self) # Store the current state incase we need to store it
         self.last_find = what
         ncursors = len(self.cursors)
         last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
@@ -387,6 +479,7 @@ class Editor(Viewer):
         if not found:
             self.parent.status("Can't find '"+what+"'")
             return
+        self.store_state(state) # Store undo point
         self.cursors = cur
         self.move_cursors()
 
@@ -409,17 +502,17 @@ class Editor(Viewer):
 
     def duplicate_line(self):
         """Copy current line and add it below as a new line."""
+        self.store_state()
         curs = sorted(self.cursors, key = lambda c: (c.y, c.x))
-        self.parent.log(curs)
-        #cur_y = []
         for cursor in curs:
-            line = self.lines[cursor.y]
+            line = Line(self.lines[cursor.y])
             self.lines.insert(cursor.y+1, line)
-            self.move_y_cursors(cursor.y+1, 1)
+            self.move_y_cursors(cursor.y, 1)
         self.move_cursors()
 
     def got_chr(self, char):
         """Handle character input."""
+
         if char == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
         elif char == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
         elif char == curses.KEY_UP: self.arrow_up()            # Arrow Up
@@ -432,6 +525,8 @@ class Editor(Viewer):
         elif char == 542: self.new_cursor_left()               # Alt + left
         elif char == 557: self.new_cursor_right()              # Alt + right
 
+        elif char == 269: self.undo()                          # F5
+        elif char == 270: self.redo()                          # F6
         elif char == 273: self.toggle_line_nums()              # F9
         elif char == 274: self.toggle_line_ends()              # F10
         elif char == 275: self.toggle_highlight()              # F11
