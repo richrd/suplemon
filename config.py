@@ -11,12 +11,15 @@ class Config:
         #self.fpath = os.path.dirname(os.path.realpath(__file__))
         self.defaults = {
             "app": {
-                "remember_open_files": False
+                "remember_open_files": False,
+                "debug": False,
             },
             "editor": {
-                "tab_width": 4,
+                "auto_indent_newline": True,
                 "cursor": "reverse", # reverse or underline
                 "default_encoding": "utf-8",
+                "max_history": 20,
+                "tab_width": 4,
                 "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
             },
             "display": {
@@ -47,6 +50,7 @@ class Config:
         return os.path.join(self.fpath, self.filename)
 
     def load(self):
+        # TODO: fill in missing/invalid config with defaults
         try:
             path = self.path()
             f = open(path)
