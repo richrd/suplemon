@@ -127,6 +127,8 @@ Must use python3 for proper character encoding support.
  * [X] Line based syntax highlighting
 
 # Fix / Defects
+ * [ ] Optimize rendering for ssh (minimal screen update)
+ * [ ] Remove debug logging in non-debug mode
  * [ ] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
  * [ ] Fill in incomplete config file with defaults
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)

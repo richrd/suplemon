@@ -85,7 +85,11 @@ class Editor(Viewer):
                 self.current_state -= 1 
             else:
                 return False
-
+        else:
+            if index < 0 and index >= len(self.history):
+                return False
+            self.current_state = index
+        
         self.last_action = None
         state = self.history[index]
         state.restore(self)
@@ -95,8 +99,10 @@ class Editor(Viewer):
         self.restore_state()
         
     def redo(self):
-        pass
-        #self.restore_state()
+        if self.current_state == len(self.history)-1:
+            return False
+        index = self.current_state-1
+        self.restore_state(index)
 
     def arrow_right(self):
         """Move cursors right."""
