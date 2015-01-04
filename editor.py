@@ -44,11 +44,7 @@ class Editor(Viewer):
         Viewer.__init__(self, parent, window)
         self.buffer = []               # Copy/paste buffer
         self.last_find = ""            # Last search used in 'find'
-        self.tab_width = 4             # Amount of spaces to insert with a tab
-        self.punctuation = ""          # Characters to separate words with
-        self.auto_indent_newline = 1   # Automatically indent new line
         self.history = []              # History of editor states for undo/redo
-        self.max_history = 10          # Max number of states to store
         self.current_state = -1        # Current state index of the editor
         self.last_action = None        # Last editor action that was used (for undo/redo)
 
@@ -67,12 +63,11 @@ class Editor(Viewer):
             state = State()
         state.store(self)
         if self.current_state < len(self.history)-1:
-            #self.parent.status("Shiet!")
             self.history = self.history[:self.current_state+1]
         self.history.append(state)
-        if len(self.history) > self.max_history:
+        if len(self.history) > self.config["max_history"]:
             self.history.pop(0)
-        if self.current_state < self.max_history-1:
+        if self.current_state < self.config["max_history"]-1:
             self.current_state += 1
 
     def restore_state(self, index=None):
@@ -133,7 +128,7 @@ class Editor(Viewer):
 
     def jump_left(self):
         """Jump one 'word' to the left."""
-        chars = self.punctuation
+        chars = self.config["punctuation"]
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.x == 0:
@@ -157,7 +152,7 @@ class Editor(Viewer):
     
     def jump_right(self):
         """Jump one 'word' to the right."""
-        chars = self.punctuation
+        chars = self.config["punctuation"]
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.x == len(line):
@@ -320,7 +315,7 @@ class Editor(Viewer):
             # Leave the beginning of the line
             self.lines[cursor.y] = Line(start)
             wspace = ""
-            if self.auto_indent_newline:
+            if self.config["auto_indent_newline"]:
                 wspace = self.whitespace(self.lines[cursor.y])*" "
             self.lines.insert(cursor.y+1, Line(wspace+end))
             self.move_y_cursors(cursor.y, 1)
@@ -388,7 +383,7 @@ class Editor(Viewer):
         """Indent lines."""
         # Add a restore point if previous action != tab
         self.store_action_state("tab")
-        for i in range(self.tab_width):
+        for i in range(self.config["tab_width"]):
             self.type(" ")
 
     def untab(self):
@@ -401,10 +396,10 @@ class Editor(Viewer):
                 cursor.x = 0
                 continue
             line = self.lines[cursor.y]
-            if line[:self.tab_width] == " "*self.tab_width:
+            if line[:self.config["tab_width"]] == " "*self.config["tab_width"]:
                 linenums.append(cursor.y)
                 cursor.x = 0
-                self.lines[cursor.y] = Line(line[self.tab_width:])
+                self.lines[cursor.y] = Line(line[self.config["tab_width"]:])
 
     def cut(self):
         """Cut lines to buffer."""
@@ -566,5 +561,3 @@ class Editor(Viewer):
             except:
                 pass
 
-        self.render()
-        self.refresh()

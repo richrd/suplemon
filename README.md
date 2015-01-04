@@ -97,6 +97,7 @@ Must use python3 for proper character encoding support.
 
 
 # Todo
+ * [ ] Global clipboard (copy from one file to another)
  * [ ] New file and close file
  * [ ] Read only viewer
  * [ ] Custom key bindings
@@ -127,19 +128,20 @@ Must use python3 for proper character encoding support.
  * [X] Line based syntax highlighting
 
 # Fix / Defects
+ * [ ] Cut command fails with multiple cursors when one is on last line
  * [ ] Optimize rendering for ssh (minimal screen update)
  * [ ] Remove debug logging in non-debug mode
  * [ ] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
  * [ ] Fill in incomplete config file with defaults
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
- * [ ] Add 'remove previous cursor' function
  * [ ] Delete key when cursor at line end; add dedicated setting.
  * [ ] Encoding errors
  * [ ] Finish refactoring viewer.py and editor.py
+ * [X] Add 'remove previous cursor' function (fixed with undo/redo)
  * [X] Can't open files like '~/.suplemon-config.json'
  * [X] Cursor invisible when at end of scrolled line
  * [X] Esc key effect is delayed
- * [X] Fixed: Find starts at top of file instead of current ~~cursor~~ line
+ * [X] Fixed: Find starts at top of file instead of current ~~line~~ cursor
  * [X] Start find at current line AND column
  * [X] Make editor white color brighter (not gray)
  * [X] Show editor at top of terminal when show_top_bar == False 

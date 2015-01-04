@@ -89,10 +89,11 @@ class App(ui.UI):
         self.files = []
         self.current_file = 0
 
+        self.path = os.path.dirname(os.path.realpath(__file__))
         self.logger = Logger()
         self.config = Config(self)
         self.config.load()
-        ui.UI.__init__(self)
+        ui.UI.__init__(self) # Load user interface
         self.inited = 1 # Indicate that windows etc. have been created.
 
     def toggle_fullscreen(self):
@@ -115,17 +116,8 @@ class App(ui.UI):
     # TODO: Non curses methods start here (to later separate ui from functionality)
     def setup_editor(self, editor):
         """Setup an editor instance with configuration."""
-        ed = self.config["editor"]
-        #editor.set_config(ed) # Implement this
-        editor.set_tab_width(ed["tab_width"])
-        editor.set_cursor(ed["cursor"])
-        editor.set_punctuation(ed["punctuation"])
-        editor.set_auto_indent_newline(ed["auto_indent_newline"])
-        
-        display = self.config["display"]
-        editor.show_line_colors = display["show_line_colors"]
-        editor.show_line_nums = display["show_line_nums"]
-        editor.line_end_char = u""+display["line_end_char"]
+        config = self.config["editor"]
+        editor.set_config(config)
 
     def reload_config(self):
         """Reload configuration."""

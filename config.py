@@ -8,7 +8,6 @@ class Config:
         self.parent = parent
         self.filename = ".suplemon-config.json"
         self.fpath = os.path.expanduser("~")
-        #self.fpath = os.path.dirname(os.path.realpath(__file__))
         self.defaults = {
             "app": {
                 "remember_open_files": False,
@@ -21,18 +20,18 @@ class Config:
                 "max_history": 20,
                 "tab_width": 4,
                 "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
+                "line_end_char": "",
+                "show_line_nums": True,
+                "show_line_colors": True,
+                "show_highlighting": False,
             },
             "display": {
                 "show_top_bar": True,
                 "show_app_name": True,
                 "show_clock": True,
                 "show_file_list": True,
-                "show_legend": False,
+                "show_legend": True,
                 "show_bottom_bar": True,
-                "show_line_nums": True,
-                "show_line_colors": True,
-                "line_end_char": "",
-                "show_highlighting": False,
                 "show_last_key": False,
                 "show_term_size": False
             },
@@ -57,6 +56,7 @@ class Config:
             data = f.read()
             f.close()
             self.config = json.loads(data)
+            self.merge_defaults(self.config)
             return True
         except:
             self.err(get_error_info())
@@ -71,6 +71,18 @@ class Config:
         f = open(self.filename)
         f.write(data)
         f.close()
+
+    def merge_defaults(self, config):
+        """Fill any missing config options with defaults."""
+        for prim_key in self.defaults.keys():
+            curr_item = self.defaults[prim_key]
+            if prim_key not in config.keys():
+                config[prim_key] = dict(curr_item)
+                continue
+            for sec_key in curr_item.keys():
+                if not sec_key in config[prim_key].keys():
+                    config[prim_key][sec_key] = curr_item[sec_key]
+        return config
  
     def __getitem__(self, i):
         return self.config[i]

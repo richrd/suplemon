@@ -27,23 +27,29 @@ class Viewer:
     def __init__(self, parent, window):
         self.parent = parent
         self.window = window
+        self.config = []
         self.data = ""
         self.lines = [Line()]
         self.file_extension = ""
-        self.show_line_colors = True
+        
+        #self.show_line_colors = True
         self.linelighter = lambda line: 0 # Dummy linelighter returns default color
         self.show_highlighting = False
         if pygments != False:
             self.setup_highlighting()
-        self.show_line_nums = True
+        #self.show_line_nums = True
         self.show_line_ends = True
-        self.line_end_char = "<"
+        #self.line_end_char = "<"
 
         self.cursor_style = curses.A_UNDERLINE
 
         self.y_scroll = 0
         self.x_scroll = 0
         self.cursors = [Cursor()]
+
+    def set_config(self, config):
+        self.config = config
+        self.set_cursor(self.config["cursor"])
 
     def setup_linelight(self):
         """Setup line based highlighting."""
@@ -125,16 +131,16 @@ class Viewer:
         self.file_extension = ext.lower()
         self.setup_linelight()
 
-    def set_tab_width(self, w):
-        """Set how many spaces are inserted with tab key."""
-        self.tab_width = w
-
-    def set_punctuation(self, p):
-        """Set string of punctuation characters used to jump between words."""
-        self.punctuation = p
-
-    def set_auto_indent_newline(self, value):
-        self.auto_indent_newline = value
+#    def set_tab_width(self, w):
+#        """Set how many spaces are inserted with tab key."""
+#        self.tab_width = w
+#
+#    def set_punctuation(self, p):
+#        """Set string of punctuation characters used to jump between words."""
+#        self.punctuation = p
+#
+#    def set_auto_indent_newline(self, value):
+#        self.auto_indent_newline = value
 
     def pad_lnum(self, n):
         """Pad line number with zeroes."""
@@ -149,7 +155,7 @@ class Viewer:
 
     def line_offset(self):
         """Get the x coordinate of beginning of line."""
-        if not self.show_line_nums:
+        if not self.config["show_line_nums"]:
             return 0
         return len(str(len(self.lines)))+1
 
@@ -164,7 +170,7 @@ class Viewer:
 
     def toggle_line_nums(self):
         """Toggle display of line numbers."""
-        self.show_line_nums = not self.show_line_nums
+        self.config["show_line_nums"] = not self.config["show_line_nums"]
         self.render()
 
     def toggle_line_ends(self):
@@ -191,7 +197,7 @@ class Viewer:
 
             line = self.lines[lnum]
 
-            if self.show_line_nums:
+            if self.config["show_line_nums"]:
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
 
             # Higlight rendering
@@ -215,12 +221,12 @@ class Viewer:
             else:
                 line_part = line[min(self.x_scroll, len(line)):]
                 if self.show_line_ends:
-                    line_part += self.line_end_char
+                    line_part += self.config["line_end_char"]
                 if len(line_part) >= max_len:
                     line_part = line_part[:max_len]
 
                 line_part = line_part.encode("utf-8")
-                if self.show_line_colors:
+                if self.config["show_line_colors"]:
                     self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
                 else:
                     self.window.addstr(i, x_offset, line_part)
