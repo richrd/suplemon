@@ -1,3 +1,7 @@
+"""
+File object for storing an opened file and editor.
+"""
+
 import os
 import time
 

@@ -1,3 +1,6 @@
+"""
+Line object to represent a single line in the text editor.
+"""
 
 class Line:
     def __init__(self, data=""):

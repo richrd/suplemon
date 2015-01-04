@@ -1,4 +1,6 @@
-
+"""
+Basic logging to delay printing until curses is unloaded.
+"""
 class Logger:
     def __init__(self, filename="log.txt"):
         self.filename = "filename"

@@ -1,3 +1,7 @@
+"""
+Curses user interface.
+"""
+
 import os
 from helpers import *
 

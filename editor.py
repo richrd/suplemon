@@ -1,5 +1,8 @@
 #!/usr/bin/python
 #-*- coding:utf-8
+"""
+Editor class for handling, well, editing.
+"""
 
 import os
 import re

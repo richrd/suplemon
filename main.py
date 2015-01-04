@@ -1,5 +1,8 @@
 #!/usr/bin/python
 #-*- coding:utf-8
+"""
+The main class that starts and runs Suplemon.
+"""
 
 __version__ = "0.0.1"
 

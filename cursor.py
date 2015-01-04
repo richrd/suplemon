@@ -1,3 +1,7 @@
+"""
+Cursor object for storing cursor data.
+"""
+
 class Cursor:
     def __init__(self, x=0, y=0):
         if type(x) == type((0,)):

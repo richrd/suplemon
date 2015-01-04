@@ -1,5 +1,8 @@
 #!/usr/bin/python
 #-*- coding:utf-8
+"""
+Text Viewer component subclassed by Editor.
+"""
 
 import os
 import re

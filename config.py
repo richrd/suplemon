@@ -1,4 +1,8 @@
 #-*- encoding: utf-8
+"""
+Config handler.
+"""
+
 import os
 import json
 from helpers import *
