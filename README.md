@@ -98,10 +98,9 @@ Must use python3 for proper character encoding support.
 
 # Todo
  * [ ] Global clipboard (copy from one file to another)
- * [ ] New file and close file
  * [ ] Read only viewer
  * [ ] Custom key bindings
- * [ ] Setting for enabling undo for cursor changes
+ * [ ] Setting for enabling/disabling undo for cursor changes
  * [ ] File selector, kind of like what nano has
  * [ ] EITHER Close files one at a time with 'save?' prompt.
  * [ ] OR     Store files and cursor positions for restoring later
@@ -110,6 +109,7 @@ Must use python3 for proper character encoding support.
  * [ ] Proper syntax higlighting
  * [ ] Editor plugins/extensions/macros
  * [ ] ...
+ * [X] New file and close file
  * [X] Undo / Redo
  * [X] Move config file to user home directory
  * [X] File type detection for highlighting
@@ -132,11 +132,11 @@ Must use python3 for proper character encoding support.
  * [ ] Optimize rendering for ssh (minimal screen update)
  * [ ] Remove debug logging in non-debug mode
  * [ ] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
- * [ ] Fill in incomplete config file with defaults
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Delete key when cursor at line end; add dedicated setting.
  * [ ] Encoding errors
  * [ ] Finish refactoring viewer.py and editor.py
+ * [X] Fill in incomplete config file with defaults
  * [X] Add 'remove previous cursor' function (fixed with undo/redo)
  * [X] Can't open files like '~/.suplemon-config.json'
  * [X] Cursor invisible when at end of scrolled line

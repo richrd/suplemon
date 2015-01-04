@@ -199,6 +199,10 @@ class App(ui.UI):
         self.setup_editor(editor)
         return editor
 
+    def new(self):
+        self.files.append(self.default_file())
+        self.current_file = len(self.files)-1
+        
     def open(self):
         """Ask for file name and try to open it."""
         name = self.query("Open:")
@@ -214,6 +218,16 @@ class App(ui.UI):
             return False
         self.switch_to_file(self.last_file())
         return True
+
+    def close(self):
+        result = self.query("Close?")
+        if result:
+            self.files.pop(self.current_file)
+            if not len(self.files):
+                self.new()
+                return False
+            if self.current_file == len(self.files):
+                self.current_file -= 1
 
     def save(self):
         """Save current file app."""
@@ -312,7 +326,6 @@ class App(ui.UI):
     
     def handle_char(self, char):
         """Handle a character from curses."""
-        editor = self.editor()
         if char == 265: self.save()                 # F1
         elif char == 266: self.reload()             # F2
         elif char == 276: self.toggle_fullscreen()  # F12
@@ -321,6 +334,8 @@ class App(ui.UI):
         elif char == 6: self.find()                 # Ctrl + F
         elif char == 7: self.go_to()                # Ctrl + G
         elif char == 15: self.open()                # Ctrl + O
+        elif char == 11: self.close()               # Ctrl + K
+        elif char == 14: self.new()                 # Ctrl + N
         elif char == 410: pass                      # Mouse events?
         elif char == 554: self.prev_file()          # Ctrl + Page Up
         elif char == 549: self.next_file()          # Ctrl + Page Down
@@ -338,8 +353,9 @@ class App(ui.UI):
         if yes:
             self.running = 0
             return True
+        self.refresh()
         return False
-
+        
     def load(self):
         """Load the app."""
         loaded = True
