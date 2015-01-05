@@ -56,6 +56,9 @@ class Viewer:
 
     def setup_linelight(self):
         """Setup line based highlighting."""
+        if not self.file_extension:
+            # TODO: Create default linelighter
+            return False
         filename = self.file_extension + ".py"
         curr_path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(curr_path, "linelight", filename)
@@ -131,8 +134,9 @@ class Viewer:
 
     def set_file_extension(self, ext):
         """Set the file extension."""
-        self.file_extension = ext.lower()
-        self.setup_linelight()
+        if ext:
+            self.file_extension = ext.lower()
+            self.setup_linelight()
 
 #    def set_tab_width(self, w):
 #        """Set how many spaces are inserted with tab key."""
