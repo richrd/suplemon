@@ -130,7 +130,8 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Fix / Defects
  * [ ] Refine find and find_next commands.
    * [ ] Better auto find with ctrl+d. (Find the current word or character)
-   * [ ] Forget last find on esc or automatically. 
+   * [ ] Forget last find on esc or automatically.
+   * [ ] Fix 'finding' empty character. Revert to 'add_cursor_right'.
  * [ ] Cut command fails with multiple cursors when one is on last line
  * [ ] Optimize rendering for ssh (minimal screen update)
  * [ ] Remove debug logging in non-debug mode

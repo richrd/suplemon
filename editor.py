@@ -219,7 +219,8 @@ class Editor(Viewer):
         self.move_cursors()
 
     def escape(self):
-        """Handle escape key. Removes all except primary cursor."""
+        """Handle escape key. Removes last_find and all cursors except primary cursor."""
+        self.last_find = ""
         self.cursors = [self.cursors[0]]
         self.move_cursors()
         self.render()
@@ -455,7 +456,6 @@ class Editor(Viewer):
     def find(self, what, findall = False):
         """Find what in data. Adds a cursor when found."""
         state = State(self) # Store the current state incase we need to store it
-        self.last_find = what
         ncursors = len(self.cursors)
         last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
         y = last_cursor.y
@@ -467,6 +467,8 @@ class Editor(Viewer):
             if last_cursor.y == y:
                 x_offset = last_cursor.x
                 indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
+                #if not indices:
+                #    indices = [x_offset]
             else:
                 indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
             for i in indices:
@@ -482,7 +484,9 @@ class Editor(Viewer):
             y += 1
         if not found:
             self.parent.status("Can't find '"+what+"'")
+            self.last_find = ""
             return
+        self.last_find = what   # Only store string if it's really found
         self.store_state(state) # Store undo point
         self.cursors = cur
         self.move_cursors()
@@ -495,8 +499,11 @@ class Editor(Viewer):
             search = "^([\w\-]+)"
             line = self.lines[cursor.y][cursor.x:]
             matches = re.match(search, line)
-            if matches == None: return
-            what = matches.group(0)
+            if matches:
+                what = matches.group(0)
+            else:
+                if line:
+                    what = line[0]
             self.last_find = what
         self.find(what)
 
