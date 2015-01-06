@@ -134,12 +134,12 @@ Command line text editor with multicursor support. The goal is to replicate subl
    * [ ] Fix 'finding' empty character. Revert to 'add_cursor_right'.
  * [ ] Cut command fails with multiple cursors when one is on last line
  * [ ] Optimize rendering for ssh (minimal screen update)
- * [ ] Remove debug logging in non-debug mode
  * [ ] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Delete key when cursor at line end; add dedicated setting.
  * [ ] Encoding errors
  * [ ] Finish refactoring viewer.py and editor.py
+ * [X] Remove debug logging in non-debug mode
  * [X] Fill in incomplete config file with defaults
  * [X] Add 'remove previous cursor' function (fixed with undo/redo)
  * [X] Can't open files like '~/.suplemon-config.json'

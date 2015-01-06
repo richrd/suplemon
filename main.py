@@ -400,6 +400,7 @@ def main(*args):
 
 if __name__ == "__main__":
     curses.wrapper(main)
+    # Output log info
+    if app.config["app"]["debug"]:
+        app.logger.output()
 
-# Output log info
-app.logger.output()
