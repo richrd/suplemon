@@ -17,14 +17,14 @@ Command line text editor with multicursor support. The goal is to replicate subl
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
  3. [X] Multi cursor ~~and multi selection~~ should be comparable to sublimetext.
- 4. [X] Develop suplemon with suplemon!!!
+ 4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing.
  5. [ ] World domination!
 
 # Usage:
 
     python3 main.py [filename]...
 
-Must use python3 for proper character encoding support.
+*Must use python3 for proper character encoding support.*
 
 # Features
  * Terminal text editing with style
@@ -128,6 +128,9 @@ Must use python3 for proper character encoding support.
  * [X] Line based syntax highlighting
 
 # Fix / Defects
+ * [ ] Refine find and find_next commands.
+   * [ ] Better auto find with ctrl+d. (Find the current word or character)
+   * [ ] Forget last find on esc or automatically. 
  * [ ] Cut command fails with multiple cursors when one is on last line
  * [ ] Optimize rendering for ssh (minimal screen update)
  * [ ] Remove debug logging in non-debug mode
