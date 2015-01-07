@@ -11,6 +11,7 @@ import sys
 import time
 
 import ui
+import modules
 from logger import *
 from config import *
 from editor import *
@@ -96,6 +97,8 @@ class App(ui.UI):
         self.logger = Logger()
         self.config = Config(self)
         self.config.load()
+        self.modules = modules.ModuleLoader()
+        self.modules.load()
         ui.UI.__init__(self) # Load user interface
         self.inited = 1 # Indicate that windows etc. have been created.
 
@@ -315,13 +318,11 @@ class App(ui.UI):
     def run_command(self):
         """Run editor commands."""
         # TODO: Replace this with command modules
-        data = self.query("Eval:")
-        res = ""
-        try:
-            res = eval(data)
-        except:
-            res = "[ERROR]"
-        self.status(res)
+        data = self.query("Cmd:")
+        for name in self.modules.modules.keys():
+            if data == name:
+                self.modules.modules[name].run(self, self.editor())
+        #self.status(res)
         return True
     
     def handle_char(self, char):

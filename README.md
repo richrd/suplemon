@@ -1,6 +1,6 @@
-suplemon
+suplemon   a
 ========
-          ___________   _________  ___     ______________________________   ___ 
+          ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
         /  /____/  /  /  /  /_/  /  / /  /  /_____/  /  /  /  /  /  /    |/  / /
        /____   /  /  /  /  _____/  / /  /  ______/  /  /  /  /  /  /  /|    / /
@@ -49,7 +49,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
  * Ctrl + W
    > Duplicate line
-  
+
  * Ctrl + X
    > Cut line(s) to buffer
 
@@ -76,10 +76,10 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
  * F2
    > Reload current file
-   
+
  * F5
    > Undo
-   
+
  * F6
    > Redo
 
@@ -107,27 +107,36 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
- * [ ] Editor plugins/extensions/macros
+ * [X] Editor plugins/extensions/macros
+   * [ ] Design proper API
+   * [X] Trim command to get rid of trailing whitespace
+   * [ ] Lower/Upper/Reverse lettercase
+   * [ ] Reverse line
  * [ ] ...
  * [X] New file and close file
  * [X] Undo / Redo
  * [X] Move config file to user home directory
  * [X] File type detection for highlighting
  * [X] Duplicate line (without clipboard)
- * [X] Use semver 
+ * [X] Use semver
  * [X] Nano-like menu and keyboard shortcuts with legend. TODO: respect future custom bindings
- * [X] Go to file as well as line number 
+ * [X] Go to file as well as line number
  * [X] Show if file is edited
  * [X] Copy / Paste buffer
  * [X] Proper status bar information
- * [X] Jump to end of whitespace with home key 
+ * [X] Jump to end of whitespace with home key
  * [X] Command line for getting input
  * [X] Line number toggling
  * [X] Loading multiple files and switching between them
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
 
+# Ideas?
+ * Refactor higher level commands/functions into modular plugins.
+ * ...
+
 # Fix / Defects
+ * [ ] Saving file into a directory stores the relative path as the filename.
  * [ ] Refine find and find_next commands.
    * [ ] Better auto find with ctrl+d. (Find the current word or character)
    * [ ] Forget last find on esc or automatically.
@@ -148,4 +157,4 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Fixed: Find starts at top of file instead of current ~~line~~ cursor
  * [X] Start find at current line AND column
  * [X] Make editor white color brighter (not gray)
- * [X] Show editor at top of terminal when show_top_bar == False 
+ * [X] Show editor at top of terminal when show_top_bar == False
