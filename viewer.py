@@ -35,14 +35,11 @@ class Viewer:
         self.lines = [Line()]
         self.file_extension = ""
         
-        #self.show_line_colors = True
         self.linelighter = lambda line: 0 # Dummy linelighter returns default color
         self.show_highlighting = False
         if pygments != False:
             self.setup_highlighting()
-        #self.show_line_nums = True
         self.show_line_ends = True
-        #self.line_end_char = "<"
 
         self.cursor_style = curses.A_UNDERLINE
 
@@ -118,7 +115,6 @@ class Viewer:
                 str_lines.append(line)
             else:
                 str_lines.append(line.data)
-        #data = u"\n".join(map(lambda line: line.data, self.lines))
         data = u"\n".join(str_lines)
         return data
 
@@ -137,17 +133,6 @@ class Viewer:
         if ext:
             self.file_extension = ext.lower()
             self.setup_linelight()
-
-#    def set_tab_width(self, w):
-#        """Set how many spaces are inserted with tab key."""
-#        self.tab_width = w
-#
-#    def set_punctuation(self, p):
-#        """Set string of punctuation characters used to jump between words."""
-#        self.punctuation = p
-#
-#    def set_auto_indent_newline(self, value):
-#        self.auto_indent_newline = value
 
     def pad_lnum(self, n):
         """Pad line number with zeroes."""
