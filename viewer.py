@@ -259,17 +259,17 @@ class Viewer:
 
     def move_cursors(self, delta=None, noupdate=False):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
-        if delta != None:
-            for cursor in self.cursors:
+        for cursor in self.cursors:
+            if delta != None:
                 if delta[0] != 0 and cursor.x >= 0:
                     cursor.x += delta[0]
                 if delta[1] != 0 and cursor.y >= 0:
                     cursor.y += delta[1]
 
-                if cursor.x < 0: cursor.x = 0
-                if cursor.y < 0: cursor.y = 0
-                if cursor.y >= len(self.lines)-1: cursor.y = len(self.lines)-1
-                if cursor.x >= len(self.lines[cursor.y]): cursor.x = len(self.lines[cursor.y])
+            if cursor.x < 0: cursor.x = 0
+            if cursor.y < 0: cursor.y = 0
+            if cursor.y >= len(self.lines)-1: cursor.y = len(self.lines)-1
+            if cursor.x >= len(self.lines[cursor.y]): cursor.x = len(self.lines[cursor.y])
 
         cur = self.cursor() # Main cursor
         size = self.size()
