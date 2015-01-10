@@ -112,8 +112,8 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Editor plugins/extensions/macros
    * [ ] Design proper API
    * [X] Trim command to get rid of trailing whitespace
-   * [ ] Lower/Upper/Reverse lettercase
-   * [ ] Reverse line
+   * [X] Lower/Upper/Reverse lettercase (todo: reverse case)
+   * [X] Reverse line
  * [ ] ...
  * [X] New file and close file
  * [X] Undo / Redo
