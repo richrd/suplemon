@@ -307,7 +307,7 @@ class Viewer:
         """Get the first (primary) cursor."""
         highest = None
         for cursor in self.cursors:
-            if highest == None or highest[1] > cursor.y:
+            if highest == None or cursor.y <  highest.y:
                 highest = cursor
         return highest
 

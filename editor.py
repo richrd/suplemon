@@ -184,17 +184,19 @@ class Editor(Viewer):
 
     def new_cursor_up(self):
         """Add a new cursor one line up."""
+        x = self.cursor().x
         cursor = self.get_first_cursor()
         if cursor.y == 0: return
-        new = Cursor(cursor.x, cursor.y-1)
+        new = Cursor(x, cursor.y-1)
         self.cursors.append(new)
         self.move_cursors()
 
     def new_cursor_down(self):
         """Add a new cursor one line down."""
+        x = self.cursor().x
         cursor = self.get_last_cursor()
         if cursor.y == len(self.lines)-1: return
-        new = Cursor(cursor.x, cursor.y+1)
+        new = Cursor(x, cursor.y+1)
         self.cursors.append(new)
         self.move_cursors()
 

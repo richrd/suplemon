@@ -97,6 +97,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
+ * [ ] Comment line command
  * [ ] Generic linelighter for generic highlighting
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Read only viewer
@@ -138,7 +139,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Fix / Defects
  * [ ] Slightly unreliable undo/redo.
- * [ ] Saving file into a directory stores the relative path as the filename.
  * [ ] Refine find and find_next commands.
    * [ ] Better auto find with ctrl+d. (Find the current word or character)
    * [ ] Forget last find on esc or automatically.
@@ -149,7 +149,8 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Delete key when cursor at line end; add dedicated setting.
  * [ ] Encoding errors
  * [ ] Finish refactoring viewer.py and editor.py
- * [ ] Make adding cursors up and down smarter: add them at main cursor x coordinate if possible
+ * [X] Make adding cursors up and down smarter: add them at main cursor x coordinate if possible
+ * [X] Saving file into a directory stores the relative path as the filename.
  * [X] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
        Solved by rectifying all cursors in move_cursors. Should optimize more in callers
  * [X] Remove debug logging in non-debug mode
