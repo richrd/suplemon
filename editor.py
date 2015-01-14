@@ -351,7 +351,27 @@ class Editor(Viewer):
                 self.lines.insert(y, Line(buf))
                 self.move_y_cursors(cur[1]-1, 1)
         self.move_cursors()
-            
+
+    def comment(self):
+        self.store_action_state("comment")
+        comment = "#"
+        used_y = []
+        curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
+        for cursor in curs:
+            if cursor.y in used_y: continue
+            used_y.append(cursor.y)
+            line = self.lines[cursor.y].data
+            w = self.whitespace(line)
+            start = line[:w]
+            self.parent.status(start)
+            if starts(line[w:], comment):
+                self.lines[cursor.y] = Line(start + line.lstrip()[len(comment):])
+                self.move_x_cursors(cursor.y, w, 0-len(comment))
+            else:
+                self.lines[cursor.y] = Line(start + comment + line.lstrip())
+                self.move_x_cursors(cursor.y, w, len(comment))
+        self.move_cursors()
+
     def push_up(self):
         """Move current lines up by one line."""
         # Add a restore point if previous action != push_up
@@ -361,13 +381,13 @@ class Editor(Viewer):
         for cursor in curs:
             if cursor.y in used_y: continue
             used_y.append(cursor.y)
-            
             if cursor.y == 0: break
             old = self.lines[cursor.y-1]
             self.lines[cursor.y-1] = Line(self.lines[cursor.y])
             self.lines[cursor.y] = Line(old)
             cursor.y -= 1
         self.move_cursors()
+            
         
     def push_down(self):
         """Move current lines down by one line."""
@@ -545,6 +565,7 @@ class Editor(Viewer):
         elif char == 275: self.toggle_highlight()              # F11
         elif char == 331: self.insert()                        # Insert
         elif char == 22: self.insert()                         # Ctrl + V
+        elif char == 16: self.comment()                        # Ctrl + P
 
         elif char == 4: self.find_next()                       # Ctrl + D
         elif char == 1: self.find_all()                        # Ctrl + A
