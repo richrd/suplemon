@@ -477,6 +477,7 @@ class Editor(Viewer):
 
     def find(self, what, findall = False):
         """Find what in data. Adds a cursor when found."""
+        if not what: return
         state = State(self) # Store the current state incase we need to store it
         ncursors = len(self.cursors)
         last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
