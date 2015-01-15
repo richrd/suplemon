@@ -27,8 +27,14 @@ class ModuleLoader:
                 #module = self.load_single(item)
                 module = self.load_single(name)
                 if module:
-                    self.modules[module[0]] = module[1]["class"]() # Store the module instance
-                
+                    #self.modules[module[0]] = module[1]["class"]() # Store the module instance
+                    self.modules[module[0]] = self.load_instance(module) # Load and store the module instance
+
+    def load_instance(self, module):
+        inst = module[1]["class"]() # Store the module instance
+        inst.name = module[0]
+        return inst
+    
     def load_single(self, name):
         path = os.path.join(self.module_path, name+".py")
         try:

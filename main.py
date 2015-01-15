@@ -317,12 +317,12 @@ class App(ui.UI):
 
     def run_command(self):
         """Run editor commands."""
-        # TODO: Replace this with command modules
         data = self.query("Cmd:")
-        for name in self.modules.modules.keys():
-            if data == name:
-                self.modules.modules[name].run(self, self.editor())
-        #self.status(res)
+        parts = data.split(" ")
+        cmd = parts[0].lower()
+        if cmd in self.modules.modules.keys():
+            self.editor().store_action_state(cmd)
+            self.modules.modules[cmd].run(self, self.editor())
         return True
     
     def handle_char(self, char):
