@@ -62,9 +62,11 @@ class Viewer:
         try:
             mod = imp.load_source(self.file_extension, path)
         except:
+            path = os.path.join(curr_path, "linelight", "generic.py")
+            mod = imp.load_source("generic", path)
             self.parent.logger.log(get_error_info())
             self.parent.logger.log("no linelight found")
-            return False
+            #return False
         if not "parse" in dir(mod):
             return False
         self.linelighter = mod.parse

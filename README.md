@@ -98,7 +98,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Todo
  * [ ] Regex find/search
- * [ ] Generic linelighter for generic highlighting
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Read only viewer
  * [ ] Custom key bindings
@@ -109,6 +108,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
+ * [X] Generic linelighter for generic highlighting
  * [X] Comment line command (TODO: add lang detection)
  * [X] Editor plugins/extensions/macros
    * [ ] Design proper API
