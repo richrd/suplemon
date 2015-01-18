@@ -18,7 +18,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
  2. [X] Usability should be as good and easy as nano.
  3. [X] Multi cursor ~~and multi selection~~ should be comparable to sublimetext.
  4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing.
- 5. [ ] World domination!
 
 # Usage:
 
