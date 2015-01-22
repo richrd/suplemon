@@ -96,6 +96,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
+ * [ ] Feature to automatically add ; to end of lines
  * [ ] Regex find/search
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Read only viewer
@@ -138,6 +139,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
 
 # Fix / Defects
+ * [ ] Tab characters mess up editing.
  * [ ] Slightly unreliable undo/redo.
  * [ ] Refine find and find_next commands.
    * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
