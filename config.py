@@ -53,18 +53,18 @@ class Config:
         return os.path.join(self.fpath, self.filename)
 
     def load(self):
-        # TODO: fill in missing/invalid config with defaults
-        try:
-            path = self.path()
-            f = open(path)
-            data = f.read()
-            f.close()
-            self.config = json.loads(data)
-            self.merge_defaults(self.config)
-            return True
-        except:
-            self.err(get_error_info())
-            self.log("Failed to load config file!")
+        path = self.path()
+        if os.path.exists(path):
+            try:
+                f = open(path)
+                data = f.read()
+                f.close()
+                self.config = json.loads(data)
+                self.merge_defaults(self.config)
+                return True
+            except:
+                self.err(get_error_info())
+                self.log("Failed to load config file!")
         return False
 
     def reload(self):
