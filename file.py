@@ -67,13 +67,18 @@ class File:
         self.last_save = time.time()
         return True
 
-    def load(self):
+    def load(self, read=True):
+        if not read:
+            return True
         path = self._path()
         try:
             f = open(self._path())
             data = f.read()
             f.close()
-        except:
+        except Exception as inst:
+            self.log(type(inst))    # the exception instance
+            self.log(inst.args)     # arguments stored in .args
+            self.log(inst)          # __str__ allows args to be printed directly,
             return False
         self.data = data
         self.editor.set_data(data)

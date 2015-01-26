@@ -13,7 +13,7 @@ def parse(raw_line):
         color = 15    # Red
     elif starts(line, "this."):
         color = 13    # Cyan
-    elif starts(line, ["//", "/*", "*/"]):
+    elif starts(line, ["//", "/*", "*/", "*"]):
         color = 14    # Magenta
     elif starts(line, ["if", "else", "for ", "while ", "continue", "break"]):
         color = 17    # Yellow

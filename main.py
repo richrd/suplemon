@@ -144,6 +144,7 @@ class App(ui.UI):
         """Refresh the UI."""
         self.editor().render()
         self.refresh_status()
+        #self.refresh_status()
         self.screen.refresh()
 
     def update(self):
@@ -152,7 +153,7 @@ class App(ui.UI):
     def status(self, s):
         """Set the status message."""
         self.status_msg = str(s)
-        self.refresh_status()
+        #self.refresh_status()
 
     def file(self):
         """Return the current file."""
@@ -247,17 +248,24 @@ class App(ui.UI):
         self.status("Couldn't write to '" + fi.name + "'")
         return False
 
-    def open_file(self, filename, new = False):
+    def open_file(self, filename):
         """Open a file."""
-        result = ""
         file = File(self)
         file.set_path(filename)
         file.set_editor(self.new_editor())
         loaded = file.load()
-        if not loaded and not new:
+        if not loaded:
             return False
         self.files.append(file)
-        return loaded
+        return True
+
+    def new_file(self, filename):
+        """Open a file."""
+        file = File(self)
+        file.set_path(filename)
+        file.set_editor(self.new_editor())
+        self.files.append(file)
+        return True
 
     def load_default(self):
         """Load a default file if no files specified."""
@@ -367,7 +375,7 @@ class App(ui.UI):
                 if self.open_file(name):
                     loaded = True
                 else:
-                    self.open_file(name, new=True)
+                    self.new_file(name)
         else:
             self.load_default()
 

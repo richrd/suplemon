@@ -139,6 +139,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
 
 # Fix / Defects
+ * [ ] Syntax specific commenting.
  * [ ] Tab characters mess up editing.
  * [ ] Slightly unreliable undo/redo.
  * [ ] Refine find and find_next commands.

@@ -46,6 +46,7 @@ class Viewer:
         self.y_scroll = 0
         self.x_scroll = 0
         self.cursors = [Cursor()]
+        self.setup_linelight()
 
     def set_config(self, config):
         self.config = config
@@ -134,7 +135,7 @@ class Viewer:
         """Set the file extension."""
         if ext:
             self.file_extension = ext.lower()
-            self.setup_linelight()
+        self.setup_linelight()
 
     def pad_lnum(self, n):
         """Pad line number with zeroes."""
