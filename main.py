@@ -18,7 +18,6 @@ from editor import *
 from helpers import *
 
 from file import *
-
 quick_help = """
 Welcome to suplemon!
 ====================
@@ -412,4 +411,4 @@ if __name__ == "__main__":
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()
-
+    exit(0)

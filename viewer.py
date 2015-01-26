@@ -54,9 +54,6 @@ class Viewer:
 
     def setup_linelight(self):
         """Setup line based highlighting."""
-        if not self.file_extension:
-            # TODO: Create default linelighter
-            return False
         filename = self.file_extension + ".py"
         curr_path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(curr_path, "linelight", filename)
@@ -66,8 +63,6 @@ class Viewer:
             path = os.path.join(curr_path, "linelight", "generic.py")
             mod = imp.load_source("generic", path)
             self.parent.logger.log(get_error_info())
-            self.parent.logger.log("no linelight found")
-            #return False
         if not "parse" in dir(mod):
             return False
         self.linelighter = mod.parse
@@ -282,7 +277,7 @@ class Viewer:
         elif cur.y - self.y_scroll < 0:
             self.y_scroll = cur.y
         if cur.x - self.x_scroll+offset > size[0] - 1:
-            # +1 to allow space for cursor at line end
+            # -1 to allow space for cursor at line end
             self.x_scroll = len(self.lines[cur.y]) - size[0]+offset+1
         if cur.x - self.x_scroll < 0:
             self.x_scroll  -= abs(cur.x - self.x_scroll) # FIXME
