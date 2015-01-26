@@ -139,8 +139,10 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
 
 # Fix / Defects
+ * [ ] Return code 0 on exit:
+       Curses forces code 130 and causes git to ignore saved commit message, argh
  * [ ] Syntax specific commenting.
- * [ ] Tab characters mess up editing.
+ * [ ] Display tab characters with a replacement char (tab messes up lines)
  * [ ] Slightly unreliable undo/redo.
  * [ ] Refine find and find_next commands.
    * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
@@ -149,7 +151,10 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Cut command fails with multiple cursors when one is on last line
  * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Only refresh cursors when moving around
-   * [ ] Only refresh modified lines when editing * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) * [ ] Encoding errors * [ ] Finish refactoring viewer.py and editor.py
+   * [ ] Only refresh modified lines when editing
+ * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
+ * [ ] Encoding errors 
+ * [ ] Finish refactoring viewer.py and editor.py
  * [X] Remove "Failed to load config." when file doesn't exist
  * [X] Delete key when cursor at line end; ~~add dedicated setting~~ made to work as normal.
  * [X] Make adding cursors up and down smarter: add them at main cursor x coordinate if possible
