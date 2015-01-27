@@ -204,6 +204,7 @@ class UI:
             ("^V", "Paste"),
             ("^F", "Find"),
             ("^D", "Find next"),
+            ("^A", "Find all"),
             ("^W", "Duplicate line"),
             ("ESC", "Single cursor"),
             ("^G", "Go to"),

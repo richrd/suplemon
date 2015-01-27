@@ -96,6 +96,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
+ * [ ] Better yes/no query for exit (and in general)
  * [ ] Feature to automatically add ; to end of lines
  * [ ] Regex find/search
  * [ ] Global clipboard (copy from one file to another)
@@ -139,6 +140,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
 
 # Fix / Defects
+ * [ ] Remember find query if occurance not found (jump to top of file)
  * [ ] Return code 0 on exit:
        Curses forces code 130 and causes git to ignore saved commit message, argh
  * [ ] Syntax specific commenting.
