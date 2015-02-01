@@ -13,32 +13,35 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Suplemon multicursor editing:
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
+# Usage:
+
+    python3 main.py [filename]...
+
+*Must use python3 for proper character encoding support.*
+*Tested on Unix.*
+
+# Features
+ * Terminal text editing with style
+ * Proper multi cursor editing, Sublime Text style. Blessed!
+ * Easy Undo/Redo
+ * Multiple files in tabs
+ * Powerful Go To feature for jumping to files and lines
+ * Copy & Paste, with multi line support
+ * Find and Find next
+ * Extensions (easy to write your own)
+ * Comming later:
+     * Selections (hopefully)
+
 # Goals:
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
  3. [X] Multi cursor ~~and multi selection~~ should be comparable to sublimetext.
  4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing.
 
-# Usage:
-
-    python3 main.py [filename]...
-
-*Must use python3 for proper character encoding support.*
-
-# Features
- * Terminal text editing with style
- * Proper multi cursor editing, Sublime Text style. Blessed!
- * Copy & Paste, with multi line support
- * Find and Find next
- * Multiple files
- * Comming later:
-     * Selections
-     * Extensions
-
 # Keyboard shortcuts:
 
- * Alt + Arrow Keys
-   > Add new curors in arrow direction
+ * Alt + Arrow Key
+   > Add new curor in arrow direction
 
  * Ctrl + Left / Right
    > Jump to previous or next word
@@ -56,7 +59,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
    > Insert buffer
 
  * Ctrl + G
-   > Go to line number or file
+   > Go to line number or file (type the beginning of a filename to go to it). 
 
  * Ctrl + F
    > Find text
@@ -96,8 +99,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
- * [ ] Better yes/no query for exit (and in general)
- * [ ] Feature to automatically add ; to end of lines
+ * [ ] Indicate if file isn't writable (in tabs and when trying to save). Use os.access(path, os.W_OK)
+ * [ ] Comment line command (TODO: add lang detection)
+ * [ ] EXT: Feature to automatically add ; to end of lines
  * [ ] Regex find/search
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Read only viewer
@@ -109,14 +113,13 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
+ * [X] Better yes/no query for exit (and in general)
  * [X] Generic linelighter for generic highlighting
- * [X] Comment line command (TODO: add lang detection)
  * [X] Editor plugins/extensions/macros
    * [ ] Design proper API
    * [X] Trim command to get rid of trailing whitespace
    * [X] Lower/Upper/Reverse lettercase (todo: reverse case)
    * [X] Reverse line
- * [ ] ...
  * [X] New file and close file
  * [X] Undo / Redo
  * [X] Move config file to user home directory
@@ -142,21 +145,22 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Fix / Defects
  * [ ] Remember find query if occurance not found (jump to top of file)
  * [ ] Return code 0 on exit:
-       Curses forces code 130 and causes git to ignore saved commit message, argh
+       Curses forces code 130 and causes git to ignore saved commit message, argh!
  * [ ] Syntax specific commenting.
  * [ ] Display tab characters with a replacement char (tab messes up lines)
  * [ ] Slightly unreliable undo/redo.
- * [ ] Refine find and find_next commands.
-   * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
-   * [X] Better auto find with ctrl+d. (Find the current word or character)
-   * [X] Forget last find on esc.
  * [ ] Cut command fails with multiple cursors when one is on last line
- * [ ] Optimize rendering for ssh (minimal screen update)
+ * [ ] Finish refactoring viewer.py and editor.py
+   * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
  * [ ] Encoding errors 
- * [ ] Finish refactoring viewer.py and editor.py
+ * [ ] Refine find and find_next commands.
+   * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
+   * [X] Better auto find with ctrl+d. (Find the current word or character)
+   * [X] Forget last find on esc.
+   * [ ] Don't forget find text automatically when using Ctrl + F 
  * [X] Remove "Failed to load config." when file doesn't exist
  * [X] Delete key when cursor at line end; ~~add dedicated setting~~ made to work as normal.
  * [X] Make adding cursors up and down smarter: add them at main cursor x coordinate if possible

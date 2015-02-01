@@ -325,6 +325,8 @@ class App(ui.UI):
     def run_command(self):
         """Run editor commands."""
         data = self.query("Cmd:")
+        if not data:
+            return False
         parts = data.split(" ")
         cmd = parts[0].lower()
         if cmd in self.modules.modules.keys():
@@ -354,7 +356,8 @@ class App(ui.UI):
     def keyboard_interrupt(self):
         """Handle a keyboard interrupt."""
         try:
-            yes = self.query("Exit?")
+            #yes = self.query("Exit?")
+            yes = self.query_bool("Close?")
         except:
             self.running = 0
             return True

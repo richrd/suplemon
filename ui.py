@@ -114,7 +114,7 @@ class UI:
         y, x = self.screen.getmaxyx()
         return (x, y)
 
-    def query(self, text, initial=""):
+    def _query(self, text, initial=""):
         """Ask for text input via the status bar."""
         self.show_capture_status(text, initial)
         self.text_input = curses.textpad.Textbox(self.status_win)
@@ -130,6 +130,24 @@ class UI:
         if len(out) > 0 and out[-1] == " ": out = out[:-1]
         out = out.rstrip("\r\n")
         return out
+
+    def query(self, text, initial=""):
+        result = self._query(text, initial)
+        return result
+
+    def query_bool(self, text, default = False):
+        indicator = "[y/N]"
+        initial = ""
+        if default:
+            indicator = "[Y/n]"
+            initial = "y"
+        
+        result = self._query(text + " " + indicator, initial)
+        if result in ["Y", "y"]:
+            return True
+        if result == "":
+            return default
+        return False
 
     def show_top_status(self):
         """Show top status row."""
