@@ -40,23 +40,14 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Keyboard shortcuts:
 
- * Alt + Arrow Key
-   > Add new curor in arrow direction
-
- * Ctrl + Left / Right
-   > Jump to previous or next word
-
- * ESC
-   > Revert to a single cursor
-
- * Ctrl + W
-   > Duplicate line
-
  * Ctrl + X
    > Cut line(s) to buffer
 
  * Ctrl + V
    > Insert buffer
+
+ * Ctrl + W
+   > Duplicate line
 
  * Ctrl + G
    > Go to line number or file (type the beginning of a filename to go to it). 
@@ -66,6 +57,15 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
  * Ctrl + D
    > Find next (add a new cursor at the next occurance)
+
+ * Alt + Arrow Key
+   > Add new curor in arrow direction
+
+ * Ctrl + Left / Right
+   > Jump to previous or next word
+
+ * ESC
+   > Revert to a single cursor
 
  * Alt + Page Up
    > Move line(s) up
@@ -99,10 +99,14 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
+ * [ ] Combine line based highlighters and other language related data (include comment syntax etc)
+ * [ ] CSS highlighter
  * [ ] Indicate if file isn't writable (in tabs and when trying to save). Use os.access(path, os.W_OK)
+    * ~~And disable editing~~ Don't disable editing to enable save as.
  * [ ] Comment line command (TODO: add lang detection)
  * [ ] EXT: Feature to automatically add ; to end of lines
- * [ ] Regex find/search
+    * [ ] Generalized: add prepend and append commands
+ * [ ] Regex find/search (make configurable instead of a new feature?)
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Read only viewer
  * [ ] Custom key bindings
