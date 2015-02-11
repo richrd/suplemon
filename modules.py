@@ -33,6 +33,7 @@ class ModuleLoader:
     def load_instance(self, module):
         inst = module[1]["class"]() # Store the module instance
         inst.name = module[0]
+        inst.options = module[1]
         return inst
     
     def load_single(self, name):
@@ -41,6 +42,9 @@ class ModuleLoader:
             mod = imp.load_source(name, path)
             if not "module" in dir(mod):
                 return False
+            options = mod.module
+            if not "status" in options.keys():
+                option["status"] = False
             return name, mod.module
         except:
             print("Failed loading:", name)

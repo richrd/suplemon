@@ -99,6 +99,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
+ * [ ] Promt for close or exit confirmation only when file(s) have been modified
  * [ ] Combine line based highlighters and other language related data (include comment syntax etc)
  * [ ] CSS highlighter
  * [ ] Indicate if file isn't writable (in tabs and when trying to save). Use os.access(path, os.W_OK)
@@ -147,6 +148,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * ...
 
 # Fix / Defects
+ * [ ] config extension double loads config file, instead of switching to it
  * [ ] Remember find query if occurance not found (jump to top of file)
  * [ ] Return code 0 on exit:
        Curses forces code 130 and causes git to ignore saved commit message, argh!

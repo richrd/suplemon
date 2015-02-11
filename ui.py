@@ -162,6 +162,11 @@ class UI:
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
+        for name in self.modules.modules.keys():
+            module = self.modules.modules[name]
+            if module.options["status"]:
+                head_parts.append(module.status());
+
         head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
