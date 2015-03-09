@@ -3,7 +3,13 @@ Various helper functions.
 """
 import sys
 import time
+import curses
 import traceback
+
+def key_name(key):
+    if type(key) == type(""):
+        return str(curses.keyname(ord(key)).decode("utf-8"))
+    return False
 
 def curr_time():
     """Current time in %H:%M"""

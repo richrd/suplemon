@@ -261,8 +261,8 @@ class UI:
             return False
         if self.config["display"]["show_top_bar"]:
             self.show_top_status()
-        if self.capturing:
-            self.show_capture_status()
+        # if self.capturing:
+        #     self.show_capture_status()
         if self.config["display"]["show_legend"]:
             self.show_legend()
         if self.config["display"]["show_bottom_bar"]:

@@ -546,7 +546,17 @@ class Editor(Viewer):
 
     def got_chr(self, char):
         """Handle character input."""
+        
+        # if type(char) == type(""):
+        #     name = str(curses.keyname(ord(char)).decode("utf-8"))
+        #     self.parent.logger.log("GOT STR KEY")
+        #     self.parent.logger.log(curses.keyname(ord(char)))
+        #     self.parent.logger.log("NAME <" + str(name) + ">")
+        # else:
+        #     self.parent.logger.log("GOT INT KEY" + str(char) + ">")
+        #     pass
 
+        name = key_name(char)
         if char == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
         elif char == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
         elif char == curses.KEY_UP: self.arrow_up()            # Arrow Up
@@ -554,6 +564,18 @@ class Editor(Viewer):
         elif char == curses.KEY_NPAGE: self.page_up()          # Page Up    
         elif char == curses.KEY_PPAGE: self.page_down()        # Page Down
 
+        elif char == 563: self.new_cursor_up()                 # Alt + Up
+        elif char == 522: self.new_cursor_down()               # Alt + Down
+        elif char == 542: self.new_cursor_left()               # Alt + Left
+        elif char == 557: self.new_cursor_right()              # Alt + Right
+        elif char == 552: self.push_up()                       # Alt + Page Up
+        elif char == 547: self.push_down()                     # Alt + Page Down
+
+        elif char == 269: self.undo()                          # F5
+        elif char == 270: self.redo()                          # F6
+        elif char == 273: self.toggle_line_nums()              # F9
+        elif char == 274: self.toggle_line_ends()              # F10
+        elif char == 275: self.toggle_highlight()              # F11
         elif char == 563: self.new_cursor_up()                 # Alt + up
         elif char == 522: self.new_cursor_down()               # Alt + down
         elif char == 542: self.new_cursor_left()               # Alt + left
@@ -565,32 +587,44 @@ class Editor(Viewer):
         elif char == 274: self.toggle_line_ends()              # F10
         elif char == 275: self.toggle_highlight()              # F11
         elif char == 331: self.insert()                        # Insert
-        elif char == 22: self.insert()                         # Ctrl + V
-        elif char == 16: self.comment()                        # Ctrl + P
 
-        elif char == 4: self.find_next()                       # Ctrl + D
-        elif char == 1: self.find_all()                        # Ctrl + A
-        elif char == 24: self.cut()                            # Ctrl + X
+        # elif char == 23: self.duplicate_line()                 # Ctrl + W
+        # elif char == 22: self.insert()                         # Ctrl + V
+        # elif char == 16: self.comment()                        # Ctrl + P
+        # elif char == 4: self.find_next()                       # Ctrl + D
+        # elif char == 1: self.find_all()                        # Ctrl + A
+        # elif char == 24: self.cut()                            # Ctrl + X
+
+        elif name == "^W": self.duplicate_line()               # Ctrl + W
+        elif name == "^V": self.insert()                       # Ctrl + V
+        elif name == "^P": self.comment()                      # Ctrl + P
+        elif name == "^D": self.find_next()                    # Ctrl + D
+        elif name == "^A": self.find_all()                     # Ctrl + A
+        elif name == "^X": self.cut()                          # Ctrl + X
         elif char == 544: self.jump_left()                     # Ctrl + Left
         elif char == 559: self.jump_right()                    # Ctrl + Right
         elif char == 565: self.jump_up()                       # Ctrl + Up
         elif char == 524: self.jump_down()                     # Ctrl + Down
-        elif char == 552: self.push_up()                       # Ctrl + Page Up
-        elif char == 547: self.push_down()                     # Ctrl + Down
+
+
 
         elif char == curses.KEY_HOME: self.home()              # Home
         elif char == curses.KEY_END: self.end()                # End
         elif char == curses.KEY_BACKSPACE: self.backspace()    # Backspace
         elif char == curses.KEY_DC: self.delete()              # Delete
         elif char == curses.KEY_ENTER: self.enter()            # Enter
-        elif char == 9: self.tab()                             # Tab
+        #elif char == 9: self.tab()                             # Tab
+        elif char == "\t": self.tab()                             # Tab
         elif char == 353: self.untab()                         # Shift + Tab
-        elif char == 10: self.enter()                          # Enter
-        elif char == 27: self.escape()                         # Escape
-        elif char == 23: self.duplicate_line()                 # Ctrl + W
+        #elif char == 10: self.enter()                          # Enter
+        elif char == "\n": self.enter()                          # Enter
+        #elif char == 27: self.escape()                         # Escape
+        elif name == "^[": self.escape()                       # Escape
         else:
             try:
-                letter = chr(char)
+                letter = char
+                #self.parent.log(str(char) + " " + letter)
+                #self.parent.logger.log(char)
                 self.type(letter)
             except:
                 pass

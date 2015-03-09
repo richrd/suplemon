@@ -87,7 +87,6 @@ class App(ui.UI):
         self.running = 0
         self.last_key = None
         self.status_msg = ""
-        self.capturing = 0
 
         self.files = []
         self.current_file = 0
@@ -98,6 +97,7 @@ class App(ui.UI):
         self.config.load()
         self.modules = modules.ModuleLoader()
         self.modules.load()
+        self.logger.log(self.modules.modules)
         ui.UI.__init__(self) # Load user interface
         self.inited = 1 # Indicate that windows etc. have been created.
 
@@ -143,7 +143,6 @@ class App(ui.UI):
         """Refresh the UI."""
         self.editor().render()
         self.refresh_status()
-        #self.refresh_status()
         self.screen.refresh()
 
     def update(self):
@@ -152,7 +151,6 @@ class App(ui.UI):
     def status(self, s):
         """Set the status message."""
         self.status_msg = str(s)
-        #self.refresh_status()
 
     def file(self):
         """Return the current file."""
@@ -217,7 +215,7 @@ class App(ui.UI):
             return True
 
         if not self.open_file(name):
-            self.status("Failed to load '"+name+"'")
+            self.status("Failed to load '" + name + "'")
             return False
         self.switch_to_file(self.last_file())
         return True
@@ -324,31 +322,49 @@ class App(ui.UI):
 
     def run_command(self):
         """Run editor commands."""
-        data = self.query("Cmd:")
+        data = self.query("Command:")
         if not data:
             return False
         parts = data.split(" ")
         cmd = parts[0].lower()
+        self.logger.log("Looking for command '" + cmd +"'")
         if cmd in self.modules.modules.keys():
+            self.logger.log("Trying to run command '" + cmd +"'")
             self.editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.editor())
         return True
     
     def handle_char(self, char):
         """Handle a character from curses."""
-        if char == 265: self.save()                 # F1
-        elif char == 266: self.reload()             # F2
-        elif char == 276: self.toggle_fullscreen()  # F12
-        elif char == 8: self.help()                 # Ctrl + H
-        elif char == 5: self.run_command()          # Ctrl + E
-        elif char == 6: self.find()                 # Ctrl + F
-        elif char == 7: self.go_to()                # Ctrl + G
-        elif char == 15: self.open()                # Ctrl + O
-        elif char == 11: self.close()               # Ctrl + K
-        elif char == 14: self.new()                 # Ctrl + N
-        elif char == 410: pass                      # Mouse events?
+        #name = key_name(char)
+        name = key_name(char)
+        #name = False
+        # if type(char) == type(""):
+        #     name = curses.keyname(ord(char)).decode("utf-8")
+        #     self.logger.log("THE KEY NAME:" + name + "<")
+        if name == "^H": self.help()                 # Ctrl + H
+        elif name == "^E": self.run_command()        # Ctrl + E
+        elif name == "^F": self.find()               # Ctrl + F
+        elif name == "^G": self.go_to()              # Ctrl + G
+        elif name == "^O": self.open()               # Ctrl + O
+        elif name == "^K": self.close()              # Ctrl + K
+        elif name == "^N": self.new()                # Ctrl + N
+
+        elif char == 265: self.save()                # F1
+        elif char == 266: self.reload()              # F2
+        elif char == 276: self.toggle_fullscreen()   # F12
+        
+        
+        # elif char == 8: self.help()                 # Ctrl + H
+        # elif char == 5: self.run_command()          # Ctrl + E
+        # elif char == 6: self.find()                 # Ctrl + F
+        # elif char == 7: self.go_to()                # Ctrl + G
+        # elif char == 15: self.open()                # Ctrl + O
+        # elif char == 11: self.close()               # Ctrl + K
+        # elif char == 14: self.new()                 # Ctrl + N
         elif char == 554: self.prev_file()          # Ctrl + Page Up
         elif char == 549: self.next_file()          # Ctrl + Page Down
+        elif char == 410: pass                      # Mouse events?
         else:
             return False
         return True
@@ -356,8 +372,7 @@ class App(ui.UI):
     def keyboard_interrupt(self):
         """Handle a keyboard interrupt."""
         try:
-            #yes = self.query("Exit?")
-            yes = self.query_bool("Close?")
+            yes = self.query_bool("Exit?")
         except:
             self.running = 0
             return True
@@ -390,16 +405,16 @@ class App(ui.UI):
             editor = self.editor()
             self.check_resize()
             try:
-                char = self.screen.getch()
-                self.last_key = char
+                #char = self.screen.getch()
+                char = self.screen.get_wch()
             except KeyboardInterrupt:
                 if self.keyboard_interrupt():
                     break
                 continue
+            #except:
                 
             if not self.handle_char(char):
                 editor.got_chr(char)
-            self.refresh_status()
             self.refresh()
 
         curses.endwin()
