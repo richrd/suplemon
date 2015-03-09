@@ -1,13 +1,15 @@
+"""
+Addon module loader.
+"""
 import os
 import imp
-
 
 from helpers import *
 
 class ModuleLoader:
     def __init__(self):
         self.curr_path = os.path.dirname(os.path.realpath(__file__))
-        self.module_path = os.path.join(self.curr_path, "modules"+os.sep)
+        self.module_path = os.path.join(self.curr_path, "modules" + os.sep)
         self.modules = {}
     
     def load(self):
@@ -42,9 +44,8 @@ class ModuleLoader:
             mod = imp.load_source(name, path)
             if not "module" in dir(mod):
                 return False
-            options = mod.module
-            if not "status" in options.keys():
-                option["status"] = False
+            if not "status" in mod.module.keys():
+                mod.module["status"] = False
             return name, mod.module
         except:
             print("Failed loading:", name)
