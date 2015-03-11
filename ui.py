@@ -267,3 +267,12 @@ class UI:
             self.show_legend()
         if self.config["display"]["show_bottom_bar"]:
             self.show_bottom_status()
+
+    def get_input(self):
+        try:
+            char = self.screen.get_wch()
+            return char
+        except KeyboardInterrupt:
+            return -1
+        except:
+            pass

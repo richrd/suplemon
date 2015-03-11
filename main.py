@@ -402,19 +402,14 @@ class App(ui.UI):
         self.running = 1
         self.refresh()
         while self.running:
-            editor = self.editor()
             self.check_resize()
-            try:
-                #char = self.screen.getch()
-                char = self.screen.get_wch()
-            except KeyboardInterrupt:
+            key = self.get_input()
+            if key == -1:
                 if self.keyboard_interrupt():
                     break
                 continue
-            #except:
-                
-            if not self.handle_char(char):
-                editor.got_chr(char)
+            if not self.handle_char(key):
+                self.editor().got_chr(key)
             self.refresh()
 
         curses.endwin()
