@@ -223,7 +223,7 @@ class UI:
             ("F1", "Save"),
             ("F2", "Reload"),
             ("^O", "Open"),
-            ("^X", "Cut"),
+            ("^C", "Cut"),
             ("^V", "Paste"),
             ("^F", "Find"),
             ("^D", "Find next"),
@@ -231,7 +231,7 @@ class UI:
             ("^W", "Duplicate line"),
             ("ESC", "Single cursor"),
             ("^G", "Go to"),
-            ("^C", "Exit"),
+            ("^X", "Exit"),
         ]
         x = 0
         y = 0

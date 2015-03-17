@@ -41,6 +41,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
 # Keyboard shortcuts:
 
  * Ctrl + X
+   > Exit
+
+ * Ctrl + C
    > Cut line(s) to buffer
 
  * Ctrl + V

@@ -557,6 +557,10 @@ class Editor(Viewer):
             self.move_y_cursors(cursor.y, 1)
         self.move_cursors()
 
+
+    def keyboard_interrupt(self):
+        self.cut()
+        
     def got_chr(self, char):
         """Handle character input."""
         
@@ -613,7 +617,7 @@ class Editor(Viewer):
         elif name == "^P": self.comment()                      # Ctrl + P
         elif name == "^D": self.find_next()                    # Ctrl + D
         elif name == "^A": self.find_all()                     # Ctrl + A
-        elif name == "^X": self.cut()                          # Ctrl + X
+        #elif name == "^X": self.cut()                          # Ctrl + X
         elif char == 544: self.jump_left()                     # Ctrl + Left
         elif char == 559: self.jump_right()                    # Ctrl + Right
         elif char == 565: self.jump_up()                       # Ctrl + Up

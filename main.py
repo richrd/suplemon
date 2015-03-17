@@ -29,6 +29,9 @@ Warning: beta software, bugs may occur.
 
 # Keyboard shortcuts:
 
+ * Ctrl + X
+   > Exit Suplemon
+
  * Alt + Arrow Keys
    > Add new curors in arrow direction
 
@@ -38,8 +41,9 @@ Warning: beta software, bugs may occur.
  * ESC
    > Revert to a single cursor
    
- * Ctrl + X
+ * Ctrl + C
    > Cut line(s) to buffer
+   > *OR* cancel a command waiting for input
    
  * Ctrl + V
    > Insert buffer
@@ -369,8 +373,8 @@ class App(ui.UI):
             return False
         return True
         
-    def keyboard_interrupt(self):
-        """Handle a keyboard interrupt."""
+    def check_exit(self):
+        """Make sure the user really wants to exit."""
         try:
             yes = self.query_bool("Exit?")
         except:
@@ -404,10 +408,15 @@ class App(ui.UI):
         while self.running:
             self.check_resize()
             key = self.get_input()
-            if key == -1:
-                if self.keyboard_interrupt():
+            name = key_name(key)
+            self.last_key = name
+            if name == "^X": # Exit
+                if self.check_exit():
                     break
                 continue
+            if key == -1: # Keyboard interrupt (Ctrl + C)
+                self.editor().keyboard_interrupt()
+                #continue
             if not self.handle_char(key):
                 self.editor().got_chr(key)
             self.refresh()
