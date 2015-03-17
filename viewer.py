@@ -313,7 +313,7 @@ class Viewer:
         """Get the last cursor."""
         lowest = None
         for cursor in self.cursors:
-            if lowest == None or cursor.y > lowest[1]:
+            if lowest == None or (cursor.y > lowest.y and cursor.x > lowest.x):
                 lowest = cursor
         return lowest
 

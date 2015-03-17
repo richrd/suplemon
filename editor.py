@@ -476,42 +476,55 @@ class Editor(Viewer):
         self.move_cursors()
 
     def find(self, what, findall = False):
-        """Find what in data. Adds a cursor when found."""
+        """Find what in data (from top to bottom). Adds a cursor when found."""
         if not what: return
         state = State(self) # Store the current state incase we need to store it
-        ncursors = len(self.cursors)
-        last_cursor = list(reversed(sorted(self.cursors, key = lambda c: (c.y, c.x))))[-1]
+        last_cursor = self.get_last_cursor()
         y = last_cursor.y
-        cur = []
+
         found = False
+        new_cursors = []
+        # Loop through all lines starting from the last cursor
         while y < len(self.lines):
             line = self.lines[y]
-            x_offset = 0
-            if last_cursor.y == y:
+            
+            x_offset = 0 # Which character to begin searching from
+            if y == last_cursor.y:
+                # On the current line begin from the last cursor x pos
                 x_offset = last_cursor.x
-                indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
-                #if not indices:
-                #    indices = [x_offset]
-            else:
-                indices = [m.start() for m in re.finditer(re.escape(what), str(line))]
+            
+            # Find all occurances of search string
+            indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
+
+            # Loop through the indices and add cursors if they don't exist yet
             for i in indices:
                 new = Cursor(i+x_offset, y)
                 if not self.cursor_exists(new):
                     found = True
-                    cur.append(new)
+                    new_cursors.append(new)
                     if not findall:
                         break
-                if not new in cur:
-                    cur.append(new)
+                if not new in new_cursors:
+                    new_cursors.append(new)
             if found and not findall: break
             y += 1
-        if not found:
-            self.parent.status("Can't find '"+what+"'")
+
+        if not new_cursors:
+            self.parent.status("Can't find '" + what + "'")
             self.last_find = ""
             return
+        else:
+            # If we only have one cursor, and it's not
+            # where the first occurance is, just remove it
+            if len(self.cursors) == 1 and self.cursors[0].tuple() != new_cursors[0].tuple():
+                self.cursors = []
         self.last_find = what   # Only store string if it's really found
         self.store_state(state) # Store undo point
-        self.cursors = cur
+
+        # Add the new cursors
+        for cursor in new_cursors:
+            self.cursors.append(cursor)
+
         self.move_cursors()
 
     def find_next(self):

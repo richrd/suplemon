@@ -7,6 +7,7 @@ import curses
 import traceback
 
 def key_name(key):
+    """Return the curses key name for keys received from get_wch."""
     if type(key) == type(""):
         return str(curses.keyname(ord(key)).decode("utf-8"))
     return False

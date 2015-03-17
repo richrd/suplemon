@@ -27,8 +27,8 @@ class Line:
     def __len__(self):
         return len(self.data)
 
-    def find(self, what):
-        return self.data.find(what)
+    def find(self, what, start=0):
+        return self.data.find(what, start)
 
     def strip(self, *args):
         return self.data.strip(*args)
