@@ -43,8 +43,8 @@ class State:
 
 class Editor(Viewer):
     """Extends Viewer with editing capabilities."""
-    def __init__(self, parent, window):
-        Viewer.__init__(self, parent, window)
+    def __init__(self, app, window):
+        Viewer.__init__(self, app, window)
         self.buffer = []               # Copy/paste buffer
         self.last_find = ""            # Last search used in 'find'
         self.history = []              # History of editor states for undo/redo
@@ -186,7 +186,8 @@ class Editor(Viewer):
         """Add a new cursor one line up."""
         x = self.cursor().x
         cursor = self.get_first_cursor()
-        if cursor.y == 0: return
+        if cursor.y == 0:
+            return
         new = Cursor(x, cursor.y-1)
         self.cursors.append(new)
         self.move_cursors()
@@ -195,7 +196,8 @@ class Editor(Viewer):
         """Add a new cursor one line down."""
         x = self.cursor().x
         cursor = self.get_last_cursor()
-        if cursor.y == len(self.lines)-1: return
+        if cursor.y == len(self.lines)-1:
+            return
         new = Cursor(x, cursor.y+1)
         self.cursors.append(new)
         self.move_cursors()
@@ -204,7 +206,8 @@ class Editor(Viewer):
         """Add a new cursor one character left."""
         new = []
         for cursor in self.cursors:
-            if cursor.x == 0: continue
+            if cursor.x == 0:
+                continue
             new.append( Cursor(cursor.x-1, cursor.y) )
         for c in new:
             self.cursors.append(c)
@@ -214,7 +217,8 @@ class Editor(Viewer):
         """Add a new cursor one character right."""
         new = []
         for cursor in self.cursors:
-            if cursor.x+1 > len(self.lines[cursor.y]): continue
+            if cursor.x+1 > len(self.lines[cursor.y]):
+                continue
             new.append( Cursor(cursor.x+1, cursor.y) )
         for c in new:
             self.cursors.append(c)
@@ -363,7 +367,7 @@ class Editor(Viewer):
             line = self.lines[cursor.y].data
             w = self.whitespace(line)
             start = line[:w]
-            self.parent.status(start)
+            self.app.status(start)
             if starts(line[w:], comment):
                 self.lines[cursor.y] = Line(start + line.lstrip()[len(comment):])
                 self.move_x_cursors(cursor.y, w, 0-len(comment))
@@ -462,7 +466,7 @@ class Editor(Viewer):
         """Move primary cursor to line, col=0."""
         try:
             line = int(line)-1
-            if line < 0: line = 0
+            if line < 0: line = len(self.lines)-1
         except:
             return False
 
@@ -510,7 +514,7 @@ class Editor(Viewer):
             y += 1
 
         if not new_cursors:
-            self.parent.status("Can't find '" + what + "'")
+            self.app.status("Can't find '" + what + "'")
             self.last_find = ""
             return
         else:
@@ -557,91 +561,58 @@ class Editor(Viewer):
             self.move_y_cursors(cursor.y, 1)
         self.move_cursors()
 
+    def got_input(self, value):
+        """Handle input."""
+        key, name = value
+        if key == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
+        elif key == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
+        elif key == curses.KEY_UP: self.arrow_up()            # Arrow Up
+        elif key == curses.KEY_DOWN: self.arrow_down()        # Arrow Down
+        elif key == curses.KEY_NPAGE: self.page_up()          # Page Up
+        elif key == curses.KEY_PPAGE: self.page_down()        # Page Down
 
-    def keyboard_interrupt(self):
-        self.cut()
-        
-    def got_chr(self, char):
-        """Handle character input."""
-        
-        # if type(char) == type(""):
-        #     name = str(curses.keyname(ord(char)).decode("utf-8"))
-        #     self.parent.logger.log("GOT STR KEY")
-        #     self.parent.logger.log(curses.keyname(ord(char)))
-        #     self.parent.logger.log("NAME <" + str(name) + ">")
-        # else:
-        #     self.parent.logger.log("GOT INT KEY" + str(char) + ">")
-        #     pass
+        elif key == 563: self.new_cursor_up()                 # Alt + Up
+        elif key == 522: self.new_cursor_down()               # Alt + Down
+        elif key == 542: self.new_cursor_left()               # Alt + Left
+        elif key == 557: self.new_cursor_right()              # Alt + Right
+        elif key == 552: self.push_up()                       # Alt + Page Up
+        elif key == 547: self.push_down()                     # Alt + Page Down
 
-        name = key_name(char)
-        if char == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
-        elif char == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
-        elif char == curses.KEY_UP: self.arrow_up()            # Arrow Up
-        elif char == curses.KEY_DOWN: self.arrow_down()        # Arrow Down
-        elif char == curses.KEY_NPAGE: self.page_up()          # Page Up    
-        elif char == curses.KEY_PPAGE: self.page_down()        # Page Down
+        elif key == 269: self.undo()                          # F5
+        elif key == 270: self.redo()                          # F6
+        elif key == 273: self.toggle_line_nums()              # F9
+        elif key == 274: self.toggle_line_ends()              # F10
+        elif key == 275: self.toggle_highlight()              # F11
+        elif key == 563: self.new_cursor_up()                 # Alt + up
+        elif key == 522: self.new_cursor_down()               # Alt + down
+        elif key == 542: self.new_cursor_left()               # Alt + left
+        elif key == 557: self.new_cursor_right()              # Alt + right
 
-        elif char == 563: self.new_cursor_up()                 # Alt + Up
-        elif char == 522: self.new_cursor_down()               # Alt + Down
-        elif char == 542: self.new_cursor_left()               # Alt + Left
-        elif char == 557: self.new_cursor_right()              # Alt + Right
-        elif char == 552: self.push_up()                       # Alt + Page Up
-        elif char == 547: self.push_down()                     # Alt + Page Down
+        elif key == 331: self.insert()                        # Insert
 
-        elif char == 269: self.undo()                          # F5
-        elif char == 270: self.redo()                          # F6
-        elif char == 273: self.toggle_line_nums()              # F9
-        elif char == 274: self.toggle_line_ends()              # F10
-        elif char == 275: self.toggle_highlight()              # F11
-        elif char == 563: self.new_cursor_up()                 # Alt + up
-        elif char == 522: self.new_cursor_down()               # Alt + down
-        elif char == 542: self.new_cursor_left()               # Alt + left
-        elif char == 557: self.new_cursor_right()              # Alt + right
+        elif name == "^C": self.cut()                         # Ctrl + C
+        elif name == "^W": self.duplicate_line()              # Ctrl + W
+        elif name == "^V": self.insert()                      # Ctrl + V
+        elif name == "^P": self.comment()                     # Ctrl + P
+        elif name == "^D": self.find_next()                   # Ctrl + D
+        elif name == "^A": self.find_all()                    # Ctrl + A
+        elif key == 544: self.jump_left()                     # Ctrl + Left
+        elif key == 559: self.jump_right()                    # Ctrl + Right
+        elif key == 565: self.jump_up()                       # Ctrl + Up
+        elif key == 524: self.jump_down()                     # Ctrl + Down
 
-        elif char == 269: self.undo()                          # F5
-        elif char == 270: self.redo()                          # F6
-        elif char == 273: self.toggle_line_nums()              # F9
-        elif char == 274: self.toggle_line_ends()              # F10
-        elif char == 275: self.toggle_highlight()              # F11
-        elif char == 331: self.insert()                        # Insert
-
-        # elif char == 23: self.duplicate_line()                 # Ctrl + W
-        # elif char == 22: self.insert()                         # Ctrl + V
-        # elif char == 16: self.comment()                        # Ctrl + P
-        # elif char == 4: self.find_next()                       # Ctrl + D
-        # elif char == 1: self.find_all()                        # Ctrl + A
-        # elif char == 24: self.cut()                            # Ctrl + X
-
-        elif name == "^W": self.duplicate_line()               # Ctrl + W
-        elif name == "^V": self.insert()                       # Ctrl + V
-        elif name == "^P": self.comment()                      # Ctrl + P
-        elif name == "^D": self.find_next()                    # Ctrl + D
-        elif name == "^A": self.find_all()                     # Ctrl + A
-        #elif name == "^X": self.cut()                          # Ctrl + X
-        elif char == 544: self.jump_left()                     # Ctrl + Left
-        elif char == 559: self.jump_right()                    # Ctrl + Right
-        elif char == 565: self.jump_up()                       # Ctrl + Up
-        elif char == 524: self.jump_down()                     # Ctrl + Down
-
-
-
-        elif char == curses.KEY_HOME: self.home()              # Home
-        elif char == curses.KEY_END: self.end()                # End
-        elif char == curses.KEY_BACKSPACE: self.backspace()    # Backspace
-        elif char == curses.KEY_DC: self.delete()              # Delete
-        elif char == curses.KEY_ENTER: self.enter()            # Enter
-        #elif char == 9: self.tab()                             # Tab
-        elif char == "\t": self.tab()                             # Tab
-        elif char == 353: self.untab()                         # Shift + Tab
-        #elif char == 10: self.enter()                          # Enter
-        elif char == "\n": self.enter()                          # Enter
-        #elif char == 27: self.escape()                         # Escape
-        elif name == "^[": self.escape()                       # Escape
+        elif key == curses.KEY_HOME: self.home()              # Home
+        elif key == curses.KEY_END: self.end()                # End
+        elif key == curses.KEY_BACKSPACE: self.backspace()    # Backspace
+        elif key == curses.KEY_DC: self.delete()              # Delete
+        elif key == curses.KEY_ENTER: self.enter()            # Enter
+        elif key == "\t": self.tab()                          # Tab
+        elif key == 353: self.untab()                         # Shift + Tab
+        elif key == "\n": self.enter()                        # Enter
+        elif name == "^[": self.escape()                      # Escape
         else:
             try:
-                letter = char
-                #self.parent.log(str(char) + " " + letter)
-                #self.parent.logger.log(char)
+                letter = key
                 self.type(letter)
             except:
                 pass

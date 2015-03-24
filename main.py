@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #-*- coding:utf-8
 """
 The main class that starts and runs Suplemon.
@@ -9,290 +9,141 @@ __version__ = "0.0.1"
 import os
 import sys
 import time
+import curses
 
 import ui
 import modules
+
+from helpers import *
 from logger import *
 from config import *
 from editor import *
-from helpers import *
-
 from file import *
-quick_help = """
-Welcome to suplemon!
-====================
-
-Usage: ```python main.py [filename]...```
 
 
-Warning: beta software, bugs may occur.
-
-# Keyboard shortcuts:
-
- * Ctrl + X
-   > Exit Suplemon
-
- * Alt + Arrow Keys
-   > Add new curors in arrow direction
-
- * Ctrl + Left / Right
-   > Jump to previous or next word
- 
- * ESC
-   > Revert to a single cursor
-   
- * Ctrl + C
-   > Cut line(s) to buffer
-   > *OR* cancel a command waiting for input
-   
- * Ctrl + V
-   > Insert buffer
-
- * Ctrl + G
-   > Go to line number or file
-   
- * Ctrl + F
-   > Find text
-   
- * Ctrl + D
-   > Find next (add a new cursor at the next occurance)
- 
- * Alt + Page Up
-   > Move line(s) up
- 
- * Alt + Page Down
-   > Move line(s) down
-   
- * F1
-   > Save current file
-   
- * F2
-   > Reload current file
-   
- * F9
-   > Toggle line numbers
- 
- * Ctrl + O
-   > Open file
-   
- * Ctrl + Page Up
-   > Switch to next file
- 
- * Ctrl + Page Down
-   > Switch to previous file
-
-"""
-
-
-class App(ui.UI):
+class App:
     def __init__(self):
         self.version = __version__
         self.inited = 0
         self.running = 0
-        self.last_key = None
-        self.status_msg = ""
-
-        self.files = []
-        self.current_file = 0
 
         self.path = os.path.dirname(os.path.realpath(__file__))
+        self.files = []
+        self.current_file = 0
+        self.status_msg = ""
+        self.last_input = None
+
+        # Load core components
         self.logger = Logger()
         self.config = Config(self)
         self.config.load()
+        self.ui = ui.UI(self) # Load user interface
+
+        # Load extension modules
         self.modules = modules.ModuleLoader()
         self.modules.load()
-        self.logger.log(self.modules.modules)
-        ui.UI.__init__(self) # Load user interface
-        self.inited = 1 # Indicate that windows etc. have been created.
 
-    def toggle_fullscreen(self):
-        """Toggle full screen editor."""
-        display = self.config["display"]
-        if display["show_top_bar"]:
-            display["show_top_bar"] = 0
-            display["show_bottom_bar"] = 0
-        else:
-            display["show_top_bar"] = 1
-            display["show_bottom_bar"] = 1
-        self.resize()
-        self.refresh()
+        # Indicate that windows etc. have been created.
+        self.inited = 1
 
-    def log(self, text):
-        """Add text to log."""
-        self.logger.log(text)
-        self.status(text)
+    def log(self, text, log_type=LOG_ERROR):
+        """Add text to the log buffer."""
+        self.logger.log(text, log_type)
 
-    # TODO: Non curses methods start here (to later separate ui from functionality)
-    def setup_editor(self, editor):
-        """Setup an editor instance with configuration."""
-        config = self.config["editor"]
-        editor.set_config(config)
+    def load(self):
+        """Load the app."""
+        self.ui.load()
+        self.load_files()
+        loaded = True
 
-    def reload_config(self):
-        """Reload configuration."""
-        self.config.reload()
-        for f in self.files:
-            self.setup_editor(f.editor)        
-        self.resize()
-        self.refresh()
+    def exit(self):
+        """Stop the main loop and exit."""
+        self.running = 0
 
-    def resize_editor(self):
-        """Resize the editor window."""
-        yx = self.screen.getmaxyx()
-        xy = self.size()
-        height = self.max_editor_height()
-        self.editor().resize( (height, yx[1]) )
+    def run(self):
+        """Run the app."""
+        self.load() # Load ui
+        self.running = 1
+        self.get_editor().resize()
+        self.ui.refresh()
+        self.main_loop()
+        self.ui.unload() # Unload ui
 
-    def refresh(self):
-        """Refresh the UI."""
-        self.editor().render()
-        self.refresh_status()
-        self.screen.refresh()
+    def main_loop(self):
+        """Run the terminal IO loop until exit() is called."""
+        while self.running:
+            # Update ui before refreshing it
+            self.ui.update()
+            # See if we have input to process
+            value = self.ui.get_input()
+            if value:
+                # Handle the input or give it to the editor
+                if not self.handle_input(value):
+                    # Pass the input to the editor component
+                    self.get_editor().got_input(value)
+                #TODO: why do I need resize here? (View won't update after switching files, WTF)
+                self.get_editor().resize()
+                self.ui.refresh()
 
-    def update(self):
-        self.refresh()
-
-    def status(self, s):
+    def set_status(self, s):
         """Set the status message."""
         self.status_msg = str(s)
 
-    def file(self):
-        """Return the current file."""
-        return self.files[self.current_file]
+    def get_status(self):
+        """Set the status message."""
+        return self.status_msg
 
-    def editor(self):
-        """Return the current editor."""
-        return self.files[self.current_file].editor
+    def handle_input(self, value):
+        """Handle a key input event."""
+        self.last_input = value
+        key, name = value
+        if name == "^H": self.help()                 # Ctrl + H
+        elif name == "^E": self.run_command()        # Ctrl + E
+        elif name == "^F": self.find()               # Ctrl + F
+        elif name == "^G": self.go_to()              # Ctrl + G
+        elif name == "^O": self.open()               # Ctrl + O
+        elif name == "^K": self.close_file()         # Ctrl + K
+        elif name == "^N": self.new_file()           # Ctrl + N
+        elif name == "^X": self.ask_exit()           # Ctrl + X
 
-    def file_exists(self, path):
-        """Check if file is open."""
-        for file in self.files:
-            if file.path() == os.path.abspath(path):
-                return file
-        return False
+        elif key == 554: self.prev_file()            # Ctrl + Page Up
+        elif key == 549: self.next_file()            # Ctrl + Page Down
+        elif key == 265: self.save_file()            # F1
+        elif key == 266: self.reload_file()          # F2
+        elif key == 275: self.toggle_fullscreen()    # F12
 
-    def go_to(self):
-        """Go to a line or a file."""
-        result = self.query("Go to:")
-        try:
-            result = int(result)
-            self.editor().go_to_pos(result)
-        except:
-            index = self.find_file(result)
-            if index != -1:
-                self.switch_to_file(index)
+        elif key == 410: pass                        # Mouse events?
+        else:
+            return False
         return True
 
-    def find(self):
-        """Find in file."""
-        what = self.query("Find:")
-        if what:
-            self.editor().find(what)
+    ###########################################################################
+    # User Interactions
+    ###########################################################################
 
-    def find_file(self, s):
-        """Find index of file matching string."""
-        i = 0
-        for file in self.files:
-            if file.name[:len(s)].lower() == s.lower():
-                return i
-            i += 1
-        return -1
-        
-    def new_editor(self):
-        """Create a new editor instance."""
-        editor = Editor(self, self.editor_win)
-        self.setup_editor(editor)
-        return editor
+    def help(self):
+        """Open help file."""
+        f = self.default_file()
+        f.set_data("Sorry, no help here yet!")
+        self.files.append(f)
+        self.switch_to_file(self.last_file_index())
 
-    def new(self):
+    def new_file(self):
+        """Open new empty file."""
         self.files.append(self.default_file())
-        self.current_file = len(self.files)-1
-        
-    def open(self):
-        """Ask for file name and try to open it."""
-        name = self.query("Open:")
-        if not name:
-            return False
-        exists = self.file_exists(name)
-        if exists:
-            self.switch_to_file(self.files.index(exists))
+        self.current_file = self.last_file_index()
+
+    def ask_exit(self):
+        """Make sure the user really wants to exit."""
+        yes = self.ui.query_bool("Exit?")
+        if yes:
+            self.exit()
             return True
-
-        if not self.open_file(name):
-            self.status("Failed to load '" + name + "'")
-            return False
-        self.switch_to_file(self.last_file())
-        return True
-
-    def close(self):
-        result = self.query("Close?")
-        if result:
-            self.files.pop(self.current_file)
-            if not len(self.files):
-                self.new()
-                return False
-            if self.current_file == len(self.files):
-                self.current_file -= 1
-
-    def save(self):
-        """Save current file app."""
-        fi = self.file()
-        name = self.query("Save as:", fi.name)
-        if not name:
-            return False
-        fi.set_name(name)
-        if fi.save():
-            self.status("Saved [" + curr_time_sec() + "] '" + fi.name + "'")
-            if fi.path() == self.config.path():
-                self.reload_config()
-            return True
-        self.status("Couldn't write to '" + fi.name + "'")
-        return False
-
-    def open_file(self, filename):
-        """Open a file."""
-        file = File(self)
-        file.set_path(filename)
-        file.set_editor(self.new_editor())
-        loaded = file.load()
-        if not loaded:
-            return False
-        self.files.append(file)
-        return True
-
-    def new_file(self, filename):
-        """Open a file."""
-        file = File(self)
-        file.set_path(filename)
-        file.set_editor(self.new_editor())
-        self.files.append(file)
-        return True
-
-    def load_default(self):
-        """Load a default file if no files specified."""
-        file = self.default_file()
-        file.set_data(quick_help)
-        self.files.append(file)
-
-    def default_file(self):
-        """Create the default file."""
-        file = File(self)
-        file.set_editor(self.new_editor())
-        file.editor.set_file_extension("md")
-        return file
-
-    def reload(self):
-        """Reload the current file."""
-        if self.query("Reload '"+self.file().name+"'?"):
-            if self.file().reload():
-                return True
         return False
 
     def switch_to_file(self, index):
         """Load a default file if no files specified."""
         self.current_file = index
-        self.resize_editor()
-        self.refresh()
 
     def next_file(self):
         """Switch to next file."""
@@ -312,87 +163,170 @@ class App(ui.UI):
             cur = len(self.files)-1
         self.switch_to_file(cur)
 
-    def last_file(self):
-        """Get index of last file."""
-        cur = len(self.files)-1
-        return cur
-        
-    def help(self):
-        """Open help file."""
-        f = self.default_file()
-        f.set_data(quick_help)
-        self.files.append(f)
-        self.switch_to_file(self.last_file())
+    def go_to(self):
+        """Go to a line or a file."""
+        result = self.ui.query("Go to:")
+        try:
+            result = int(result)
+            self.get_editor().go_to_pos(result)
+        except:
+            index = self.find_file(result)
+            if index != -1:
+                self.switch_to_file(index)
+        return True
+
+    def find(self):
+        """Find in file."""
+        what = self.ui.query("Find:")
+        if what:
+            self.get_editor().find(what)
+
+    def find_file(self, s):
+        """Return index of file matching string."""
+        i = 0
+        for file in self.files:
+            if file.name[:len(s)].lower() == s.lower():
+                return i
+            i += 1
+        return -1
 
     def run_command(self):
         """Run editor commands."""
-        data = self.query("Command:")
+        data = self.ui.query("Command:")
         if not data:
             return False
+        if data == "fail": #log debug
+            try: # to
+                fail
+            except:
+                self.log(get_error_info())
         parts = data.split(" ")
         cmd = parts[0].lower()
-        self.logger.log("Looking for command '" + cmd +"'")
+        self.logger.log("Looking for command '" + cmd +"'", LOG_INFO)
         if cmd in self.modules.modules.keys():
-            self.logger.log("Trying to run command '" + cmd +"'")
-            self.editor().store_action_state(cmd)
-            self.modules.modules[cmd].run(self, self.editor())
+            self.logger.log("Trying to run command '" + cmd +"'", LOG_INFO)
+            self.get_editor().store_action_state(cmd)
+            self.modules.modules[cmd].run(self, self.get_editor())
         return True
-    
-    def handle_char(self, char):
-        """Handle a character from curses."""
-        #name = key_name(char)
-        name = key_name(char)
-        #name = False
-        # if type(char) == type(""):
-        #     name = curses.keyname(ord(char)).decode("utf-8")
-        #     self.logger.log("THE KEY NAME:" + name + "<")
-        if name == "^H": self.help()                 # Ctrl + H
-        elif name == "^E": self.run_command()        # Ctrl + E
-        elif name == "^F": self.find()               # Ctrl + F
-        elif name == "^G": self.go_to()              # Ctrl + G
-        elif name == "^O": self.open()               # Ctrl + O
-        elif name == "^K": self.close()              # Ctrl + K
-        elif name == "^N": self.new()                # Ctrl + N
 
-        elif char == 265: self.save()                # F1
-        elif char == 266: self.reload()              # F2
-        elif char == 276: self.toggle_fullscreen()   # F12
-        
-        
-        # elif char == 8: self.help()                 # Ctrl + H
-        # elif char == 5: self.run_command()          # Ctrl + E
-        # elif char == 6: self.find()                 # Ctrl + F
-        # elif char == 7: self.go_to()                # Ctrl + G
-        # elif char == 15: self.open()                # Ctrl + O
-        # elif char == 11: self.close()               # Ctrl + K
-        # elif char == 14: self.new()                 # Ctrl + N
-        elif char == 554: self.prev_file()          # Ctrl + Page Up
-        elif char == 549: self.next_file()          # Ctrl + Page Down
-        elif char == 410: pass                      # Mouse events?
+    def toggle_fullscreen(self):
+        """Toggle full screen editor."""
+        display = self.config["display"]
+        if display["show_top_bar"]:
+            display["show_top_bar"] = 0
+            display["show_bottom_bar"] = 0
         else:
+            display["show_top_bar"] = 1
+            display["show_bottom_bar"] = 1
+        # Virtual curses windows need to be resized
+        self.ui.resize()
+
+    ###########################################################################
+    # Editor operations
+    ###########################################################################
+
+    def new_editor(self):
+        """Create a new editor instance."""
+        editor = Editor(self, self.ui.editor_win)
+        self.setup_editor(editor)
+        return editor
+
+    def get_editor(self):
+        """Return the current editor."""
+        return self.files[self.current_file].editor
+
+    def setup_editor(self, editor):
+        """Setup an editor instance with configuration."""
+        config = self.config["editor"]
+        editor.set_config(config)
+
+    ###########################################################################
+    # File operations
+    ###########################################################################
+
+    def open(self):
+        """Ask for file name and try to open it."""
+        name = self.ui.query("Open file:")
+        if not name:
             return False
+        exists = self.file_is_open(name)
+        if exists:
+            self.switch_to_file(self.files.index(exists))
+            return True
+
+        if not self.open_file(name):
+            self.set_status("Failed to load '" + name + "'")
+            return False
+        self.switch_to_file(self.last_file_index())
         return True
-        
-    def check_exit(self):
-        """Make sure the user really wants to exit."""
-        try:
-            yes = self.query_bool("Exit?")
-        except:
-            self.running = 0
+
+    def close_file(self):
+        """Close current file if user confirms action."""
+        if self.ui.query_bool("Close file?"):
+            self.files.pop(self.current_file)
+            if not len(self.files):
+                self.new_file()
+                return False
+            if self.current_file == len(self.files):
+                self.current_file -= 1
+
+    def save_file(self):
+        """Save current file."""
+        f = self.get_file()
+        name = self.ui.query("Save as:", f.name)
+        if not name:
+            return False
+        f.set_name(name)
+        if f.save():
+            self.set_status("Saved [" + curr_time_sec() + "] '" + f.name + "'")
+            if f.path() == self.config.path():
+                self.reload_config()
             return True
-        if yes:
-            self.running = 0
-            return True
-        self.refresh()
+        self.set_status("Couldn't write to '" + f.name + "'")
+        return False
+
+    def reload_file(self):
+        """Reload the current file."""
+        if self.ui.query_bool("Reload '" + self.get_file().name + "'?"):
+            if self.get_file().reload():
+                return True
         return False
         
-    def load(self):
-        """Load the app."""
-        loaded = True
+    def get_files(self):
+        """Return list of open files."""
+        return self.files
+
+    def get_file(self):
+        """Return the current file."""
+        return self.files[self.current_file]
+
+
+    def last_file_index(self):
+        """Get index of last file."""
+        cur = len(self.files)-1
+        return cur
+
+    def current_file_index(self):
+        """Get index of current file."""
+        return self.current_file
+
+    def open_file(self, filename):
+        """Open a file."""
+        file = File(self)
+        file.set_path(filename)
+        file.set_editor(self.new_editor())
+        if not file.load():
+            return False
+        self.files.append(file)
+        return True
+
+    def load_files(self):
+        """Try to load all files specified in arguments."""
+        #TODO: use argparse (this won't work for quoted filenames)
         if len(sys.argv) > 1:
             names = sys.argv[1:]
             for name in names:
-                if self.file_exists(name): continue
+                if self.file_is_open(name): continue
                 if self.open_file(name):
                     loaded = True
                 else:
@@ -400,28 +334,25 @@ class App(ui.UI):
         else:
             self.load_default()
 
-    def run(self):
-        """Run the app."""
-        self.load()
-        self.running = 1
-        self.refresh()
-        while self.running:
-            self.check_resize()
-            key = self.get_input()
-            name = key_name(key)
-            self.last_key = name
-            if name == "^X": # Exit
-                if self.check_exit():
-                    break
-                continue
-            if key == -1: # Keyboard interrupt (Ctrl + C)
-                self.editor().keyboard_interrupt()
-                #continue
-            if not self.handle_char(key):
-                self.editor().got_chr(key)
-            self.refresh()
+    def file_is_open(self, path):
+        """Check if file is open. Returns the File object or False."""
+        for file in self.files:
+            if file.path() == os.path.abspath(path):
+                return file
+        return False
 
-        curses.endwin()
+    def load_default(self):
+        """Load a default file if no files specified."""
+        file = self.default_file()
+        self.files.append(file)
+
+    def default_file(self):
+        """Create the default file."""
+        file = File(self)
+        file.set_editor(self.new_editor())
+        file.editor.set_file_extension("md")
+        return file
+
 
 def main(*args):
     global app
@@ -430,7 +361,7 @@ def main(*args):
 
 if __name__ == "__main__":
     curses.wrapper(main)
+
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()
-    exit(0)

@@ -27,8 +27,8 @@ except:
     pygments = False
 
 class Viewer:
-    def __init__(self, parent, window):
-        self.parent = parent
+    def __init__(self, app, window):
+        self.app = app
         self.window = window
         self.config = []
         self.data = ""
@@ -54,17 +54,28 @@ class Viewer:
 
     def setup_linelight(self):
         """Setup line based highlighting."""
-        filename = self.file_extension + ".py"
         curr_path = os.path.dirname(os.path.realpath(__file__))
+
+        filename = self.file_extension + ".py"
         path = os.path.join(curr_path, "linelight", filename)
-        try:
-            mod = imp.load_source(self.file_extension, path)
-        except:
+
+        mod = False
+        if os.path.isfile(path):
+            try:
+                mod = imp.load_source(self.file_extension, path)
+            except:
+                self.app.logger.log(get_error_info())
+        else:
             path = os.path.join(curr_path, "linelight", "generic.py")
-            mod = imp.load_source("generic", path)
-            self.parent.logger.log(get_error_info())
-        if not "parse" in dir(mod):
+            if os.path.isfile(path):
+                try:
+                    mod = imp.load_source("generic", path)
+                except:
+                    self.app.logger.log(get_error_info())
+
+        if not mod or not "parse" in dir(mod):
             return False
+            
         self.linelighter = mod.parse
 
     def setup_highlighting(self):
@@ -94,7 +105,8 @@ class Viewer:
 
     def log(self, s):
         """Log to the app."""
-        self.parent.log(s)
+        #TODO: log types: ERROR | WARNING | NOTICE
+        self.app.log(s)
 
     def set_data(self, data):
         """Set editor data or contents."""
@@ -243,13 +255,20 @@ class Viewer:
 
     def resize(self, yx = None):
         """Resize the UI."""
+        if not yx:
+            yx = self.window.getmaxyx()
         self.window.resize(yx[0], yx[1])
         self.move_cursors()
         self.refresh()
 
     def move_win(self, yx):
         """Move the editor window to position yx."""
-        self.window.mvwin( yx[0], yx[1] )
+        # Must try & catch since mvwin might
+        # crash with incorrect coordinates
+        try:
+            self.window.mvwin( yx[0], yx[1] )
+        except:
+            self.app.log(get_error_info(), LOG_WONTFIX)
 
     def move_y_scroll(self, delta):
         """Add delta the y scroll axis scroll"""
@@ -313,8 +332,12 @@ class Viewer:
         """Get the last cursor."""
         lowest = None
         for cursor in self.cursors:
-            if lowest == None or (cursor.y > lowest.y and cursor.x > lowest.x):
+            if lowest == None:
                 lowest = cursor
+            elif cursor.y > lowest.y:
+                lowest = cursor
+            elif cursor.y == lowest.y and cursor.x > lowest.x:
+                 lowest = cursor
         return lowest
 
     def cursor_exists(self, cursor):

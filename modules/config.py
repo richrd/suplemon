@@ -7,7 +7,7 @@ class Config(Command):
     def run(self, app, editor):
         if not app.open_file("~/.suplemon-config.json"):
             app.new_file("~/.suplemon-config.json")
-        app.switch_to_file(app.last_file())
+        app.switch_to_file(app.last_file_index())
  
 module = {
     "class": Config,

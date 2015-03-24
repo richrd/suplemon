@@ -1,16 +1,14 @@
 """
-Various helper functions.
+Various helper constants and functions.
 """
 import sys
 import time
-import curses
 import traceback
 
-def key_name(key):
-    """Return the curses key name for keys received from get_wch."""
-    if type(key) == type(""):
-        return str(curses.keyname(ord(key)).decode("utf-8"))
-    return False
+LOG_WONTFIX = 0
+LOG_INFO = 1
+LOG_WARNING = 2
+LOG_ERROR = 3
 
 def curr_time():
     """Current time in %H:%M"""
