@@ -4,12 +4,8 @@ from mod_base import *
 class Battery(Command):
     def __init__(self):
         self.last_value = None
-        #self.status = True
         self.checked = time.time()
         self.interval = 10
-
-    def run(self, app, editor):
-        app.status("BAT:" + str(state))
 
     def value(self):
         if not self.last_value:
@@ -24,10 +20,7 @@ class Battery(Command):
     def value_str(self):
         return "BAT:" + str(self.value()) + "%"
 
-    def run(self, app, editor):
-        app.status(self.value_str())
-
-    def status(self):
+    def get_status(self):
         return self.value_str()
 
     def battery_status(self):
@@ -52,5 +45,5 @@ class Battery(Command):
 module = {
     "class": Battery,
     "name": "battery",
-    "status": True,
+    "status": "bottom",
 }

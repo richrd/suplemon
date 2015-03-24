@@ -1,3 +1,4 @@
+#-*- encoding: utf-8
 """
 Addon module loader.
 """
@@ -7,7 +8,8 @@ import imp
 from helpers import *
 
 class ModuleLoader:
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
         self.curr_path = os.path.dirname(os.path.realpath(__file__))
         self.module_path = os.path.join(self.curr_path, "modules" + os.sep)
         self.modules = {}
@@ -16,6 +18,7 @@ class ModuleLoader:
         dirlist = os.listdir(self.module_path)
         modules = {}
         for item in dirlist:
+            # Skip 'hidden' dot files
             if item[0] == ".":
                 continue
             parts = item.split(".")
@@ -26,10 +29,8 @@ class ModuleLoader:
         
             # only load .py modules that don't begin with an underscore
             if ext == "py" and name[0] != "_":
-                #module = self.load_single(item)
                 module = self.load_single(name)
                 if module:
-                    #self.modules[module[0]] = module[1]["class"]() # Store the module instance
                     self.modules[module[0]] = self.load_instance(module) # Load and store the module instance
 
     def load_instance(self, module):
@@ -48,9 +49,9 @@ class ModuleLoader:
                 mod.module["status"] = False
             return name, mod.module
         except:
-            print("Failed loading:", name)
-            print(traceback.format_exc())
-            print(sys.exc_info()[0])
+            self.app.log("Failed loading module:", name)
+            self.app.log(traceback.format_exc())
+            self.app.log(sys.exc_info()[0])
             return False
 
 if __name__ == "__main__":

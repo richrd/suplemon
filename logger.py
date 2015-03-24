@@ -1,3 +1,4 @@
+#-*- encoding: utf-8
 """
 Basic logging to delay printing until curses is unloaded.
 """

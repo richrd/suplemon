@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-#-*- coding:utf-8
+#-*- encoding: utf-8
 """
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import os
 import sys
@@ -19,7 +19,6 @@ from logger import *
 from config import *
 from editor import *
 from file import *
-
 
 class App:
     def __init__(self):
@@ -40,7 +39,7 @@ class App:
         self.ui = ui.UI(self) # Load user interface
 
         # Load extension modules
-        self.modules = modules.ModuleLoader()
+        self.modules = modules.ModuleLoader(self)
         self.modules.load()
 
         # Indicate that windows etc. have been created.
@@ -62,12 +61,16 @@ class App:
 
     def run(self):
         """Run the app."""
-        self.load() # Load ui
+        # Load ui and files etc
+        self.load()
         self.running = 1
+        # Initial render
         self.get_editor().resize()
         self.ui.refresh()
+        # Start mainloop
         self.main_loop()
-        self.ui.unload() # Unload ui
+        # Unload ui
+        self.ui.unload()
 
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
@@ -93,10 +96,30 @@ class App:
         """Set the status message."""
         return self.status_msg
 
+    def get_file_index(self, file_obj):
+        """Get file index by file object."""
+        return self.files.index(file_obj)
+
+    def unsaved_changes(self):
+        """Check if there are unsaved changes in any file."""
+        for f in self.files:
+            if f.is_changed():
+                return True
+        return False
+
+    def reload_config(self):
+        """Reload configuration."""
+        self.config.reload()
+        for f in self.files:
+            self.setup_editor(f.editor)        
+        self.resize()
+        self.refresh()
+
     def handle_input(self, value):
         """Handle a key input event."""
         self.last_input = value
         key, name = value
+
         if name == "^H": self.help()                 # Ctrl + H
         elif name == "^E": self.run_command()        # Ctrl + E
         elif name == "^F": self.find()               # Ctrl + F
@@ -110,12 +133,22 @@ class App:
         elif key == 549: self.next_file()            # Ctrl + Page Down
         elif key == 265: self.save_file()            # F1
         elif key == 266: self.reload_file()          # F2
+        elif key == 272: self.toggle_mouse()         # F8
         elif key == 275: self.toggle_fullscreen()    # F12
 
-        elif key == 410: pass                        # Mouse events?
+        elif key == curses.KEY_MOUSE:                # Mouse events
+            mouse_state = self.ui.get_mouse_state()
+            if mouse_state:
+                self.handle_mouse(mouse_state)
         else:
             return False
         return True
+
+    def handle_mouse(self, state):
+        """Handle a mouse event."""
+        #TODO: implement this
+        self.last_input = state
+        pass
 
     ###########################################################################
     # User Interactions
@@ -134,12 +167,16 @@ class App:
         self.current_file = self.last_file_index()
 
     def ask_exit(self):
-        """Make sure the user really wants to exit."""
-        yes = self.ui.query_bool("Exit?")
-        if yes:
+        """Exit if no unsaved changes, else make sure the user really wants to exit."""
+        if self.unsaved_changes():
+            yes = self.ui.query_bool("Exit?")
+            if yes:
+                self.exit()
+                return True
+            return False
+        else:
             self.exit()
             return True
-        return False
 
     def switch_to_file(self, index):
         """Load a default file if no files specified."""
@@ -220,6 +257,12 @@ class App:
             display["show_bottom_bar"] = 1
         # Virtual curses windows need to be resized
         self.ui.resize()
+
+    def toggle_mouse(self):
+        """Toggle mouse support."""
+        # Invert the boolean
+        self.config["editor"]["use_mouse"] = not self.config["editor"]["use_mouse"]
+        self.ui.setup_mouse()
 
     ###########################################################################
     # Editor operations
@@ -350,6 +393,7 @@ class App:
         """Create the default file."""
         file = File(self)
         file.set_editor(self.new_editor())
+        # Set markdown as the default file type
         file.editor.set_file_extension("md")
         return file
 
@@ -360,6 +404,7 @@ def main(*args):
     app.run()
 
 if __name__ == "__main__":
+    """Only run the app if it's run directly (not imported)."""
     curses.wrapper(main)
 
     # Output log info

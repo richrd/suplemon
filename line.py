@@ -1,3 +1,4 @@
+#-*- encoding: utf-8
 """
 Line object to represent a single line in the text editor.
 """

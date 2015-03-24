@@ -8,7 +8,7 @@ suplemon
      /_______/\_______/__/ /  /_______/________/__/__/__/________/__/ /|__/ /
      \_______\ \______\__\/   \_______\________\__\__\__\________\__\/ \__\/
 
-Command line text editor with multicursor support. The goal is to replicate sublimetext style functionality in the terminal.
+Command line text editor with multicursor support. The goal is to replicate sublimetext style functionality in the terminal with the ease of use of Nano.
 
 # Suplemon multicursor editing:
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
@@ -29,14 +29,15 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * Copy & Paste, with multi line support
  * Find and Find next
  * Extensions (easy to write your own)
- * Comming later:
-     * Selections (hopefully)
+ * Might be comming later:
+     * Selections
 
 # Goals:
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
- 3. [X] Multi cursor ~~and multi selection~~ should be comparable to sublimetext.
- 4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing.
+ 3. [X] Multi cursor ~~and multi selection~~ should be comparable to Sublimetext.
+ 4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing,
+        Git commits, and a lot of developement.
 
 # Keyboard shortcuts:
 
@@ -53,10 +54,10 @@ Command line text editor with multicursor support. The goal is to replicate subl
    > Duplicate line
 
  * Ctrl + G
-   > Go to line number or file (type the beginning of a filename to go to it). 
+   > Go to line number or file (type the beginning of a filename to switch to it). 
 
  * Ctrl + F
-   > Find text
+   > Find string
 
  * Ctrl + D
    > Find next (add a new cursor at the next occurance)
@@ -88,8 +89,14 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * F6
    > Redo
 
+ * F8
+   > Toggle mouse mode
+
  * F9
    > Toggle line numbers
+
+ * F11
+   > Toggle full screen
 
  * Ctrl + O
    > Open file
@@ -102,11 +109,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 
 # Todo
- * [ ] Indicate if file was saved successfully or if it failed
- * [ ] Promt for close or exit confirmation only when file(s) have been modified
+ * [ ] Custom key bindings
  * [ ] Combine line based highlighters and other language related data (include comment syntax etc)
  * [ ] CSS highlighter
- * [ ] Indicate if file isn't writable (in tabs and when trying to save). Use os.access(path, os.W_OK)
     * ~~And disable editing~~ Don't disable editing to enable save as.
  * [ ] Comment line command (TODO: add lang detection)
  * [ ] EXT: Feature to automatically add ; to end of lines
@@ -114,7 +119,6 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Regex find/search (make configurable instead of a new feature?)
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Read only viewer
- * [ ] Custom key bindings
  * [ ] Setting for enabling/disabling undo for cursor changes
  * [ ] File selector, kind of like what nano has
  * [ ] EITHER Close files one at a time with 'save?' prompt.
@@ -122,6 +126,9 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
+ * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
+ * [X] Prompt for close or exit confirmation only when file(s) have been modified
+ * [X] Indicate if file was saved successfully or if it failed
  * [X] Better yes/no query for exit (and in general)
  * [X] Generic linelighter for generic highlighting
  * [X] Editor plugins/extensions/macros
@@ -153,10 +160,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
 # Fix / Defects
  * [ ] Can't open files that have spaces in them.
- * [ ] Config extension double loads config file, instead of switching to it
  * [ ] Remember find query if occurance not found (jump to top of file)
- * [ ] Return code 0 on exit:
-       Curses forces code 130 and causes git to ignore saved commit message, argh!
  * [ ] Syntax specific commenting.
  * [ ] Display tab characters with a replacement char (tab messes up lines)
  * [ ] Slightly unreliable undo/redo.
@@ -166,12 +170,15 @@ Command line text editor with multicursor support. The goal is to replicate subl
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
- * [ ] Encoding errors 
  * [ ] Refine find and find_next commands.
    * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
    * [X] Better auto find with ctrl+d. (Find the current word or character)
    * [X] Forget last find on esc.
    * [ ] Don't forget find text automatically when using Ctrl + F 
+ * [X] Return code 0 on exit:
+       Curses forces code 130 and causes git to ignore saved commit message, argh!
+ * [X] Config extension double loads config file, instead of switching to it
+ * [X] Encoding errors 
  * [X] Remove "Failed to load config." when file doesn't exist
  * [X] Delete key when cursor at line end; ~~add dedicated setting~~ made to work as normal.
  * [X] Make adding cursors up and down smarter: add them at main cursor x coordinate if possible

@@ -1,5 +1,4 @@
-#!/usr/bin/python
-#-*- coding:utf-8
+#-*- encoding: utf-8
 """
 Text Viewer component subclassed by Editor.
 """
@@ -16,6 +15,7 @@ from cursor import *
 from helpers import *
 
 try:
+    # Try to load syntax highlighter
     from pygments import highlight
     from pygments.lexers import PythonLexer
     from pygments.formatters import TerminalFormatter

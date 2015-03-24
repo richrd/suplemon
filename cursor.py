@@ -1,3 +1,4 @@
+#-*- encoding: utf-8
 """
 Cursor object for storing cursor data.
 """

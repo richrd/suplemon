@@ -1,3 +1,4 @@
+#-*- encoding: utf-8
 """
 File object for storing an opened file and editor.
 """

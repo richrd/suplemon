@@ -1,6 +1,8 @@
+#-*- encoding: utf-8
 """
 Various helper constants and functions.
 """
+
 import sys
 import time
 import traceback

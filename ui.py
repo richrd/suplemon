@@ -1,3 +1,4 @@
+#-*- encoding: utf-8
 """
 Curses user interface.
 """
@@ -6,7 +7,7 @@ import os
 from helpers import *
 
 # Force enabling colors
-os.environ["TERM"] = "xterm-256color"
+os.environ["TERM"] = "screen-256color"
 # Reduce ESC detection time to 50ms
 os.environ["ESCDELAY"] = "50"
 
@@ -26,14 +27,24 @@ class UI:
         curses.cbreak()
         curses.noecho()
         curses.curs_set(0)
+
         self.screen.keypad(1)
 
         self.current_yx = self.screen.getmaxyx() # For checking resize
+        self.setup_mouse()
         self.setup_windows()
 
     def unload(self):
         """Unload curses."""
         curses.endwin()
+
+    def setup_mouse(self):
+        # Mouse support
+        curses.mouseinterval(10)
+        if self.app.config["editor"]["use_mouse"]:
+            curses.mousemask(-1) # All events
+        else:
+            curses.mousemask(0) # All events
 
     def setup_colors(self):
         """Initialize color support and define colors."""
@@ -147,10 +158,11 @@ class UI:
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
-        # for name in self.modules.modules.keys():
-        #     module = self.modules.modules[name]
-        #     if module.options["status"]:
-        #         head_parts.append(module.status());
+        # Add module statuses
+        for name in self.app.modules.modules.keys():
+            module = self.app.modules.modules[name]
+            if module.options["status"] == "top":
+                head_parts.append(module.get_status());
 
         head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
@@ -175,7 +187,6 @@ class UI:
 
     def show_bottom_status(self):
         # """Show bottom status row."""
-        # # FIXME: Seems to write to max_y+1 line and crash
         editor = self.app.get_editor()
         size = self.size()
         cur = editor.cursor()
@@ -192,6 +203,13 @@ class UI:
         #    find = editor.last_find
         #    if len(find) > 10:find = find[:10]+"..."
         #    data = "find:'"+find+"' " + data
+
+        # Add module statuses
+        for name in self.app.modules.modules.keys():
+            module = self.app.modules.modules[name]
+            if module.options["status"] == "bottom":
+                data += " " + module.get_status();
+
         self.status_win.clear()
         status = self.app.get_status()
         extra = size[0] - len(status+data) - 1
@@ -291,3 +309,11 @@ class UI:
             return (-1, "^C")
         except:
             return False
+
+    def get_mouse_state(self):
+        try:
+            mouse_state = curses.getmouse()
+            return mouse_state
+        except:
+            self.app.log(get_error_info())
+        return False

@@ -5,11 +5,12 @@ Config handler.
 
 import os
 import json
+
 from helpers import *
 
 class Config:
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self, app):
+        self.app = app
         self.filename = ".suplemon-config.json"
         self.fpath = os.path.expanduser("~")
         self.defaults = {
@@ -21,13 +22,14 @@ class Config:
                 "auto_indent_newline": True,
                 "cursor": "reverse", # reverse or underline
                 "default_encoding": "utf-8",
-                "max_history": 20,
                 "tab_width": 4,
+                "max_history": 20,
                 "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
                 "line_end_char": "",
                 "show_line_nums": True,
                 "show_line_colors": True,
                 "show_highlighting": False,
+                "use_mouse": False,
             },
             "display": {
                 "show_top_bar": True,
@@ -44,10 +46,7 @@ class Config:
         self.config = dict(self.defaults)
 
     def log(self, s):
-        self.parent.status(s)
-
-    def err(self, s):
-        self.parent.logger.log(s)
+        self.app.status(s)
 
     def path(self):
         return os.path.join(self.fpath, self.filename)
@@ -63,14 +62,16 @@ class Config:
                 self.merge_defaults(self.config)
                 return True
             except:
-                self.err(get_error_info())
                 self.log("Failed to load config file!")
+                self.log(get_error_info())
         return False
 
     def reload(self):
+        """Reload the config file."""
         return self.load()
         
     def store(self):
+        """Write current config state to file."""
         data = json.dumps(self.config)
         f = open(self.filename)
         f.write(data)
@@ -89,13 +90,17 @@ class Config:
         return config
  
     def __getitem__(self, i):
+        """Get a config variable."""
         return self.config[i]
 
     def __setitem__(self, i, v):
+        """Set a config variable."""
         self.config[i] = v
 
     def __str__(self):
+        """Convert entire config array to string.""" 
         return str(self.config)
 
     def __len__(self):
+        """Return length of top level config variables."""
         return len(self.config)
