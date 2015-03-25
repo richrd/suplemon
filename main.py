@@ -10,6 +10,7 @@ import os
 import sys
 import time
 import curses
+import argparse
 
 import ui
 import modules
@@ -201,16 +202,29 @@ class App:
         self.switch_to_file(cur)
 
     def go_to(self):
-        """Go to a line or a file."""
-        result = self.ui.query("Go to:")
-        try:
-            result = int(result)
-            self.get_editor().go_to_pos(result)
-        except:
-            index = self.find_file(result)
-            if index != -1:
-                self.switch_to_file(index)
-        return True
+        """Go to a line or a file (or a line in a specific file with 'name:lineno')."""
+        input_str = self.ui.query("Go to:")
+        lineno = None
+        fname = None
+        if input_str.find(":") != -1:
+            parts = input_str.split(":")
+            fname = parts[0]
+            lineno = parts[1]
+            file_index = self.find_file(fname)
+            if file_index != -1:
+                self.switch_to_file(file_index)
+                try:
+                    input_str = int(lineno)
+                    self.get_editor().go_to_pos(input_str)
+                except:
+                    pass
+        else:
+            if input_str.isdigit():
+                self.get_editor().go_to_pos(int(input_str))
+            else:
+                file_index = self.find_file(input_str)
+                if file_index != -1:
+                    self.switch_to_file(file_index)
 
     def find(self):
         """Find in file."""
@@ -365,7 +379,7 @@ class App:
 
     def load_files(self):
         """Try to load all files specified in arguments."""
-        #TODO: use argparse (this won't work for quoted filenames)
+        #TODO: Maybe use argparse for this
         if len(sys.argv) > 1:
             names = sys.argv[1:]
             for name in names:

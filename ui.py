@@ -7,7 +7,7 @@ import os
 from helpers import *
 
 # Force enabling colors
-os.environ["TERM"] = "screen-256color"
+os.environ["TERM"] = "xterm-256color"
 # Reduce ESC detection time to 50ms
 os.environ["ESCDELAY"] = "50"
 
@@ -158,7 +158,7 @@ class UI:
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
-        # Add module statuses
+        # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "top":
@@ -186,7 +186,7 @@ class UI:
         return " ".join(str_list)
 
     def show_bottom_status(self):
-        # """Show bottom status row."""
+        """Show bottom status line."""
         editor = self.app.get_editor()
         size = self.size()
         cur = editor.cursor()
@@ -204,7 +204,7 @@ class UI:
         #    if len(find) > 10:find = find[:10]+"..."
         #    data = "find:'"+find+"' " + data
 
-        # Add module statuses
+        # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "bottom":

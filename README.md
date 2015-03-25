@@ -8,7 +8,10 @@ suplemon
      /_______/\_______/__/ /  /_______/________/__/__/__/________/__/ /|__/ /
      \_______\ \______\__\/   \_______\________\__\__\__\________\__\/ \__\/
 
-Command line text editor with multicursor support. The goal is to replicate sublimetext style functionality in the terminal with the ease of use of Nano.
+              *Remedying the pain of command line editing since 2014*
+
+
+Command line text editor with multicursor support. Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 
 # Suplemon multicursor editing:
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
@@ -55,6 +58,7 @@ Command line text editor with multicursor support. The goal is to replicate subl
 
  * Ctrl + G
    > Go to line number or file (type the beginning of a filename to switch to it). 
+   > You can also use 'filena:42' to go to line 42 in filename.py etc.
 
  * Ctrl + F
    > Find string
@@ -107,26 +111,11 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * Ctrl + Page Down
    > Switch to previous file
 
-
 # Todo
- * [ ] Custom key bindings
- * [ ] Combine line based highlighters and other language related data (include comment syntax etc)
  * [ ] CSS highlighter
-    * ~~And disable editing~~ Don't disable editing to enable save as.
- * [ ] Comment line command (TODO: add lang detection)
- * [ ] EXT: Feature to automatically add ; to end of lines
-    * [ ] Generalized: add prepend and append commands
- * [ ] Regex find/search (make configurable instead of a new feature?)
- * [ ] Global clipboard (copy from one file to another)
- * [ ] Read only viewer
- * [ ] Setting for enabling/disabling undo for cursor changes
- * [ ] File selector, kind of like what nano has
- * [ ] EITHER Close files one at a time with 'save?' prompt.
- * [ ] OR     Store files and cursor positions for restoring later
- * [ ] Auto complete
- * [ ] Selections
- * [ ] Proper syntax higlighting
- * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
+ * [ ] Regex find/search (make find configurable to do normal & regex)
+ * [X] The following solved with global exit check (if any file is modified but not sved)
+    * [X] Close files one at a time with 'save?' prompt.
  * [X] Prompt for close or exit confirmation only when file(s) have been modified
  * [X] Indicate if file was saved successfully or if it failed
  * [X] Better yes/no query for exit (and in general)
@@ -154,29 +143,44 @@ Command line text editor with multicursor support. The goal is to replicate subl
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
 
-# Ideas?
- * Refactor higher level commands/functions into modular plugins.
- * ...
-
-# Fix / Defects
- * [ ] Can't open files that have spaces in them.
- * [ ] Remember find query if occurance not found (jump to top of file)
+# Whishlist (Stuff that would be nice, but not planning to do yet. Maybe for 2.0.0)
+ * [ ] Global clipboard (copy from one file to another)
+ * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
+ * [ ] Custom key bindings
+ * [ ] Auto complete
+ * [ ] Selections
+ * [ ] Proper syntax higlighting
+   * [ ] Combine line based highlighters and other language related data (include comment syntax etc)
+   * [ ] Default to legendary Monokai colors 
+         http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/
+ * [ ] File selector, kind of like what nano has
+ * [ ] Store files and cursor positions for and restoring on next run
+ * [ ] Feature to automatically add ; to end of lines
+    * [ ] Generalized: add line prepend and append commands
+    * [ ] Will need multiline comment and string detection etc.
+ * [ ] Setting for enabling/disabling undo for cursor changes
+ * [ ] Read only viewer
+    * ~~And disable editing~~ Don't disable editing. Instead enable save as.
  * [ ] Syntax specific commenting.
  * [ ] Display tab characters with a replacement char (tab messes up lines)
- * [ ] Slightly unreliable undo/redo.
- * [ ] Cut command fails with multiple cursors when one is on last line
- * [ ] Finish refactoring viewer.py and editor.py
-   * [ ] Optimize rendering for ssh (minimal screen update)
+ * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
+
+# Fix / Defects
+ * [ ] Remember find query if occurance not found (jump to top of file)
+ * [ ] Unreliable undo/redo.
+ * [ ] Finish refactoring viewer.py and editor.py
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
  * [ ] Refine find and find_next commands.
    * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
    * [X] Better auto find with ctrl+d. (Find the current word or character)
    * [X] Forget last find on esc.
-   * [ ] Don't forget find text automatically when using Ctrl + F 
+   * [ ] Don't forget string to find automatically when using Ctrl + F 
  * [X] Return code 0 on exit:
        Curses forces code 130 and causes git to ignore saved commit message, argh!
+ * [X] Cut command fails with multiple cursors when one is on last line
+ * [X] ~~Can't open files that have spaces in them.~~ Works when using 'file\ name'
  * [X] Config extension double loads config file, instead of switching to it
  * [X] Encoding errors 
  * [X] Remove "Failed to load config." when file doesn't exist
