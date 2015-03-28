@@ -167,16 +167,16 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
    * [ ] Only refresh modified lines when editing
 
 # Fix / Defects
- * [ ] Unreliable undo/redo.
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
+ * [ ] Remember find query if occurance not found (jump to top of file)
+ * [X] Unreliable undo/redo.
  * [X] Refine find and find_next commands.
+ * [X] Don't forget string to find automatically when using Ctrl + F 
  * [X] Finish refactoring viewer.py and editor.py
  * [X] Cut command fails when multiple cursors are on or close to the last line
-   * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
-   * [X] Better auto find with ctrl+d. (Find the current word or character)
-   * [X] Forget last find on esc.
-   * [ ] Don't forget string to find automatically when using Ctrl + F 
-   * [ ] Remember find query if occurance not found (jump to top of file)
+ * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
+ * [X] Better auto find with ctrl+d. (Find the current word or character)
+ * [X] Forget last find on esc.
  * [X] Return code 0 on exit:
        Curses forces code 130 and causes git to ignore saved commit message, argh!
  * [X] ~~Can't open files that have spaces in them.~~ Works when using 'file\ name'
