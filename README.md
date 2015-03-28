@@ -112,7 +112,7 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * [X] Regex find/search (make find configurable to do normal & regex)
  * [X] CSS highlighter
  * [X] Move the editor view (scroll) down when finding multiple occurances
- * [X] The following solved with global exit check (if any file is modified but not sved)
+ * [X] The following solved with global exit check (if any file is modified but not saved)
     * [X] Close files one at a time with 'save?' prompt.
  * [X] Prompt for close or exit confirmation only when file(s) have been modified
  * [X] Indicate if file was saved successfully or if it failed

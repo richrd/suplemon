@@ -60,7 +60,9 @@ class Editor(Viewer):
             self.last_action = action
             self.store_state(state)
         else:
-            self.history[self.current_state].store(self)
+            # TODO:This if is here just for safety. current_state might be wrong ;.<
+            if self.current_state < len(self.history)-1:
+                self.history[self.current_state].store(self)
 
     def store_state(self, state = None, action = None):
         """Store the current editor state for undo/redo."""

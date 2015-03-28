@@ -251,11 +251,6 @@ class App:
         data = self.ui.query("Command:")
         if not data:
             return False
-        if data == "fail": #log debug
-            try: # to
-                fail
-            except:
-                self.log(get_error_info())
         parts = data.split(" ")
         cmd = parts[0].lower()
         self.logger.log("Looking for command '" + cmd +"'", LOG_INFO)
@@ -263,6 +258,8 @@ class App:
             self.logger.log("Trying to run command '" + cmd +"'", LOG_INFO)
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor())
+        else:
+            self.set_state("Command '" + cmd + "' not found.")
         return True
 
     def toggle_fullscreen(self):
