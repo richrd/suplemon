@@ -50,10 +50,12 @@ class Editor(Viewer):
         self.last_action = None        # Last editor action that was used (for undo/redo)
 
     def set_data(self, data):
+        """Set the editor text contents."""
         Viewer.set_data(self, data)
         self.store_state()
 
     def store_action_state(self, action, state = None):
+        """Store the editor state if a new action is taken."""
         if self.last_action != action:
             self.last_action = action
             self.store_state(state)
@@ -92,9 +94,11 @@ class Editor(Viewer):
         self.refresh()
 
     def undo(self):
+        """Undo the last command or change."""
         self.restore_state()
         
     def redo(self):
+        """Redo the last command or change."""
         if self.current_state == len(self.history)-1:
             return False
         index = self.current_state-1
@@ -355,6 +359,7 @@ class Editor(Viewer):
         self.move_cursors()
 
     def comment(self):
+        """Comment the current line(s)."""
         self.store_action_state("comment")
         comment = "#"
         used_y = []
@@ -433,23 +438,34 @@ class Editor(Viewer):
         """Cut lines to buffer."""
         # Add a restore point if previous action != cut
         self.store_action_state("cut")
-        buf = []
-        for cursor in self.cursors:
+        # Store cut lines in buffer
+        cut_buffer = []
+        # Get all lines with cursors on them
+        current_lines = self.get_lines_with_cursors()
+        current_lines.sort() # Sort from low to high
+        # Check how many times a cut operation should be done
+        times_to_cut = len(current_lines)
+        i = 0
+        while i < times_to_cut:
+            # Make sure we don't remove the last line
             if len(self.lines) == 1:
-                buf.append(self.lines[0])
+                cut_buffer.append(self.lines[0])
                 self.lines[0] = Line()
                 break
-            buf.append(self.lines[cursor.y])
-            self.lines.pop(cursor.y)
-            self.move_y_cursors(cursor.y, -1)
-            if cursor.y > len(self.lines)-1:
-                cursor.y = len(self.lines)-1
-            
-            # Handle any stray cursors we might have.
-            # Just in case. Might want to refine this.
-            self.purge_cursors()
-        self.buffer = buf
-        self.move_cursors()
+            # Get the top most line
+            line_no = current_lines[0]
+            # Append it to buffer
+            cut_buffer.append(self.lines[line_no])
+            # Remove it from line list
+            self.lines.pop(line_no)
+            # Move all cursors below up one line
+            self.move_y_cursors(line_no, -1)
+            # Refresh the current line list
+            current_lines = self.get_lines_with_cursors()
+            current_lines.sort()
+            i += 1
+        # Store buffer
+        self.buffer = cut_buffer
 
     def type(self, letter):
         """Insert a character."""
@@ -499,7 +515,14 @@ class Editor(Viewer):
                 x_offset = last_cursor.x
             
             # Find all occurances of search string
-            indices = [m.start() for m in re.finditer(re.escape(what), str(line[x_offset:]))]
+            pattern = re.escape(what) # Default to non regex pattern
+            if self.config["regex_find"]:
+                try: # Try to search with the actual regex
+                    indices = [match.start() for match in re.finditer(what, str(line[x_offset:]))]
+                except: # Revert to normal search
+                    indices = [match.start() for match in re.finditer(pattern, str(line[x_offset:]))]
+            else:
+                indices = [match.start() for match in re.finditer(pattern, str(line[x_offset:]))]
 
             # Loop through the indices and add cursors if they don't exist yet
             for i in indices:

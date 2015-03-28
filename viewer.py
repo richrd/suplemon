@@ -6,25 +6,13 @@ Text Viewer component subclassed by Editor.
 import os
 import re
 import sys
+import imp
 import time
 import curses
-import imp
 
 from line import *
 from cursor import *
 from helpers import *
-
-try:
-    # Try to load syntax highlighter
-    from pygments import highlight
-    from pygments.lexers import PythonLexer
-    from pygments.formatters import TerminalFormatter
-    from pygments.formatters import Terminal256Formatter
-    from curses_formatter import * 
-    from term_colors import *
-    pygments = True
-except:
-    pygments = False
 
 class Viewer:
     def __init__(self, app, window):
@@ -36,9 +24,6 @@ class Viewer:
         self.file_extension = ""
         
         self.linelighter = lambda line: 0 # Dummy linelighter returns default color
-        self.show_highlighting = False
-        if pygments != False:
-            self.setup_highlighting()
         self.show_line_ends = True
 
         self.cursor_style = curses.A_UNDERLINE
@@ -77,15 +62,6 @@ class Viewer:
             return False
             
         self.linelighter = mod.parse
-
-    def setup_highlighting(self):
-        """Setup pygments syntax highlighting."""
-        return # Incomplete implementation
-        #self.show_highlighting = True
-        #self.lexer = PythonLexer(encoding = 'utf-8')
-        #self.term_fmt = CursesFormatter(encoding = 'utf-8')
-        #self.outfile = HighlightFile()
-        #self.colors = Colors()
 
     def size(self):
         """Get editor size (x,y)."""
@@ -183,8 +159,6 @@ class Viewer:
     def toggle_highlight(self):
         """Toggle syntax highlighting."""
         return False
-        #self.show_highlighting = not self.show_highlighting
-        #self.render()
 
     def render(self):
         """Render the editor curses window."""
@@ -195,43 +169,26 @@ class Viewer:
         max_len = self.max_line_length()
         while i < max_y:
             lnum = i + self.y_scroll
-            if lnum == len(self.lines): break
+            if lnum >= len(self.lines): # Make sure we have a line to show
+                break
 
             line = self.lines[lnum]
-
             if self.config["show_line_nums"]:
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
 
-            # Higlight rendering
-            if self.show_highlighting and pygments:
-                self.outfile.clear()
-
-                highlight(line, self.lexer, self.term_fmt, self.outfile)
-                items = self.outfile.get(self.x_scroll, max_len)
-                part_offset = x_offset
-                for item in items:
-                    text = item[0]
-                    color = self.colors.get(item[1])
-                    self.window.addstr(i, part_offset, text, curses.color_pair(color))
-                    part_offset += len(text)
-                    #if len(s)+part_offset > max_len:
-                    #    s = s[:max_len+part_offset-len(s)-1]
-                    #if part_offset > 20:
-                    #    break
-
             # Normal rendering
-            else:
-                line_part = line[min(self.x_scroll, len(line)):]
-                if self.show_line_ends:
-                    line_part += self.config["line_end_char"]
-                if len(line_part) >= max_len:
-                    line_part = line_part[:max_len]
+            line_part = line[min(self.x_scroll, len(line)):]
+            if self.show_line_ends:
+                line_part += self.config["line_end_char"]
+            if len(line_part) >= max_len:
+                line_part = line_part[:max_len]
 
-                line_part = line_part.encode("utf-8")
-                if self.config["show_line_colors"]:
-                    self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
-                else:
-                    self.window.addstr(i, x_offset, line_part)
+            line_part = line_part.encode("utf-8")
+            if self.config["show_line_colors"]:
+                self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
+            else:
+                self.window.addstr(i, x_offset, line_part)
+
             i += 1
         self.render_cursors()
         self.window.refresh()
@@ -307,6 +264,7 @@ class Viewer:
             self.purge_cursors()
 
     def scroll_to_line(self, line_no):
+        """Center the viewport on line_no."""
         if line_no >= len(self.lines):
             line_no = len(self.lines)-1
         new_y = line_no - int(self.size()[1] / 2)
@@ -349,14 +307,31 @@ class Viewer:
                  lowest = cursor
         return lowest
 
+    def get_lines_with_cursors(self):
+        """Return all line indices that have cursors."""
+        line_nums = []
+        for cursor in self.cursors:
+            if not cursor.y in line_nums:
+                line_nums.append(cursor.y)
+        return line_nums
+
     def cursor_exists(self, cursor):
         """Check if a given cursor exists."""
         return cursor.tuple() in [cursor.tuple() for cursor in self.cursors]
 
+    def remove_cursor(self, cursor):
+        """Remove a cursor object from the cursor list."""
+        try:
+            index = self.cursors.index(cursor)
+        except:
+            return False
+        self.cursors.pop(index)
+        return True
+
     def purge_cursors(self):
         """Remove duplicate cursors that have the same position."""
         new = []
-        # This sucks: can't use "in" for different instances (?)
+        # This sucks: can't use "if .. in .." for different instances (?)
         # Use a reference list instead. FIXME: use a generator
         ref = []
         for cursor in self.cursors:
@@ -365,3 +340,19 @@ class Viewer:
                 new.append(cursor)
         self.cursors = new
         self.render()
+
+    def purge_line_cursors(self, line_no):
+        """Remove all but first cursor on given line."""
+        line_cursors = []
+        for cursor in self.cursors:
+            if cursor.y == line_no:
+                line_cursors.append(cursor)
+        if len(line_cursors) < 2:
+            return False
+
+        # Leave the first cursor out
+        line_cursors.pop(0)
+        # Remove the rest
+        for line_cursors in cursor:
+            self.remove_cursor(cursor)
+        return True

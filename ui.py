@@ -4,6 +4,7 @@ Curses user interface.
 """
 
 import os
+
 from helpers import *
 
 
@@ -12,8 +13,8 @@ def wrapper(func):
 
     # Force enabling colors
     os.environ["TERM"] = "xterm-256color"
-    # Reduce ESC detection time to 50ms
-    os.environ["ESCDELAY"] = "50"
+    # Reduce ESC detection time to 100ms
+    os.environ["ESCDELAY"] = "100"
 
     # Now import curses
     import curses

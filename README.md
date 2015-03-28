@@ -109,9 +109,8 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
    > Switch to previous file
 
 # Todo
- * [ ] CSS highlighter
- * [ ] Regex find/search (make find configurable to do normal & regex)
- * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
+ * [X] Regex find/search (make find configurable to do normal & regex)
+ * [X] CSS highlighter
  * [X] Move the editor view (scroll) down when finding multiple occurances
  * [X] The following solved with global exit check (if any file is modified but not sved)
     * [X] Close files one at a time with 'save?' prompt.
@@ -143,6 +142,7 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * [X] Line based syntax highlighting
 
 # Whishlist (Stuff that would be nice, but not planning to do yet. Maybe for 2.0.0)
+ * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
  * [ ] Custom key bindings
@@ -167,16 +167,16 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
    * [ ] Only refresh modified lines when editing
 
 # Fix / Defects
- * [ ] Cut command fails when multiple cursors are on or close to the last line
- * [ ] Remember find query if occurance not found (jump to top of file)
  * [ ] Unreliable undo/redo.
- * [ ] Finish refactoring viewer.py and editor.py
  * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
- * [ ] Refine find and find_next commands.
+ * [X] Refine find and find_next commands.
+ * [X] Finish refactoring viewer.py and editor.py
+ * [X] Cut command fails when multiple cursors are on or close to the last line
    * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
    * [X] Better auto find with ctrl+d. (Find the current word or character)
    * [X] Forget last find on esc.
    * [ ] Don't forget string to find automatically when using Ctrl + F 
+   * [ ] Remember find query if occurance not found (jump to top of file)
  * [X] Return code 0 on exit:
        Curses forces code 130 and causes git to ignore saved commit message, argh!
  * [X] ~~Can't open files that have spaces in them.~~ Works when using 'file\ name'

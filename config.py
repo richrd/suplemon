@@ -31,6 +31,7 @@ class Config:
                 "show_line_colors": True,
                 "show_highlighting": False,
                 "use_mouse": False,
+                "regex_find": False,
             },
             "display": {
                 "show_top_bar": True,
@@ -47,7 +48,7 @@ class Config:
         self.config = dict(self.defaults)
 
     def log(self, s):
-        self.app.status(s)
+        self.app.log(s)
 
     def path(self):
         return os.path.join(self.fpath, self.filename)

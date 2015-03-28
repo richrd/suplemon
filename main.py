@@ -145,7 +145,7 @@ class App:
 
     def handle_mouse(self, state):
         """Handle a mouse event."""
-        #TODO: implement this
+        #TODO: implement mouse events
         self.last_input = state
         pass
 
@@ -160,9 +160,12 @@ class App:
         self.files.append(f)
         self.switch_to_file(self.last_file_index())
 
-    def new_file(self):
+    def new_file(self, path=None):
         """Open new empty file."""
-        self.files.append(self.default_file())
+        new_file = self.default_file()
+        if path:
+            new_file.set_path(path)
+        self.files.append(new_file)
         self.current_file = self.last_file_index()
 
     def ask_exit(self):
@@ -423,3 +426,4 @@ if __name__ == "__main__":
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()
+    
