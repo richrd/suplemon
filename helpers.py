@@ -29,6 +29,16 @@ def starts(s, what):
             return True
     return False
 
+def ends(s, what):
+    """Check if a string ends with given string or any one in given list."""
+    s = s[::-1]
+    if type(what) == type(""):
+        what = [what]
+    for item in what:
+        if s.find(item[::-1]) == 0:
+            return True
+    return False
+
 def get_error_info():
     """Return info about last error."""
     msg = str(traceback.format_exc()) + "\n" + str(sys.exc_info())

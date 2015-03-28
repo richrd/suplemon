@@ -8,7 +8,6 @@ import re
 import sys
 import time
 import curses
-import imp
 
 from line import *
 from cursor import *
@@ -366,7 +365,7 @@ class Editor(Viewer):
             line = self.lines[cursor.y].data
             w = self.whitespace(line)
             start = line[:w]
-            self.app.status(start)
+            self.app.set_status(start)
             if starts(line[w:], comment):
                 self.lines[cursor.y] = Line(start + line.lstrip()[len(comment):])
                 self.move_x_cursors(cursor.y, w, 0-len(comment))
@@ -442,9 +441,13 @@ class Editor(Viewer):
                 break
             buf.append(self.lines[cursor.y])
             self.lines.pop(cursor.y)
-            self.move_y_cursors(cursor.y,-1)
+            self.move_y_cursors(cursor.y, -1)
             if cursor.y > len(self.lines)-1:
                 cursor.y = len(self.lines)-1
+            
+            # Handle any stray cursors we might have.
+            # Just in case. Might want to refine this.
+            self.purge_cursors()
         self.buffer = buf
         self.move_cursors()
 
@@ -461,19 +464,18 @@ class Editor(Viewer):
             cursor.x += 1
         self.move_cursors()
 
-    def go_to_pos(self, line, col = 0):
-        """Move primary cursor to line, col=0."""
-        try:
-            line = int(line)-1
-            if line < 0: line = len(self.lines)-1
-        except:
-            return False
+    def go_to_pos(self, line_no, col = 0):
+        """Move primary cursor to line_no, col=0."""
+        if line_no < 0:
+            line_no = len(self.lines)-1
+        else:
+            line_no = line_no-1
 
         self.store_state()
         cur = self.cursor()
         if col != None:
             cur.x = col
-        cur.y = line
+        cur.y = line_no
         if cur.y >= len(self.lines):
             cur.y = len(self.lines)-1
         self.move_cursors()
@@ -513,7 +515,7 @@ class Editor(Viewer):
             y += 1
 
         if not new_cursors:
-            self.app.status("Can't find '" + what + "'")
+            self.app.set_status("Can't find '" + what + "'")
             self.last_find = ""
             return
         else:
@@ -528,7 +530,8 @@ class Editor(Viewer):
         for cursor in new_cursors:
             self.cursors.append(cursor)
 
-        self.move_cursors()
+        destination = self.get_last_cursor().y
+        self.scroll_to_line(destination)
 
     def find_next(self):
         """Find next occurance."""

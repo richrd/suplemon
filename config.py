@@ -17,6 +17,7 @@ class Config:
             "app": {
                 "remember_open_files": False,
                 "debug": False,
+                "escdelay": 50
             },
             "editor": {
                 "auto_indent_newline": True,

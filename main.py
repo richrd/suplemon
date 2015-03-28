@@ -9,8 +9,6 @@ __version__ = "0.1.0"
 import os
 import sys
 import time
-import curses
-import argparse
 
 import ui
 import modules
@@ -113,8 +111,8 @@ class App:
         self.config.reload()
         for f in self.files:
             self.setup_editor(f.editor)        
-        self.resize()
-        self.refresh()
+        self.ui.resize()
+        self.ui.refresh()
 
     def handle_input(self, value):
         """Handle a key input event."""
@@ -137,7 +135,7 @@ class App:
         elif key == 272: self.toggle_mouse()         # F8
         elif key == 275: self.toggle_fullscreen()    # F12
 
-        elif key == curses.KEY_MOUSE:                # Mouse events
+        elif self.ui.is_mouse(key): # Mouse events
             mouse_state = self.ui.get_mouse_state()
             if mouse_state:
                 self.handle_mouse(mouse_state)
@@ -206,6 +204,8 @@ class App:
         input_str = self.ui.query("Go to:")
         lineno = None
         fname = None
+        if input_str == False:
+            return False
         if input_str.find(":") != -1:
             parts = input_str.split(":")
             fname = parts[0]
@@ -219,9 +219,10 @@ class App:
                 except:
                     pass
         else:
-            if input_str.isdigit():
-                self.get_editor().go_to_pos(int(input_str))
-            else:
+            try:
+                line_no = int(input_str)
+                self.get_editor().go_to_pos(line_no)
+            except:
                 file_index = self.find_file(input_str)
                 if file_index != -1:
                     self.switch_to_file(file_index)
@@ -357,7 +358,6 @@ class App:
         """Return the current file."""
         return self.files[self.current_file]
 
-
     def last_file_index(self):
         """Get index of last file."""
         cur = len(self.files)-1
@@ -419,8 +419,7 @@ def main(*args):
 
 if __name__ == "__main__":
     """Only run the app if it's run directly (not imported)."""
-    curses.wrapper(main)
-
+    ui.wrapper(main)
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()

@@ -6,19 +6,24 @@ Curses user interface.
 import os
 from helpers import *
 
-# Force enabling colors
-os.environ["TERM"] = "xterm-256color"
-# Reduce ESC detection time to 50ms
-os.environ["ESCDELAY"] = "50"
 
-# Now import curses
-import curses
-import curses.textpad
+def wrapper(func):
+    global curses
+
+    # Force enabling colors
+    os.environ["TERM"] = "xterm-256color"
+    # Reduce ESC detection time to 50ms
+    os.environ["ESCDELAY"] = "50"
+
+    # Now import curses
+    import curses
+    import curses.textpad
+    curses.wrapper(func)
 
 class UI:
     def __init__(self, app):
         self.app = app
-
+       
     def load(self):
         """Load an setup curses."""
         self.screen = curses.initscr()
@@ -311,9 +316,14 @@ class UI:
             return False
 
     def get_mouse_state(self):
+        """Get the mouse event data."""
         try:
             mouse_state = curses.getmouse()
             return mouse_state
         except:
             self.app.log(get_error_info())
         return False
+
+    def is_mouse(self, key):
+        """Check for mouse events"""
+        return key == curses.KEY_MOUSE

@@ -291,10 +291,11 @@ class Viewer:
         cur = self.cursor() # Main cursor
         size = self.size()
         offset = self.line_offset()
-        if cur.y - self.y_scroll >= size[1]:
-            self.y_scroll = cur.y - size[1]+1
-        elif cur.y - self.y_scroll < 0:
-            self.y_scroll = cur.y
+        if len(self.cursors) == 1:
+            if cur.y - self.y_scroll >= size[1]:
+                self.y_scroll = cur.y - size[1]+1
+            elif cur.y - self.y_scroll < 0:
+                self.y_scroll = cur.y
         if cur.x - self.x_scroll+offset > size[0] - 1:
             # -1 to allow space for cursor at line end
             self.x_scroll = len(self.lines[cur.y]) - size[0]+offset+1
@@ -304,6 +305,14 @@ class Viewer:
             self.x_scroll -= 1
         if not noupdate:
             self.purge_cursors()
+
+    def scroll_to_line(self, line_no):
+        if line_no >= len(self.lines):
+            line_no = len(self.lines)-1
+        new_y = line_no - int(self.size()[1] / 2)
+        if new_y < 0:
+            new_y = 0
+        self.y_scroll = new_y
 
     def move_x_cursors(self, line, col, delta):
         """Move all cursors starting at line and col with delta on the x axis."""
@@ -356,4 +365,3 @@ class Viewer:
                 new.append(cursor)
         self.cursors = new
         self.render()
-        self.refresh()

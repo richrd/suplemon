@@ -8,11 +8,10 @@ suplemon
      /_______/\_______/__/ /  /_______/________/__/__/__/________/__/ /|__/ /
      \_______\ \______\__\/   \_______\________\__\__\__\________\__\/ \__\/
 
-              *Remedying the pain of command line editing since 2014*
+              Remedying the pain of command line editing since 2014
 
 
-Command line text editor with multicursor support. Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
-
+Intuitive command line text editor with multicursor support. Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 # Suplemon multicursor editing:
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
@@ -32,8 +31,6 @@ Command line text editor with multicursor support. Suplemon replicates Sublime T
  * Copy & Paste, with multi line support
  * Find and Find next
  * Extensions (easy to write your own)
- * Might be comming later:
-     * Selections
 
 # Goals:
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
@@ -114,6 +111,8 @@ Command line text editor with multicursor support. Suplemon replicates Sublime T
 # Todo
  * [ ] CSS highlighter
  * [ ] Regex find/search (make find configurable to do normal & regex)
+ * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
+ * [X] Move the editor view (scroll) down when finding multiple occurances
  * [X] The following solved with global exit check (if any file is modified but not sved)
     * [X] Close files one at a time with 'save?' prompt.
  * [X] Prompt for close or exit confirmation only when file(s) have been modified
@@ -168,6 +167,7 @@ Command line text editor with multicursor support. Suplemon replicates Sublime T
    * [ ] Only refresh modified lines when editing
 
 # Fix / Defects
+ * [ ] Cut command fails when multiple cursors are on or close to the last line
  * [ ] Remember find query if occurance not found (jump to top of file)
  * [ ] Unreliable undo/redo.
  * [ ] Finish refactoring viewer.py and editor.py
@@ -179,7 +179,6 @@ Command line text editor with multicursor support. Suplemon replicates Sublime T
    * [ ] Don't forget string to find automatically when using Ctrl + F 
  * [X] Return code 0 on exit:
        Curses forces code 130 and causes git to ignore saved commit message, argh!
- * [X] Cut command fails with multiple cursors when one is on last line
  * [X] ~~Can't open files that have spaces in them.~~ Works when using 'file\ name'
  * [X] Config extension double loads config file, instead of switching to it
  * [X] Encoding errors 
