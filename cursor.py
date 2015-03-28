@@ -7,8 +7,14 @@ class Cursor:
     def __init__(self, x=0, y=0):
         if type(x) == type((0,)):
             x,y = x
-        self.x = x
-        self.y = y
+            self.x = x
+            self.y = y
+        elif isinstance(x, Cursor):
+            self.x = x.x
+            self.y = x.y
+        else:
+            self.x = x
+            self.y = y
         
     def __getitem__(self, i):
         if i == 0:
