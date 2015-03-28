@@ -232,9 +232,10 @@ class App:
 
     def find(self):
         """Find in file."""
-        what = self.ui.query("Find:")
+        editor = self.get_editor()
+        what = self.ui.query("Find:", editor.last_find)
         if what:
-            self.get_editor().find(what)
+            editor.find(what)
 
     def find_file(self, s):
         """Return index of file matching string."""
