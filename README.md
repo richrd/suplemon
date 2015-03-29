@@ -32,14 +32,14 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * Find and Find next
  * Extensions (easy to write your own)
 
-# Goals:
+# Goals
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
  3. [X] Multi cursor ~~and multi selection~~ should be comparable to Sublimetext.
  4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing,
         Git commits, and a lot of developement.
 
-# Keyboard shortcuts:
+# Keyboard shortcuts
 
  * Ctrl + X
    > Exit
@@ -84,6 +84,15 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * F2
    > Reload current file
 
+ * Ctrl + O
+   > Open file
+
+ * Ctrl + Page Up
+   > Switch to next file
+
+ * Ctrl + Page Down
+   > Switch to previous file
+
  * F5
    > Undo
 
@@ -99,21 +108,14 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * F11
    > Toggle full screen
 
- * Ctrl + O
-   > Open file
 
- * Ctrl + Page Up
-   > Switch to next file
-
- * Ctrl + Page Down
-   > Switch to previous file
 
 # Todo
  * [X] Regex find/search (make find configurable to do normal & regex)
  * [X] CSS highlighter
  * [X] Move the editor view (scroll) down when finding multiple occurances
  * [X] The following solved with global exit check (if any file is modified but not saved)
-    * [X] Close files one at a time with 'save?' prompt.
+   * [X] Close files one at a time with 'save?' prompt.
  * [X] Prompt for close or exit confirmation only when file(s) have been modified
  * [X] Indicate if file was saved successfully or if it failed
  * [X] Better yes/no query for exit (and in general)
@@ -167,8 +169,9 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
    * [ ] Only refresh modified lines when editing
 
 # Fix / Defects
- * [ ] With multpile lines selected pressing backspace and enter makes changes (shouldn't) 
+ * [ ] With multiple lines selected pressing backspace and enter makes changes (shouldn't)
  * [ ] Remember find query if occurance not found (jump to top of file)
+ * [ ] Input queries can't detect trailing whitespace
  * [X] Unreliable undo/redo.
  * [X] Refine find and find_next commands.
  * [X] Don't forget string to find automatically when using Ctrl + F 

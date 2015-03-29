@@ -45,14 +45,19 @@ class Editor(Viewer):
         Viewer.__init__(self, app, window)
         self.buffer = []               # Copy/paste buffer
         self.last_find = ""            # Last search used in 'find'
-        self.history = [State()]              # History of editor states for undo/redo
-        self.current_state = 0        # Current state index of the editor
+        self.history = [State()]       # History of editor states for undo/redo
+        self.current_state = 0         # Current state index of the editor
         self.last_action = None        # Last editor action that was used (for undo/redo)
 
     def set_data(self, data):
         """Set the editor text contents."""
         Viewer.set_data(self, data)
-        self.store_state()
+        if len(self.buffer) > 1:
+            self.store_state()
+        else:
+            state = State()
+            state.store(self)
+            self.history[0] = state
 
     def store_action_state(self, action, state = None):
         """Store the editor state if a new action is taken."""
@@ -101,7 +106,7 @@ class Editor(Viewer):
         self.last_action = "undo"
         """Undo the last command or change."""
         self.restore_state()
-        
+
     def redo(self):
         self.last_action = "redo"
         """Redo the last command or change."""
@@ -160,7 +165,7 @@ class Editor(Viewer):
                     if line[next] in chars:
                         break
         self.move_cursors()
-    
+
     def jump_right(self):
         """Jump one 'word' to the right."""
         chars = self.config["punctuation"]
@@ -509,7 +514,6 @@ class Editor(Viewer):
         """Find what in data (from top to bottom). Adds a cursor when found."""
         if not what:
             return
-        state = State(self) # Store the current state incase we need to store it
         last_cursor = self.get_last_cursor()
         y = last_cursor.y
 
@@ -564,7 +568,7 @@ class Editor(Viewer):
 
         destination = self.get_last_cursor().y
         self.scroll_to_line(destination)
-        self.store_action_state(state, "find") # Store undo point
+        self.store_action_state("find") # Store undo point
 
     def find_next(self):
         """Find next occurance."""

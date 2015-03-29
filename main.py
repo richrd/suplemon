@@ -156,7 +156,8 @@ class App:
     def help(self):
         """Open help file."""
         f = self.default_file()
-        f.set_data("Sorry, no help here yet!")
+        import help
+        f.set_data(help.help_text)
         self.files.append(f)
         self.switch_to_file(self.last_file_index())
 
