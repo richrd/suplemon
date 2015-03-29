@@ -58,10 +58,10 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
    > You can also use 'filena:42' to go to line 42 in filename.py etc.
 
  * Ctrl + F
-   > Find string
+   > Search for a string or regular expression (configurable)
 
  * Ctrl + D
-   > Find next (add a new cursor at the next occurance)
+   > Search for next occurance or find the word the cursor is on. Adds a new cursor at each new occurance.
 
  * Alt + Arrow Key
    > Add new curor in arrow direction
@@ -93,6 +93,9 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * Ctrl + Page Down
    > Switch to previous file
 
+ * Ctrl + E
+   > Run a command.
+
  * F5
    > Undo
 
@@ -107,7 +110,6 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
 
  * F11
    > Toggle full screen
-
 
 
 # Todo
