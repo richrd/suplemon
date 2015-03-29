@@ -22,6 +22,11 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
 *Must use python3 for proper character encoding support.*
 *Tested on Unix.*
 
+# Description
+Suplemon is an intuitive command line text editor. It supports multiple cursors editing out of the box.
+It is as easy to use as nano, and has much of the power of Sublime Text. It also supports extensions
+to allow all kinds of customizations. To get more help use 'Ctrl + H' in the editor. 
+
 # Features
  * Terminal text editing with style
  * Proper multi cursor editing, Sublime Text style. Blessed!
@@ -146,6 +151,8 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * [X] Line based syntax highlighting
 
 # Whishlist (Stuff that would be nice, but not planning to do yet. Maybe for 2.0.0)
+ * [ ] Auto backup. Activate on n changes or every n seconds
+ * [ ] Option to show whitespace with a visible character
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
@@ -203,3 +210,11 @@ Intuitive command line text editor with multicursor support. Suplemon replicates
  * [X] Start find at current line AND column
  * [X] Make editor white color brighter (not gray)
  * [X] Show editor at top of terminal when show_top_bar == False
+
+
+## Rationale
+For many the command line is a different environment for text editing.
+Most coders are familiar GUI text editors and for them vi and emacs
+have a too steep learing curve. For them (like for me) nano was the weapon of
+choice. But nano feels clunky and it has its limitations. That's why
+I wrote my own editor with built in multi cursor support to fix the situation.
