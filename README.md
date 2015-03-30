@@ -15,16 +15,18 @@ Suplemon is an intuitive command line text editor with multicursor support. Supl
 ## Suplemon multicursor editing
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
+## Installation
+
+    git clone https://github.com/richrd/suplemon.git
+
+No dependencies outside the Python Standard Library needed.
+
 ## Usage
 
     python3 main.py [filename]...
 
 *Must use python3 for proper character encoding support.*
 *Tested on Unix.*
-
-## Installation
-
-    git clone https://github.com/richrd/suplemon.git
 
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
