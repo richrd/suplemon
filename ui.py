@@ -233,6 +233,8 @@ class UI:
         keys = [
             ("F1", "Save"),
             ("F2", "Reload"),
+            ("F5", "Undo"),
+            ("F6", "Redo"),
             ("^O", "Open"),
             ("^C", "Cut"),
             ("^V", "Paste"),
@@ -242,6 +244,7 @@ class UI:
             ("^W", "Duplicate line"),
             ("ESC", "Single cursor"),
             ("^G", "Go to"),
+            ("^E", "Run command"),
             ("^X", "Exit"),
         ]
         x = 0

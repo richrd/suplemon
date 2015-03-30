@@ -183,6 +183,8 @@ class Viewer:
             if len(line_part) >= max_len:
                 line_part = line_part[:max_len]
 
+            if self.config["show_white_space"]:
+                line_part = line_part.replace(" ", self.config["white_space_char"])
             line_part = line_part.encode("utf-8")
             if self.config["show_line_colors"]:
                 self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))

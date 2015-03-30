@@ -11,23 +11,27 @@ suplemon
               Remedying the pain of command line editing since 2014
 
 
-Intuitive command line text editor with multicursor support. Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
-# Suplemon multicursor editing:
+Suplemon is an intuitive command line text editor with multicursor support. Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
+## Suplemon multicursor editing
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
-# Usage:
+## Usage
 
     python3 main.py [filename]...
 
 *Must use python3 for proper character encoding support.*
 *Tested on Unix.*
 
-# Description
-Suplemon is an intuitive command line text editor. It supports multiple cursors editing out of the box.
-It is as easy to use as nano, and has much of the power of Sublime Text. It also supports extensions
+## Installation
+
+    git clone https://github.com/richrd/suplemon.git
+
+## Description
+Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
+It is as easy as nano, and has much of the power of Sublime Text. It also supports extensions
 to allow all kinds of customizations. To get more help use 'Ctrl + H' in the editor. 
 
-# Features
+## Features
  * Terminal text editing with style
  * Proper multi cursor editing, Sublime Text style. Blessed!
  * Easy Undo/Redo
@@ -37,14 +41,14 @@ to allow all kinds of customizations. To get more help use 'Ctrl + H' in the edi
  * Find and Find next
  * Extensions (easy to write your own)
 
-# Goals
+## Goals
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
  2. [X] Usability should be as good and easy as nano.
  3. [X] Multi cursor ~~and multi selection~~ should be comparable to Sublimetext.
  4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing,
         Git commits, and a lot of developement.
 
-# Keyboard shortcuts
+## Keyboard shortcuts
 
  * Ctrl + X
    > Exit
@@ -214,7 +218,9 @@ to allow all kinds of customizations. To get more help use 'Ctrl + H' in the edi
 
 ## Rationale
 For many the command line is a different environment for text editing.
-Most coders are familiar GUI text editors and for them vi and emacs
+Most coders are familiar with GUI text editors and for many vi and emacs
 have a too steep learing curve. For them (like for me) nano was the weapon of
 choice. But nano feels clunky and it has its limitations. That's why
 I wrote my own editor with built in multi cursor support to fix the situation.
+Another reason is that developing Suplemon is simply fun to do.
+

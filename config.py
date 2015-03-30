@@ -24,9 +24,11 @@ class Config:
                 "cursor": "reverse", # reverse or underline
                 "default_encoding": "utf-8",
                 "tab_width": 4,
-                "max_history": 20,
+                "max_history": 50,
                 "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
                 "line_end_char": "",
+                "white_space_char": "\u25E6",
+                "show_white_space": True,
                 "show_line_nums": True,
                 "show_line_colors": True,
                 "show_highlighting": False,
