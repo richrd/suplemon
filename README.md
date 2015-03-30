@@ -29,7 +29,8 @@ Suplemon is an intuitive command line text editor with multicursor support. Supl
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
 It is as easy as nano, and has much of the power of Sublime Text. It also supports extensions
-to allow all kinds of customizations. To get more help use 'Ctrl + H' in the editor. 
+to allow all kinds of customizations. To get more help use 'Ctrl + H' in the editor.
+Suplemon is licensed under the MIT license.
 
 ## Features
  * Terminal text editing with style
