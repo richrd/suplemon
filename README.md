@@ -19,13 +19,16 @@ Suplemon is an intuitive command line text editor with multicursor support. Supl
 
     git clone https://github.com/richrd/suplemon.git
 
+**The master branch is considered stable.**
+
 No dependencies outside the Python Standard Library needed.
 
 ## Usage
 
     python3 main.py [filename]...
 
-*Must use python3 for proper character encoding support.*
+**Must use python3 for proper character encoding support.**
+
 *Tested on Unix.*
 
 ## Description
