@@ -16,6 +16,7 @@ Suplemon is an intuitive command line text editor with multicursor support. Supl
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
 ## Installation
+Try it out! Installation is as easy as pulling the repo.
 
     git clone https://github.com/richrd/suplemon.git
 
@@ -160,9 +161,9 @@ Suplemon is licensed under the MIT license.
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
 
-# Whishlist (Stuff that would be nice, but not planning to do yet. Maybe for 2.0.0)
+# Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
+ * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
  * [ ] Auto backup. Activate on n changes or every n seconds
- * [ ] Option to show whitespace with a visible character
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [ ] Global clipboard (copy from one file to another)
  * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
