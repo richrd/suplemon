@@ -421,6 +421,9 @@ def main(*args):
 
 if __name__ == "__main__":
     """Only run the app if it's run directly (not imported)."""
+    if sys.version_info[0] < 3:
+        print("Sorry, you must run Suplemon with python3 (you ran it with python2)")
+        sys.exit()
     ui.wrapper(main)
     # Output log info
     if app.config["app"]["debug"]:
