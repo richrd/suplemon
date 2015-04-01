@@ -461,8 +461,12 @@ class Editor(Viewer):
                 cut_buffer.append(self.lines[0])
                 self.lines[0] = Line()
                 break
-            # Get the top most line
-            line_no = current_lines[0]
+            # Get the next line that hasn't been cut yet
+            try: # This try is for safety..
+                line_no = current_lines[i]
+            except:
+                self.app.log("Cut: failed to get current line, falling back on -1")
+                line_no = current_lines[-1]
             # Append it to buffer
             cut_buffer.append(self.lines[line_no])
             # Remove it from line list
