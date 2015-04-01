@@ -166,7 +166,9 @@ class UI:
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "top":
-                head_parts.append(module.get_status())
+                status = module.get_status()
+                if status:
+                    head_parts.append()
                 
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())

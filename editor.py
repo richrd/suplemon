@@ -246,15 +246,13 @@ class Editor(Viewer):
 
     def page_up(self):
         """Move half a page up."""
-        for i in range(int(self.size()[1]/2)):
-            self.move_cursors((0 ,1), noupdate = True)
-        self.move_cursors()
+        amount = int(self.size()[1]/2)
+        self.move_cursors((0 ,amount), noupdate = True)
 
     def page_down(self):
         """Move half a page down."""
-        for i in range(int(self.size()[1]/2)):
-            self.move_cursors((0, -1), noupdate = True)
-        self.move_cursors()
+        amount = int(self.size()[1]/2)
+        self.move_cursors((0 ,amount * -1), noupdate = True)
 
     def home(self):
         """Move to start of line or text on that line."""
