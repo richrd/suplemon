@@ -18,7 +18,10 @@ class Battery(Command):
         return state
 
     def value_str(self):
-        return "BAT:" + str(self.value()) + "%"
+        val = self.value()
+        if val:
+            return "BAT " + str(val) + "%"
+        return ""
 
     def get_status(self):
         return self.value_str()
@@ -45,5 +48,5 @@ class Battery(Command):
 module = {
     "class": Battery,
     "name": "battery",
-    "status": "bottom",
+    "status": "top",
 }

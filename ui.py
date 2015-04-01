@@ -161,14 +161,16 @@ class UI:
             head_parts.append("Suplemon Editor v"+self.app.version)
         if display["show_clock"]:
             head_parts.append(curr_time())
-        if display["show_file_list"]:
-            head_parts.append(self.file_list_str())
-
+        
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "top":
-                head_parts.append(module.get_status());
+                head_parts.append(module.get_status())
+                
+        if display["show_file_list"]:
+            head_parts.append(self.file_list_str())
+
 
         head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
