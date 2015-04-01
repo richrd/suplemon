@@ -464,7 +464,7 @@ class Editor(Viewer):
             # Get the next line that hasn't been cut yet
             try: # This try is for safety..
                 line_no = current_lines[i]
-            except:
+            except: # Verified that this might fail. TODO: improve logic.
                 self.app.log("Cut: failed to get current line, falling back on -1")
                 line_no = current_lines[-1]
             # Append it to buffer
