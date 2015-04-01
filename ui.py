@@ -168,7 +168,7 @@ class UI:
             if module.options["status"] == "top":
                 status = module.get_status()
                 if status:
-                    head_parts.append()
+                    head_parts.append(status)
                 
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
