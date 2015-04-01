@@ -94,7 +94,7 @@ Suplemon is licensed under the MIT license.
  * Alt + Page Down
    > Move line(s) down
 
- * F1
+ * F1, Ctrl + S
    > Save current file
 
  * F2

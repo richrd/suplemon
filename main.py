@@ -120,6 +120,7 @@ class App:
         key, name = value
 
         if name == "^H": self.help()                 # Ctrl + H
+        elif name == "^S": self.save_file()          # Ctrl + S
         elif name == "^E": self.run_command()        # Ctrl + E
         elif name == "^F": self.find()               # Ctrl + F
         elif name == "^G": self.go_to()              # Ctrl + G

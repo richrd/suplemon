@@ -231,7 +231,7 @@ class UI:
         """Show keyboard legend."""
         self.legend_win.clear()
         keys = [
-            ("F1", "Save"),
+            ("F1, ^S", "Save"),
             ("F2", "Reload"),
             ("F5", "Undo"),
             ("F6", "Redo"),
