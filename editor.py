@@ -582,6 +582,10 @@ class Editor(Viewer):
             else:
                 if line:
                     what = line[0]
+            # Escape the data if regex is enabled
+            if self.config["regex_find"]:
+                what = re.escape(what)
+                
             self.last_find = what
         self.find(what)
 

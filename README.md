@@ -189,9 +189,9 @@ Suplemon is licensed under the MIT license.
    * [ ] Only refresh modified lines when editing
 
 # Fix / Defects
- * [ ] With multiple lines selected pressing backspace and enter makes changes (shouldn't)
- * [ ] Remember find query if occurance not found (jump to top of file)
  * [ ] Input queries can't detect trailing whitespace
+ * [ ] Remember find query if occurance not found (jump to top of file)
+ * [X] With multiple lines selected pressing backspace and enter makes changes (shouldn't)
  * [X] Unreliable undo/redo.
  * [X] Refine find and find_next commands.
  * [X] Don't forget string to find automatically when using Ctrl + F 
