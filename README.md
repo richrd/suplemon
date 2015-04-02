@@ -44,8 +44,9 @@ Suplemon is licensed under the MIT license.
  * Easy Undo/Redo
  * Multiple files in tabs
  * Powerful Go To feature for jumping to files and lines
- * Copy & Paste, with multi line support
  * Find and Find next
+ * Copy & Paste, with multi line support
+ * Mouse support
  * Extensions (easy to write your own)
 
 ## Goals

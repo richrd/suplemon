@@ -146,7 +146,10 @@ class UI:
         if self.app.config["display"]["show_legend"]:
             y_sub += 2
         self.editor_win = curses.newwin(yx[0]-y_sub, yx[1], y_start, 0)
-        self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub+1, 0)
+        if self.app.config["display"]["show_top_bar"]:
+            self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub+1, 0)
+        else:
+            self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub, 0)
 
         if resize:
             self.app.get_editor().resize( (yx[0]-y_sub, yx[1]) )
@@ -280,6 +283,7 @@ class UI:
             ("ESC", "Single cursor"),
             ("^G", "Go to"),
             ("^E", "Run command"),
+            ("F8", "Mouse mode"),
             ("^X", "Exit"),
         ]
         x = 0

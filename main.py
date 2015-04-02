@@ -292,6 +292,10 @@ class App:
         # Invert the boolean
         self.config["editor"]["use_mouse"] = not self.config["editor"]["use_mouse"]
         self.ui.setup_mouse()
+        if self.config["editor"]["use_mouse"]:
+            self.set_status("Mouse enabled")
+        else:
+            self.set_status("Mouse disabled")
 
     ###########################################################################
     # Editor operations
