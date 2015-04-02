@@ -160,6 +160,10 @@ class Viewer:
         """Toggle syntax highlighting."""
         return False
 
+    def set_single_cursor(self, cursor):
+        """Discard all cursors and place a new one."""
+        self.cursors = [Cursor(cursor)]
+
     def render(self):
         """Render the editor curses window."""
         self.window.clear()

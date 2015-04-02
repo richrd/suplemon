@@ -603,9 +603,12 @@ class Editor(Viewer):
         self.move_cursors()
         self.store_action_state("duplicate_line")
 
-    def got_input(self, value):
+    def handle_input(self, event):
         """Handle input."""
-        key, name = value
+        if event.type == "mouse":
+            return False
+        key = event.key_code
+        name = event.key_name
         if key == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
         elif key == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
         elif key == curses.KEY_UP: self.arrow_up()            # Arrow Up

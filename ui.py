@@ -21,6 +21,44 @@ def wrapper(func):
     import curses.textpad
     curses.wrapper(func)
 
+class InputEvent:
+    def __init__(self):
+        self.type = None # 'key' or 'mouse'
+        self.key_name = None
+        self.key_code = None
+        self.mouse_code = None
+        self.mouse_pos = (0, 0)
+
+    def parse_mouse_state(self, state):
+        self.type = "mouse"
+        self.mouse_code = state[4]
+        self.mouse_pos = (state[1], state[2])
+
+    def parse_key_code(self, code):
+        self.type = "key"
+        self.key_code = code
+        self.key_name = self._key_name(code)
+
+    def set_key_name(self, name):
+        self.type = "key"
+        self.key_name = name
+
+    def _key_name(self, key):
+        """Return the curses key name for keys received from get_wch."""
+        if type(key) == type(""):
+            return str(curses.keyname(ord(key)).decode("utf-8"))
+        return False
+
+    def __str__(self):
+        parts = [
+            str(self.type),
+            str(self.key_name),
+            str(self.key_code),
+            str(self.mouse_code),
+            str(self.mouse_pos)
+        ]
+        return " ".join(parts)
+
 class UI:
     def __init__(self, app):
         self.app = app
@@ -171,7 +209,6 @@ class UI:
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
-
         head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
@@ -201,10 +238,6 @@ class UI:
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(editor.cursors))+" "+\
             "buf:"+str(len(editor.buffer))
-        if self.app.config["display"]["show_last_key"]:
-            data += " key:"+str(self.app.last_input)
-        #if self.app.config["display"]["show_term_size"]:
-        #    data += " ["+str(size[0])+"x"+str(size[1])+"]"
         if self.app.config["app"]["debug"]:
             data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
         #if editor.last_find:
@@ -270,12 +303,6 @@ class UI:
         self.status_win.addstr(0, 0, s, curses.A_REVERSE)
         self.status_win.addstr(0, len(s), value)
 
-    def _key_name(self, key):
-        """Return the curses key name for keys received from get_wch."""
-        if type(key) == type(""):
-            return str(curses.keyname(ord(key)).decode("utf-8"))
-        return False
-
     def _query(self, text, initial=""):
         """Ask for text input via the status bar."""
         self.show_capture_status(text, initial)
@@ -312,24 +339,48 @@ class UI:
         return False
 
     def get_input(self):
-        """Get a character or key from keyboard. Returns False or a tuple containing the key value and key name."""
+        """Get an input event from keyboard or mouse. Returns False or an InputEvent instance."""
+        char = False
+        event = InputEvent()
         try:
             char = self.screen.get_wch()
-            return (char, self._key_name(char))
         except KeyboardInterrupt:
-            return (-1, "^C")
+            event.set_key_name("^C")
+            return event
         except:
             return False
 
-    def get_mouse_state(self):
-        """Get the mouse event data."""
-        try:
-            mouse_state = curses.getmouse()
-            return mouse_state
-        except:
-            self.app.log(get_error_info())
+        if char:
+            if self.is_mouse(char):
+                state = self.get_mouse_state()
+                if state:
+                    event.parse_mouse_state(state)
+                    return event
+            else:
+                event.parse_key_code(char)
+                return event
         return False
 
     def is_mouse(self, key):
         """Check for mouse events"""
         return key == curses.KEY_MOUSE
+
+    def get_mouse_state(self):
+        """Get the mouse event data."""
+        try:
+            mouse_state = curses.getmouse()
+        except:
+            self.app.log(get_error_info())
+            return False
+        # Translate the coordinates to the editor coordinate system
+        return self._translate_mouse_to_editor(mouse_state)
+
+    def _translate_mouse_to_editor(self, state):
+        """Translate the screen coordinates to a position in the editor view."""
+        editor = self.app.get_editor()
+        x,y = (state[1], state[2])
+        if self.app.config["display"]["show_top_bar"]:
+            y -= 1
+        x -= editor.line_offset()
+        y += editor.y_scroll
+        return (state[0], x, y, state[3], state[4])
