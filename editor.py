@@ -291,26 +291,36 @@ class Editor(Viewer):
     def backspace(self):
         """Delete the previous character."""
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
-        for cursor in curs: # order?
+        # Iterate through all cursors from bottom to top
+        for cursor in curs:
+            line_no = cursor.y
+            # If we're at the beginning of file don't do anything
             if cursor.x == 0 and cursor.y == 0:
                 continue
+            # If were operating at the beginning of a line
             if cursor.x == 0 and cursor.y != 0:
-                prev_line = self.lines[cursor.y-1]
-                line = self.lines[cursor.y]
-                self.lines.pop(cursor.y)
-                self.lines[cursor.y-1]+=line
-                length = len(self.lines[cursor.y-1])
-                cursor.y -= 1
-                cursor.x = len(prev_line)
+                curr_line = self.lines.pop(line_no)
+                prev_line = self.lines[line_no-1]
+                length = len(prev_line) # Get the length of previous line
+                self.lines[cursor.y-1] += curr_line # Add the current line to the previous one
+                line_cursors = self.get_cursors_on_line(line_no) # Get all cursors on current line
+                for line_cursor in line_cursors: # Move the cursors
+                    line_cursor.y -= 1 # One line up
+                    # Add the length of previous line to each x coordinate
+                    # so that their relative positions
+                    line_cursor.x += length
+                # Move all cursors below up one line (since a line was removed above them)
                 self.move_y_cursors(cursor.y, -1)
+            # Handle all other cases
             else:
                 # TODO: tab backspace
-                line = self.lines[cursor.y]
-                start = line[:cursor.x-1]
-                end = line[cursor.x:]
-                self.lines[cursor.y] = Line(start+end)
-                cursor.x -= 1
-                self.move_x_cursors(cursor.y, cursor.x, -1)
+                curr_line = self.lines[line_no]
+                # Slice one character out of the line
+                start = curr_line[:cursor.x-1]
+                end = curr_line[cursor.x:]
+                self.lines[line_no] = Line(start+end) # Store the new line
+                cursor.x -= 1 # Move the operating curser back one
+                self.move_x_cursors(line_no, cursor.x, -1) # Do the same to the rest
         # Ensure we keep the view scrolled
         self.move_cursors()
         # Add a restore point if previous action != backspace
@@ -450,33 +460,24 @@ class Editor(Viewer):
         # Store cut lines in buffer
         cut_buffer = []
         # Get all lines with cursors on them
-        current_lines = self.get_lines_with_cursors()
-        current_lines.sort() # Sort from low to high
-        # Check how many times a cut operation should be done
-        times_to_cut = len(current_lines)
+        line_nums = self.get_lines_with_cursors()
+        # Sort from last to first (invert order)
+        line_nums = line_nums[::-1]
         i = 0
-        while i < times_to_cut:
-            # Make sure we don't remove the last line
+        while i < len(line_nums): # Iterate from last to first
+            # Make sure we don't completely remove the last line
             if len(self.lines) == 1:
                 cut_buffer.append(self.lines[0])
                 self.lines[0] = Line()
                 break
-            # Get the top most line
-            line_no = current_lines[0]
-            # Append it to buffer
-            cut_buffer.append(self.lines[line_no])
-            # Remove it from line list
-            self.lines.pop(line_no)
-            # Move all cursors below up one line
-            self.move_y_cursors(line_no, -1)
-            # Refresh the current line list
-            current_lines = self.get_lines_with_cursors()
-            current_lines.sort()
+            line_no = line_nums[i] # Get the current line
+            line = self.lines.pop(line_no) # Get and remove the line
+            cut_buffer.append(line) # Put it in our temporary buffer
+            self.move_y_cursors(line_no, -1) # Move all cursors below the current line up
             i += 1
-        # Store buffer
-        self.buffer = cut_buffer
-
-        # Add a restore point if previous action != cut
+        self.move_cursors() # Make sure cursors are in valid places
+        # Reverse the buffer to get correct order and store it
+        self.buffer = cut_buffer[::-1]
         self.store_action_state("cut")
 
     def type(self, letter):
@@ -581,6 +582,10 @@ class Editor(Viewer):
             else:
                 if line:
                     what = line[0]
+            # Escape the data if regex is enabled
+            if self.config["regex_find"]:
+                what = re.escape(what)
+                
             self.last_find = what
         self.find(what)
 
@@ -598,9 +603,12 @@ class Editor(Viewer):
         self.move_cursors()
         self.store_action_state("duplicate_line")
 
-    def got_input(self, value):
+    def handle_input(self, event):
         """Handle input."""
-        key, name = value
+        if event.type == "mouse":
+            return False
+        key = event.key_code
+        name = event.key_name
         if key == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
         elif key == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
         elif key == curses.KEY_UP: self.arrow_up()            # Arrow Up

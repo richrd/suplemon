@@ -160,6 +160,10 @@ class Viewer:
         """Toggle syntax highlighting."""
         return False
 
+    def set_single_cursor(self, cursor):
+        """Discard all cursors and place a new one."""
+        self.cursors = [Cursor(cursor)]
+
     def render(self):
         """Render the editor curses window."""
         self.window.clear()
@@ -309,12 +313,21 @@ class Viewer:
                  lowest = cursor
         return lowest
 
+    def get_cursors_on_line(self, line_no):
+        """Return all cursors on a specific line."""
+        cursors = []
+        for cursor in self.cursors:
+            if cursor.y == line_no:
+                cursors.append(cursor)
+        return cursors
+
     def get_lines_with_cursors(self):
         """Return all line indices that have cursors."""
         line_nums = []
         for cursor in self.cursors:
             if not cursor.y in line_nums:
                 line_nums.append(cursor.y)
+        line_nums.sort()
         return line_nums
 
     def cursor_exists(self, cursor):

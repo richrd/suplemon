@@ -77,12 +77,12 @@ class App:
             # Update ui before refreshing it
             self.ui.update()
             # See if we have input to process
-            value = self.ui.get_input()
-            if value:
+            event = self.ui.get_input()
+            if event:
                 # Handle the input or give it to the editor
-                if not self.handle_input(value):
+                if not self.handle_input(event):
                     # Pass the input to the editor component
-                    self.get_editor().got_input(value)
+                    self.get_editor().handle_input(event)
                 #TODO: why do I need resize here? (View won't update after switching files, WTF)
                 self.get_editor().resize()
                 self.ui.refresh()
@@ -110,45 +110,56 @@ class App:
         """Reload configuration."""
         self.config.reload()
         for f in self.files:
-            self.setup_editor(f.editor)        
+            self.setup_editor(f.editor)
         self.ui.resize()
         self.ui.refresh()
 
-    def handle_input(self, value):
-        """Handle a key input event."""
-        self.last_input = value
-        key, name = value
+    def handle_input(self, event):
+        """Handle an input event."""
+        if not event:
+            return False
+        self.last_input = event
 
-        if name == "^H": self.help()                 # Ctrl + H
-        elif name == "^S": self.save_file()          # Ctrl + S
-        elif name == "^E": self.run_command()        # Ctrl + E
-        elif name == "^F": self.find()               # Ctrl + F
-        elif name == "^G": self.go_to()              # Ctrl + G
-        elif name == "^O": self.open()               # Ctrl + O
-        elif name == "^K": self.close_file()         # Ctrl + K
-        elif name == "^N": self.new_file()           # Ctrl + N
-        elif name == "^X": self.ask_exit()           # Ctrl + X
+        if event.type == "key":
+            return self.handle_key(event)
+        elif event.type == "mouse":
+            return self.handle_mouse(event)
+        return False
 
-        elif key == 554: self.prev_file()            # Ctrl + Page Up
-        elif key == 549: self.next_file()            # Ctrl + Page Down
-        elif key == 265: self.save_file()            # F1
-        elif key == 266: self.reload_file()          # F2
-        elif key == 272: self.toggle_mouse()         # F8
-        elif key == 275: self.toggle_fullscreen()    # F12
+    def handle_key(self, event):
+        """Handle a keyboard event."""
+        if event.key_name == "^H": self.help()                 # Ctrl + H
+        elif event.key_name == "^S": self.save_file()          # Ctrl + S
+        elif event.key_name == "^E": self.run_command()        # Ctrl + E
+        elif event.key_name == "^F": self.find()               # Ctrl + F
+        elif event.key_name == "^G": self.go_to()              # Ctrl + G
+        elif event.key_name == "^O": self.open()               # Ctrl + O
+        elif event.key_name == "^K": self.close_file()         # Ctrl + K
+        elif event.key_name == "^N": self.new_file()           # Ctrl + N
+        elif event.key_name == "^X": self.ask_exit()           # Ctrl + X
 
-        elif self.ui.is_mouse(key): # Mouse events
-            mouse_state = self.ui.get_mouse_state()
-            if mouse_state:
-                self.handle_mouse(mouse_state)
+        elif event.key_code == 554: self.prev_file()           # Ctrl + Page Up
+        elif event.key_code == 549: self.next_file()           # Ctrl + Page Down
+        elif event.key_code == 265: self.save_file()           # F1
+        elif event.key_code == 266: self.reload_file()         # F2
+        elif event.key_code == 272: self.toggle_mouse()        # F8
+        elif event.key_code == 275: self.toggle_fullscreen()   # F12
         else:
             return False
         return True
 
-    def handle_mouse(self, state):
+    def handle_mouse(self, event):
         """Handle a mouse event."""
-        #TODO: implement mouse events
-        self.last_input = state
-        pass
+        editor = self.get_editor()
+        if event.mouse_code == 1:                    # Left mouse button release
+            editor.set_single_cursor(event.mouse_pos)
+        elif event.mouse_code == 134217728:          # Wheel up (and unfortunately left button drag)
+            editor.page_up()
+        elif event.mouse_code == 524288:             # Wheel down
+            editor.page_down()
+        else:
+            return False
+        return True
 
     ###########################################################################
     # User Interactions
@@ -281,6 +292,10 @@ class App:
         # Invert the boolean
         self.config["editor"]["use_mouse"] = not self.config["editor"]["use_mouse"]
         self.ui.setup_mouse()
+        if self.config["editor"]["use_mouse"]:
+            self.set_status("Mouse enabled")
+        else:
+            self.set_status("Mouse disabled")
 
     ###########################################################################
     # Editor operations

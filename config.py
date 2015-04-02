@@ -41,9 +41,7 @@ class Config:
                 "show_clock": True,
                 "show_file_list": True,
                 "show_legend": True,
-                "show_bottom_bar": True,
-                "show_last_key": False,
-                "show_term_size": False
+                "show_bottom_bar": True
             },
         }
 
