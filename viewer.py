@@ -309,6 +309,14 @@ class Viewer:
                  lowest = cursor
         return lowest
 
+    def get_cursors_on_line(self, line_no):
+        """Return all cursors on a specific line."""
+        cursors = []
+        for cursor in self.cursors:
+            if cursor.y == line_no:
+                cursors.append(cursor)
+        return cursors
+
     def get_lines_with_cursors(self):
         """Return all line indices that have cursors."""
         line_nums = []
