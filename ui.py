@@ -159,8 +159,6 @@ class UI:
         head_parts = []
         if display["show_app_name"]:
             head_parts.append("Suplemon Editor v"+self.app.version)
-        if display["show_clock"]:
-            head_parts.append(curr_time())
         
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
