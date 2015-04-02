@@ -450,37 +450,24 @@ class Editor(Viewer):
         # Store cut lines in buffer
         cut_buffer = []
         # Get all lines with cursors on them
-        current_lines = self.get_lines_with_cursors()
-        current_lines.sort() # Sort from low to high
-        # Check how many times a cut operation should be done
-        times_to_cut = len(current_lines)
+        line_nums = self.get_lines_with_cursors()
+        # Sort from last to first (invert order)
+        line_nums = line_nums[::-1]
         i = 0
-        while i < times_to_cut:
-            # Make sure we don't remove the last line
+        while i < len(line_nums): # Iterate from last to first
+            # Make sure we don't completely remove the last line
             if len(self.lines) == 1:
                 cut_buffer.append(self.lines[0])
                 self.lines[0] = Line()
                 break
-            # Get the next line that hasn't been cut yet
-            try: # This try is for safety..
-                line_no = current_lines[i]
-            except: # Verified that this might fail. TODO: improve logic.
-                self.app.log("Cut: failed to get current line, falling back on -1")
-                line_no = current_lines[-1]
-            # Append it to buffer
-            cut_buffer.append(self.lines[line_no])
-            # Remove it from line list
-            self.lines.pop(line_no)
-            # Move all cursors below up one line
-            self.move_y_cursors(line_no, -1)
-            # Refresh the current line list
-            current_lines = self.get_lines_with_cursors()
-            current_lines.sort()
+            line_no = line_nums[i] # Get the current line
+            line = self.lines.pop(line_no) # Get and remove the line
+            cut_buffer.append(line) # Put it in our temporary buffer
+            self.move_y_cursors(line_no, -1) # Move all cursors below the current line up
             i += 1
-        # Store buffer
-        self.buffer = cut_buffer
-
-        # Add a restore point if previous action != cut
+        self.move_cursors() # Make sure cursors are in valid places
+        # Reverse the buffer to get correct order and store it
+        self.buffer = cut_buffer[::-1]
         self.store_action_state("cut")
 
     def type(self, letter):

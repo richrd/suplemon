@@ -315,6 +315,7 @@ class Viewer:
         for cursor in self.cursors:
             if not cursor.y in line_nums:
                 line_nums.append(cursor.y)
+        line_nums.sort()
         return line_nums
 
     def cursor_exists(self, cursor):
