@@ -641,6 +641,7 @@ class Editor(Viewer):
         elif name == "^P": self.comment()                     # Ctrl + P
         elif name == "^D": self.find_next()                   # Ctrl + D
         elif name == "^A": self.find_all()                    # Ctrl + A
+        elif name == "^?": self.backspace()                   # Backspace (fix for Mac)
         elif key == 544: self.jump_left()                     # Ctrl + Left
         elif key == 559: self.jump_right()                    # Ctrl + Right
         elif key == 565: self.jump_up()                       # Ctrl + Up
