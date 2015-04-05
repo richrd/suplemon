@@ -661,7 +661,7 @@ class Editor(Viewer):
             try:
                 if type(key) == type(""):
                     self.type(key)
-                else:
+                elif not event.name.startswith("KEY_"):
                     self.type(name)
             except:
                 pass
