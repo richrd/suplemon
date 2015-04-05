@@ -652,14 +652,17 @@ class Editor(Viewer):
         elif key == curses.KEY_BACKSPACE: self.backspace()    # Backspace
         elif key == curses.KEY_DC: self.delete()              # Delete
         elif key == curses.KEY_ENTER: self.enter()            # Enter
+        elif name == "^J": self.enter()                       # Enter (fallback for 'getch')
         elif key == "\t": self.tab()                          # Tab
         elif key == 353: self.untab()                         # Shift + Tab
         elif key == "\n": self.enter()                        # Enter
         elif name == "^[": self.escape()                      # Escape
         else:
             try:
-                letter = key
-                self.type(letter)
+                if type(key) == type(""):
+                    self.type(key)
+                else:
+                    self.type(name)
             except:
                 pass
 

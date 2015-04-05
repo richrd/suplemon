@@ -22,6 +22,7 @@ def wrapper(func):
     curses.wrapper(func)
 
 class InputEvent:
+    """Represents a keyboard or mouse event."""
     def __init__(self):
         self.type = None # 'key' or 'mouse'
         self.key_name = None
@@ -29,25 +30,38 @@ class InputEvent:
         self.mouse_code = None
         self.mouse_pos = (0, 0)
 
-    def parse_mouse_state(self, state):
-        self.type = "mouse"
-        self.mouse_code = state[4]
-        self.mouse_pos = (state[1], state[2])
-
     def parse_key_code(self, code):
+        """Parse a key namoe or code from curses."""
         self.type = "key"
+        #if type(code) == type(1):
         self.key_code = code
         self.key_name = self._key_name(code)
 
     def set_key_name(self, name):
+        """Manually set the event key name."""
         self.type = "key"
         self.key_name = name
 
+    def parse_mouse_state(self, state):
+        """Parse curses mouse events."""
+        self.type = "mouse"
+        self.mouse_code = state[4]
+        self.mouse_pos = (state[1], state[2])
+
     def _key_name(self, key):
-        """Return the curses key name for keys received from get_wch."""
+        """Return the curses key name for keys received from get_wch (and getch)."""
+        if type(key) == type(1): # getch fallback
+            try: # Try to convert to a curses key name
+            	return str(curses.keyname(key).decode("utf-8"))
+            except: # Otherwise try to convert to a character
+                try:
+                    return chr(key)
+                except:
+                    return False
+        # Handle get_wch input
         if type(key) == type(""):
             return str(curses.keyname(ord(key)).decode("utf-8"))
-        return False
+        return key
 
     def __str__(self):
         parts = [
@@ -348,12 +362,17 @@ class UI:
         event = InputEvent()
         try:
             char = self.screen.get_wch()
+        except AttributeError:
+            try:
+                char = self.screen.getch()
+            except KeyboardInterrupt:
+                event.set_key_name("^C")
+                return event
         except KeyboardInterrupt:
             event.set_key_name("^C")
             return event
         except:
             return False
-
         if char:
             if self.is_mouse(char):
                 state = self.get_mouse_state()
