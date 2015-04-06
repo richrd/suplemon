@@ -7,7 +7,6 @@ import os
 
 from helpers import *
 
-
 def wrapper(func):
     global curses
 
@@ -50,6 +49,10 @@ class InputEvent:
 
     def _key_name(self, key):
         """Return the curses key name for keys received from get_wch (and getch)."""
+        # Handle multibyte get_wch input in Python 3.3
+        if type(key) == type(""):
+            return str(curses.keyname(ord(key)).decode("utf-8"))
+        # Fallback to try and handle Python < 3.3
         if type(key) == type(1): # getch fallback
             try: # Try to convert to a curses key name
             	return str(curses.keyname(key).decode("utf-8"))
@@ -58,9 +61,6 @@ class InputEvent:
                     return chr(key)
                 except:
                     return False
-        # Handle get_wch input
-        if type(key) == type(""):
-            return str(curses.keyname(ord(key)).decode("utf-8"))
         return key
 
     def __str__(self):
@@ -358,21 +358,25 @@ class UI:
 
     def get_input(self):
         """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""
+        event = InputEvent() # Initialize new empty event
         char = False
-        event = InputEvent()
-        try:
-            char = self.screen.get_wch()
-        except AttributeError:
-            try:
-                char = self.screen.getch()
-            except KeyboardInterrupt:
-                event.set_key_name("^C")
-                return event
+        input_func = None
+        if "get_wch" in dir(self.screen):
+            # New Python 3.3 curses method for wide characters.
+            input_func = self.screen.get_wch
+        else:
+            # Old Python fallback. No multibyte characters.
+            input_func = self.screen.getch
+        try: 
+            char = input_func()
         except KeyboardInterrupt:
+            # Handle KeyboardInterrupt as Ctrl+C
             event.set_key_name("^C")
             return event
         except:
+            # No input available
             return False
+
         if char:
             if self.is_mouse(char):
                 state = self.get_mouse_state()
