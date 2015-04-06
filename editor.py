@@ -51,6 +51,50 @@ class Editor(Viewer):
         self.current_state = 0         # Current state index of the editor
         self.last_action = None        # Last editor action that was used (for undo/redo)
 
+        self.key_bindings = {
+            curses.KEY_HOME: self.home,               # Home
+            curses.KEY_END: self.end,                 # End
+            curses.KEY_BACKSPACE: self.backspace,     # Backspace
+            curses.KEY_DC: self.delete,               # Delete
+            curses.KEY_ENTER: self.enter,             # Enter
+            curses.KEY_RIGHT: self.arrow_right,       # Arrow Right
+            curses.KEY_LEFT: self.arrow_left,         # Arrow Left
+            curses.KEY_UP: self.arrow_up,             # Arrow Up
+            curses.KEY_DOWN: self.arrow_down,         # Arrow Down
+            563: self.new_cursor_up,                  # Alt + Up
+            522: self.new_cursor_down,                # Alt + Down
+            542: self.new_cursor_left,                # Alt + Left
+            557: self.new_cursor_right,               # Alt + Right
+            curses.KEY_NPAGE: self.page_up,           # Page Up
+            curses.KEY_PPAGE: self.page_down,         # Page Down
+            552: self.push_up,                        # Alt + Page Up
+            547: self.push_down,                      # Alt + Page Down
+            269: self.undo,                           # F5
+            270: self.redo,                           # F6
+            273: self.toggle_line_nums,               # F9
+            274: self.toggle_line_ends,               # F10
+            275: self.toggle_highlight,               # F11
+            331: self.insert,                         # Insert
+            "^C": self.cut,                           # Ctrl + C
+            "^W": self.duplicate_line,                # Ctrl + W
+            "^V": self.insert,                        # Ctrl + V
+            "^P": self.comment,                       # Ctrl + P
+            "^D": self.find_next,                     # Ctrl + D
+            "^A": self.find_all,                      # Ctrl + A
+            "^?": self.backspace,                     # Backspace (fix for Mac)
+            544: self.jump_left,                      # Ctrl + Left
+            559: self.jump_right,                     # Ctrl + Right
+            565: self.jump_up,                        # Ctrl + Up
+            524: self.jump_down,                      # Ctrl + Down
+            "^J": self.enter,                         # Enter (fallback for 'getch')
+            "\t": self.tab,                           # Tab
+            353: self.untab,                          # Shift + Tab
+            "\n": self.enter,                         # Enter
+            "^[": self.escape,                        # Escape
+        }
+
+
+
     def set_data(self, data):
         """Set the editor text contents."""
         Viewer.set_data(self, data)
@@ -612,57 +656,14 @@ class Editor(Viewer):
             return False
         key = event.key_code
         name = event.key_name
-        if key == curses.KEY_RIGHT: self.arrow_right()        # Arrow Right
-        elif key == curses.KEY_LEFT: self.arrow_left()        # Arrow Left
-        elif key == curses.KEY_UP: self.arrow_up()            # Arrow Up
-        elif key == curses.KEY_DOWN: self.arrow_down()        # Arrow Down
-        elif key == curses.KEY_NPAGE: self.page_up()          # Page Up
-        elif key == curses.KEY_PPAGE: self.page_down()        # Page Down
-
-        elif key == 563: self.new_cursor_up()                 # Alt + Up
-        elif key == 522: self.new_cursor_down()               # Alt + Down
-        elif key == 542: self.new_cursor_left()               # Alt + Left
-        elif key == 557: self.new_cursor_right()              # Alt + Right
-        elif key == 552: self.push_up()                       # Alt + Page Up
-        elif key == 547: self.push_down()                     # Alt + Page Down
-
-        elif key == 269: self.undo()                          # F5
-        elif key == 270: self.redo()                          # F6
-        elif key == 273: self.toggle_line_nums()              # F9
-        elif key == 274: self.toggle_line_ends()              # F10
-        elif key == 275: self.toggle_highlight()              # F11
-        elif key == 563: self.new_cursor_up()                 # Alt + up
-        elif key == 522: self.new_cursor_down()               # Alt + down
-        elif key == 542: self.new_cursor_left()               # Alt + left
-        elif key == 557: self.new_cursor_right()              # Alt + right
-
-        elif key == 331: self.insert()                        # Insert
-
-        elif name == "^C": self.cut()                         # Ctrl + C
-        elif name == "^W": self.duplicate_line()              # Ctrl + W
-        elif name == "^V": self.insert()                      # Ctrl + V
-        elif name == "^P": self.comment()                     # Ctrl + P
-        elif name == "^D": self.find_next()                   # Ctrl + D
-        elif name == "^A": self.find_all()                    # Ctrl + A
-        elif name == "^?": self.backspace()                   # Backspace (fix for Mac)
-        elif key == 544: self.jump_left()                     # Ctrl + Left
-        elif key == 559: self.jump_right()                    # Ctrl + Right
-        elif key == 565: self.jump_up()                       # Ctrl + Up
-        elif key == 524: self.jump_down()                     # Ctrl + Down
-
-        elif key == curses.KEY_HOME: self.home()              # Home
-        elif key == curses.KEY_END: self.end()                # End
-        elif key == curses.KEY_BACKSPACE: self.backspace()    # Backspace
-        elif key == curses.KEY_DC: self.delete()              # Delete
-        elif key == curses.KEY_ENTER: self.enter()            # Enter
-        elif name == "^J": self.enter()                       # Enter (fallback for 'getch')
-        elif key == "\t": self.tab()                          # Tab
-        elif key == 353: self.untab()                         # Shift + Tab
-        elif key == "\n": self.enter()                        # Enter
-        elif name == "^[": self.escape()                      # Escape
+        # Try match a key to a method and call it
+        if key in self.key_bindings.keys():
+            self.key_bindings[key]()
+        elif name in self.key_bindings.keys():
+            self.key_bindings[name]()
+        # Try to type the key into the editor
         else:
             if type(key) == type(""):
                 self.type(key)
             elif name and not name.startswith("KEY_"):
                 self.type(name)
-
