@@ -150,6 +150,11 @@ class UI:
         self.text_input = None
         self.header_win = curses.newwin(1, yx[1], 0, 0)
         self.status_win = curses.newwin(1, yx[1], yx[0]-1, 0)
+        
+        # Test for new curses
+        if not "get_wch" in dir(self.header_win):
+            self.app.log("Using old curses! Some keys and special characters might not work.", LOG_WARNING)
+            
         y_sub = 0
         y_start = 0
         if self.app.config["display"]["show_top_bar"]:
