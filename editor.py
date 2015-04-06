@@ -26,6 +26,7 @@ class State:
             self.store(editor)
 
     def store(self, editor):
+        """Store the state of editor instance."""
         self.cursors = [cursor.tuple() for cursor in editor.cursors]
         self.lines = [line.data for line in editor.lines]
         self.y_scroll = editor.y_scroll
@@ -33,6 +34,7 @@ class State:
         self.last_find = editor.last_find
 
     def restore(self, editor):
+        """Restore stored state into the editor instance."""
         editor.cursors = [Cursor(cursor) for cursor in self.cursors]
         editor.lines = [Line(line) for line in self.lines]
         editor.y_scroll = self.y_scroll
@@ -103,13 +105,13 @@ class Editor(Viewer):
         self.refresh()
 
     def undo(self):
-        self.last_action = "undo"
         """Undo the last command or change."""
+        self.last_action = "undo"
         self.restore_state()
 
     def redo(self):
-        self.last_action = "redo"
         """Redo the last command or change."""
+        self.last_action = "redo"
         if self.current_state == len(self.history)-1:
             return False
         index = self.current_state+1
