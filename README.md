@@ -30,6 +30,8 @@ No dependencies outside the Python Standard Library needed.
 
 **Must use Python 3.3 for proper character encoding support.**
 
+*Lower Python versions might work, but aren't officially supported.*
+
 *Tested on Unix.*
 
 ## Description
