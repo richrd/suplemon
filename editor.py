@@ -513,6 +513,7 @@ class Editor(Viewer):
 
     def find(self, what, findall = False):
         """Find what in data (from top to bottom). Adds a cursor when found."""
+        # Sorry for this collosal function
         if not what:
             return
         last_cursor = self.get_last_cursor()
@@ -660,11 +661,8 @@ class Editor(Viewer):
         elif key == "\n": self.enter()                        # Enter
         elif name == "^[": self.escape()                      # Escape
         else:
-            try:
-                if type(key) == type(""):
-                    self.type(key)
-                elif not event.name.startswith("KEY_"):
-                    self.type(name)
-            except:
-                pass
+            if type(key) == type(""):
+                self.type(key)
+            elif name and not name.startswith("KEY_"):
+                self.type(name)
 
