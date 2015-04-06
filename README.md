@@ -28,7 +28,7 @@ No dependencies outside the Python Standard Library needed.
 
     python3 main.py [filename]...
 
-**Must use python3 for proper character encoding support.**
+**Must use Python 3.3 for proper character encoding support.**
 
 *Tested on Unix.*
 
