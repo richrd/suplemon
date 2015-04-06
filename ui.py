@@ -357,7 +357,7 @@ class UI:
         return False
 
     def get_input(self):
-        """Get an input event from keyboard or mouse. Returns False or an InputEvent instance."""
+        """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""
         char = False
         event = InputEvent()
         try:
