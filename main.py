@@ -79,6 +79,7 @@ class App:
             # See if we have input to process
             event = self.ui.get_input()
             if event:
+                #self.log("INPUT:"+str(event), LOG_INFO)
                 # Handle the input or give it to the editor
                 if not self.handle_input(event):
                     # Pass the input to the editor component
@@ -272,7 +273,7 @@ class App:
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor())
         else:
-            self.set_state("Command '" + cmd + "' not found.")
+            self.set_status("Command '" + cmd + "' not found.")
         return True
 
     def toggle_fullscreen(self):
@@ -444,4 +445,3 @@ if __name__ == "__main__":
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()
-    
