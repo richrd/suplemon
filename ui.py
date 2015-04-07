@@ -7,7 +7,6 @@ import os
 
 from helpers import *
 
-
 def wrapper(func):
     global curses
 
@@ -22,6 +21,7 @@ def wrapper(func):
     curses.wrapper(func)
 
 class InputEvent:
+    """Represents a keyboard or mouse event."""
     def __init__(self):
         self.type = None # 'key' or 'mouse'
         self.key_name = None
@@ -29,25 +29,39 @@ class InputEvent:
         self.mouse_code = None
         self.mouse_pos = (0, 0)
 
-    def parse_mouse_state(self, state):
-        self.type = "mouse"
-        self.mouse_code = state[4]
-        self.mouse_pos = (state[1], state[2])
-
     def parse_key_code(self, code):
+        """Parse a key namoe or code from curses."""
         self.type = "key"
+        #if type(code) == type(1):
         self.key_code = code
         self.key_name = self._key_name(code)
 
     def set_key_name(self, name):
+        """Manually set the event key name."""
         self.type = "key"
         self.key_name = name
 
+    def parse_mouse_state(self, state):
+        """Parse curses mouse events."""
+        self.type = "mouse"
+        self.mouse_code = state[4]
+        self.mouse_pos = (state[1], state[2])
+
     def _key_name(self, key):
-        """Return the curses key name for keys received from get_wch."""
+        """Return the curses key name for keys received from get_wch (and getch)."""
+        # Handle multibyte get_wch input in Python 3.3
         if type(key) == type(""):
             return str(curses.keyname(ord(key)).decode("utf-8"))
-        return False
+        # Fallback to try and handle Python < 3.3
+        if type(key) == type(1): # getch fallback
+            try: # Try to convert to a curses key name
+            	return str(curses.keyname(key).decode("utf-8"))
+            except: # Otherwise try to convert to a character
+                try:
+                    return chr(key)
+                except:
+                    return False
+        return key
 
     def __str__(self):
         parts = [
@@ -136,6 +150,11 @@ class UI:
         self.text_input = None
         self.header_win = curses.newwin(1, yx[1], 0, 0)
         self.status_win = curses.newwin(1, yx[1], yx[0]-1, 0)
+        
+        # Test for new curses
+        if not "get_wch" in dir(self.header_win):
+            self.app.log("Using old curses! Some keys and special characters might not work.", LOG_WARNING)
+            
         y_sub = 0
         y_start = 0
         if self.app.config["display"]["show_top_bar"]:
@@ -343,15 +362,24 @@ class UI:
         return False
 
     def get_input(self):
-        """Get an input event from keyboard or mouse. Returns False or an InputEvent instance."""
+        """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""
+        event = InputEvent() # Initialize new empty event
         char = False
-        event = InputEvent()
-        try:
-            char = self.screen.get_wch()
+        input_func = None
+        if "get_wch" in dir(self.screen):
+            # New Python 3.3 curses method for wide characters.
+            input_func = self.screen.get_wch
+        else:
+            # Old Python fallback. No multibyte characters.
+            input_func = self.screen.getch
+        try: 
+            char = input_func()
         except KeyboardInterrupt:
+            # Handle KeyboardInterrupt as Ctrl+C
             event.set_key_name("^C")
             return event
         except:
+            # No input available
             return False
 
         if char:

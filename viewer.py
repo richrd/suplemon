@@ -101,7 +101,8 @@ class Viewer:
                 str_lines.append(line)
             else:
                 str_lines.append(line.data)
-        data = u"\n".join(str_lines)
+        #data = u"\n".join(str_lines)
+        data = str("\n".join(str_lines))
         return data
 
     def set_cursor(self, cursor):
@@ -189,7 +190,8 @@ class Viewer:
 
             if self.config["show_white_space"]:
                 line_part = line_part.replace(" ", self.config["white_space_char"])
-            line_part = line_part.encode("utf-8")
+            if sys.version_info[0] == 3 and sys.version_info[1] > 2:
+                line_part = line_part.encode("utf-8")
             if self.config["show_line_colors"]:
                 self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
             else:
@@ -208,7 +210,7 @@ class Viewer:
             y = cursor.y - self.y_scroll
             if y < 0: continue
             if y >= max_y: break
-            if x < self.line_offset(): continue 
+            if x < self.line_offset(): continue
             if x > max_x-1: continue 
             self.window.chgat(y, cursor.x+self.line_offset()-self.x_scroll, 1, self.cursor_style)
 

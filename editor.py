@@ -26,6 +26,7 @@ class State:
             self.store(editor)
 
     def store(self, editor):
+        """Store the state of editor instance."""
         self.cursors = [cursor.tuple() for cursor in editor.cursors]
         self.lines = [line.data for line in editor.lines]
         self.y_scroll = editor.y_scroll
@@ -33,6 +34,7 @@ class State:
         self.last_find = editor.last_find
 
     def restore(self, editor):
+        """Restore stored state into the editor instance."""
         editor.cursors = [Cursor(cursor) for cursor in self.cursors]
         editor.lines = [Line(line) for line in self.lines]
         editor.y_scroll = self.y_scroll
@@ -103,13 +105,13 @@ class Editor(Viewer):
         self.refresh()
 
     def undo(self):
-        self.last_action = "undo"
         """Undo the last command or change."""
+        self.last_action = "undo"
         self.restore_state()
 
     def redo(self):
-        self.last_action = "redo"
         """Redo the last command or change."""
+        self.last_action = "redo"
         if self.current_state == len(self.history)-1:
             return False
         index = self.current_state+1
@@ -511,6 +513,7 @@ class Editor(Viewer):
 
     def find(self, what, findall = False):
         """Find what in data (from top to bottom). Adds a cursor when found."""
+        # Sorry for this collosal function
         if not what:
             return
         last_cursor = self.get_last_cursor()
@@ -641,6 +644,7 @@ class Editor(Viewer):
         elif name == "^P": self.comment()                     # Ctrl + P
         elif name == "^D": self.find_next()                   # Ctrl + D
         elif name == "^A": self.find_all()                    # Ctrl + A
+        elif name == "^?": self.backspace()                   # Backspace (fix for Mac)
         elif key == 544: self.jump_left()                     # Ctrl + Left
         elif key == 559: self.jump_right()                    # Ctrl + Right
         elif key == 565: self.jump_up()                       # Ctrl + Up
@@ -651,14 +655,14 @@ class Editor(Viewer):
         elif key == curses.KEY_BACKSPACE: self.backspace()    # Backspace
         elif key == curses.KEY_DC: self.delete()              # Delete
         elif key == curses.KEY_ENTER: self.enter()            # Enter
+        elif name == "^J": self.enter()                       # Enter (fallback for 'getch')
         elif key == "\t": self.tab()                          # Tab
         elif key == 353: self.untab()                         # Shift + Tab
         elif key == "\n": self.enter()                        # Enter
         elif name == "^[": self.escape()                      # Escape
         else:
-            try:
-                letter = key
-                self.type(letter)
-            except:
-                pass
+            if type(key) == type(""):
+                self.type(key)
+            elif name and not name.startswith("KEY_"):
+                self.type(name)
 

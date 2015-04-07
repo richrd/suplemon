@@ -7,8 +7,8 @@ import os
 import time
 
 class File:
-    def __init__(self, parent = None):
-        self.parent = parent
+    def __init__(self, app = None):
+        self.app = app
         self.name = ""
         self.fpath = ""
         self.data = None
@@ -18,12 +18,15 @@ class File:
         self.editor = None
 
     def _path(self):
+        """Get the full path of the file."""
         return os.path.join(self.fpath, self.name)
 
     def path(self):
+        """Get the full path of the file."""
         return self._path()
 
     def parse_path(self, path):
+        """Parse a relative path and return full directory and filename as a tuple."""
         if path[:2] == "~"+os.sep:
             p  = os.path.expanduser("~")
             path = os.path.join(p+os.sep, path[2:])
@@ -32,30 +35,32 @@ class File:
         return parts
 
     def log(self, s):
-        self.parent.logger.log(s)
+        self.app.logger.log(s)
             
     def set_name(self, name):
+        """Set the file name."""
         # TODO: sanitize
         self.name = name
         
     def set_path(self, path):
+        """Set the file path. Relative paths are sanitized."""
         self.fpath, self.name = self.parse_path(path)
 
     def set_data(self, data):
+        """Set the file data and apply to editor if it exists."""
         self.data = data
         if self.editor:
             self.editor.set_data(data)
                 
     def set_editor(self, editor):
+        """The editor instance set its file extension."""
         self.editor = editor
         ext = self.name.split(".")
         if len(ext) > 1:
             editor.set_file_extension(ext[-1])
 
-    def set_saved(self, m):
-         self.last_save = time.time()
-
     def save(self):
+        """Write the editor data to file."""
         path = self._path()
         data = self.editor.get_data()
         try:
@@ -69,6 +74,7 @@ class File:
         return True
 
     def load(self, read=True):
+        """Try to read the actual file and load the data into the editor instance."""
         if not read:
             return True
         path = self._path()
@@ -86,7 +92,9 @@ class File:
         return True
 
     def reload(self):
+        """Reload file data."""
         return self.load()
         
     def is_changed(self):
+        """Check if the editor data is different from the file."""
         return self.editor.get_data() != self.data
