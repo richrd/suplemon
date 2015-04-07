@@ -50,6 +50,9 @@ class App:
 
     def load(self):
         """Load the app."""
+        if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
+            ver = ".".join(map(str, sys.version_info[0:2]))
+            self.log("Running Suplemon with Python "+ver+" wich isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
         self.ui.load()
         self.load_files()
         loaded = True
@@ -438,9 +441,6 @@ def main(*args):
 
 if __name__ == "__main__":
     """Only run the app if it's run directly (not imported)."""
-    #if sys.version_info[0] < 3:
-    #    print("Sorry, you must run Suplemon with python3 (you ran it with python2)")
-    #    sys.exit()
     ui.wrapper(main)
     # Output log info
     if app.config["app"]["debug"]:
