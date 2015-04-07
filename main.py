@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 import os
 import sys
@@ -50,6 +50,9 @@ class App:
 
     def load(self):
         """Load the app."""
+        if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
+            ver = ".".join(map(str, sys.version_info[0:2]))
+            self.log("Running Suplemon with Python "+ver+" wich isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
         self.ui.load()
         self.load_files()
         loaded = True
@@ -79,6 +82,7 @@ class App:
             # See if we have input to process
             event = self.ui.get_input()
             if event:
+                #self.log("INPUT:"+str(event), LOG_INFO)
                 # Handle the input or give it to the editor
                 if not self.handle_input(event):
                     # Pass the input to the editor component
@@ -272,7 +276,7 @@ class App:
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor())
         else:
-            self.set_state("Command '" + cmd + "' not found.")
+            self.set_status("Command '" + cmd + "' not found.")
         return True
 
     def toggle_fullscreen(self):
@@ -437,11 +441,7 @@ def main(*args):
 
 if __name__ == "__main__":
     """Only run the app if it's run directly (not imported)."""
-    if sys.version_info[0] < 3:
-        print("Sorry, you must run Suplemon with python3 (you ran it with python2)")
-        sys.exit()
     ui.wrapper(main)
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()
-    
