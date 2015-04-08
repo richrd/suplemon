@@ -30,6 +30,7 @@ class App:
         self.current_file = 0
         self.status_msg = ""
         self.last_input = None
+        self.global_buffer = []
 
         # Load core components
         self.logger = Logger()

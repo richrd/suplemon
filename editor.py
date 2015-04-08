@@ -51,10 +51,23 @@ class Editor(Viewer):
         self.current_state = 0         # Current state index of the editor
         self.last_action = None        # Last editor action that was used (for undo/redo)
 
+    def get_buffer(self):
+        if self.app.config["editor"]["use_global_buffer"]:
+            return self.app.global_buffer
+        else:
+            return self.buffer
+
+    def set_buffer(self, buffer):
+        if self.app.config["editor"]["use_global_buffer"]:
+            self.app.global_buffer = buffer
+        else:
+            self.buffer = buffer
+
     def set_data(self, data):
         """Set the editor text contents."""
         Viewer.set_data(self, data)
-        if len(self.buffer) > 1:
+        buffer = self.get_buffer() #TODO: check this
+        if len(buffer) > 1:
             self.store_state()
         else:
             state = State()
@@ -360,8 +373,8 @@ class Editor(Viewer):
     def insert(self):
         """Insert buffer data at cursor(s)."""
         cur = self.cursor()
-        buffer = list(self.buffer)
-        if len(self.buffer) == len(self.cursors):
+        buffer = list(self.get_buffer())
+        if len(buffer) == len(self.cursors):
             curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
             for cursor in curs:
                 line = self.lines[cursor.y]
@@ -371,7 +384,7 @@ class Editor(Viewer):
                 buffer.pop(0)
                 self.move_x_cursors(cursor.y, cursor.x-1, len(buf))
         else:
-            for buf in self.buffer:
+            for buf in buffer:
                 y = cur[1]
                 if y < 0: y = 0
                 self.lines.insert(y, Line(buf))
@@ -480,7 +493,7 @@ class Editor(Viewer):
             i += 1
         self.move_cursors() # Make sure cursors are in valid places
         # Reverse the buffer to get correct order and store it
-        self.buffer = cut_buffer[::-1]
+        self.set_buffer(cut_buffer[::-1])
         self.store_action_state("cut")
 
     def type(self, letter):

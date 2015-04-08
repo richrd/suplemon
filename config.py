@@ -33,6 +33,7 @@ class Config:
                 "show_line_colors": True,
                 "show_highlighting": False,
                 "use_mouse": False,
+                "use_global_buffer": True,
                 "regex_find": False,
             },
             "display": {
