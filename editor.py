@@ -446,14 +446,15 @@ class Editor(Viewer):
         """Unindent lines."""
         linenums = []
         for cursor in self.cursors:
-            if cursor.y in linenums:
-                cursor.x = 0
-                continue
             line = self.lines[cursor.y]
-            if line[:self.config["tab_width"]] == " "*self.config["tab_width"]:
+            if cursor.y in linenums:
+                cursor.x = self.whitespace(line)
+                continue
+            elif line[:self.config["tab_width"]] == " "*self.config["tab_width"]:
+                line = Line(line[self.config["tab_width"]:])
+                self.lines[cursor.y] = line
+                cursor.x = self.whitespace(line)
                 linenums.append(cursor.y)
-                cursor.x = 0
-                self.lines[cursor.y] = Line(line[self.config["tab_width"]:])
         # Add a restore point if previous action != untab
         self.store_action_state("untab")
 
