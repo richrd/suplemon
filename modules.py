@@ -40,7 +40,7 @@ class ModuleLoader:
         
             # only load .py modules that don't begin with an underscore
             if ext == "py" and name[0] != "_":
-                self.log("Loading:"+str(item), LOG_INFO)
+                self.log("Loading: "+str(item), LOG_INFO)
                 module = self.load_single(name)
                 if module:
                     self.modules[module[0]] = self.load_instance(module) # Load and store the module instance
