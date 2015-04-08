@@ -27,7 +27,7 @@ class Config:
                 "max_history": 50,
                 "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
                 "line_end_char": "",
-                "white_space_char": "\u25E6",
+                "white_space_char": "\u00B7",
                 "show_white_space": False,
                 "show_line_nums": True,
                 "show_line_colors": True,
