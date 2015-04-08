@@ -112,7 +112,7 @@ class UI:
         if curses.can_change_color(): # Can't get these to work :(
             #curses.init_color(11, 254, 0, 1000)
             pass
-
+        
         # This only works with: TERM=xterm-256color
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
@@ -123,24 +123,45 @@ class UI:
         black = curses.COLOR_BLACK
         curses.init_pair(10, -1, -1) # Default (white on black)
 
-        curses.init_pair(11, curses.COLOR_BLUE, black)
-        curses.init_pair(12, curses.COLOR_CYAN, black)
-        curses.init_pair(13, curses.COLOR_GREEN, black)
-        curses.init_pair(14, curses.COLOR_MAGENTA, black)
-        curses.init_pair(15, curses.COLOR_RED, black)
-        curses.init_pair(17, curses.COLOR_YELLOW, black)
-        curses.init_pair(16, curses.COLOR_WHITE, black)
+        """
+        Default Terminal Colors
+        0: White
+        1: Black
+        2: Red
+        3: Green
+        4: Yellow
+        5: Blue
+        6: Violet
+        7: Cyan
+        """
+        curses.init_pair(0, curses.COLOR_WHITE, black)
+        curses.init_pair(1, curses.COLOR_BLACK, black)
+        curses.init_pair(2, curses.COLOR_RED, black)
+        curses.init_pair(3, curses.COLOR_GREEN, black)
+        curses.init_pair(4, curses.COLOR_YELLOW, black)
+        curses.init_pair(5, curses.COLOR_BLUE, black)
+        curses.init_pair(6, curses.COLOR_MAGENTA, black)
+        curses.init_pair(7, curses.COLOR_CYAN, black)
+
+        #curses.init_pair(11, curses.COLOR_BLUE, black)
+        #curses.init_pair(12, curses.COLOR_CYAN, black)
+        #curses.init_pair(13, curses.COLOR_GREEN, black)
+        #curses.init_pair(14, curses.COLOR_MAGENTA, black)
+        #curses.init_pair(15, curses.COLOR_RED, black)
+        #curses.init_pair(16, curses.COLOR_WHITE, black)
+        #curses.init_pair(17, curses.COLOR_YELLOW, black)
 
         # Better colors
         try:
             # TODO: Define RGB forthese to avoid getting
             # different results in different terminals
-            curses.init_pair(11, 69, black) # blue
-            curses.init_pair(12, 81, black) # cyan
-            curses.init_pair(13, 119, black) # green
-            curses.init_pair(14, 171, black) # magenta
-            curses.init_pair(15, 197, black) # red
-            curses.init_pair(17, 221, black) # yellow
+            curses.init_pair(1, 242, black) # gray
+            curses.init_pair(2, 197, black) # red
+            curses.init_pair(3, 119, black) # green
+            curses.init_pair(4, 221, black) # yellow
+            curses.init_pair(5, 69, black) # blue
+            curses.init_pair(6, 171, black) # magenta
+            curses.init_pair(7, 81, black) # cyan
         except:
             self.app.logger.log("Enhanced colors failed to load.")
 
