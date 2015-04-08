@@ -167,8 +167,8 @@ class Viewer:
 
     def render(self):
         """Render the editor curses window."""
-        #self.window.clear()
-        self.window.erase()
+        self.window.clear()
+        #self.window.erase()
         max_y = self.size()[1]
         i = 0
         x_offset = self.line_offset()
@@ -192,6 +192,8 @@ class Viewer:
 
             if self.config["show_white_space"]:
                 line_part = line_part.replace(" ", self.config["white_space_char"])
+            #if len(line_part) < max_len: # Trying to add spaces to clear stray characters
+            #line_part += " "*(max_len-len(line_part))
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
             if self.config["show_line_colors"]:
@@ -201,7 +203,7 @@ class Viewer:
 
             i += 1
         self.render_cursors()
-        self.window.refresh()
+        #self.window.refresh()
 
     def render_cursors(self):
         """Render editor window cursors."""

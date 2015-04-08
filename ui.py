@@ -79,7 +79,8 @@ class UI:
        
     def load(self):
         """Load an setup curses."""
-        self.app.log("Loading UI for terminal " + str(curses.termname()), LOG_INFO)
+        # Log the terminal type
+        self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), LOG_INFO)
 
         self.screen = curses.initscr()
         self.setup_colors()
@@ -109,21 +110,7 @@ class UI:
     def setup_colors(self):
         """Initialize color support and define colors."""
         curses.start_color()
-        curses.use_default_colors()
-
-        if curses.can_change_color(): # Can't get these to work :(
-            #curses.init_color(11, 254, 0, 1000)
-            pass
-        
-        # This only works with: TERM=xterm-256color
-        #curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        #curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
-        #curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
-        #curses.init_pair(4, curses.COLOR_WHITE, -1)
-
-        # Higlight colors:
-        black = curses.COLOR_BLACK
-        curses.init_pair(10, -1, -1) # Default (white on black)
+        curses.use_default_colors()        
 
         """
         Default Terminal Colors
@@ -136,8 +123,10 @@ class UI:
         6: Violet
         7: Cyan
         """
+        black = curses.COLOR_BLACK
 
         # This gets colors working in TTY's as well as terminal emulators
+        #curses.init_pair(10, -1, -1) # Default (white on black)
         curses.init_pair(0, curses.COLOR_WHITE, black)
         curses.init_pair(1, curses.COLOR_BLACK, black)
         curses.init_pair(2, curses.COLOR_RED, black)
@@ -147,20 +136,12 @@ class UI:
         curses.init_pair(6, curses.COLOR_MAGENTA, black)
         curses.init_pair(7, curses.COLOR_CYAN, black)
 
-        #curses.init_pair(11, curses.COLOR_BLUE, black)
-        #curses.init_pair(12, curses.COLOR_CYAN, black)
-        #curses.init_pair(13, curses.COLOR_GREEN, black)
-        #curses.init_pair(14, curses.COLOR_MAGENTA, black)
-        #curses.init_pair(15, curses.COLOR_RED, black)
-        #curses.init_pair(16, curses.COLOR_WHITE, black)
-        #curses.init_pair(17, curses.COLOR_YELLOW, black)
-
-        
-        # Nicer shades of same colors but kills TTY colors :(
+        # Nicer shades of same colors (if supported)
         if curses.can_change_color():
             try:
                 # TODO: Define RGB forthese to avoid getting
                 # different results in different terminals
+                # curses.init_color(171, 0, 1000, 0)
                 curses.init_pair(1, 242, black) # gray
                 curses.init_pair(2, 197, black) # red
                 curses.init_pair(3, 119, black) # green
@@ -172,8 +153,18 @@ class UI:
             except:
                 self.app.logger.log("Enhanced colors failed to load.")
         else:
-            self.app.logger.log("Enhanced colors not supported.")
+            self.app.logger.log("Enhanced colors not supported.", LOG_INFO)
 
+        # Legacy        
+        #curses.init_pair(11, curses.COLOR_BLUE, black)
+        #curses.init_pair(12, curses.COLOR_CYAN, black)
+        #curses.init_pair(13, curses.COLOR_GREEN, black)
+        #curses.init_pair(14, curses.COLOR_MAGENTA, black)
+        #curses.init_pair(15, curses.COLOR_RED, black)
+        #curses.init_pair(16, curses.COLOR_WHITE, black)
+        #curses.init_pair(17, curses.COLOR_YELLOW, black)
+
+        
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
@@ -214,6 +205,7 @@ class UI:
         self.check_resize()
 
     def refresh(self):
+        #self.screen.erase()
         self.refresh_status()
         self.screen.refresh()
 
@@ -245,7 +237,8 @@ class UI:
 
     def show_top_status(self):
         """Show top status row."""
-        self.header_win.clear()
+        #self.header_win.clear()
+        self.header_win.erase()
         size = self.size()
         display = self.app.config["display"]
         head_parts = []
@@ -305,7 +298,8 @@ class UI:
             if module.options["status"] == "bottom":
                 data += " " + module.get_status();
 
-        self.status_win.clear()
+        #self.status_win.clear()
+        self.status_win.erase()
         status = self.app.get_status()
         extra = size[0] - len(status+data) - 1
         line = status+(" "*extra)+data
@@ -318,7 +312,8 @@ class UI:
         
     def show_legend(self):
         """Show keyboard legend."""
-        self.legend_win.clear()
+        #self.legend_win.clear()
+        self.legend_win.erase()
         keys = [
             ("F1, ^S", "Save"),
             ("F2", "Reload"),
@@ -354,7 +349,7 @@ class UI:
 
     def show_capture_status(self, s="", value=""):
         """Show status when capturing input."""
-        self.status_win.clear()
+        self.status_win.erase()
         self.status_win.addstr(0, 0, s, curses.A_REVERSE)
         self.status_win.addstr(0, len(s), value)
 
