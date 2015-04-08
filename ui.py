@@ -123,18 +123,19 @@ class UI:
         6: Violet
         7: Cyan
         """
-        black = curses.COLOR_BLACK
-
+        bg = curses.COLOR_BLACK
+        bg = -1
+        
         # This gets colors working in TTY's as well as terminal emulators
         #curses.init_pair(10, -1, -1) # Default (white on black)
-        curses.init_pair(0, curses.COLOR_WHITE, black)
-        curses.init_pair(1, curses.COLOR_BLACK, black)
-        curses.init_pair(2, curses.COLOR_RED, black)
-        curses.init_pair(3, curses.COLOR_GREEN, black)
-        curses.init_pair(4, curses.COLOR_YELLOW, black)
-        curses.init_pair(5, curses.COLOR_BLUE, black)
-        curses.init_pair(6, curses.COLOR_MAGENTA, black)
-        curses.init_pair(7, curses.COLOR_CYAN, black)
+        curses.init_pair(0, curses.COLOR_WHITE, bg)
+        curses.init_pair(1, curses.COLOR_BLACK, bg)
+        curses.init_pair(2, curses.COLOR_RED, bg)
+        curses.init_pair(3, curses.COLOR_GREEN, bg)
+        curses.init_pair(4, curses.COLOR_YELLOW, bg)
+        curses.init_pair(5, curses.COLOR_BLUE, bg)
+        curses.init_pair(6, curses.COLOR_MAGENTA, bg)
+        curses.init_pair(7, curses.COLOR_CYAN, bg)
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
@@ -142,13 +143,13 @@ class UI:
                 # TODO: Define RGB forthese to avoid getting
                 # different results in different terminals
                 # curses.init_color(171, 0, 1000, 0)
-                curses.init_pair(1, 242, black) # gray
-                curses.init_pair(2, 197, black) # red
-                curses.init_pair(3, 119, black) # green
-                curses.init_pair(4, 221, black) # yellow
-                curses.init_pair(5, 69, black) # blue
-                curses.init_pair(6, 171, black) # magenta
-                curses.init_pair(7, 81, black) # cyan
+                curses.init_pair(1, 242, bg) # gray
+                curses.init_pair(2, 204, bg) # red
+                curses.init_pair(3, 119, bg) # green
+                curses.init_pair(4, 221, bg) # yellow
+                curses.init_pair(5, 69, bg) # blue
+                curses.init_pair(6, 171, bg) # magenta
+                curses.init_pair(7, 81, bg) # cyan
                 pass
             except:
                 self.app.logger.log("Enhanced colors failed to load.")
@@ -163,8 +164,6 @@ class UI:
         #curses.init_pair(15, curses.COLOR_RED, black)
         #curses.init_pair(16, curses.COLOR_WHITE, black)
         #curses.init_pair(17, curses.COLOR_YELLOW, black)
-
-        
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
