@@ -1,16 +1,5 @@
 from helpers import *
 
-"""
-curses.init_pair(0, curses.COLOR_WHITE, black)
-curses.init_pair(1, curses.COLOR_BLACK, black)
-curses.init_pair(2, curses.COLOR_RED, black)
-curses.init_pair(3, curses.COLOR_GREEN, black)
-curses.init_pair(4, curses.COLOR_YELLOW, black)
-curses.init_pair(5, curses.COLOR_BLUE, black)
-curses.init_pair(6, curses.COLOR_MAGENTA, black)
-curses.init_pair(7, curses.COLOR_CYAN, black
-"""
-
 def parse(raw_line):
     color = 0
     line = raw_line.strip()

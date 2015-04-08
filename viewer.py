@@ -58,13 +58,6 @@ class Viewer:
                 mod = imp.load_source(ext, path)
             except:
                 self.app.logger.log(get_error_info())
-        else:
-            path = os.path.join(curr_path, "linelight", "generic.py")
-            if os.path.isfile(path):
-                try:
-                    mod = imp.load_source("generic", path)
-                except:
-                    self.app.logger.log(get_error_info())
 
         if not mod or not "parse" in dir(mod):
             return False
