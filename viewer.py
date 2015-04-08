@@ -24,6 +24,9 @@ class Viewer:
         self.file_extension = ""
         
         self.linelighter = lambda line: 0 # Dummy linelighter returns default color
+        self.extension_map = {
+            "scss": "css",
+        }
         self.show_line_ends = True
 
         self.cursor_style = curses.A_UNDERLINE
@@ -39,15 +42,20 @@ class Viewer:
 
     def setup_linelight(self):
         """Setup line based highlighting."""
+        ext = self.file_extension
+        # Check if a file extension is redefined
+        # Maps e.g. 'scss' to 'css'
+        if ext in self.extension_map.keys():
+            ext = self.extension_map[ext] # Use it
         curr_path = os.path.dirname(os.path.realpath(__file__))
 
-        filename = self.file_extension + ".py"
+        filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
 
         mod = False
         if os.path.isfile(path):
             try:
-                mod = imp.load_source(self.file_extension, path)
+                mod = imp.load_source(ext, path)
             except:
                 self.app.logger.log(get_error_info())
         else:
