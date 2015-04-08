@@ -167,7 +167,8 @@ class Viewer:
 
     def render(self):
         """Render the editor curses window."""
-        self.window.clear()
+        #self.window.clear()
+        self.window.erase()
         max_y = self.size()[1]
         i = 0
         x_offset = self.line_offset()

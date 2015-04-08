@@ -11,7 +11,7 @@ def wrapper(func):
     global curses
 
     # Force enabling colors
-    os.environ["TERM"] = "xterm-256color"
+    #os.environ["TERM"] = "xterm-256color"
     # Reduce ESC detection time to 100ms
     os.environ["ESCDELAY"] = "100"
 
@@ -79,6 +79,8 @@ class UI:
        
     def load(self):
         """Load an setup curses."""
+        self.app.log("Loading UI for terminal " + str(curses.termname()), LOG_INFO)
+
         self.screen = curses.initscr()
         self.setup_colors()
 
@@ -114,10 +116,10 @@ class UI:
             pass
         
         # This only works with: TERM=xterm-256color
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
-        curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
-        curses.init_pair(4, curses.COLOR_WHITE, -1)
+        #curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        #curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
+        #curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
+        #curses.init_pair(4, curses.COLOR_WHITE, -1)
 
         # Higlight colors:
         black = curses.COLOR_BLACK
@@ -134,6 +136,8 @@ class UI:
         6: Violet
         7: Cyan
         """
+
+        # This gets colors working in TTY's as well as terminal emulators
         curses.init_pair(0, curses.COLOR_WHITE, black)
         curses.init_pair(1, curses.COLOR_BLACK, black)
         curses.init_pair(2, curses.COLOR_RED, black)
@@ -151,19 +155,25 @@ class UI:
         #curses.init_pair(16, curses.COLOR_WHITE, black)
         #curses.init_pair(17, curses.COLOR_YELLOW, black)
 
-        # Better colors
-        try:
-            # TODO: Define RGB forthese to avoid getting
-            # different results in different terminals
-            curses.init_pair(1, 242, black) # gray
-            curses.init_pair(2, 197, black) # red
-            curses.init_pair(3, 119, black) # green
-            curses.init_pair(4, 221, black) # yellow
-            curses.init_pair(5, 69, black) # blue
-            curses.init_pair(6, 171, black) # magenta
-            curses.init_pair(7, 81, black) # cyan
-        except:
-            self.app.logger.log("Enhanced colors failed to load.")
+        
+        # Nicer shades of same colors but kills TTY colors :(
+        if curses.can_change_color():
+            try:
+                # TODO: Define RGB forthese to avoid getting
+                # different results in different terminals
+                curses.init_pair(1, 242, black) # gray
+                curses.init_pair(2, 197, black) # red
+                curses.init_pair(3, 119, black) # green
+                curses.init_pair(4, 221, black) # yellow
+                curses.init_pair(5, 69, black) # blue
+                curses.init_pair(6, 171, black) # magenta
+                curses.init_pair(7, 81, black) # cyan
+                pass
+            except:
+                self.app.logger.log("Enhanced colors failed to load.")
+        else:
+            self.app.logger.log("Enhanced colors not supported.")
+
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
@@ -211,7 +221,8 @@ class UI:
         """Resize UI to yx."""
         if yx == None:
             yx = self.screen.getmaxyx()
-        self.screen.clear()
+        #self.screen.clear() #TODO: replace with 'erase'
+        self.screen.erase() #TODO: replace with 'erase'
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows(resize = True)
         self.screen.refresh()
