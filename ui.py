@@ -242,7 +242,7 @@ class UI:
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
-            head_parts.append("Suplemon Editor v"+self.app.version)
+            head_parts.append("Suplemon Editor v" + self.app.version + " -")
         
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
@@ -255,7 +255,8 @@ class UI:
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
-        head = " - ".join(head_parts)
+        head = " ".join(head_parts)
+        #head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
             head = head[:size[0]-1]
@@ -283,7 +284,7 @@ class UI:
         cur = editor.cursor()
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(editor.cursors))+" "+\
-            "buf:"+str(len(editor.buffer))
+            "buf:"+str(len(editor.get_buffer()))
         if self.app.config["app"]["debug"]:
             data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
         #if editor.last_find:
