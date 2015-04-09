@@ -2,7 +2,7 @@ import time
 from mod_base import *
  
 class Battery(Command):
-    def __init__(self):
+    def init(self):
         self.last_value = None
         self.checked = time.time()
         self.interval = 10
@@ -20,7 +20,10 @@ class Battery(Command):
     def value_str(self):
         val = self.value()
         if val:
-            return "BAT " + str(val) + "%"
+            if self.app.config["app"]["use_unicode_symbols"]:
+                return "\u26A1" + str(val) + "%"
+            else:
+                return "BAT " + str(val) + "%"
         return ""
 
     def get_status(self):

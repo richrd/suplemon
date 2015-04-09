@@ -2,12 +2,10 @@ import time
 from mod_base import *
  
 class Clock(Command):
-    def __init__(self):
-        pass
-
     def get_status(self):
-        return time.strftime("%H:%M")
- 
+        s = time.strftime("%H:%M")
+        return s
+
 module = {
     "class": Clock,
     "name": "clock",

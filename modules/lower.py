@@ -1,9 +1,6 @@
 from mod_base import *
 
 class Lower(Command):
-    def __init__(self):
-        pass
-
     def run(self, app, editor):
         line_nums = []
         for cursor in editor.cursors:

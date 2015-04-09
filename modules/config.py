@@ -1,9 +1,6 @@
 from mod_base import *
 
 class Config(Command):
-    def __init__(self):
-        pass
-
     def run(self, app, editor):
         path = app.config.path()
         f = app.file_is_open(path)
