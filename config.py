@@ -15,31 +15,49 @@ class Config:
         self.fpath = os.path.expanduser("~")
         self.defaults = {
             "app": {
-                "remember_open_files": False,
+                # Print debug logging
                 "debug": False,
-                "escdelay": 50
+                # How long curses will wait to detect ESC key
+                "escdelay": 50,
+                # Wether to use special unicode symbols for decoration
+                "use_unicode_symbols": 0,
             },
             "editor": {
+                # Indent new lines to same level as previous line
                 "auto_indent_newline": True,
-                "cursor": "reverse", # reverse or underline
+                # Cursor style. 'reverse' or 'underline'
+                "cursor": "reverse",
                 "default_encoding": "utf-8",
+                # Number of spaces to insert when pressing tab
                 "tab_width": 4,
+                # Amount of undo states to store
                 "max_history": 50,
-                "punctuation": " (){}[]'\"=+-/*.:,;_", # for jumping between words
+                # Characters considered to separate words
+                "punctuation": " (){}[]'\"=+-/*.:,;_",
+                # Character to use to visualize end of line
                 "line_end_char": "",
-                "white_space_char": "\u00B7",
+                # White space characters and their visual matches
+                "white_space_map": {
+                    " ": "\u00B7",        # Show space as interpunct
+                    "\t": "\u21B9",       # Tab as tab symbol
+                    "\u00AD": "\u2423",   # Soft hyphen as letter shelf
+                    "\u200B": "\u00B7"    # Zero width space as interpunct
+                },
+                #"white_space": " ",
+                # Wether to visually show white space chars
                 "show_white_space": False,
                 "show_line_nums": True,
                 "show_line_colors": True,
                 "show_highlighting": False,
                 "use_mouse": False,
+                # Wether to use copy/paste across multiple files
                 "use_global_buffer": True,
+                # Find with regex by default
                 "regex_find": False,
             },
             "display": {
                 "show_top_bar": True,
                 "show_app_name": True,
-                "show_clock": True,
                 "show_file_list": True,
                 "show_legend": True,
                 "show_bottom_bar": True
