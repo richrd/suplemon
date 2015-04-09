@@ -192,9 +192,9 @@ class Viewer:
                 line_part = line_part[:max_len]
 
             if self.config["show_white_space"]:
-                line_part = line_part.replace(" ", self.config["white_space_char"])
-            #if len(line_part) < max_len: # Trying to add spaces to clear stray characters
-            #line_part += " "*(max_len-len(line_part))
+                for key in self.config["white_space_map"].keys():
+                    char = self.config["white_space_map"][key]
+                    line_part = line_part.replace(key, char);
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
             if self.config["show_line_colors"]:
