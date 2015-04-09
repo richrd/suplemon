@@ -43,15 +43,22 @@ class ModuleLoader:
                 self.log("Loading: "+str(item), LOG_INFO)
                 module = self.load_single(name)
                 if module:
-                    self.modules[module[0]] = self.load_instance(module) # Load and store the module instance
+                    # Load and store the module instance
+                    inst = self.load_instance(module)
+                    if inst:
+                        self.modules[module[0]] = inst
 
     def load_instance(self, module):
         """Initialize a module."""
-        inst = module[1]["class"]() # Store the module instance
-        inst.name = module[0]
-        inst.options = module[1]
-        return inst
-    
+        try:
+            inst = module[1]["class"](self.app) # Store the module instance
+            inst.name = module[0]
+            inst.options = module[1]
+            return inst
+        except:
+            self.log("Initializing module failed: " + module[0])
+        return False
+
     def load_single(self, name):
         """Load single module file."""
         path = os.path.join(self.module_path, name+".py")
