@@ -4,17 +4,15 @@ def parse(raw_line):
     color = 0
     line = raw_line.strip()
     if starts(line, ["import", "from"]):
-        color = 11
-#    elif starts(line, "class"):
-#        color = 13    # Green
+        color = 5    
     elif starts(line, "function"):
-        color = 12    # Cyan
+        color = 7    # Cyan
     elif starts(line, ["return"]):
-        color = 15    # Red
+        color = 2    # Red
     elif starts(line, "this."):
-        color = 13    # Cyan
+        color = 3    # Cyan
     elif starts(line, ["//", "/*", "*/", "*"]):
-        color = 14    # Magenta
+        color = 6    # Magenta
     elif starts(line, ["if", "else", "for ", "while ", "continue", "break"]):
-        color = 17    # Yellow
+        color = 4    # Yellow
     return color

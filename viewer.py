@@ -24,6 +24,9 @@ class Viewer:
         self.file_extension = ""
         
         self.linelighter = lambda line: 0 # Dummy linelighter returns default color
+        self.extension_map = {
+            "scss": "css",
+        }
         self.show_line_ends = True
 
         self.cursor_style = curses.A_UNDERLINE
@@ -39,24 +42,22 @@ class Viewer:
 
     def setup_linelight(self):
         """Setup line based highlighting."""
+        ext = self.file_extension
+        # Check if a file extension is redefined
+        # Maps e.g. 'scss' to 'css'
+        if ext in self.extension_map.keys():
+            ext = self.extension_map[ext] # Use it
         curr_path = os.path.dirname(os.path.realpath(__file__))
 
-        filename = self.file_extension + ".py"
+        filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
 
         mod = False
         if os.path.isfile(path):
             try:
-                mod = imp.load_source(self.file_extension, path)
+                mod = imp.load_source(ext, path)
             except:
                 self.app.logger.log(get_error_info())
-        else:
-            path = os.path.join(curr_path, "linelight", "generic.py")
-            if os.path.isfile(path):
-                try:
-                    mod = imp.load_source("generic", path)
-                except:
-                    self.app.logger.log(get_error_info())
 
         if not mod or not "parse" in dir(mod):
             return False
@@ -168,6 +169,7 @@ class Viewer:
     def render(self):
         """Render the editor curses window."""
         self.window.clear()
+        #self.window.erase()
         max_y = self.size()[1]
         i = 0
         x_offset = self.line_offset()
@@ -179,7 +181,8 @@ class Viewer:
 
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
+                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
+                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(1))
 
             # Normal rendering
             line_part = line[min(self.x_scroll, len(line)):]
@@ -189,7 +192,9 @@ class Viewer:
                 line_part = line_part[:max_len]
 
             if self.config["show_white_space"]:
-                line_part = line_part.replace(" ", self.config["white_space_char"])
+                for key in self.config["white_space_map"].keys():
+                    char = self.config["white_space_map"][key]
+                    line_part = line_part.replace(key, char);
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
             if self.config["show_line_colors"]:
@@ -199,7 +204,7 @@ class Viewer:
 
             i += 1
         self.render_cursors()
-        self.window.refresh()
+        #self.window.refresh()
 
     def render_cursors(self):
         """Render editor window cursors."""

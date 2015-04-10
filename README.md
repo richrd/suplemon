@@ -168,7 +168,6 @@ Suplemon is licensed under the MIT license.
  * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
  * [ ] Auto backup. Activate on n changes or every n seconds
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
- * [ ] Global clipboard (copy from one file to another)
  * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
  * [ ] Custom key bindings
  * [ ] Auto complete
@@ -186,10 +185,11 @@ Suplemon is licensed under the MIT license.
  * [ ] Read only viewer
     * ~~And disable editing~~ Don't disable editing. Instead enable save as.
  * [ ] Syntax specific commenting.
- * [ ] Display tab characters with a replacement char (tab messes up lines)
  * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
+ * [X] Display tab characters with a replacement char (tab messes up lines)
+ * [X] Global clipboard (copy from one file to another)
 
 # Fix / Defects
  * [ ] Input queries can't detect trailing whitespace

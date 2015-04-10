@@ -1,9 +1,6 @@
 from mod_base import *
 
 class TabsToSpaces(Command):
-    def __init__(self):
-        pass
-
     def run(self, app, editor):
         i = 0
         for line in editor.lines:

@@ -1,11 +1,9 @@
 from mod_base import *
 
 class Trim(Command):
-    def __init__(self):
-        pass
-
     def run(self, app, editor):
-        for line in editor.lines:
+        lines = editor.get_lines_with_cursors()
+        for line in lines:
             line.data = line.data.rstrip()
 
 module = {

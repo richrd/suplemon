@@ -11,7 +11,7 @@ def wrapper(func):
     global curses
 
     # Force enabling colors
-    os.environ["TERM"] = "xterm-256color"
+    #os.environ["TERM"] = "xterm-256color"
     # Reduce ESC detection time to 100ms
     os.environ["ESCDELAY"] = "100"
 
@@ -79,6 +79,9 @@ class UI:
        
     def load(self):
         """Load an setup curses."""
+        # Log the terminal type
+        self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), LOG_INFO)
+
         self.screen = curses.initscr()
         self.setup_colors()
 
@@ -107,42 +110,60 @@ class UI:
     def setup_colors(self):
         """Initialize color support and define colors."""
         curses.start_color()
-        curses.use_default_colors()
+        curses.use_default_colors()        
 
-        if curses.can_change_color(): # Can't get these to work :(
-            #curses.init_color(11, 254, 0, 1000)
-            pass
+        """
+        Default Terminal Colors
+        0: White
+        1: Black
+        2: Red
+        3: Green
+        4: Yellow
+        5: Blue
+        6: Violet
+        7: Cyan
+        """
+        bg = curses.COLOR_BLACK
+        bg = -1
+        
+        # This gets colors working in TTY's as well as terminal emulators
+        #curses.init_pair(10, -1, -1) # Default (white on black)
+        curses.init_pair(0, curses.COLOR_WHITE, bg)
+        curses.init_pair(1, curses.COLOR_BLACK, bg)
+        curses.init_pair(2, curses.COLOR_RED, bg)
+        curses.init_pair(3, curses.COLOR_GREEN, bg)
+        curses.init_pair(4, curses.COLOR_YELLOW, bg)
+        curses.init_pair(5, curses.COLOR_BLUE, bg)
+        curses.init_pair(6, curses.COLOR_MAGENTA, bg)
+        curses.init_pair(7, curses.COLOR_CYAN, bg)
 
-        # This only works with: TERM=xterm-256color
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
-        curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLUE)
-        curses.init_pair(4, curses.COLOR_WHITE, -1)
+        # Nicer shades of same colors (if supported)
+        if curses.can_change_color():
+            try:
+                # TODO: Define RGB forthese to avoid getting
+                # different results in different terminals
+                # curses.init_color(171, 0, 1000, 0)
+                curses.init_pair(1, 242, bg) # gray
+                curses.init_pair(2, 204, bg) # red
+                curses.init_pair(3, 119, bg) # green
+                curses.init_pair(4, 221, bg) # yellow
+                curses.init_pair(5, 69, bg) # blue
+                curses.init_pair(6, 171, bg) # magenta
+                curses.init_pair(7, 81, bg) # cyan
+                pass
+            except:
+                self.app.logger.log("Enhanced colors failed to load.")
+        else:
+            self.app.logger.log("Enhanced colors not supported.", LOG_INFO)
 
-        # Higlight colors:
-        black = curses.COLOR_BLACK
-        curses.init_pair(10, -1, -1) # Default (white on black)
-
-        curses.init_pair(11, curses.COLOR_BLUE, black)
-        curses.init_pair(12, curses.COLOR_CYAN, black)
-        curses.init_pair(13, curses.COLOR_GREEN, black)
-        curses.init_pair(14, curses.COLOR_MAGENTA, black)
-        curses.init_pair(15, curses.COLOR_RED, black)
-        curses.init_pair(17, curses.COLOR_YELLOW, black)
-        curses.init_pair(16, curses.COLOR_WHITE, black)
-
-        # Better colors
-        try:
-            # TODO: Define RGB forthese to avoid getting
-            # different results in different terminals
-            curses.init_pair(11, 69, black) # blue
-            curses.init_pair(12, 81, black) # cyan
-            curses.init_pair(13, 119, black) # green
-            curses.init_pair(14, 171, black) # magenta
-            curses.init_pair(15, 197, black) # red
-            curses.init_pair(17, 221, black) # yellow
-        except:
-            self.app.logger.log("Enhanced colors failed to load.")
+        # Legacy        
+        #curses.init_pair(11, curses.COLOR_BLUE, black)
+        #curses.init_pair(12, curses.COLOR_CYAN, black)
+        #curses.init_pair(13, curses.COLOR_GREEN, black)
+        #curses.init_pair(14, curses.COLOR_MAGENTA, black)
+        #curses.init_pair(15, curses.COLOR_RED, black)
+        #curses.init_pair(16, curses.COLOR_WHITE, black)
+        #curses.init_pair(17, curses.COLOR_YELLOW, black)
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
@@ -190,7 +211,7 @@ class UI:
         """Resize UI to yx."""
         if yx == None:
             yx = self.screen.getmaxyx()
-        self.screen.clear()
+        self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows(resize = True)
         self.screen.refresh()
@@ -213,12 +234,12 @@ class UI:
 
     def show_top_status(self):
         """Show top status row."""
-        self.header_win.clear()
+        self.header_win.erase()
         size = self.size()
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
-            head_parts.append("Suplemon Editor v"+self.app.version)
+            head_parts.append("Suplemon Editor v" + self.app.version + " -")
         
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
@@ -231,7 +252,7 @@ class UI:
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
-        head = " - ".join(head_parts)
+        head = " ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
             head = head[:size[0]-1]
@@ -259,7 +280,7 @@ class UI:
         cur = editor.cursor()
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(editor.cursors))+" "+\
-            "buf:"+str(len(editor.buffer))
+            "buf:"+str(len(editor.get_buffer()))
         if self.app.config["app"]["debug"]:
             data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
         #if editor.last_find:
@@ -273,7 +294,7 @@ class UI:
             if module.options["status"] == "bottom":
                 data += " " + module.get_status();
 
-        self.status_win.clear()
+        self.status_win.erase()
         status = self.app.get_status()
         extra = size[0] - len(status+data) - 1
         line = status+(" "*extra)+data
@@ -286,7 +307,7 @@ class UI:
         
     def show_legend(self):
         """Show keyboard legend."""
-        self.legend_win.clear()
+        self.legend_win.erase()
         keys = [
             ("F1, ^S", "Save"),
             ("F2", "Reload"),
@@ -322,7 +343,7 @@ class UI:
 
     def show_capture_status(self, s="", value=""):
         """Show status when capturing input."""
-        self.status_win.clear()
+        self.status_win.erase()
         self.status_win.addstr(0, 0, s, curses.A_REVERSE)
         self.status_win.addstr(0, len(s), value)
 

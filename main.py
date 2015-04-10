@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 import os
 import sys
@@ -30,6 +30,7 @@ class App:
         self.current_file = 0
         self.status_msg = ""
         self.last_input = None
+        self.global_buffer = []
 
         # Load core components
         self.logger = Logger()
