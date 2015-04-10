@@ -204,7 +204,6 @@ class UI:
         self.check_resize()
 
     def refresh(self):
-        #self.screen.erase()
         self.refresh_status()
         self.screen.refresh()
 
@@ -212,8 +211,7 @@ class UI:
         """Resize UI to yx."""
         if yx == None:
             yx = self.screen.getmaxyx()
-        #self.screen.clear() #TODO: replace with 'erase'
-        self.screen.erase() #TODO: replace with 'erase'
+        self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows(resize = True)
         self.screen.refresh()
@@ -236,7 +234,6 @@ class UI:
 
     def show_top_status(self):
         """Show top status row."""
-        #self.header_win.clear()
         self.header_win.erase()
         size = self.size()
         display = self.app.config["display"]
@@ -256,7 +253,6 @@ class UI:
             head_parts.append(self.file_list_str())
 
         head = " ".join(head_parts)
-        #head = " - ".join(head_parts)
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
             head = head[:size[0]-1]
@@ -298,7 +294,6 @@ class UI:
             if module.options["status"] == "bottom":
                 data += " " + module.get_status();
 
-        #self.status_win.clear()
         self.status_win.erase()
         status = self.app.get_status()
         extra = size[0] - len(status+data) - 1
