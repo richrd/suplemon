@@ -307,7 +307,6 @@ class UI:
         
     def show_legend(self):
         """Show keyboard legend."""
-        #self.legend_win.clear()
         self.legend_win.erase()
         keys = [
             ("F1, ^S", "Save"),
