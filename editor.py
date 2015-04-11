@@ -328,14 +328,23 @@ class Editor(Viewer):
                 self.move_y_cursors(cursor.y, -1)
             # Handle all other cases
             else:
-                # TODO: tab backspace
                 curr_line = self.lines[line_no]
-                # Slice one character out of the line
-                start = curr_line[:cursor.x-1]
+                # Remove one character by default
+                del_n_chars = 1
+                # Check if we should unindent
+                if self.config["backspace_unindent"]:
+                    # Check if we can unindent, and that it's actually whitespace
+                    indent = self.config["tab_width"]
+                    if cursor.x >= indent and curr_line[cursor.x-indent:cursor.x] == indent*" ":
+                        del_n_chars = indent # Remove an indents worth of whitespace
+                # Slice characters out of the line
+                start = curr_line[:cursor.x-del_n_chars]
                 end = curr_line[cursor.x:]
-                self.lines[line_no] = Line(start+end) # Store the new line
-                cursor.x -= 1 # Move the operating curser back one
-                self.move_x_cursors(line_no, cursor.x, -1) # Do the same to the rest
+                # Store the new line
+                self.lines[line_no] = Line(start+end)
+                # Move the operating curser back the deleted amount
+                cursor.x -= del_n_chars
+                self.move_x_cursors(line_no, cursor.x, -1*del_n_chars) # Do the same to the rest
         # Ensure we keep the view scrolled
         self.move_cursors()
         # Add a restore point if previous action != backspace

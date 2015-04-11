@@ -18,7 +18,7 @@ class Viewer:
     def __init__(self, app, window):
         self.app = app
         self.window = window
-        self.config = []
+        self.config = {}
         self.data = ""
         self.lines = [Line()]
         self.file_extension = ""
