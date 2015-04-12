@@ -23,7 +23,6 @@ class Viewer:
         self.lines = [Line()]
         self.file_extension = ""
         
-        self.linelighter = lambda line: 0 # Dummy linelighter returns default color
         self.extension_map = {
             "scss": "css",
         }
@@ -34,6 +33,9 @@ class Viewer:
         self.y_scroll = 0
         self.x_scroll = 0
         self.cursors = [Cursor()]
+
+        #self.linelighter = lambda line: 0 # Dummy linelighter returns default color
+        self.syntax = None
         self.setup_linelight()
 
     def set_config(self, config):
@@ -52,17 +54,23 @@ class Viewer:
         filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
 
-        mod = False
+        module = False
         if os.path.isfile(path):
+            self.app.log("Syntax file found...", LOG_INFO)
             try:
-                mod = imp.load_source(ext, path)
+                module = imp.load_source(ext, path)
+                self.app.log("File loaded...", LOG_INFO)
             except:
-                self.app.logger.log(get_error_info())
+                self.app.log(get_error_info())
+        else:
+            return False
 
-        if not mod or not "parse" in dir(mod):
+        if not module or not "Syntax" in dir(module):
+            self.app.log("File doesn't match API!")
             return False
             
-        self.linelighter = mod.parse
+        #self.linelighter = mod.parse
+        self.syntax = module.Syntax()
 
     def size(self):
         """Get editor size (x,y)."""
@@ -75,10 +83,12 @@ class Viewer:
 
     def get_line_color(self, raw_line):
         """Return a color based on line contents."""
-        try:
-            return self.linelighter(raw_line)
-        except:
-            return 0
+        if self.syntax:
+            try:
+                return self.syntax.get_color(raw_line)
+            except:
+                return 0
+        return 0
 
     def log(self, s):
         """Log to the app."""
