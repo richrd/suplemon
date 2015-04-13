@@ -1,13 +1,13 @@
 from mod_base import *
 
-class Trim(Command):
+class RStrip(Command):
     def run(self, app, editor):
         line_nums = editor.get_lines_with_cursors()
         for n in line_nums:
             line = editor.lines[n]
-            line.data = line.data.strip()
+            line.data = line.data.rstrip()
 
 module = {
-    "class": Trim,
-    "name": "trim",
+    "class": RStrip,
+    "name": "rstrip",
 }
