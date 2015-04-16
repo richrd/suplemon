@@ -165,6 +165,7 @@ Suplemon is licensed under the MIT license.
  * [X] Line based syntax highlighting
 
 # Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
+ * [ ] Syntax specific commenting.
  * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
  * [ ] Auto backup. Activate on n changes or every n seconds
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
@@ -184,7 +185,6 @@ Suplemon is licensed under the MIT license.
  * [ ] Setting for enabling/disabling undo for cursor changes
  * [ ] Read only viewer
     * ~~And disable editing~~ Don't disable editing. Instead enable save as.
- * [ ] Syntax specific commenting.
  * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
