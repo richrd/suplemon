@@ -57,6 +57,7 @@ class ModuleLoader:
             return inst
         except:
             self.log("Initializing module failed: " + module[0])
+            self.log(get_error_info())
         return False
 
     def load_single(self, name):

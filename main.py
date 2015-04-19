@@ -25,12 +25,14 @@ class App:
         self.inited = 0
         self.running = 0
 
+        # Set default variables
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.files = []
         self.current_file = 0
         self.status_msg = ""
         self.last_input = None
         self.global_buffer = []
+        self.init_keys()
 
         # Load core components
         self.logger = Logger()
@@ -45,6 +47,7 @@ class App:
         # Indicate that windows etc. have been created.
         self.inited = 1
 
+    def init_keys(self):
         self.key_bindings = {
             "^H": self.help,               # Ctrl + H
             "^S": self.save_file,          # Ctrl + S
@@ -62,6 +65,9 @@ class App:
             272: self.toggle_mouse,        # F8
             275: self.toggle_fullscreen,   # F12
         }
+
+    def set_key_binding(self, key, callback):
+        self.key_bindings[key] = callback
 
     def log(self, text, log_type=LOG_ERROR):
         """Add text to the log buffer."""
