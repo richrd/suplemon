@@ -78,7 +78,7 @@ class Editor(Viewer):
             "^C": self.cut,                           # Ctrl + C
             "^W": self.duplicate_line,                # Ctrl + W
             "^V": self.insert,                        # Ctrl + V
-            "^P": self.comment,                       # Ctrl + P
+#            "^P": self.comment,                       # Ctrl + P
             "^D": self.find_next,                     # Ctrl + D
             "^A": self.find_all,                      # Ctrl + A
             "^?": self.backspace,                     # Backspace (fix for Mac)
@@ -443,48 +443,6 @@ class Editor(Viewer):
         self.move_cursors()
         # Add a restore point if previous action != insert
         self.store_action_state("insert")
-
-    def comment(self):
-        """Comment the current line(s)."""
-        try:
-            # Try to get comment start and end syntax
-            comment = self.syntax.get_comment()
-        except:
-            return False
-        line_nums = self.get_lines_with_cursors()
-        # Iterate through lines
-        for lnum in line_nums:
-            line = self.lines[lnum]
-            if not len(line):
-                continue # Skip empty lines
-            # Look for comment syntax in stripped line (TODO:Make this smarter)
-            target = str(line).strip()
-            w = self.whitespace(line) # Amount of whitespace at line start
-            # If the line starts with comment syntax
-            if starts(target, comment[0]):
-                # Reconstruct the whitespace and add the line without whitespace
-                new_line = (" "*w) + line[w+len(comment[0]):]
-                # If comment end syntax exists
-                if comment[1]:
-                    # Try to remove it from the end of the line
-                    if ends(new_line, comment[1]):
-                        new_line = new_line[:-1*len(comment[1])]
-                # Store the modified line
-                self.lines[lnum] = Line(new_line)
-            # If the line isn't commented
-            else:
-                # Slice out the prepended whitespace
-                new_line = line[w:]
-                # Add the whitespace and starting comment
-                new_line = (" "*w) + comment[0] + new_line
-                if comment[1]:
-                    # Add comment end syntax if needed
-                    new_line += comment[1]
-                # Store modified line
-                self.lines[lnum] = Line(new_line)
-        # Keep cursors under control, same as usual...
-        self.move_cursors()
-        self.store_action_state("comment")
 
     def push_up(self):
         """Move current lines up by one line."""
