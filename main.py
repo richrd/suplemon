@@ -74,6 +74,7 @@ class App:
         self.logger.log(text, log_type)
 
     def load(self):
+        
         """Load the app."""
         if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
