@@ -26,7 +26,6 @@ class Logger:
                 log_type = self.get_type_str(entry[0])
                 stamp = time.strftime("%H:%M:%S", time.localtime(entry[2]))
                 print("[" + stamp + " " + log_type + "] " + str(entry[1]))
-                #print(entry[1])
             except:
                 print("Shit! Failed to print a log entry and forgot to write it in a file :(")
                 print("Here's why:")
