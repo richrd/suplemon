@@ -347,11 +347,17 @@ class UI:
         self.status_win.addstr(0, 0, s, curses.A_REVERSE)
         self.status_win.addstr(0, len(s), value)
 
+    def _process_query_key(self, key):
+        if app.config["app"]["debug"]:
+            self.app.log("QUERY GOT KEY:"+str(key), LOG_INFO)
+        return key
+
     def _query(self, text, initial=""):
         """Ask for text input via the status bar."""
         self.show_capture_status(text, initial)
         self.text_input = curses.textpad.Textbox(self.status_win)
         try:
+            #out = self.text_input.edit(self._process_query_key)
             out = self.text_input.edit()
         except:
             return False

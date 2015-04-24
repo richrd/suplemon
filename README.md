@@ -11,7 +11,10 @@ suplemon
               Remedying the pain of command line editing since 2014
 
 
-Suplemon is an intuitive command line text editor with multicursor support. Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
+Suplemon is an intuitive command line text editor with multicursor support.
+Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
+http://github.com/richrd/suplemon
+
 ## Suplemon multicursor editing
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
@@ -57,6 +60,11 @@ Suplemon is licensed under the MIT license.
  3. [X] Multi cursor ~~and multi selection~~ should be comparable to Sublimetext.
  4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing,
         Git commits, and a lot of developement.
+
+## Support
+
+If you have a question or need help, you can find me in IRC at #suplemon @ Freenode.
+I'll be happy to chat with you!
 
 ## Keyboard shortcuts
 
@@ -131,7 +139,13 @@ Suplemon is licensed under the MIT license.
    > Toggle full screen
 
 
-# Todo
+## Todo
+ * [ ] Only confirm closing file if it's modified.
+ * [ ] Design proper API for plugins/extensions/macros
+ * [X] Setup a IRC channel for Suplemon
+ * [X] Trim command to get rid of trailing whitespace
+ * [X] Lower/Upper/Reverse lettercase (todo: reverse case)
+ * [X] Reverse line
  * [X] Regex find/search (make find configurable to do normal & regex)
  * [X] CSS highlighter
  * [X] Move the editor view (scroll) down when finding multiple occurances
@@ -141,11 +155,6 @@ Suplemon is licensed under the MIT license.
  * [X] Indicate if file was saved successfully or if it failed
  * [X] Better yes/no query for exit (and in general)
  * [X] Generic linelighter for generic highlighting
- * [X] Editor plugins/extensions/macros
-   * [ ] Design proper API
-   * [X] Trim command to get rid of trailing whitespace
-   * [X] Lower/Upper/Reverse lettercase (todo: reverse case)
-   * [X] Reverse line
  * [X] New file and close file
  * [X] Undo / Redo
  * [X] Move config file to user home directory
@@ -164,7 +173,8 @@ Suplemon is licensed under the MIT license.
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
 
-# Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
+## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
+ * [ ] Syntax specific commenting.
  * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
  * [ ] Auto backup. Activate on n changes or every n seconds
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
@@ -173,10 +183,17 @@ Suplemon is licensed under the MIT license.
  * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
+ * [ ] Remember cursor positions in files (and restore when opened again)
    * [ ] Combine line based highlighters and other language related data (include comment syntax etc)
    * [ ] Default to legendary Monokai colors 
          http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/
+ * [ ] List of recent files
  * [ ] File selector, kind of like what nano has
+   * [ ] This should be implemented as an extension
+   * [ ] Could be triggered with a key binding (and/or override open file)
+   * [ ] Need to refactor App class to support views instead of just files
+   * [ ] A view could be an editor or an extension ui
+   * [ ] Extensions should be able to control both status bars and key legend
  * [ ] Store files and cursor positions for and restoring on next run
  * [ ] Feature to automatically add ; to end of lines
     * [ ] Generalized: add line prepend and append commands
@@ -184,14 +201,13 @@ Suplemon is licensed under the MIT license.
  * [ ] Setting for enabling/disabling undo for cursor changes
  * [ ] Read only viewer
     * ~~And disable editing~~ Don't disable editing. Instead enable save as.
- * [ ] Syntax specific commenting.
  * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
  * [X] Display tab characters with a replacement char (tab messes up lines)
  * [X] Global clipboard (copy from one file to another)
 
-# Fix / Defects
+## Fix / Defects
  * [ ] Input queries can't detect trailing whitespace
  * [ ] Remember find query if occurance not found (jump to top of file)
  * [X] With multiple lines selected pressing backspace and enter makes changes (shouldn't)
@@ -224,6 +240,16 @@ Suplemon is licensed under the MIT license.
  * [X] Start find at current line AND column
  * [X] Make editor white color brighter (not gray)
  * [X] Show editor at top of terminal when show_top_bar == False
+
+## API plans
+ * [ ] Refactor main class to support views
+ * Editor
+   * [ ] Define core editing operations
+   * [ ] 
+ * Line objects
+   * [ ] Add set_data method
+   * [ ] 
+
 
 
 ## Rationale

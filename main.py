@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 import os
 import sys
@@ -25,12 +25,14 @@ class App:
         self.inited = 0
         self.running = 0
 
+        # Set default variables
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.files = []
         self.current_file = 0
         self.status_msg = ""
         self.last_input = None
         self.global_buffer = []
+        self.init_keys()
 
         # Load core components
         self.logger = Logger()
@@ -45,11 +47,34 @@ class App:
         # Indicate that windows etc. have been created.
         self.inited = 1
 
+    def init_keys(self):
+        self.key_bindings = {
+            "^H": self.help,               # Ctrl + H
+            "^S": self.save_file,          # Ctrl + S
+            "^E": self.run_command,        # Ctrl + E
+            "^F": self.find,               # Ctrl + F
+            "^G": self.go_to,              # Ctrl + G
+            "^O": self.open,               # Ctrl + O
+            "^K": self.close_file,         # Ctrl + K
+            "^N": self.new_file,           # Ctrl + N
+            "^X": self.ask_exit,           # Ctrl + X
+            554: self.prev_file,           # Ctrl + Page Up
+            549: self.next_file,           # Ctrl + Page Down
+            265: self.save_file,           # F1
+            266: self.reload_file,         # F2
+            272: self.toggle_mouse,        # F8
+            275: self.toggle_fullscreen,   # F12
+        }
+
+    def set_key_binding(self, key, callback):
+        self.key_bindings[key] = callback
+
     def log(self, text, log_type=LOG_ERROR):
         """Add text to the log buffer."""
         self.logger.log(text, log_type)
 
     def load(self):
+        
         """Load the app."""
         if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
@@ -133,22 +158,10 @@ class App:
 
     def handle_key(self, event):
         """Handle a keyboard event."""
-        if event.key_name == "^H": self.help()                 # Ctrl + H
-        elif event.key_name == "^S": self.save_file()          # Ctrl + S
-        elif event.key_name == "^E": self.run_command()        # Ctrl + E
-        elif event.key_name == "^F": self.find()               # Ctrl + F
-        elif event.key_name == "^G": self.go_to()              # Ctrl + G
-        elif event.key_name == "^O": self.open()               # Ctrl + O
-        elif event.key_name == "^K": self.close_file()         # Ctrl + K
-        elif event.key_name == "^N": self.new_file()           # Ctrl + N
-        elif event.key_name == "^X": self.ask_exit()           # Ctrl + X
-
-        elif event.key_code == 554: self.prev_file()           # Ctrl + Page Up
-        elif event.key_code == 549: self.next_file()           # Ctrl + Page Down
-        elif event.key_code == 265: self.save_file()           # F1
-        elif event.key_code == 266: self.reload_file()         # F2
-        elif event.key_code == 272: self.toggle_mouse()        # F8
-        elif event.key_code == 275: self.toggle_fullscreen()   # F12
+        if event.key_name in self.key_bindings.keys():
+            self.key_bindings[event.key_name]()
+        elif event.key_code in self.key_bindings.keys():
+            self.key_bindings[event.key_code]()
         else:
             return False
         return True
