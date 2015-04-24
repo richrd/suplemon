@@ -1,4 +1,4 @@
-#Dev branch plans (aiming for v.1.0.0)
+# Developement plans (aiming for v.1.0.0)
 
 This file is intended for planning and brainstorming
 existing and new features for suplemon.
