@@ -41,10 +41,12 @@ class File:
         """Set the file name."""
         # TODO: sanitize
         self.name = name
+        self.update_editor_extension()
         
     def set_path(self, path):
         """Set the file path. Relative paths are sanitized."""
         self.fpath, self.name = self.parse_path(path)
+        self.update_editor_extension()
 
     def set_data(self, data):
         """Set the file data and apply to editor if it exists."""
@@ -55,9 +57,14 @@ class File:
     def set_editor(self, editor):
         """The editor instance set its file extension."""
         self.editor = editor
+        self.update_editor_extension()
+
+    def update_editor_extension(self):
+        if not self.editor:
+            return False
         ext = self.name.split(".")
         if len(ext) > 1:
-            editor.set_file_extension(ext[-1])
+            self.editor.set_file_extension(ext[-1])
 
     def save(self):
         """Write the editor data to file."""

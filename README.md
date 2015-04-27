@@ -11,7 +11,7 @@ suplemon
               Remedying the pain of command line editing since 2014
 
 
-Suplemon is an intuitive command line text editor with multicursor support.
+Suplemon is a modern, slick and intuitive console text editor with multicursor support.
 Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 http://github.com/richrd/suplemon
 

@@ -425,12 +425,17 @@ class Editor(Viewer):
         """Insert buffer data at cursor(s)."""
         cur = self.cursor()
         buffer = list(self.get_buffer())
-        if len(buffer) == len(self.cursors):
+
+        if len(self.cursors) != 1:
+            # If the cursor count is more than the buffer length extend
+            # the buffer until it's at least as long as the cursor count
+            while len(buffer) < len(self.cursors):
+                buffer.extend(buffer)
             curs = sorted(self.cursors, key = lambda c: (c[1], c[0]))
             for cursor in curs:
                 line = self.lines[cursor.y]
                 buf = buffer[0]
-                line = line[:cursor.x]+buf+line[cursor.x:]
+                line = line[:cursor.x] + buf + line[cursor.x:]
                 self.lines[cursor.y] = Line(line)
                 buffer.pop(0)
                 self.move_x_cursors(cursor.y, cursor.x-1, len(buf))

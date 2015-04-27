@@ -7,7 +7,7 @@ class Syntax:
     def get_color(self, raw_line):
         color = 0
         line = raw_line.strip()
-        if starts(line, "*"):  # List
+        if starts(line, ["*", "-"]):  # List
             color = 7    # Cyan
         elif starts(line, "#"):  # Header
             color = 3    # Green
