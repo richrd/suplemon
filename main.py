@@ -356,13 +356,16 @@ class App:
 
     def close_file(self):
         """Close current file if user confirms action."""
-        if self.ui.query_bool("Close file?"):
-            self.files.pop(self.current_file)
-            if not len(self.files):
-                self.new_file()
-                return False
-            if self.current_file == len(self.files):
-                self.current_file -= 1
+        flag = True
+        if self.get_file().is_changed():
+            if not self.ui.query_bool("Close file?"):
+                flag = False
+        self.files.pop(self.current_file)
+        if not len(self.files):
+            self.new_file()
+            return False
+        if self.current_file == len(self.files):
+            self.current_file -= 1
 
     def save_file(self):
         """Save current file."""
