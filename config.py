@@ -42,6 +42,7 @@ class Config:
                 "white_space_map": {
                     " ": "\u00B7",        # Show space as interpunct
                     "\t": "\u21B9",       # Tab as tab symbol
+                    "\u00A0": "\u00B7",   # Show non breaking space as interpunct
                     "\u00AD": "\u2423",   # Soft hyphen as letter shelf
                     "\u200B": "\u00B7"    # Zero width space as interpunct
                 },
