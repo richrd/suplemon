@@ -1,6 +1,9 @@
 from mod_base import *
 
-class Trim(Command):
+class Strip(Command):
+    def init(self):
+        self.bind_key("") # Used to bind a key to the run-method
+
     def run(self, app, editor):
         line_nums = editor.get_lines_with_cursors()
         for n in line_nums:
@@ -8,6 +11,6 @@ class Trim(Command):
             line.data = line.data.strip()
 
 module = {
-    "class": Trim,
-    "name": "trim",
+    "class": Strip,
+    "name": "strip",
 }
