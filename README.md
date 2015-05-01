@@ -189,11 +189,11 @@ I'll be happy to chat with you!
          http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/
  * [ ] List of recent files
  * [ ] File selector, kind of like what nano has
-   * [ ] This should be implemented as an extension
-   * [ ] Could be triggered with a key binding (and/or override open file)
+   * [ ] This should be implemented as an extension
+   * [ ] Could be triggered with a key binding (and/or override open file)
    * [ ] Need to refactor App class to support views instead of just files
    * [ ] A view could be an editor or an extension ui
-   * [ ] Extensions should be able to control both status bars and key legend
+   * [ ] Extensions should be able to control both status bars and key legend
  * [ ] Store files and cursor positions for and restoring on next run
  * [ ] Feature to automatically add ; to end of lines
     * [ ] Generalized: add line prepend and append commands
@@ -242,9 +242,9 @@ I'll be happy to chat with you!
  * [X] Show editor at top of terminal when show_top_bar == False
 
 ## API plans
- * [ ] Refactor main class to support views
- * Editor
-   * [ ] Define core editing operations
+ * [ ] Refactor main class to support views
+ * Editor
+   * [ ] Define core editing operations
    * [ ] 
  * Line objects
    * [ ] Add set_data method
