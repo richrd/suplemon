@@ -243,10 +243,10 @@ I'll be happy to chat with you!
 
 ## API plans
  * [ ] Refactor main class to support views
- * Editor
+ * [ ] Editor
    * [ ] Define core editing operations
    * [ ] 
- * Line objects
+ * [ ] Line objects
    * [ ] Add set_data method
    * [ ] 
 
@@ -259,4 +259,3 @@ have a too steep learing curve. For them (like for me) nano was the weapon of
 choice. But nano feels clunky and it has its limitations. That's why
 I wrote my own editor with built in multi cursor support to fix the situation.
 Another reason is that developing Suplemon is simply fun to do.
-
