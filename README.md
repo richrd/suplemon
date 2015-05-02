@@ -189,11 +189,11 @@ I'll be happy to chat with you!
          http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/
  * [ ] List of recent files
  * [ ] File selector, kind of like what nano has
-   * [ ] This should be implemented as an extension
-   * [ ] Could be triggered with a key binding (and/or override open file)
+   * [ ] This should be implemented as an extension
+   * [ ] Could be triggered with a key binding (and/or override open file)
    * [ ] Need to refactor App class to support views instead of just files
    * [ ] A view could be an editor or an extension ui
-   * [ ] Extensions should be able to control both status bars and key legend
+   * [ ] Extensions should be able to control both status bars and key legend
  * [ ] Store files and cursor positions for and restoring on next run
  * [ ] Feature to automatically add ; to end of lines
     * [ ] Generalized: add line prepend and append commands
@@ -242,11 +242,11 @@ I'll be happy to chat with you!
  * [X] Show editor at top of terminal when show_top_bar == False
 
 ## API plans
- * [ ] Refactor main class to support views
- * Editor
-   * [ ] Define core editing operations
+ * [ ] Refactor main class to support views
+ * [ ] Editor
+   * [ ] Define core editing operations
    * [ ] 
- * Line objects
+ * [ ] Line objects
    * [ ] Add set_data method
    * [ ] 
 
@@ -259,4 +259,3 @@ have a too steep learing curve. For them (like for me) nano was the weapon of
 choice. But nano feels clunky and it has its limitations. That's why
 I wrote my own editor with built in multi cursor support to fix the situation.
 Another reason is that developing Suplemon is simply fun to do.
-
