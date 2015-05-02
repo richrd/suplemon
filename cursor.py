@@ -36,7 +36,7 @@ class Cursor:
     def __eq__(self, item):
         """Check for equality."""
         if isinstance(item, Cursor):
-            if item.x == self.x and item.y == self.x:
+            if item.x == self.x and item.y == self.y:
                 return True
         return False
 
