@@ -330,6 +330,9 @@ class Editor(Viewer):
     def delete(self):
         """Delete the next character."""
         for cursor in self.cursors:
+            if len(self.lines)-1 < cursor.y:
+                # If we've run out of lines
+                break
             line = self.lines[cursor.y]
             if len(self.lines)>1 and cursor.x == len(line) and cursor.y != len(self.lines)-1:
                 data = self.lines[cursor.y]
