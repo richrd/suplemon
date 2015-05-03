@@ -142,9 +142,11 @@ I'll be happy to chat with you!
  * F11
    > Toggle full screen
 
-
 ## Todo
+ * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Design proper API for plugins/extensions/macros
+ * [ ] Documentation for v 1.0.0
+ * [ ] Package Suplemon and upload to PIP
  * [X] Only confirm closing file if it's modified.
  * [X] Setup a IRC channel for Suplemon
  * [X] Trim command to get rid of trailing whitespace
@@ -176,30 +178,18 @@ I'll be happy to chat with you!
  * [X] Loading multiple files and switching between them
  * [X] Live config reloading when it's modified
  * [X] Line based syntax highlighting
-
-## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
  * [X] Syntax specific commenting.
  * [X] Custom key bindings
- * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
- * [ ] Extension: Auto backup. Activate on n changes or every n seconds
+
+## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
  * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
- * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Default to legendary Monokai colors 
        http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/
  * [ ] List of recent files
- * [ ] File selector, kind of like what nano has
-   * [ ] This should be implemented as an extension
-   * [ ] Could be triggered with a key binding (and/or override open file)
-   * [ ] Need to refactor App class to support views instead of just files
-   * [ ] A view could be an editor or an extension ui
-   * [ ] Extensions should be able to control both status bars and key legend
- * [ ] Feature to automatically add ; to end of lines
-    * [ ] Generalized: add line prepend and append commands
-    * [ ] Will need multiline comment and string detection etc.
  * [ ] Setting for enabling/disabling undo for cursor changes
  * [ ] Read only viewer
     * ~~And disable editing~~ Don't disable editing. Instead enable save as.
@@ -208,6 +198,18 @@ I'll be happy to chat with you!
    * [ ] Only refresh modified lines when editing
  * [X] Display tab characters with a replacement char (tab messes up lines)
  * [X] Global clipboard (copy from one file to another)
+ * [ ] Extensions: 
+   * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
+   * [ ] Auto backup. Activate on n changes or every n seconds
+   * [ ] File selector, kind of like what nano has
+     * [ ] This should be implemented as an extension
+     * [ ] Could be triggered with a key binding (and/or override open file)
+     * [ ] Need to refactor App class to support views instead of just files
+     * [ ] A view could be an editor or an extension ui
+     * [ ] Extensions should be able to control both status bars and key legend
+   * [ ] Automatically add ; to end of lines
+      * [ ] Generalized: add line prepend and append commands
+      * [ ] Will need multiline comment and string detection etc.
 
 ## Fix / Defects
  * [ ] Input queries can't detect trailing whitespace
@@ -245,17 +247,17 @@ I'll be happy to chat with you!
 
 ## API plans
  * [ ] Refactor main class to support views
+ * [ ] 
  * [ ] Editor
-   * [ ] Define core editing operations
-   * [ ] 
+   * [X] Define core editing operations
+   * [ ] Make core editing operations overidable by extensions
  * [ ] Line objects
-   * [ ] Add set_data method
-   * [ ] 
+   * [X] Add set_data method
+   * [X] Add get_data method
  * [ ] Cursor objects
    * [ ] Methods for moving the cursor (left, right, up, down)
    * [ ] Methods for getting cursor position
    * [ ] Make cursor manipulation more functional
-
 
 ## Rationale
 For many the command line is a different environment for text editing.

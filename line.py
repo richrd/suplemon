@@ -28,6 +28,12 @@ class Line:
     def __len__(self):
         return len(self.data)
 
+    def get_data(self):
+        return self.data
+        
+    def set_data(self, data):
+        self.data = data
+
     def find(self, what, start=0):
         return self.data.find(what, start)
 
