@@ -129,7 +129,7 @@ class UI:
         
         # This gets colors working in TTY's as well as terminal emulators
         #curses.init_pair(10, -1, -1) # Default (white on black)
-        # Colors for xterm (not xterm-256-colors)
+        # Colors for xterm (not xterm-256color)
         # Dark Colors
         curses.init_pair(0, curses.COLOR_BLACK, bg) # Black
         curses.init_pair(1, curses.COLOR_RED, bg) # Red
@@ -140,7 +140,7 @@ class UI:
         curses.init_pair(6, curses.COLOR_CYAN, bg) # Cyan
         curses.init_pair(7, fg, bg) # White on Black
 
-        # Light Colors (only work on xterm-256-colors)
+        # Light Colors (only work on xterm-256color)
         #curses.init_pair(1, 9, bg) # Red
         #curses.init_pair(2, 10, bg) # Green
         #curses.init_pair(3, 11, bg) # Yellow
@@ -153,7 +153,7 @@ class UI:
             try:
                 # TODO: Define RGB forthese to avoid getting
                 # different results in different terminals
-                # xterm-256-color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
+                # xterm-256color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
 
                 # curses.init_color(171, 0, 1000, 0)
                 curses.init_pair(0, 242, bg) # 0 black
@@ -165,9 +165,9 @@ class UI:
                 curses.init_pair(6, 81, bg)  # 6 cyan
                 curses.init_pair(7, 15, bg)  # 7 White
             except:
-                self.app.logger.log("Enhanced colors failed to load.")
+                self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
         else:
-            self.app.logger.log("Enhanced colors not supported.", LOG_INFO)
+            self.app.logger.log("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.", LOG_INFO)
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
