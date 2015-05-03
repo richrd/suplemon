@@ -5,15 +5,15 @@ class Syntax:
         return ("","")
 
     def get_color(self, raw_line):
-        color = 0
+        color = 7
         line = raw_line.strip()
         if starts(line, ["*", "-"]):  # List
-            color = 7    # Cyan
+            color = 6    # Cyan
         elif starts(line, "#"):  # Header
-            color = 3    # Green
+            color = 2    # Green
         elif starts(line, ">"):  # Item desription
-            color = 4    # Yellow
+            color = 3    # Yellow
         elif starts(raw_line, "    "):  # Code
-            color = 6    # Magenta
+            color = 5    # Magenta
         return color
     

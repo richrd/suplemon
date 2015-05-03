@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 
 import os
 import sys
@@ -74,11 +74,10 @@ class App:
         self.logger.log(text, log_type)
 
     def load(self):
-        
         """Load the app."""
         if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
-            self.log("Running Suplemon with Python "+ver+" wich isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
+            self.log("Running Suplemon with Python "+ver+" which isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
         self.ui.load()
         self.load_files()
         loaded = True

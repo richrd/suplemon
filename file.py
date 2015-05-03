@@ -92,16 +92,17 @@ class File:
             return False
         data = self._read_text(path)
         if data == False:
-            self.log("Normal file read failed.", LOG_INFO)
+            self.log("Normal file read failed.", LOG_WARNING)
             data = self._read_binary(path)
         if data == False:
-            self.log("Fallback file read failed.", LOG_INFO)
+            self.log("Fallback file read failed.", LOG_WARNING)
             return False
         self.data = data
         self.editor.set_data(data)
         return True
 
     def _read_text(self, file):
+        # Read text file
         try:
             f = open(self._path())
             data = f.read()
@@ -111,6 +112,7 @@ class File:
             return False
 
     def _read_binary(self, file):
+        # Read binary file and try to autodetect encoding
         try:
             f = open(self._path(), "rb")
             data = f.read()
@@ -119,8 +121,9 @@ class File:
             detection = chardet.detect(data)
             charenc = detection['encoding']
             if charenc == None:
-                self.log("Failed to detect file encoding.")
+                self.log("Failed to detect file encoding.", LOG_WARNING)
                 return False
+            self.log("Trying to decode with encoding '" + charenc + "'", LOG_INFO)
             return data.decode(charenc)
         except Exception as inst:
             self.log(type(inst))    # the exception instance

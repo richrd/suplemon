@@ -5,16 +5,16 @@ class Syntax:
         return ("/*","*/")
 
     def get_color(self, raw_line):
-        color = 0
+        color = 7
         line = raw_line.strip()
         if starts(line, "@import"):
-            color = 5
+            color = 4    # Blue
         elif starts(line, "$"):
-            color = 3
+            color = 2    # Green
         elif starts(line, "/*") or ends(line, "*/"):
-            color = 6    # Magenta
+            color = 5    # Magenta
         elif starts(line, "{") or ends(line, "}") or ends(line, "{"):
-            color = 7    # Cyan
+            color = 6    # Cyan
         elif ends(line, ";"):
-            color = 4    # Yellow
+            color = 3    # Yellow
         return color

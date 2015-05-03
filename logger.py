@@ -17,7 +17,9 @@ class Logger:
             LOG_ERROR: "ERROR",
         }
 
-    def log(self, data, log_type=3):
+    def log(self, data, log_type=None):
+        if log_type == None:
+            log_type = LOG_ERROR
         self.entries.append( (log_type, str(data), time.time()) )
 
     def output(self):
