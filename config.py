@@ -5,6 +5,7 @@ Config handler.
 
 import os
 import json
+import curses # Get key definitons
 
 from helpers import *
 
@@ -16,11 +17,29 @@ class Config:
         self.defaults = {
             "app": {
                 # Print debug logging
-                "debug": False,
+                "debug": 1,
                 # How long curses will wait to detect ESC key
                 "escdelay": 50,
                 # Wether to use special unicode symbols for decoration
                 "use_unicode_symbols": 0,
+                # Key bindings for app functions
+                "keys": {
+                    "^H": "help",               # Ctrl + H
+                    "^S": "save_file",          # Ctrl + S
+                    "^E": "run_command",        # Ctrl + E
+                    "^F": "find",               # Ctrl + F
+                    "^G": "go_to",              # Ctrl + G
+                    "^O": "open",               # Ctrl + O
+                    "^K": "close_file",         # Ctrl + K
+                    "^N": "new_file",           # Ctrl + N
+                    "^X": "ask_exit",           # Ctrl + X
+                    554: "prev_file",           # Ctrl + Page Up
+                    549: "next_file",           # Ctrl + Page Down
+                    265: "save_file_as",        # F1
+                    266: "reload_file",         # F2
+                    272: "toggle_mouse",        # F8
+                    275: "toggle_fullscreen",   # F12
+                }
             },
             "editor": {
                 # Indent new lines to same level as previous line
@@ -57,6 +76,47 @@ class Config:
                 "use_global_buffer": True,
                 # Find with regex by default
                 "regex_find": False,
+                # Key bindings for editor functions
+                "keys": {
+                    curses.KEY_HOME: "home",              # Home
+                    curses.KEY_END: "end",                # End
+                    curses.KEY_BACKSPACE: "backspace",    # Backspace
+                    curses.KEY_DC: "delete",              # Delete
+                    curses.KEY_ENTER: "enter",            # Enter
+                    curses.KEY_RIGHT: "arrow_right",      # Arrow Right
+                    curses.KEY_LEFT: "arrow_left",        # Arrow Left
+                    curses.KEY_UP: "arrow_up",            # Arrow Up
+                    curses.KEY_DOWN: "arrow_down",        # Arrow Down
+                    563: "new_cursor_up",                 # Alt + Up
+                    522: "new_cursor_down",               # Alt + Down
+                    542: "new_cursor_left",               # Alt + Left
+                    557: "new_cursor_right",              # Alt + Right
+                    curses.KEY_NPAGE: "page_up",          # Page Up
+                    curses.KEY_PPAGE: "page_down",        # Page Down
+                    552: "push_up",                       # Alt + Page Up
+                    547: "push_down",                     # Alt + Page Down
+                    269: "undo",                          # F5
+                    270: "redo",                          # F6
+                    273: "toggle_line_nums",              # F9
+                    274: "toggle_line_ends",              # F10
+                    275: "toggle_highlight",              # F11
+                    331: "insert",                        # Insert
+                    "^C": "cut",                          # Ctrl + C
+                    "^W": "duplicate_line",               # Ctrl + W
+                    "^V": "insert",                       # Ctrl + V
+                    "^D": "find_next",                    # Ctrl + D
+                    "^A": "find_all",                     # Ctrl + A
+                    "^?": "backspace",                    # Backspace (fix for Mac)
+                    544: "jump_left",                     # Ctrl + Left
+                    559: "jump_right",                    # Ctrl + Right
+                    565: "jump_up",                       # Ctrl + Up
+                    524: "jump_down",                     # Ctrl + Down
+                    "^J": "enter",                        # Enter (fallback for 'getch')
+                    "\t": "tab",                          # Tab
+                    353: "untab",                         # Shift + Tab
+                    "\n": "enter",                        # Enter
+                    "^[": "escape",                       # Escape
+                }
             },
             "display": {
                 "show_top_bar": True,
@@ -111,8 +171,20 @@ class Config:
             for sec_key in curr_item.keys():
                 if not sec_key in config[prim_key].keys():
                     config[prim_key][sec_key] = curr_item[sec_key]
+        self.merge_keys(config)
         return config
- 
+        
+    def merge_keys(self, config):
+        """Fill in config with default keys."""
+        # Do merge for app and editor keys
+        for dest in ["app", "editor"]:
+            key_config = config[dest]["keys"]
+            key_defaults = self.defaults[dest]["keys"]
+            for key in key_defaults.keys():
+                # Fill in each key that's not defined yet
+                if not key in key_config.keys():
+                    key_config[key] = key_defaults[key]
+
     def __getitem__(self, i):
         """Get a config variable."""
         return self.config[i]

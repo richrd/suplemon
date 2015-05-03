@@ -44,30 +44,35 @@ class App:
         self.modules = modules.ModuleLoader(self)
         self.modules.load()
 
+        # Define core operations
+        self.operations = {
+            "help": self.help,
+            "save_file": self.save_file,
+            "run_command": self.run_command,
+            "find": self.find,
+            "go_to": self.go_to,
+            "open": self.open,
+            "close_file": self.close_file,
+            "new_file": self.new_file,
+            "ask_exit": self.ask_exit,
+            "prev_file": self.prev_file,
+            "next_file": self.next_file,
+            "save_file_as": self.save_file_as,
+            "reload_file": self.reload_file,
+            "toggle_mouse": self.toggle_mouse,
+            "toggle_fullscreen": self.toggle_fullscreen,
+        }
+
         # Indicate that windows etc. have been created.
         self.inited = 1
 
     def init_keys(self):
-        self.key_bindings = {
-            "^H": self.help,               # Ctrl + H
-            "^S": self.save_file,          # Ctrl + S
-            "^E": self.run_command,        # Ctrl + E
-            "^F": self.find,               # Ctrl + F
-            "^G": self.go_to,              # Ctrl + G
-            "^O": self.open,               # Ctrl + O
-            "^K": self.close_file,         # Ctrl + K
-            "^N": self.new_file,           # Ctrl + N
-            "^X": self.ask_exit,           # Ctrl + X
-            554: self.prev_file,           # Ctrl + Page Up
-            549: self.next_file,           # Ctrl + Page Down
-            265: self.save_file_as,        # F1
-            266: self.reload_file,         # F2
-            272: self.toggle_mouse,        # F8
-            275: self.toggle_fullscreen,   # F12
-        }
+        # Reserving this for future use
+        pass
 
-    def set_key_binding(self, key, callback):
-        self.key_bindings[key] = callback
+    def set_key_binding(self, key, operation):
+        """Bind a key to an operation."""
+        self.get_key_bindings()[key] = operation
 
     def log(self, text, log_type=LOG_ERROR):
         """Add text to the log buffer."""
@@ -127,6 +132,9 @@ class App:
     def get_file_index(self, file_obj):
         """Get file index by file object."""
         return self.files.index(file_obj)
+    
+    def get_key_bindings(self):
+        return self.config["app"]["keys"]
 
     def unsaved_changes(self):
         """Check if there are unsaved changes in any file."""
@@ -157,12 +165,14 @@ class App:
 
     def handle_key(self, event):
         """Handle a keyboard event."""
-        if event.key_name in self.key_bindings.keys():
-            self.key_bindings[event.key_name]()
-        elif event.key_code in self.key_bindings.keys():
-            self.key_bindings[event.key_code]()
+        key_bindings = self.get_key_bindings()
+        if event.key_name in key_bindings.keys():
+            operation = key_bindings[event.key_name]
+        elif event.key_code in key_bindings.keys():
+            operation = key_bindings[event.key_code]
         else:
             return False
+        self.run_operation(operation)
         return True
 
     def handle_mouse(self, event):
@@ -291,6 +301,12 @@ class App:
         else:
             self.set_status("Command '" + cmd + "' not found.")
         return True
+
+    def run_operation(self, operation):
+        """Run an app core operation."""
+        if operation in self.operations.keys():
+            return self.operations[operation]()
+        return False
 
     def toggle_fullscreen(self):
         """Toggle full screen editor."""

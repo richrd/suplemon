@@ -51,46 +51,45 @@ class Editor(Viewer):
         self.current_state = 0         # Current state index of the editor
         self.last_action = None        # Last editor action that was used (for undo/redo)
 
-        self.key_bindings = {
-            curses.KEY_HOME: self.home,               # Home
-            curses.KEY_END: self.end,                 # End
-            curses.KEY_BACKSPACE: self.backspace,     # Backspace
-            curses.KEY_DC: self.delete,               # Delete
-            curses.KEY_ENTER: self.enter,             # Enter
-            curses.KEY_RIGHT: self.arrow_right,       # Arrow Right
-            curses.KEY_LEFT: self.arrow_left,         # Arrow Left
-            curses.KEY_UP: self.arrow_up,             # Arrow Up
-            curses.KEY_DOWN: self.arrow_down,         # Arrow Down
-            563: self.new_cursor_up,                  # Alt + Up
-            522: self.new_cursor_down,                # Alt + Down
-            542: self.new_cursor_left,                # Alt + Left
-            557: self.new_cursor_right,               # Alt + Right
-            curses.KEY_NPAGE: self.page_up,           # Page Up
-            curses.KEY_PPAGE: self.page_down,         # Page Down
-            552: self.push_up,                        # Alt + Page Up
-            547: self.push_down,                      # Alt + Page Down
-            269: self.undo,                           # F5
-            270: self.redo,                           # F6
-            273: self.toggle_line_nums,               # F9
-            274: self.toggle_line_ends,               # F10
-            275: self.toggle_highlight,               # F11
-            331: self.insert,                         # Insert
-            "^C": self.cut,                           # Ctrl + C
-            "^W": self.duplicate_line,                # Ctrl + W
-            "^V": self.insert,                        # Ctrl + V
-#            "^P": self.comment,                       # Ctrl + P
-            "^D": self.find_next,                     # Ctrl + D
-            "^A": self.find_all,                      # Ctrl + A
-            "^?": self.backspace,                     # Backspace (fix for Mac)
-            544: self.jump_left,                      # Ctrl + Left
-            559: self.jump_right,                     # Ctrl + Right
-            565: self.jump_up,                        # Ctrl + Up
-            524: self.jump_down,                      # Ctrl + Down
-            "^J": self.enter,                         # Enter (fallback for 'getch')
-            "\t": self.tab,                           # Tab
-            353: self.untab,                          # Shift + Tab
-            "\n": self.enter,                         # Enter
-            "^[": self.escape,                        # Escape
+        self.operations = {
+            "home": self.home,                            # Home
+            "end": self.end,                              # End
+            "backspace": self.backspace,                  # Backspace
+            "delete": self.delete,                        # Delete
+            "enter": self.enter,                          # Enter
+            "arrow_right": self.arrow_right,              # Arrow Right
+            "arrow_left": self.arrow_left,                # Arrow Left
+            "arrow_up": self.arrow_up,                    # Arrow Up
+            "arrow_down": self.arrow_down,                # Arrow Down
+            "new_cursor_up": self.new_cursor_up,          # Alt + Up
+            "new_cursor_down": self.new_cursor_down,      # Alt + Down
+            "new_cursor_left": self.new_cursor_left,      # Alt + Left
+            "new_cursor_right": self.new_cursor_right,    # Alt + Right
+            "page_up": self.page_up,                      # Page Up
+            "page_down": self.page_down,                  # Page Down
+            "push_up": self.push_up,                      # Alt + Page Up
+            "push_down": self.push_down,                  # Alt + Page Down
+            "undo": self.undo,                            # F5
+            "redo": self.redo,                            # F6
+            "toggle_line_nums": self.toggle_line_nums,    # F9
+            "toggle_line_ends": self.toggle_line_ends,    # F10
+            "toggle_highlight": self.toggle_highlight,    # F11
+            "insert": self.insert,                        # Insert
+            "cut": self.cut,                              # Ctrl + C
+            "duplicate_line": self.duplicate_line,        # Ctrl + W
+            "insert": self.insert,                        # Ctrl + V
+            "find_next": self.find_next,                  # Ctrl + D
+            "find_all": self.find_all,                    # Ctrl + A
+            "backspace": self.backspace,                  # Backspace (fix for Mac)
+            "jump_left": self.jump_left,                  # Ctrl + Left
+            "jump_right": self.jump_right,                # Ctrl + Right
+            "jump_up": self.jump_up,                      # Ctrl + Up
+            "jump_down": self.jump_down,                  # Ctrl + Down
+            "enter": self.enter,                          # Enter (fallback for 'getch')
+            "tab": self.tab,                              # Tab
+            "untab": self.untab,                          # Shift + Tab
+            "enter": self.enter,                          # Enter
+            "escape": self.escape,                        # Escape
         }
 
     def get_buffer(self):
@@ -98,6 +97,9 @@ class Editor(Viewer):
             return self.app.global_buffer
         else:
             return self.buffer
+
+    def get_key_bindings(self):
+        return self.config["keys"]
 
     def set_buffer(self, buffer):
         if self.app.config["editor"]["use_global_buffer"]:
@@ -667,13 +669,25 @@ class Editor(Viewer):
         key = event.key_code
         name = event.key_name
         # Try match a key to a method and call it
-        if key in self.key_bindings.keys():
-            self.key_bindings[key]()
-        elif name in self.key_bindings.keys():
-            self.key_bindings[name]()
+        
+        key_bindings = self.get_key_bindings()
+        operation = None
+        if key in key_bindings.keys():
+            operation = key_bindings[key]
+        elif name in key_bindings.keys():
+            operation = key_bindings[name]
+        if operation:
+            self.run_operation(operation)
         # Try to type the key into the editor
         else:
             if type(key) == type(""):
                 self.type(key)
             elif name and not name.startswith("KEY_"):
                 self.type(name)
+        return False
+
+    def run_operation(self, operation):
+        """Run an editor core operation."""
+        if operation in self.operations.keys():
+            return self.operations[operation]()
+        return False
