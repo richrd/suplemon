@@ -446,6 +446,8 @@ class App:
         """Create the default file."""
         file = File(self)
         file.set_editor(self.new_editor())
+        # Specify contents to avoid appearing as modified
+        file.set_data("")
         # Set markdown as the default file type
         file.editor.set_file_extension("md")
         return file
