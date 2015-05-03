@@ -33,4 +33,3 @@ class Line:
 
     def strip(self, *args):
         return self.data.strip(*args)
-
