@@ -192,8 +192,8 @@ class Viewer:
 
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
-                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(4))
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(1))
+                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(1))
+                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(7))
 
             # Normal rendering
             line_part = line[min(self.x_scroll, len(line)):]

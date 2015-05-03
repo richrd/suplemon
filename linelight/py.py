@@ -5,20 +5,20 @@ class Syntax:
         return ("#","")
 
     def get_color(self, raw_line):
-        color = 0
+        color = 7
         line = raw_line.strip()
         if starts(line, ["import", "from"]):
-            color = 5
+            color = 4    # Blue
         elif starts(line, "class"):
-            color = 3    # Green
+            color = 2    # Green
         elif starts(line, "def"):
-            color = 7    # Cyan
+            color = 6    # Cyan
         elif starts(line, ["return", "yield"]):
-            color = 2    # Red
+            color = 1    # Red
         elif starts(line, "self."):
-            color = 7    # Cyan
+            color = 6    # Cyan
         elif starts(line, ["#", "//", "\"", "'"]):
-            color = 6    # Magenta
+            color = 5    # Magenta
         elif starts(line, ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue", "pass", "break"]):
-            color = 4    # Yellow
+            color = 3    # Yellow
         return color

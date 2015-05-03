@@ -110,60 +110,64 @@ class UI:
     def setup_colors(self):
         """Initialize color support and define colors."""
         curses.start_color()
-        curses.use_default_colors()        
+        curses.use_default_colors()
 
         """
         Default Terminal Colors
-        0: White
-        1: Black
-        2: Red
-        3: Green
-        4: Yellow
-        5: Blue
-        6: Violet
-        7: Cyan
+        0: Black
+        1: Red
+        2: Green
+        3: Yellow
+        4: Blue
+        5: Magenta
+        6: Cyan
+        7: White
         """
-        bg = curses.COLOR_BLACK
-        bg = -1
+
+        fg = -1 # Default foreground color (could also be set to curses.COLOR_WHITE)
+        bg = -1 # Default background color (could also be set to curses.COLOR_BLACK)
         
         # This gets colors working in TTY's as well as terminal emulators
         #curses.init_pair(10, -1, -1) # Default (white on black)
-        curses.init_pair(0, curses.COLOR_WHITE, bg)
-        curses.init_pair(1, curses.COLOR_BLACK, bg)
-        curses.init_pair(2, curses.COLOR_RED, bg)
-        curses.init_pair(3, curses.COLOR_GREEN, bg)
-        curses.init_pair(4, curses.COLOR_YELLOW, bg)
-        curses.init_pair(5, curses.COLOR_BLUE, bg)
-        curses.init_pair(6, curses.COLOR_MAGENTA, bg)
-        curses.init_pair(7, curses.COLOR_CYAN, bg)
+        # Colors for xterm (not xterm-256-colors)
+        # Dark Colors
+        curses.init_pair(0, curses.COLOR_BLACK, bg) # Black
+        curses.init_pair(1, curses.COLOR_RED, bg) # Red
+        curses.init_pair(2, curses.COLOR_GREEN, bg) # Green
+        curses.init_pair(3, curses.COLOR_YELLOW, bg) # Yellow
+        curses.init_pair(4, curses.COLOR_BLUE, bg) # Blue
+        curses.init_pair(5, curses.COLOR_MAGENTA, bg) # Magenta
+        curses.init_pair(6, curses.COLOR_CYAN, bg) # Cyan
+        curses.init_pair(7, fg, bg) # White on Black
+
+        # Light Colors (only work on xterm-256-colors)
+        #curses.init_pair(1, 9, bg) # Red
+        #curses.init_pair(2, 10, bg) # Green
+        #curses.init_pair(3, 11, bg) # Yellow
+        #curses.init_pair(4, 12, bg) # Blue
+        #curses.init_pair(5, 13, bg) # Magenta
+        #curses.init_pair(6, 14, bg) # Cyan
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
             try:
                 # TODO: Define RGB forthese to avoid getting
                 # different results in different terminals
+                # xterm-256-color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
+
                 # curses.init_color(171, 0, 1000, 0)
-                curses.init_pair(1, 242, bg) # gray
-                curses.init_pair(2, 204, bg) # red
-                curses.init_pair(3, 119, bg) # green
-                curses.init_pair(4, 221, bg) # yellow
-                curses.init_pair(5, 69, bg) # blue
-                curses.init_pair(6, 171, bg) # magenta
-                curses.init_pair(7, 81, bg) # cyan
-                pass
+                curses.init_pair(0, 242, bg) # 0 black
+                curses.init_pair(1, 204, bg) # 1 red
+                curses.init_pair(2, 119, bg) # 2 green
+                curses.init_pair(3, 221, bg) # 3 yellow
+                curses.init_pair(4, 69, bg)  # 4 blue
+                curses.init_pair(5, 171, bg) # 5 magenta
+                curses.init_pair(6, 81, bg)  # 6 cyan
+                curses.init_pair(7, 15, bg)  # 7 White
             except:
                 self.app.logger.log("Enhanced colors failed to load.")
         else:
             self.app.logger.log("Enhanced colors not supported.", LOG_INFO)
-
-        # Legacy        
-        #curses.init_pair(11, curses.COLOR_BLUE, black)
-        #curses.init_pair(12, curses.COLOR_CYAN, black)
-        #curses.init_pair(13, curses.COLOR_GREEN, black)
-        #curses.init_pair(14, curses.COLOR_MAGENTA, black)
-        #curses.init_pair(15, curses.COLOR_RED, black)
-        #curses.init_pair(16, curses.COLOR_WHITE, black)
-        #curses.init_pair(17, curses.COLOR_YELLOW, black)
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
