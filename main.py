@@ -34,16 +34,6 @@ class App:
         self.global_buffer = []
         self.init_keys()
 
-        # Load core components
-        self.logger = Logger()
-        self.config = Config(self)
-        self.config.load()
-        self.ui = ui.UI(self) # Load user interface
-
-        # Load extension modules
-        self.modules = modules.ModuleLoader(self)
-        self.modules.load()
-
         # Define core operations
         self.operations = {
             "help": self.help,
@@ -62,6 +52,16 @@ class App:
             "toggle_mouse": self.toggle_mouse,
             "toggle_fullscreen": self.toggle_fullscreen,
         }
+
+        # Load core components
+        self.logger = Logger()
+        self.config = Config(self)
+        self.config.load()
+        self.ui = ui.UI(self) # Load user interface
+
+        # Load extension modules
+        self.modules = modules.ModuleLoader(self)
+        self.modules.load()
 
         # Indicate that windows etc. have been created.
         self.inited = 1
@@ -304,7 +304,10 @@ class App:
 
     def run_operation(self, operation):
         """Run an app core operation."""
-        if operation in self.operations.keys():
+        # Support arbitrary callables
+        if hasattr(operation, '__call__'):
+            operation()
+        elif operation in self.operations.keys():
             return self.operations[operation]()
         return False
 
