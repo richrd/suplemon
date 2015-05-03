@@ -105,8 +105,11 @@ I'll be happy to chat with you!
  * Alt + Page Down
    > Move line(s) down
 
- * F1, Ctrl + S
+ * Ctrl + S
    > Save current file
+ 
+ * F1
+   > Save file with new name
 
  * F2
    > Reload current file
@@ -140,8 +143,8 @@ I'll be happy to chat with you!
 
 
 ## Todo
- * [ ] Only confirm closing file if it's modified.
  * [ ] Design proper API for plugins/extensions/macros
+ * [X] Only confirm closing file if it's modified.
  * [X] Setup a IRC channel for Suplemon
  * [X] Trim command to get rid of trailing whitespace
  * [X] Lower/Upper/Reverse lettercase (todo: reverse case)
@@ -176,7 +179,7 @@ I'll be happy to chat with you!
 ## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
  * [ ] Syntax specific commenting.
  * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
- * [ ] Auto backup. Activate on n changes or every n seconds
+ * [ ] Extension: Auto backup. Activate on n changes or every n seconds
  * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
  * [ ] Custom key bindings
@@ -249,7 +252,10 @@ I'll be happy to chat with you!
  * [ ] Line objects
    * [ ] Add set_data method
    * [ ] 
-
+ * [ ] Cursor objects
+   * [ ] Methods for moving the cursor (left, right, up, down)
+   * [ ] Methods for getting cursor position
+   * [ ] Make cursor manipulation more functional
 
 
 ## Rationale

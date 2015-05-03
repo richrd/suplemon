@@ -128,9 +128,10 @@ class Viewer:
 
     def set_file_extension(self, ext):
         """Set the file extension."""
-        if ext:
-            self.file_extension = ext.lower()
-        self.setup_linelight()
+        ext = ext.lower()
+        if ext and ext != self.file_extension:
+            self.file_extension = ext
+            self.setup_linelight()
 
     def pad_lnum(self, n):
         """Pad line number with zeroes."""

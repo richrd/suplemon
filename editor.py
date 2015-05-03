@@ -330,6 +330,9 @@ class Editor(Viewer):
     def delete(self):
         """Delete the next character."""
         for cursor in self.cursors:
+            if len(self.lines)-1 < cursor.y:
+                # If we've run out of lines
+                break
             line = self.lines[cursor.y]
             if len(self.lines)>1 and cursor.x == len(line) and cursor.y != len(self.lines)-1:
                 data = self.lines[cursor.y]
@@ -426,7 +429,9 @@ class Editor(Viewer):
         cur = self.cursor()
         buffer = list(self.get_buffer())
 
-        if len(self.cursors) != 1:
+        # If we have more than one cursor
+        # Or one cursor and one line
+        if len(self.cursors) > 1 or len(buffer) == 1:
             # If the cursor count is more than the buffer length extend
             # the buffer until it's at least as long as the cursor count
             while len(buffer) < len(self.cursors):
@@ -439,6 +444,7 @@ class Editor(Viewer):
                 self.lines[cursor.y] = Line(line)
                 buffer.pop(0)
                 self.move_x_cursors(cursor.y, cursor.x-1, len(buf))
+        # If we have one cursor and multiple lines
         else:
             for buf in buffer:
                 y = cur[1]

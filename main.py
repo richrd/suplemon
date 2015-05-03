@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 import os
 import sys
@@ -60,7 +60,7 @@ class App:
             "^X": self.ask_exit,           # Ctrl + X
             554: self.prev_file,           # Ctrl + Page Up
             549: self.next_file,           # Ctrl + Page Down
-            265: self.save_file,           # F1
+            265: self.save_file_as,        # F1
             266: self.reload_file,         # F2
             272: self.toggle_mouse,        # F8
             275: self.toggle_fullscreen,   # F12
@@ -367,13 +367,9 @@ class App:
         if self.current_file == len(self.files):
             self.current_file -= 1
 
-    def save_file(self):
+    def save_file(self, file = False):
         """Save current file."""
-        f = self.get_file()
-        name = self.ui.query("Save as:", f.name)
-        if not name:
-            return False
-        f.set_name(name)
+        f = file or self.get_file()
         if f.save():
             self.set_status("Saved [" + curr_time_sec() + "] '" + f.name + "'")
             if f.path() == self.config.path():
@@ -381,6 +377,15 @@ class App:
             return True
         self.set_status("Couldn't write to '" + f.name + "'")
         return False
+
+    def save_file_as(self):
+        """Save current file."""
+        f = self.get_file()
+        name = self.ui.query("Save as:", f.name)
+        if not name:
+            return False
+        f.set_name(name)
+        return self.save_file(f)
 
     def reload_file(self):
         """Reload the current file."""
@@ -446,6 +451,8 @@ class App:
         """Create the default file."""
         file = File(self)
         file.set_editor(self.new_editor())
+        # Specify contents to avoid appearing as modified
+        file.set_data("")
         # Set markdown as the default file type
         file.editor.set_file_extension("md")
         return file
