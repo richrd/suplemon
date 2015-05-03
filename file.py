@@ -6,13 +6,15 @@ File object for storing an opened file and editor.
 import os
 import time
 
+from helpers import *
+
 class File:
     def __init__(self, app = None):
         self.app = app
         self.name = ""
         self.fpath = ""
         self.data = None
-        self.read_only = False
+        self.read_only = False # Currently unused
         self.last_save = None
         self.opened = time.time()
         self.editor = None
@@ -34,8 +36,8 @@ class File:
         parts = os.path.split(ab)
         return parts
 
-    def log(self, s):
-        self.app.logger.log(s)
+    def log(self, s, type=None):
+        self.app.logger.log(s, type)
             
     def set_name(self, name):
         """Set the file name."""
@@ -85,18 +87,46 @@ class File:
         if not read:
             return True
         path = self._path()
-        try:
-            f = open(self._path())
-            data = f.read()
-            f.close()
-        except Exception as inst:
-            self.log(type(inst))    # the exception instance
-            self.log(inst.args)     # arguments stored in .args
-            self.log(inst)          # __str__ allows args to be printed directly,
+        if not os.path.isfile(path):
+            self.log("Given path isn't a file.")
+            return False
+        data = self._read_text(path)
+        if data == False:
+            self.log("Normal file read failed.", LOG_INFO)
+            data = self._read_binary(path)
+        if data == False:
+            self.log("Fallback file read failed.", LOG_INFO)
             return False
         self.data = data
         self.editor.set_data(data)
         return True
+
+    def _read_text(self, file):
+        try:
+            f = open(self._path())
+            data = f.read()
+            f.close()
+            return data
+        except:
+            return False
+
+    def _read_binary(self, file):
+        try:
+            f = open(self._path(), "rb")
+            data = f.read()
+            f.close()
+            import chardet
+            detection = chardet.detect(data)
+            charenc = detection['encoding']
+            if charenc == None:
+                self.log("Failed to detect file encoding.")
+                return False
+            return data.decode(charenc)
+        except Exception as inst:
+            self.log(type(inst))    # the exception instance
+            self.log(inst.args)     # arguments stored in .args
+            self.log(inst)          # __str__ allows args to be printed directly,
+        return False
 
     def reload(self):
         """Reload file data."""
