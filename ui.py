@@ -112,18 +112,6 @@ class UI:
         curses.start_color()
         curses.use_default_colors()
 
-        """
-        Default Terminal Colors
-        0: Black
-        1: Red
-        2: Green
-        3: Yellow
-        4: Blue
-        5: Magenta
-        6: Cyan
-        7: White
-        """
-
         fg = -1 # Default foreground color (could also be set to curses.COLOR_WHITE)
         bg = -1 # Default background color (could also be set to curses.COLOR_BLACK)
         
@@ -131,15 +119,16 @@ class UI:
         #curses.init_pair(10, -1, -1) # Default (white on black)
         # Colors for xterm (not xterm-256color)
         # Dark Colors
-        curses.init_pair(0, curses.COLOR_BLACK, bg) # Black
-        curses.init_pair(1, curses.COLOR_RED, bg) # Red
-        curses.init_pair(2, curses.COLOR_GREEN, bg) # Green
-        curses.init_pair(3, curses.COLOR_YELLOW, bg) # Yellow
-        curses.init_pair(4, curses.COLOR_BLUE, bg) # Blue
-        curses.init_pair(5, curses.COLOR_MAGENTA, bg) # Magenta
-        curses.init_pair(6, curses.COLOR_CYAN, bg) # Cyan
+        curses.init_pair(0, curses.COLOR_BLACK, bg)      # 0 Black
+        curses.init_pair(1, curses.COLOR_RED, bg)        # 1 Red
+        curses.init_pair(2, curses.COLOR_GREEN, bg)      # 2 Green
+        curses.init_pair(3, curses.COLOR_YELLOW, bg)     # 3 Yellow
+        curses.init_pair(4, curses.COLOR_BLUE, bg)       # 4 Blue
+        curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
+        curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
         curses.init_pair(7, fg, bg) # White on Black
-
+        curses.init_pair(8, fg, bg) # White on Black (Line number color)
+        
         # Light Colors (only work on xterm-256color)
         #curses.init_pair(1, 9, bg) # Red
         #curses.init_pair(2, 10, bg) # Green
@@ -154,16 +143,15 @@ class UI:
                 # TODO: Define RGB forthese to avoid getting
                 # different results in different terminals
                 # xterm-256color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
-
-                # curses.init_color(171, 0, 1000, 0)
-                curses.init_pair(0, 242, bg) # 0 black
-                curses.init_pair(1, 204, bg) # 1 red
-                curses.init_pair(2, 119, bg) # 2 green
-                curses.init_pair(3, 221, bg) # 3 yellow
-                curses.init_pair(4, 69, bg)  # 4 blue
-                curses.init_pair(5, 171, bg) # 5 magenta
-                curses.init_pair(6, 81, bg)  # 6 cyan
+                curses.init_pair(0, 242, bg) # 0 Black
+                curses.init_pair(1, 204, bg) # 1 Red
+                curses.init_pair(2, 119, bg) # 2 Green
+                curses.init_pair(3, 221, bg) # 3 Yellow
+                curses.init_pair(4, 69, bg)  # 4 Blue
+                curses.init_pair(5, 171, bg) # 5 Magenta
+                curses.init_pair(6, 81, bg)  # 6 Cyan
                 curses.init_pair(7, 15, bg)  # 7 White
+                curses.init_pair(8, 8, bg)  # 8 Gray (Line number color)
             except:
                 self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
         else:
