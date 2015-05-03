@@ -208,11 +208,15 @@ class Viewer:
                     line_part = line_part.replace(key, char);
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
-            if self.config["show_line_colors"]:
-                self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
-            else:
-                self.window.addstr(i, x_offset, line_part)
-
+            try:
+                if self.config["show_line_colors"]:
+                    self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
+                else:
+                    self.window.addstr(i, x_offset, line_part)
+            except Exception as inst:
+                self.log(type(inst))    # the exception instance
+                self.log(inst.args)     # arguments stored in .args
+                self.log(inst)          # __str__ allows args to be printed directly,
             i += 1
         self.render_cursors()
         #self.window.refresh()
