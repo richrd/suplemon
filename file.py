@@ -29,7 +29,7 @@ class File:
 
     def parse_path(self, path):
         """Parse a relative path and return full directory and filename as a tuple."""
-        if path[:2] == "~"+os.sep:
+        if path[:2] == "~" + os.sep:
             p  = os.path.expanduser("~")
             path = os.path.join(p+os.sep, path[2:])
         ab = os.path.abspath(path)

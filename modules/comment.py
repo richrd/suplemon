@@ -4,7 +4,6 @@ from mod_base import *
 class Comment(Command):
     def init(self):
         self.bind_key("^P")
-        #self.bind_key("^K")
 
     def run(self, app, editor):
         """Comment the current line(s)."""
