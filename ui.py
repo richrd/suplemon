@@ -55,7 +55,7 @@ class InputEvent:
         # Fallback to try and handle Python < 3.3
         if type(key) == type(1): # getch fallback
             try: # Try to convert to a curses key name
-            	return str(curses.keyname(key).decode("utf-8"))
+                return str(curses.keyname(key).decode("utf-8"))
             except: # Otherwise try to convert to a character
                 try:
                     return chr(key)
