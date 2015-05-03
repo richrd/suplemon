@@ -127,7 +127,8 @@ class UI:
         curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
         curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
         curses.init_pair(7, fg, bg) # White on Black
-        curses.init_pair(8, fg, bg) # White on Black (Line number color)
+        #curses.init_pair(8, fg, bg) # White on Black (Line number color)
+        curses.init_pair(8, fg, curses.COLOR_BLACK) # White on Black (Line number color)
         
         # Light Colors (only work on xterm-256color)
         #curses.init_pair(1, 9, bg) # Red
@@ -152,6 +153,7 @@ class UI:
                 curses.init_pair(6, 81, bg)  # 6 Cyan
                 curses.init_pair(7, 15, bg)  # 7 White
                 curses.init_pair(8, 8, bg)  # 8 Gray (Line number color)
+                curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray (Line number color)
             except:
                 self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
         else:
