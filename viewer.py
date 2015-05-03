@@ -203,10 +203,13 @@ class Viewer:
             if len(line_part) >= max_len:
                 line_part = line_part[:max_len]
 
-            if self.config["show_white_space"]:
-                for key in self.config["white_space_map"].keys():
+            # Replace unsafe whitespace with normal space or visible replacement
+            # For example tab characters make cursors go out of sync with line contents
+            for key in self.config["white_space_map"].keys():
+                char = " "
+                if self.config["show_white_space"]:
                     char = self.config["white_space_map"][key]
-                    line_part = line_part.replace(key, char);
+                line_part = line_part.replace(key, char);
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
             try:
