@@ -18,20 +18,35 @@ class Cursor:
         else:
             self.x = x
             self.y = y
+
+    def get_x(self):
+        return x
+        
+    def get_y(self):
+        return y
+        
+    def set_x(self, x):
+        self.x = x
+        
+    def set_y(self, y):
+        self.y = y
         
     def __getitem__(self, i):
+        # TODO: Deprecate in favor of proper access methods.
         """Get coordinates with list indices."""
         if i == 0:
             return self.x
         elif i == 1:
             return self.y
 
-    def __setitem__(self, i, v):
-        """Set coordinates with list indices."""
-        if i == 0:
-            self.x = v
-        elif i == 1:
-            self.y = v
+    # Deprecated
+    #def __setitem__(self, i, v):
+    #    # TODO: Deprecate in favor of proper access methods.
+    #    """Set coordinates with list indices."""
+    #    if i == 0:
+    #        self.x = v
+    #    elif i == 1:
+    #        self.y = v
 
     def __eq__(self, item):
         """Check for equality."""
@@ -49,4 +64,3 @@ class Cursor:
     def tuple(self):
         """Return cursor as a tuple."""
         return (self.x, self.y)
-
