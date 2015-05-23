@@ -32,6 +32,7 @@ class App:
         self.status_msg = ""
         self.last_input = None
         self.global_buffer = []
+        self.event_bindings = {}
         self.init_keys()
 
         # Define core operations
@@ -70,10 +71,6 @@ class App:
     def init_keys(self):
         # Reserving this for future use
         pass
-
-    def set_key_binding(self, key, operation):
-        """Bind a key to an operation."""
-        self.get_key_bindings()[key] = operation
 
     def log(self, text, log_type=LOG_ERROR):
         """Add text to the log buffer."""
@@ -126,10 +123,6 @@ class App:
                 self.get_editor().resize()
                 self.ui.refresh()
 
-    def set_status(self, s):
-        """Set the status message."""
-        self.status_msg = str(s)
-
     def get_status(self):
         """Set the status message."""
         return self.status_msg
@@ -139,7 +132,28 @@ class App:
         return self.files.index(file_obj)
     
     def get_key_bindings(self):
+        """Returns the list of key bindings."""
         return self.config["app"]["keys"]
+
+    def get_event_bindings(self):
+        """Returns the dict of event bindings."""
+        return self.event_bindings
+
+    def set_key_binding(self, key, operation):
+        """Bind a key to an operation."""
+        self.get_key_bindings()[key] = operation
+
+    def set_event_binding(self, event, callback):
+        """Bind a key to an operatio n."""
+        event_bindings = self.get_event_bindings()
+        if event in event_bindings.keys():
+            event_bindings[event].append(callback)
+        else:
+            event_bindings[event] = [callback]
+
+    def set_status(self, s):
+        """Set the status message."""
+        self.status_msg = str(s)
 
     def unsaved_changes(self):
         """Check if there are unsaved changes in any file."""
@@ -313,8 +327,23 @@ class App:
         if hasattr(operation, '__call__'):
             operation()
         elif operation in self.operations.keys():
-            return self.operations[operation]()
+            cancel = self.trigger_event(operation)
+            if not cancel:
+                result = self.operations[operation]()
+                return result
         return False
+
+    def trigger_event(self, event):
+        """Triggers event and runs registered callbacks."""
+        status = False
+        bindings = self.get_event_bindings()
+        if event in bindings.keys():
+            callbacks = bindings[event]
+            for cb in callbacks:
+                val = cb(event)
+                if val:
+                    status = True
+        return status
 
     def toggle_fullscreen(self):
         """Toggle full screen editor."""
