@@ -147,6 +147,9 @@ I'll be happy to chat with you!
  * [ ] Design proper API for plugins/extensions/macros
  * [ ] Documentation for v 1.0.0
  * [ ] Package Suplemon and upload to PIP
+ * [ ] Auto complete
+ * [X] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
+ * [X] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [X] Only confirm closing file if it's modified.
  * [X] Setup a IRC channel for Suplemon
  * [X] Trim command to get rid of trailing whitespace
@@ -182,9 +185,6 @@ I'll be happy to chat with you!
  * [X] Custom key bindings
 
 ## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
- * [ ] Add option to change ESCDELAY (function keys aren't detected on slow connections)
- * [ ] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
- * [ ] Auto complete
  * [ ] Selections
  * [ ] Proper syntax higlighting
  * [ ] Default to legendary Monokai colors 
@@ -250,7 +250,7 @@ I'll be happy to chat with you!
  * [ ] 
  * [ ] Editor
    * [X] Define core editing operations
-   * [ ] Make core editing operations overidable by extensions
+   * [X] Make core editing operations overidable by extensions
  * [ ] Line objects
    * [X] Add set_data method
    * [X] Add get_data method
@@ -258,6 +258,10 @@ I'll be happy to chat with you!
    * [ ] Methods for moving the cursor (left, right, up, down)
    * [ ] Methods for getting cursor position
    * [ ] Make cursor manipulation more functional
+ * [ ] Extensions
+   * [ ] Allow extensions to be run at a desired interval
+   * [ ] Implement events that can be hookend onto
+    
 
 ## Rationale
 For many the command line is a different environment for text editing.
