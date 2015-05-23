@@ -14,10 +14,6 @@ class ReplaceAll(Command):
             return False
         for file in app.get_files():
             file.editor.replace_all(r_from, r_to)
-        #line_nums = editor.get_lines_with_cursors()
-        #for n in line_nums:
-            #line = editor.lines[n]
-            #line.data = line.data.rstrip()
 
 module = {
     "class": ReplaceAll,
