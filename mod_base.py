@@ -12,9 +12,16 @@ class Command:
     def init(self):
         pass
 
+    def log(self, data):
+        self.app.log(data)
+
     def bind_key(self, key):
         """Shortcut for binding run method to a key."""
         self.app.set_key_binding(key, self._proxy_run)
+        
+    def bind_event(self, event, callback):
+        """Binding a method to an event."""
+        self.app.set_event_binding(event, callback)
         
     def _proxy_run(self):
         self.run(self.app, self.app.get_editor())
