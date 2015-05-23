@@ -330,6 +330,7 @@ class Editor(Viewer):
         self.move_cursors()
 
     def replace_all(self, what, replacement):
+        """Replaces what with replacement on each line."""
         for line in self.lines:
             data = line.get_data()
             new = data.replace(what, replacement)
@@ -501,8 +502,7 @@ class Editor(Viewer):
         """Indent lines."""
         # Add a restore point if previous action != tab
         self.store_action_state("tab")
-        for i in range(self.config["tab_width"]):
-            self.type(" ")
+        self.type(" "*self.config["tab_width"])
 
     def untab(self):
         """Unindent lines."""
@@ -545,18 +545,22 @@ class Editor(Viewer):
         self.set_buffer(cut_buffer[::-1])
         self.store_action_state("cut")
 
-    def type(self, letter):
-        """Insert a character."""
+    def type(self, data):
+        """Insert data at each cursor position."""
         for cursor in self.cursors:
-            line = self.lines[cursor.y]
-            start = line[:cursor.x]
-            end = line[cursor.x:]
-            self.lines[cursor.y] = Line(start + letter + end)
-            self.move_x_cursors(cursor.y, cursor.x, 1)
-            cursor.x += 1
+            self.type_at_cursor(cursor, data)
         self.move_cursors()
         # Add a restore point if previous action != type
         self.store_action_state("type")
+
+    def type_at_cursor(self, cursor, data):
+        """Insert data at specified cursor."""
+        line = self.lines[cursor.y]
+        start = line[:cursor.x]
+        end = line[cursor.x:]
+        self.lines[cursor.y] = Line(start + data + end)
+        self.move_x_cursors(cursor.y, cursor.x, len(data))
+        cursor.x += len(data)
 
     def go_to_pos(self, line_no, col = 0):
         """Move primary cursor to line_no, col=0."""
@@ -696,5 +700,8 @@ class Editor(Viewer):
     def run_operation(self, operation):
         """Run an editor core operation."""
         if operation in self.operations.keys():
-            return self.operations[operation]()
+            cancel = self.app.trigger_event(operation)
+            if not cancel:
+                result = self.operations[operation]()
+                return result
         return False
