@@ -317,9 +317,11 @@ class App:
         if display["show_top_bar"]:
             display["show_top_bar"] = 0
             display["show_bottom_bar"] = 0
+            display["show_legend"] = 0
         else:
             display["show_top_bar"] = 1
             display["show_bottom_bar"] = 1
+            display["show_legend"] = 1
         # Virtual curses windows need to be resized
         self.ui.resize()
 
