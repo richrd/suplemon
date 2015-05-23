@@ -329,6 +329,13 @@ class Editor(Viewer):
             cursor.x = len(self.lines[cursor.y])
         self.move_cursors()
 
+    def replace_all(self, what, replacement):
+        for line in self.lines:
+            data = line.get_data()
+            new = data.replace(what, replacement)
+            line.set_data(new)
+        self.move_cursors()
+
     def delete(self):
         """Delete the next character."""
         for cursor in self.cursors:

@@ -280,11 +280,19 @@ class Viewer:
         cur = self.cursor() # Main cursor
         size = self.size()
         offset = self.line_offset()
-        if len(self.cursors) == 1:
-            if cur.y - self.y_scroll >= size[1]:
-                self.y_scroll = cur.y - size[1]+1
-            elif cur.y - self.y_scroll < 0:
-                self.y_scroll = cur.y
+
+        # Check if cursors moved vertically and scroll if necessary
+        if delta:
+            if delta[1] > 0:
+                if self.cursors[-1].y - self.y_scroll >= size[1]:
+                    # Scroll down
+                    self.y_scroll = self.cursors[-1].y - size[1]+1
+            elif delta[1] < 0:
+                if cur.y - self.y_scroll < 0:
+                    # Scroll up
+                    self.y_scroll = cur.y
+
+        # Check if we should scroll horizontally
         if cur.x - self.x_scroll+offset > size[0] - 1:
             # -1 to allow space for cursor at line end
             self.x_scroll = len(self.lines[cur.y]) - size[0]+offset+1
