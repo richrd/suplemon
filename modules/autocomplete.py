@@ -8,12 +8,17 @@ class AutoComplete(Command):
         self.bind_event("tab", self.auto_complete)
         self.bind_event("save_file", self.build_word_list)
 
+    def get_separators(self):
+        separators = self.app.config["editor"]["punctuation"]
+        separators = separators.replace("_", "")
+        return separators
+
     def build_word_list(self, *args):
         """Build word list based on contents of open files."""
         word_list = []
         for file in self.app.files:            
             data = file.get_editor().get_data()
-            words = multisplit(data, self.app.config["editor"]["punctuation"])
+            words = multisplit(data, self.get_separators())
             for word in words:
                 # Discard undesired whitespace
                 word = word.strip()
@@ -51,7 +56,7 @@ class AutoComplete(Command):
     def auto_complete(self, *args):
         """Attempt to autocomplete at each cursor position."""
         editor = self.app.get_editor()
-        pattern = '|'.join(map(re.escape, self.app.config["editor"]["punctuation"]))
+        pattern = '|'.join(map(re.escape, self.get_separators()))
         matched = False
         for cursor in editor.cursors:
             line = editor.lines[cursor.y][:cursor.x]
