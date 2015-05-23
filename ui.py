@@ -271,7 +271,9 @@ class UI:
         file_list = files[curr_file_index:] + files[:curr_file_index]
         str_list = []
         for f in file_list:
-            fname = f.name + (["", "*"][f.is_changed()])
+            prepend = ["!", ""][f.is_writable()]
+            append = ["", "*"][f.is_changed()]
+            fname = prepend + f.name + append
             if not str_list:
                 str_list.append("[" + fname + "]")
             else:
