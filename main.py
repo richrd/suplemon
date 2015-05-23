@@ -58,6 +58,7 @@ class App:
         self.config = Config(self)
         self.config.load()
         self.ui = ui.UI(self) # Load user interface
+        self.ui.init()
 
         # Load extension modules
         self.modules = modules.ModuleLoader(self)
@@ -80,10 +81,10 @@ class App:
 
     def load(self):
         """Load the app."""
+        self.ui.load()
         if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
             self.log("Running Suplemon with Python "+ver+" which isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
-        self.ui.load()
         self.load_files()
         loaded = True
 
@@ -91,7 +92,11 @@ class App:
         """Stop the main loop and exit."""
         self.running = 0
 
-    def run(self):
+    def init(self):
+        """Run the app via the ui wrapper."""
+        self.ui.run(self.run)
+
+    def run(self, *args):
         """Run the app."""
         # Load ui and files etc
         self.load()
@@ -479,15 +484,10 @@ class App:
         file.editor.set_file_extension("md")
         return file
 
-
-def main(*args):
-    global app
-    app = App()
-    app.run()
-
 if __name__ == "__main__":
     """Only run the app if it's run directly (not imported)."""
-    ui.wrapper(main)
+    app = App()
+    app.init()
     # Output log info
     if app.config["app"]["debug"]:
         app.logger.output()

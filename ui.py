@@ -7,18 +7,6 @@ import os
 
 from helpers import *
 
-def wrapper(func):
-    global curses
-
-    # Force enabling colors
-    #os.environ["TERM"] = "xterm-256color"
-    # Reduce ESC detection time to 100ms
-    os.environ["ESCDELAY"] = "100"
-    # Now import curses
-    import curses
-    import curses.textpad
-    curses.wrapper(func)
-
 class InputEvent:
     """Represents a keyboard or mouse event."""
     def __init__(self):
@@ -76,9 +64,22 @@ class UI:
     def __init__(self, app):
         self.app = app
         self.warned_old_curses = 0
+
+    def init(self):
+        """Set ESC delay and then import curses."""
+        global curses
+        # Set ESC detection time
+        os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
+        # Now import curses, otherwise ESCDELAY won't have any effect
+        import curses
+        import curses.textpad
+
+    def run(self, func):
+        """Run the application main function via the curses wrapper for safety."""
+        curses.wrapper(func)
         
-    def load(self):
-        """Load an setup curses."""
+    def load(self, *args):
+        """Setup curses."""
         # Log the terminal type
         self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), LOG_INFO)
 
