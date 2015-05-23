@@ -14,7 +14,6 @@ def wrapper(func):
     #os.environ["TERM"] = "xterm-256color"
     # Reduce ESC detection time to 100ms
     os.environ["ESCDELAY"] = "100"
-
     # Now import curses
     import curses
     import curses.textpad
@@ -76,7 +75,8 @@ class InputEvent:
 class UI:
     def __init__(self, app):
         self.app = app
-       
+        self.warned_old_curses = 0
+        
     def load(self):
         """Load an setup curses."""
         # Log the terminal type
@@ -167,7 +167,10 @@ class UI:
         
         # Test for new curses
         if not "get_wch" in dir(self.header_win):
-            self.app.log("Using old curses! Some keys and special characters might not work.", LOG_WARNING)
+            # Notify only once
+            if not self.warned_old_curses:
+                self.app.log("Using old curses! Some keys and special characters might not work.", LOG_WARNING)
+                self.warned_old_curses = 1
             
         y_sub = 0
         y_start = 0
@@ -365,10 +368,12 @@ class UI:
         return out
 
     def query(self, text, initial=""):
+        """Get a single line input string from the user."""
         result = self._query(text, initial)
         return result
 
     def query_bool(self, text, default = False):
+        """Get a boolean from the user."""
         indicator = "[y/N]"
         initial = ""
         if default:
