@@ -87,7 +87,11 @@ class UI:
 
         curses.cbreak()
         curses.noecho()
-        curses.curs_set(0)
+        try:
+            # Might fail on vt100 terminal emulators
+            curses.curs_set(0)
+        except:
+            self.app.log("curses.curs_set(0) failed!", LOG_WARNING)
 
         self.screen.keypad(1)
 
@@ -110,7 +114,11 @@ class UI:
     def setup_colors(self):
         """Initialize color support and define colors."""
         curses.start_color()
-        curses.use_default_colors()
+        try:
+            curses.use_default_colors()
+        except:
+            self.app.logger.log("Failed to load curses default colors. You could try 'export TERM=xterm-256color'.")
+            return False
 
         fg = -1 # Default foreground color (could also be set to curses.COLOR_WHITE)
         bg = -1 # Default background color (could also be set to curses.COLOR_BLACK)
