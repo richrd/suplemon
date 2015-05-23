@@ -30,6 +30,31 @@ class Cursor:
         
     def set_y(self, y):
         self.y = y
+
+    def move_left(self, delta):
+        """Move the cursor left with delta."""
+        self.x -= delta
+        if self.x < 0:
+            self.x = 0
+        return
+
+    def move_right(self, delta):
+        """Move the cursor right with delta."""
+        self.x += delta
+        return
+
+    def move_up(self, delta):
+        """Move the cursor up with delta."""
+        self.y -= 1
+        if self.y < 0:
+            self.y = 0
+        return
+
+    def move_down(self, delta):
+        """Move the cursor down with delta."""
+        self.y += delta
+        return
+
         
     def __getitem__(self, i):
         # TODO: Deprecate in favor of proper access methods.
