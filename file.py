@@ -38,7 +38,11 @@ class File:
 
     def log(self, s, type=None):
         self.app.logger.log(s, type)
-            
+
+    def get_name(self):
+        """Get the file name."""
+        return self.name
+
     def set_name(self, name):
         """Set the file name."""
         # TODO: sanitize

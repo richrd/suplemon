@@ -390,6 +390,8 @@ class App:
     def save_file(self, file = False):
         """Save current file."""
         f = file or self.get_file()
+        if not f.get_name():
+            return self.save_file_as(f)
         if f.save():
             self.set_status("Saved [" + curr_time_sec() + "] '" + f.name + "'")
             if f.path() == self.config.path():
@@ -398,9 +400,9 @@ class App:
         self.set_status("Couldn't write to '" + f.name + "'")
         return False
 
-    def save_file_as(self):
+    def save_file_as(self, file = False):
         """Save current file."""
-        f = self.get_file()
+        f = file or self.get_file()
         name = self.ui.query("Save as:", f.name)
         if not name:
             return False
