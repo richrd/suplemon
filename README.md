@@ -46,6 +46,7 @@ Suplemon is licensed under the MIT license.
 ## Features
  * Terminal text editing with style
  * Proper multi cursor editing, Sublime Text style. Blessed!
+ * Autocomplete
  * Easy Undo/Redo
  * Multiple files in tabs
  * Powerful Go To feature for jumping to files and lines
