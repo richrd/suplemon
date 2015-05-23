@@ -33,8 +33,10 @@ class Config:
                     "^K": "close_file",         # Ctrl + K
                     "^N": "new_file",           # Ctrl + N
                     "^X": "ask_exit",           # Ctrl + X
-                    554: "prev_file",           # Ctrl + Page Up
-                    549: "next_file",           # Ctrl + Page Down
+                    554: "next_file",           # Ctrl + Page Up
+                    549: "prev_file",           # Ctrl + Page Down
+                    "kNXT5": "next_file",       # Ctrl + Page Up
+                    "kPRV5": "prev_file",       # Ctrl + Page Down
                     265: "save_file_as",        # F1
                     266: "reload_file",         # F2
                     272: "toggle_mouse",        # F8
@@ -65,7 +67,6 @@ class Config:
                     "\u00AD": "\u2423",   # Soft hyphen as letter shelf
                     "\u200B": "\u00B7"    # Zero width space as interpunct
                 },
-                #"white_space": " ",
                 # Wether to visually show white space chars
                 "show_white_space": False,
                 "show_line_nums": True,
@@ -78,19 +79,31 @@ class Config:
                 "regex_find": False,
                 # Key bindings for editor functions
                 "keys": {
+                    curses.KEY_UP: "arrow_up",            # Up
+                    curses.KEY_DOWN: "arrow_down",        # Down
+                    curses.KEY_LEFT: "arrow_left",        # Left
+                    curses.KEY_RIGHT: "arrow_right",      # Right
+                    curses.KEY_ENTER: "enter",            # Enter
+                    "\n": "enter",                        # Enter
+                    "^J": "enter",                        # Enter (fallback for 'getch')
+                    curses.KEY_BACKSPACE: "backspace",    # Backspace
+                    "^?": "backspace",                    # Backspace (fix for Mac)
+                    curses.KEY_DC: "delete",              # Delete
+                    331: "insert",                        # Insert
+                    "\t": "tab",                          # Tab
+                    "^I": "tab",                          # Tab
+                    353: "untab",                         # Shift + Tab
                     curses.KEY_HOME: "home",              # Home
                     curses.KEY_END: "end",                # End
-                    curses.KEY_BACKSPACE: "backspace",    # Backspace
-                    curses.KEY_DC: "delete",              # Delete
-                    curses.KEY_ENTER: "enter",            # Enter
-                    curses.KEY_RIGHT: "arrow_right",      # Arrow Right
-                    curses.KEY_LEFT: "arrow_left",        # Arrow Left
-                    curses.KEY_UP: "arrow_up",            # Arrow Up
-                    curses.KEY_DOWN: "arrow_down",        # Arrow Down
+                    "^[": "escape",                       # Escape
                     563: "new_cursor_up",                 # Alt + Up
                     522: "new_cursor_down",               # Alt + Down
                     542: "new_cursor_left",               # Alt + Left
                     557: "new_cursor_right",              # Alt + Right
+                    "kUP3": "new_cursor_up",              # Alt + Up
+                    "kDN3": "new_cursor_down",            # Alt + Down
+                    "kLFT5": "jump_left",                 # Ctrl + Left
+                    "kRIT5": "jump_right",                # Ctrl + Right
                     curses.KEY_NPAGE: "page_up",          # Page Up
                     curses.KEY_PPAGE: "page_down",        # Page Down
                     552: "push_up",                       # Alt + Page Up
@@ -100,22 +113,15 @@ class Config:
                     273: "toggle_line_nums",              # F9
                     274: "toggle_line_ends",              # F10
                     275: "toggle_highlight",              # F11
-                    331: "insert",                        # Insert
                     "^C": "cut",                          # Ctrl + C
                     "^W": "duplicate_line",               # Ctrl + W
                     "^V": "insert",                       # Ctrl + V
                     "^D": "find_next",                    # Ctrl + D
                     "^A": "find_all",                     # Ctrl + A
-                    "^?": "backspace",                    # Backspace (fix for Mac)
                     544: "jump_left",                     # Ctrl + Left
                     559: "jump_right",                    # Ctrl + Right
                     565: "jump_up",                       # Ctrl + Up
                     524: "jump_down",                     # Ctrl + Down
-                    "^J": "enter",                        # Enter (fallback for 'getch')
-                    "\t": "tab",                          # Tab
-                    353: "untab",                         # Shift + Tab
-                    "\n": "enter",                        # Enter
-                    "^[": "escape",                       # Escape
                 }
             },
             "display": {
