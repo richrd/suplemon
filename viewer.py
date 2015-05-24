@@ -1,6 +1,6 @@
 #-*- encoding: utf-8
 """
-Text Viewer component subclassed by Editor.
+Text viewer component subclassed by Editor.
 """
 
 import os
@@ -23,6 +23,7 @@ class Viewer:
         self.lines = [Line()]
         self.file_extension = ""
         
+        # Map special extensions to generic ones for highlighting
         self.extension_map = {
             "scss": "css",
         }
@@ -34,13 +35,8 @@ class Viewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
-        #self.linelighter = lambda line: 0 # Dummy linelighter returns default color
         self.syntax = None
         self.setup_linelight()
-
-    def set_config(self, config):
-        self.config = config
-        self.set_cursor(self.config["cursor"])
 
     def setup_linelight(self):
         """Setup line based highlighting."""
@@ -68,8 +64,6 @@ class Viewer:
         if not module or not "Syntax" in dir(module):
             self.app.log("File doesn't match API!")
             return False
-            
-        #self.linelighter = mod.parse
         self.syntax = module.Syntax()
 
     def size(self):
@@ -99,7 +93,7 @@ class Viewer:
         """Set editor data or contents."""
         self.data = data
         self.lines = []
-        lines = self.data.split("\n")
+        lines = self.data.split(self.config["end_of_line"])
         for line in lines:
             self.lines.append(Line(line))
 
@@ -111,13 +105,22 @@ class Viewer:
             if type(line) == type(""):
                 str_lines.append(line)
             else:
-                str_lines.append(line.data)
-        #data = u"\n".join(str_lines)
-        data = str("\n".join(str_lines))
+                str_lines.append(line.get_data())
+        data = str(self.config["end_of_line"].join(str_lines))
         return data
 
+    def set_config(self, config):
+        """Set the viewer configuration dict."""
+        self.config = config
+        self.set_cursor(self.config["cursor"])
+
     def set_cursor(self, cursor):
-        """Set cursor style."""
+        # TODO: Rename to set_cursor_style
+        """Set cursor style.
+
+        Args:
+            cursor: String containing either 'underline' or 'reverse'.
+        """
         if cursor == "underline":
             self.cursor_style = curses.A_UNDERLINE
         elif cursor == "reverse":
@@ -125,6 +128,10 @@ class Viewer:
         else:
             return False
         return True
+
+    def set_single_cursor(self, cursor):
+        """Discard all cursors and place a new one."""
+        self.cursors = [Cursor(cursor)]
 
     def set_file_extension(self, ext):
         """Set the file extension."""
@@ -173,27 +180,22 @@ class Viewer:
         """Toggle syntax highlighting."""
         return False
 
-    def set_single_cursor(self, cursor):
-        """Discard all cursors and place a new one."""
-        self.cursors = [Cursor(cursor)]
-
     def render(self):
         """Render the editor curses window."""
         self.window.clear()
-        #self.window.erase()
         max_y = self.size()[1]
         i = 0
         x_offset = self.line_offset()
         max_len = self.max_line_length()
+        # Iterate through visible lines
         while i < max_y:
             lnum = i + self.y_scroll
             if lnum >= len(self.lines): # Make sure we have a line to show
                 break
-
+            
+            # Get line for current row
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
-                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(1))
-                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(7))
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(8))
 
             # Normal rendering
@@ -201,6 +203,7 @@ class Viewer:
             if self.show_line_ends:
                 line_part += self.config["line_end_char"]
             if len(line_part) >= max_len:
+                # Clamp line length to view width
                 line_part = line_part[:max_len]
 
             # Replace unsafe whitespace with normal space or visible replacement
@@ -210,6 +213,7 @@ class Viewer:
                 if self.config["show_white_space"]:
                     char = self.config["white_space_map"][key]
                 line_part = line_part.replace(key, char);
+            # Use unicode support on Python 3.3 and higher
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
             try:
@@ -223,7 +227,6 @@ class Viewer:
                 self.log(inst)          # __str__ allows args to be printed directly,
             i += 1
         self.render_cursors()
-        #self.window.refresh()
 
     def render_cursors(self):
         """Render editor window cursors."""
@@ -385,7 +388,7 @@ class Viewer:
         ref = []
         for cursor in self.cursors:
             if not cursor.tuple() in ref:
-                ref.append( cursor.tuple() )
+                ref.append(cursor.tuple())
                 new.append(cursor)
         self.cursors = new
         self.render()
