@@ -1,3 +1,4 @@
+#-*- encoding:utf-8
 import re
 
 from mod_base import *
@@ -6,10 +7,12 @@ class AutoComplete(Command):
     def init(self):
         self.word_list = []
         self.bind_event("tab", self.auto_complete)
+        self.bind_event("app_loaded", self.build_word_list)
         self.bind_event("save_file", self.build_word_list)
 
     def get_separators(self):
         separators = self.app.config["editor"]["punctuation"]
+        # Support words with underscores
         separators = separators.replace("_", "")
         return separators
 
