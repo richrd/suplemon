@@ -1,6 +1,6 @@
 #-*- encoding: utf-8
 """
-Editor class for handling, well, editing.
+Editor class for extending viewer with text editing features.
 """
 
 import os
@@ -44,6 +44,12 @@ class State:
 class Editor(Viewer):
     """Extends Viewer with editing capabilities."""
     def __init__(self, app, window):
+        """Initialize the editor.
+
+        Args:
+            app: The Suplemon main instance.
+            window: A window object to use for the ui.
+        """
         Viewer.__init__(self, app, window)
         self.buffer = []               # Copy/paste buffer
         self.last_find = ""            # Last search used in 'find'
@@ -93,15 +99,21 @@ class Editor(Viewer):
         }
 
     def get_buffer(self):
+        """Returns the current buffer.
+        
+        Returns the local buffer or the global buffer depending on config.
+        """
         if self.app.config["editor"]["use_global_buffer"]:
             return self.app.global_buffer
         else:
             return self.buffer
 
     def get_key_bindings(self):
+        """Get list of editor key bindings."""
         return self.config["keys"]
 
     def set_buffer(self, buffer):
+        """Sets local or global buffer depending on config."""
         if self.app.config["editor"]["use_global_buffer"]:
             self.app.global_buffer = buffer
         else:
@@ -406,7 +418,7 @@ class Editor(Viewer):
         self.store_action_state("backspace")
 
     def enter(self):
-        """Insert a new line."""
+        """Insert a new line at each cursor."""
         # We sort the cursors, and loop through them from last to first
         # That way we avoid messing with the relative positions of the higher cursors
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
@@ -476,8 +488,7 @@ class Editor(Viewer):
             old = self.lines[cursor.y-1]
             self.lines[cursor.y-1] = Line(self.lines[cursor.y])
             self.lines[cursor.y] = Line(old)
-            cursor.y -= 1
-        self.move_cursors()
+        self.move_cursors((0, -1))
         # Add a restore point if previous action != push_up
         self.store_action_state("push_up")
             
@@ -493,8 +504,7 @@ class Editor(Viewer):
             old = self.lines[cursor.y+1]
             self.lines[cursor.y+1] = Line(self.lines[cursor.y])
             self.lines[cursor.y] = Line(old)
-            cursor.y += 1
-        self.move_cursors()
+        self.move_cursors((0, 1))
         # Add a restore point if previous action != push_down
         self.store_action_state("push_down")
 
