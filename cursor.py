@@ -31,26 +31,26 @@ class Cursor:
     def set_y(self, y):
         self.y = y
 
-    def move_left(self, delta):
+    def move_left(self, delta=1):
         """Move the cursor left with delta."""
         self.x -= delta
         if self.x < 0:
             self.x = 0
         return
 
-    def move_right(self, delta):
+    def move_right(self, delta=1):
         """Move the cursor right with delta."""
         self.x += delta
         return
 
-    def move_up(self, delta):
+    def move_up(self, delta=1):
         """Move the cursor up with delta."""
         self.y -= 1
         if self.y < 0:
             self.y = 0
         return
 
-    def move_down(self, delta):
+    def move_down(self, delta=1):
         """Move the cursor down with delta."""
         self.y += delta
         return
