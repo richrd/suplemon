@@ -148,7 +148,7 @@ I'll be happy to chat with you!
  * [ ] Design proper API for plugins/extensions/macros
  * [ ] Documentation for v 1.0.0
  * [ ] Package Suplemon and upload to PIP
- * [ ] Auto complete
+ * [X] Auto complete
  * [X] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
  * [X] Add option to change ESCDELAY (function keys aren't detected on slow connections)
  * [X] Only confirm closing file if it's modified.
