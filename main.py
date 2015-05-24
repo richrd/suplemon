@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #-*- encoding: utf-8
+
 """
 The main class that starts and runs Suplemon.
 """
@@ -33,7 +34,6 @@ class App:
         self.last_input = None
         self.global_buffer = []
         self.event_bindings = {}
-        self.init_keys()
 
         # Define core operations
         self.operations = {
@@ -68,13 +68,29 @@ class App:
         # Indicate that windows etc. have been created.
         self.inited = 1
 
-    def init_keys(self):
-        # Reserving this for future use
-        pass
-
     def log(self, text, log_type=LOG_ERROR):
         """Add text to the log buffer."""
         self.logger.log(text, log_type)
+
+    def init(self):
+        """Run the app via the ui wrapper."""
+        self.ui.run(self.run)
+
+    def exit(self):
+        """Stop the main loop and exit."""
+        self.running = 0
+
+    def run(self, *args):
+        """Run the app."""
+        # Load ui and files etc
+        self.load()
+        # Initial render
+        self.get_editor().resize()
+        self.ui.refresh()
+        # Start mainloop
+        self.main_loop()
+        # Unload ui
+        self.ui.unload()
 
     def load(self):
         """Load the app."""
@@ -83,28 +99,8 @@ class App:
             ver = ".".join(map(str, sys.version_info[0:2]))
             self.log("Running Suplemon with Python "+ver+" which isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
         self.load_files()
-        loaded = True
-
-    def exit(self):
-        """Stop the main loop and exit."""
-        self.running = 0
-
-    def init(self):
-        """Run the app via the ui wrapper."""
-        self.ui.run(self.run)
-
-    def run(self, *args):
-        """Run the app."""
-        # Load ui and files etc
-        self.load()
         self.running = 1
-        # Initial render
-        self.get_editor().resize()
-        self.ui.refresh()
-        # Start mainloop
-        self.main_loop()
-        # Unload ui
-        self.ui.unload()
+        self.trigger_event("app_loaded")
 
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
