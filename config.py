@@ -46,6 +46,8 @@ class Config:
             "editor": {
                 # Indent new lines to same level as previous line
                 "auto_indent_newline": True,
+                # Character to use for end of line
+                "end_of_line": "\n",
                 # Unindent with backspace
                 "backspace_unindent": True,
                 # Cursor style. 'reverse' or 'underline'
