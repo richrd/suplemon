@@ -1,9 +1,9 @@
+#-*- coding:utf-8
 from mod_base import *
 
 class ReplaceAll(Command):
     def init(self):
         pass
-        #sel f.bind_key("kEND7") # Used to bind a key to the run-method
 
     def run(self, app, editor):
         r_from = self.app.ui.query("Replace text:")
