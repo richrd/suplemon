@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 #-*- encoding: utf-8
 
 """
@@ -21,7 +20,13 @@ from editor import *
 from file import *
 
 class App:
-    def __init__(self):
+    def __init__(self, filenames=None):
+        """
+        Handle App initialization
+
+        :param list filenames: Names of files to load initially
+        :param str filenames[*]: Path to a file to load
+        """
         self.version = __version__
         self.inited = 0
         self.running = 0
@@ -64,6 +69,9 @@ class App:
         # Load extension modules
         self.modules = modules.ModuleLoader(self)
         self.modules.load()
+
+        # Save filenames for later
+        self.filenames = filenames
 
         # Indicate that windows etc. have been created.
         self.inited = 1
@@ -474,10 +482,8 @@ class App:
 
     def load_files(self):
         """Try to load all files specified in arguments."""
-        #TODO: Maybe use argparse for this
-        if len(sys.argv) > 1:
-            names = sys.argv[1:]
-            for name in names:
+        if self.filenames:
+            for name in self.filenames:
                 if self.file_is_open(name): continue
                 if self.open_file(name):
                     loaded = True
@@ -507,11 +513,3 @@ class App:
         # Set markdown as the default file type
         file.editor.set_file_extension("md")
         return file
-
-if __name__ == "__main__":
-    """Only run the app if it's run directly (not imported)."""
-    app = App()
-    app.init()
-    # Output log info
-    if app.config["app"]["debug"]:
-        app.logger.output()
