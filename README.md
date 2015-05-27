@@ -29,7 +29,7 @@ No dependencies outside the Python Standard Library needed.
 
 ## Usage
 
-    python3 main.py [filename]...
+    python3 cli.py [filename]...
 
 **Must use Python 3.3 for proper character encoding support.**
 
