@@ -1,17 +1,18 @@
 import os
 import time
+import subprocess
 
 from mod_base import *
  
 class Battery(Command):
     def init(self):
-        self.last_value = None
+        self.last_value = -1
         self.checked = time.time()
-        self.interval = 30
+        self.interval = 10
 
     def value(self):
         """Get the battery charge percent and cache it."""
-        if self.last_value == None:
+        if self.last_value == -1:
             state = self.battery_status()
         elif time.time()-self.checked > self.interval:
             state = self.battery_status()
@@ -36,12 +37,17 @@ class Battery(Command):
 
     def battery_status(self):
         """Attempts to get the battery charge percent."""
-        val = self.battery_status_read()
-        if val != None:
-            return val
-        else:
-            val = self.battery_status_acpi()
-        return val
+        value = None
+        methods = [
+            self.battery_status_read,
+            self.battery_status_acpi,
+            self.battery_status_upower
+        ]
+        for m in methods:
+            value = m()
+            if value != None:
+                break
+        return value
         
     def battery_status_read(self):
         try:
@@ -58,11 +64,19 @@ class Battery(Command):
 
     def battery_status_acpi(self):
         try:
-            raw_str = os.popen("acpi").read()
+            raw_str = subprocess.check_output(["acpi"])
         except:
             return None
         part = get_string_between(",", "%", raw_str)
         return int(part)
+
+    def battery_status_upower(self):
+        try:
+            raw_str = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT0"])
+        except:
+            return None
+        part = get_string_between("percentage:", "%", raw_str)
+        return int(part.strip())
 
     def readf(self, path):
         f = open(path)
