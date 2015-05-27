@@ -75,6 +75,7 @@ class Battery(Command):
             raw_str = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT0"])
         except:
             return None
+        raw_str = raw_str.decode("utf-8")
         part = get_string_between("percentage:", "%", raw_str)
         return int(part.strip())
 
