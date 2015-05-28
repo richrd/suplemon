@@ -67,7 +67,8 @@ class Battery(Command):
             raw_str = subprocess.check_output(["acpi"])
         except:
             return None
-        part = get_string_between(",", "%", raw_str)
+        raw_str = raw_str.decode("utf-8")
+        part = get_string_between(",", "%", raw_str)	
         return int(part)
 
     def battery_status_upower(self):
