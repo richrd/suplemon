@@ -422,7 +422,7 @@ class Editor(Viewer):
         # We sort the cursors, and loop through them from last to first
         # That way we avoid messing with the relative positions of the higher cursors
         curs = reversed(sorted(self.cursors, key = lambda c: (c[1], c[0])))
-        for cursor in curs: # order?
+        for cursor in curs:
             # The current line this cursor is on
             line = self.lines[cursor.y]
             
@@ -441,8 +441,7 @@ class Editor(Viewer):
             self.move_y_cursors(cursor.y, 1)
             cursor.x = len(wspace)
             cursor.y += 1
-        self.move_cursors()
-
+        self.move_cursors((0, 0))
         # Add a restore point if previous action != enter
         self.store_action_state("enter")
 
