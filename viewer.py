@@ -269,7 +269,7 @@ class Viewer:
     def move_cursors(self, delta=None, noupdate=False):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
         for cursor in self.cursors:
-            if delta != None:
+            if delta:
                 if delta[0] != 0 and cursor.x >= 0:
                     cursor.x += delta[0]
                 if delta[1] != 0 and cursor.y >= 0:
@@ -286,14 +286,15 @@ class Viewer:
 
         # Check if cursors moved vertically and scroll if necessary
         if delta:
-            if delta[1] > 0:
-                if self.cursors[-1].y - self.y_scroll >= size[1]:
-                    # Scroll down
-                    self.y_scroll = self.cursors[-1].y - size[1]+1
-            elif delta[1] < 0:
+            if delta[1] < 0:
                 if cur.y - self.y_scroll < 0:
                     # Scroll up
                     self.y_scroll = cur.y
+            #if delta[1] > 0:
+            else:
+                if self.cursors[-1].y - self.y_scroll >= size[1]:
+                    # Scroll down
+                    self.y_scroll = self.cursors[-1].y - size[1]+1
 
         # Check if we should scroll horizontally
         if cur.x - self.x_scroll+offset > size[0] - 1:
