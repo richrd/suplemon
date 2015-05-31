@@ -12,8 +12,8 @@ import time
 
 import ui
 import modules
+import helpers
 
-from helpers import *
 from logger import *
 from config import *
 from editor import *
@@ -430,7 +430,7 @@ class App:
         if not f.get_name():
             return self.save_file_as(f)
         if f.save():
-            self.set_status("Saved [" + curr_time_sec() + "] '" + f.name + "'")
+            self.set_status("Saved [" + helpers.curr_time_sec() + "] '" + f.name + "'")
             if f.path() == self.config.path():
                 self.reload_config()
             return True
