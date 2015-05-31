@@ -4,6 +4,7 @@ Base class for extension modules to inherit.
 """
 from helpers import *
 
+#TODO: rename to Module and add subclass Command if needed
 class Command:
     def __init__(self, app):
         self.app = app

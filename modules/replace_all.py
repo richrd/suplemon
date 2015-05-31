@@ -2,9 +2,6 @@
 from mod_base import *
 
 class ReplaceAll(Command):
-    def init(self):
-        pass
-
     def run(self, app, editor):
         r_from = self.app.ui.query("Replace text:")
         if not r_from:

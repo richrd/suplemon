@@ -50,6 +50,7 @@ class Battery(Command):
         return value
         
     def battery_status_read(self):
+        """Get the battery status via proc/acpi."""
         try:
             path_info = self.readf("/proc/acpi/battery/BAT0/info")
             path_state = self.readf("/proc/acpi/battery/BAT0/state")
@@ -63,6 +64,7 @@ class Battery(Command):
             return None
 
     def battery_status_acpi(self):
+        """Get the battery status via acpi."""
         try:
             raw_str = subprocess.check_output(["acpi"])
         except:
@@ -72,6 +74,7 @@ class Battery(Command):
         return int(part)
 
     def battery_status_upower(self):
+        """Get the battery status via upower."""
         try:
             raw_str = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT0"])
         except:
@@ -81,6 +84,7 @@ class Battery(Command):
         return int(part.strip())
 
     def readf(self, path):
+        """Read and return file contents at path."""
         f = open(path)
         data = f.read()
         f.close()
