@@ -106,10 +106,12 @@ class Config:
                     "kDN3": "new_cursor_down",            # Alt + Down
                     "kLFT5": "jump_left",                 # Ctrl + Left
                     "kRIT5": "jump_right",                # Ctrl + Right
-                    curses.KEY_NPAGE: "page_up",          # Page Up
-                    curses.KEY_PPAGE: "page_down",        # Page Down
+                    curses.KEY_PPAGE: "page_up",          # Page Up
+                    curses.KEY_NPAGE: "page_down",        # Page Down
                     552: "push_up",                       # Alt + Page Up
                     547: "push_down",                     # Alt + Page Down
+                    "kPRV3": "push_up",                   # Alt + Page Up
+                    "kNXT3": "push_down",                 # Alt + Page Down
                     269: "undo",                          # F5
                     270: "redo",                          # F6
                     273: "toggle_line_nums",              # F9
@@ -124,6 +126,8 @@ class Config:
                     559: "jump_right",                    # Ctrl + Right
                     565: "jump_up",                       # Ctrl + Up
                     524: "jump_down",                     # Ctrl + Down
+                    "kUP5": "jump_up",                    # Ctrl + Up
+                    "kDN5": "jump_down",                  # Ctrl + Down
                 }
             },
             "display": {
