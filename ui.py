@@ -200,7 +200,7 @@ class UI:
             self.app.get_editor().resize( (yx[0]-y_sub, yx[1]) )
             self.app.get_editor().move_win( (y_start, 0) )
 
-    def size(self):
+    def get_size(self):
         """Get terminal size."""
         y, x = self.screen.getmaxyx()
         return (x, y)
@@ -240,7 +240,7 @@ class UI:
     def show_top_status(self):
         """Show top status row."""
         self.header_win.erase()
-        size = self.size()
+        size = self.get_size()
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
@@ -283,8 +283,8 @@ class UI:
     def show_bottom_status(self):
         """Show bottom status line."""
         editor = self.app.get_editor()
-        size = self.size()
-        cur = editor.cursor()
+        size = self.get_size()
+        cur = editor.get_cursor()
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(editor.cursors))+" "+\
             "buf:"+str(len(editor.get_buffer()))
@@ -338,7 +338,7 @@ class UI:
         y = 0
         max_y = 1
         for key in keys:
-            if x+len(" ".join(key)) >= self.size()[0]:
+            if x+len(" ".join(key)) >= self.get_size()[0]:
                 x = 0
                 y += 1
                 if y > max_y:
