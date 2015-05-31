@@ -64,15 +64,6 @@ class Cursor:
         elif i == 1:
             return self.y
 
-    # Deprecated
-    #def __setitem__(self, i, v):
-    #    # TODO: Deprecate in favor of proper access methods.
-    #    """Set coordinates with list indices."""
-    #    if i == 0:
-    #        self.x = v
-    #    elif i == 1:
-    #        self.y = v
-
     def __eq__(self, item):
         """Check for equality."""
         if isinstance(item, Cursor):
