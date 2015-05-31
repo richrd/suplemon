@@ -65,8 +65,8 @@ Suplemon is licensed under the MIT license.
 
 ## Support
 
-If you have a question or need help, you can find me in IRC at #suplemon @ Freenode.
-I'll be happy to chat with you!
+If you have a question, need help, or just want to chat head over to the IRC channel #suplemon @ Freenode.
+I'll be happy to chat with you, see you there!
 
 ## Keyboard shortcuts
 
@@ -248,20 +248,19 @@ I'll be happy to chat with you!
 
 ## API plans
  * [ ] Refactor main class to support views
- * [ ] 
  * [ ] Editor
    * [X] Define core editing operations
    * [X] Make core editing operations overidable by extensions
- * [ ] Line objects
+ * [X] Line objects
    * [X] Add set_data method
    * [X] Add get_data method
  * [ ] Cursor objects
-   * [ ] Methods for moving the cursor (left, right, up, down)
-   * [ ] Methods for getting cursor position
+   * [X] Methods for moving the cursor (left, right, up, down)
+   * [X] Methods for getting cursor position
    * [ ] Make cursor manipulation more functional
  * [ ] Extensions
    * [ ] Allow extensions to be run at a desired interval
-   * [ ] Implement events that can be hookend onto
+   * [X] Implement events that can be hookend onto
     
 
 ## Rationale
