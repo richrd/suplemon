@@ -187,10 +187,10 @@ class Editor(Viewer):
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0 ):
-                cursor.y += 1
-                cursor.x = 0
+                cursor.move_down()
+                cursor.set_x(0)
             elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:
-                cursor.x += 1
+                cursor.move_right()
         self.move_cursors()
         self.scroll_down()
 
@@ -198,8 +198,8 @@ class Editor(Viewer):
         """Move cursors left."""
         for cursor in self.cursors:
             if cursor.y != 0 and cursor.x == 0:
-                cursor.y-=1
-                cursor.x = len(self.lines[cursor.y])+1
+                cursor.move_up()
+                cursor.set_x(len(self.lines[cursor.y])+1)
         self.move_cursors((-1 ,0))
         self.scroll_up()
         
@@ -228,11 +228,11 @@ class Editor(Viewer):
                 next = cursor.x-2
                 if next < 0: next = 0
                 if cur_chr == " ":
-                    cursor.x -= 1
+                    cursor.move_left()
                     if line[next] != " ":
                         break
                 else:
-                    cursor.x -= 1
+                    cursor.move_left()
                     if line[next] in chars:
                         break
         self.move_cursors()
@@ -249,11 +249,11 @@ class Editor(Viewer):
                 next = cursor.x+1
                 if next == len(line):next-=1
                 if cur_chr == " ":
-                    cursor.x += 1
+                    cursor.move_right()
                     if line[next] != " ":
                         break
                 else:
-                    cursor.x += 1
+                    cursor.move_right()
                     if line[next] in chars:
                         break
         self.move_cursors()
@@ -324,13 +324,13 @@ class Editor(Viewer):
     def page_up(self):
         """Move half a page up."""
         amount = int(self.get_size()[1]/2) * -1
-        self.move_cursors((0 ,amount))
+        self.move_cursors((0, amount))
         self.scroll_up()
         
     def page_down(self):
         """Move half a page down."""
         amount = int(self.get_size()[1]/2)
-        self.move_cursors((0 ,amount))
+        self.move_cursors((0, amount))
         self.scroll_down()
 
     def home(self):
@@ -338,15 +338,15 @@ class Editor(Viewer):
         for cursor in self.cursors:
             wspace = self.whitespace(self.lines[cursor.y])
             if cursor.x == wspace:
-                cursor.x = 0
+                cursor.set_x(0)
             else:
-                cursor.x = wspace
+                cursor.set_x(wspace)
         self.move_cursors()
 
     def end(self):
         """Move to end of line."""
         for cursor in self.cursors:
-            cursor.x = len(self.lines[cursor.y])
+            cursor.set_x(len(self.lines[cursor.y]))
         self.move_cursors()
 
     def replace_all(self, what, replacement):
@@ -395,10 +395,10 @@ class Editor(Viewer):
                 self.lines[cursor.y-1] += curr_line # Add the current line to the previous one
                 line_cursors = self.get_cursors_on_line(line_no) # Get all cursors on current line
                 for line_cursor in line_cursors: # Move the cursors
-                    line_cursor.y -= 1 # One line up
+                    line_cursor.move_up()
                     # Add the length of previous line to each x coordinate
                     # so that their relative positions
-                    line_cursor.x += length
+                    line_cursor.move_right(length)
                 # Move all cursors below up one line (since a line was removed above them)
                 self.move_y_cursors(cursor.y, -1)
             # Handle all other cases
@@ -418,7 +418,7 @@ class Editor(Viewer):
                 # Store the new line
                 self.lines[line_no] = Line(start+end)
                 # Move the operating curser back the deleted amount
-                cursor.x -= del_n_chars
+                cursor.move_left(del_n_chars)
                 self.move_x_cursors(line_no, cursor.x, -1*del_n_chars) # Do the same to the rest
         # Ensure we keep the view scrolled
         self.move_cursors()
@@ -448,8 +448,8 @@ class Editor(Viewer):
                 wspace = self.whitespace(self.lines[cursor.y])*" "
             self.lines.insert(cursor.y+1, Line(wspace+end))
             self.move_y_cursors(cursor.y, 1)
-            cursor.x = len(wspace)
-            cursor.y += 1
+            cursor.set_x(len(wspace))
+            cursor.move_down()
         self.move_cursors()
         self.scroll_down()
         # Add a restore point if previous action != enter
@@ -582,7 +582,7 @@ class Editor(Viewer):
         end = line[cursor.x:]
         self.lines[cursor.y] = Line(start + data + end)
         self.move_x_cursors(cursor.y, cursor.x, len(data))
-        cursor.x += len(data)
+        cursor.move_right(len(data))
 
     def go_to_pos(self, line_no, col = 0):
         """Move primary cursor to line_no, col=0."""

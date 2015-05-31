@@ -16,6 +16,12 @@ from helpers import *
 
 class Viewer:
     def __init__(self, app, window):
+        """
+        Handle Viewer initialization
+        
+        :param App app: The main App class of Suplemon
+        :param Window window: The ui window to use for the viewer
+        """
         self.app = app
         self.window = window
         self.config = {}
@@ -123,7 +129,11 @@ class Viewer:
         return cursors
 
     def get_lines_with_cursors(self):
-        """Return all line indices that have cursors."""
+        """Return all line indices that have cursors.
+
+        :return: A list of line numbers that have cursors.
+        :rtype: list
+        """
         line_nums = []
         for cursor in self.cursors:
             if not cursor.y in line_nums:
@@ -132,7 +142,11 @@ class Viewer:
         return line_nums
 
     def get_line_color(self, raw_line):
-        """Return a color based on line contents."""
+        """Return a color based on line contents.
+        
+        :param str raw_line: The line from which to get a color value.
+        :return: A color value for given raw_data.
+        :rtype: int
         if self.syntax:
             try:
                 return self.syntax.get_color(raw_line)
@@ -141,8 +155,11 @@ class Viewer:
         return 0
 
     def get_data(self):
-        """Get editor contents."""
-        # FIXME: Unify storing lines as Line instances
+        """Get editor contents.
+        
+        :return: Editor contents.
+        :rtype: str
+        """
         str_lines = []
         for line in self.lines:
             if type(line) == type(""):
@@ -153,7 +170,10 @@ class Viewer:
         return data
 
     def set_data(self, data):
-        """Set editor data or contents."""
+        """Set editor data or contents.
+        
+        :param str data: Set the editor contents to data.
+        """
         self.data = data
         self.lines = []
         lines = self.data.split(self.config["end_of_line"])
@@ -161,15 +181,17 @@ class Viewer:
             self.lines.append(Line(line))
 
     def set_config(self, config):
-        """Set the viewer configuration dict."""
+        """Set the viewer configuration dict.
+        
+        :param dict config: Editor config dict with any supported fields. See config.py.
+        """
         self.config = config
         self.set_cursor_style(self.config["cursor"])
 
     def set_cursor_style(self, cursor):
         """Set cursor style.
-
-        Args:
-            cursor: String containing either 'underline' or 'reverse'.
+        
+        :param str cursor: Cursor type, either 'underline' or 'reverse'.
         """
         if cursor == "underline":
             self.cursor_style = curses.A_UNDERLINE
@@ -345,9 +367,9 @@ class Viewer:
         for cursor in self.cursors:
             if delta:
                 if delta[0] != 0 and cursor.x >= 0:
-                    cursor.x += delta[0]
+                    cursor.move_right(delta[0])
                 if delta[1] != 0 and cursor.y >= 0:
-                    cursor.y += delta[1]
+                    cursor.move_down(delta[1])
 
             if cursor.x < 0: cursor.x = 0
             if cursor.y < 0: cursor.y = 0
@@ -382,15 +404,16 @@ class Viewer:
         for cursor in self.cursors:
             if cursor.y == line:
                 if cursor.x > col:
-                    cursor.x += delta
+                    cursor.move_right(delta)
 
     def move_y_cursors(self, line, delta, exclude = None):
         """Move all cursors starting at line and col with delta on the y axis.
         Exlude a cursor by passing it via the exclude argument."""
         for cursor in self.cursors:
-            if cursor == exclude: continue
+            if cursor == exclude:
+                continue
             if cursor.y > line:
-                    cursor.y += delta
+                cursor.move_down(delta)
 
     def cursor_exists(self, cursor):
         """Check if a given cursor exists."""
@@ -414,7 +437,7 @@ class Viewer:
         for cursor in self.cursors:
             if not cursor.tuple() in ref:
                 ref.append(cursor.tuple())
-                new.append(cursor)
+                    new.append(cursor)
         self.cursors = new
         self.render()
 
