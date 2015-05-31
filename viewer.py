@@ -147,6 +147,7 @@ class Viewer:
         :param str raw_line: The line from which to get a color value.
         :return: A color value for given raw_data.
         :rtype: int
+        """
         if self.syntax:
             try:
                 return self.syntax.get_color(raw_line)
@@ -437,7 +438,7 @@ class Viewer:
         for cursor in self.cursors:
             if not cursor.tuple() in ref:
                 ref.append(cursor.tuple())
-                    new.append(cursor)
+                new.append(cursor)
         self.cursors = new
         self.render()
 
