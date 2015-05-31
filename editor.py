@@ -62,7 +62,11 @@ class Editor(Viewer):
             "end": self.end,                              # End
             "backspace": self.backspace,                  # Backspace
             "delete": self.delete,                        # Delete
+            "insert": self.insert,                        # Insert
             "enter": self.enter,                          # Enter
+            "tab": self.tab,                              # Tab
+            "untab": self.untab,                          # Shift + Tab
+            "escape": self.escape,                        # Escape
             "arrow_right": self.arrow_right,              # Arrow Right
             "arrow_left": self.arrow_left,                # Arrow Left
             "arrow_up": self.arrow_up,                    # Arrow Up
@@ -80,22 +84,14 @@ class Editor(Viewer):
             "toggle_line_nums": self.toggle_line_nums,    # F9
             "toggle_line_ends": self.toggle_line_ends,    # F10
             "toggle_highlight": self.toggle_highlight,    # F11
-            "insert": self.insert,                        # Insert
             "cut": self.cut,                              # Ctrl + C
             "duplicate_line": self.duplicate_line,        # Ctrl + W
-            "insert": self.insert,                        # Ctrl + V
             "find_next": self.find_next,                  # Ctrl + D
             "find_all": self.find_all,                    # Ctrl + A
-            "backspace": self.backspace,                  # Backspace (fix for Mac)
             "jump_left": self.jump_left,                  # Ctrl + Left
             "jump_right": self.jump_right,                # Ctrl + Right
             "jump_up": self.jump_up,                      # Ctrl + Up
             "jump_down": self.jump_down,                  # Ctrl + Down
-            "enter": self.enter,                          # Enter (fallback for 'getch')
-            "tab": self.tab,                              # Tab
-            "untab": self.untab,                          # Shift + Tab
-            "enter": self.enter,                          # Enter
-            "escape": self.escape,                        # Escape
         }
 
     def get_buffer(self):
@@ -196,6 +192,7 @@ class Editor(Viewer):
             elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:
                 cursor.x += 1
         self.move_cursors()
+        self.scroll_down()
 
     def arrow_left(self):
         """Move cursors left."""
@@ -204,14 +201,17 @@ class Editor(Viewer):
                 cursor.y-=1
                 cursor.x = len(self.lines[cursor.y])+1
         self.move_cursors((-1 ,0))
-
+        self.scroll_up()
+        
     def arrow_up(self):
         """Move cursors up."""
         self.move_cursors((0 ,-1))
+        self.scroll_up()
 
     def arrow_down(self):
         """Move cursors down."""
         self.move_cursors((0 ,1))
+        self.scroll_down()
 
     def jump_left(self):
         """Jump one 'word' to the left."""
@@ -261,30 +261,34 @@ class Editor(Viewer):
     def jump_up(self):
         """Jump up 3 lines."""
         self.move_cursors((0, -3))
+        self.scroll_up()
 
     def jump_down(self):
         """Jump down 3 lines."""
         self.move_cursors((0, 3))
+        self.scroll_down()
 
     def new_cursor_up(self):
         """Add a new cursor one line up."""
-        x = self.cursor().x
+        x = self.get_cursor().x
         cursor = self.get_first_cursor()
         if cursor.y == 0:
             return
         new = Cursor(x, cursor.y-1)
         self.cursors.append(new)
         self.move_cursors()
+        self.scroll_up()
 
     def new_cursor_down(self):
         """Add a new cursor one line down."""
-        x = self.cursor().x
+        x = self.get_cursor().x
         cursor = self.get_last_cursor()
         if cursor.y == len(self.lines)-1:
             return
         new = Cursor(x, cursor.y+1)
         self.cursors.append(new)
         self.move_cursors()
+        self.scroll_down()
 
     def new_cursor_left(self):
         """Add a new cursor one character left."""
@@ -296,6 +300,7 @@ class Editor(Viewer):
         for c in new:
             self.cursors.append(c)
         self.move_cursors()
+        self.scroll_up()
 
     def new_cursor_right(self):
         """Add a new cursor one character right."""
@@ -307,6 +312,7 @@ class Editor(Viewer):
         for c in new:
             self.cursors.append(c)
         self.move_cursors()
+        self.scroll_down()
 
     def escape(self):
         """Handle escape key. Removes last_find and all cursors except primary cursor."""
@@ -317,13 +323,15 @@ class Editor(Viewer):
 
     def page_up(self):
         """Move half a page up."""
-        amount = int(self.size()[1]/2)
-        self.move_cursors((0 ,amount), noupdate = True)
-
+        amount = int(self.get_size()[1]/2) * -1
+        self.move_cursors((0 ,amount))
+        self.scroll_up()
+        
     def page_down(self):
         """Move half a page down."""
-        amount = int(self.size()[1]/2)
-        self.move_cursors((0 ,amount * -1), noupdate = True)
+        amount = int(self.get_size()[1]/2)
+        self.move_cursors((0 ,amount))
+        self.scroll_down()
 
     def home(self):
         """Move to start of line or text on that line."""
@@ -414,6 +422,7 @@ class Editor(Viewer):
                 self.move_x_cursors(line_no, cursor.x, -1*del_n_chars) # Do the same to the rest
         # Ensure we keep the view scrolled
         self.move_cursors()
+        self.scroll_up()
         # Add a restore point if previous action != backspace
         self.store_action_state("backspace")
 
@@ -441,13 +450,14 @@ class Editor(Viewer):
             self.move_y_cursors(cursor.y, 1)
             cursor.x = len(wspace)
             cursor.y += 1
-        self.move_cursors((0, 0))
+        self.move_cursors()
+        self.scroll_down()
         # Add a restore point if previous action != enter
         self.store_action_state("enter")
 
     def insert(self):
         """Insert buffer data at cursor(s)."""
-        cur = self.cursor()
+        cur = self.get_cursor()
         buffer = list(self.get_buffer())
 
         # If we have more than one cursor
@@ -473,6 +483,7 @@ class Editor(Viewer):
                 self.lines.insert(y, Line(buf))
                 self.move_y_cursors(cur[1]-1, 1)
         self.move_cursors()
+        self.scroll_down()
         # Add a restore point if previous action != insert
         self.store_action_state("insert")
 
@@ -488,6 +499,7 @@ class Editor(Viewer):
             self.lines[cursor.y-1] = Line(self.lines[cursor.y])
             self.lines[cursor.y] = Line(old)
         self.move_cursors((0, -1))
+        self.scroll_up()
         # Add a restore point if previous action != push_up
         self.store_action_state("push_up")
             
@@ -504,6 +516,7 @@ class Editor(Viewer):
             self.lines[cursor.y+1] = Line(self.lines[cursor.y])
             self.lines[cursor.y] = Line(old)
         self.move_cursors((0, 1))
+        self.scroll_down()
         # Add a restore point if previous action != push_down
         self.store_action_state("push_down")
 
@@ -579,7 +592,7 @@ class Editor(Viewer):
             line_no = line_no-1
 
         self.store_state()
-        cur = self.cursor()
+        cur = self.get_cursor()
         if col != None:
             cur.x = col
         cur.y = line_no
@@ -652,7 +665,7 @@ class Editor(Viewer):
         """Find next occurance."""
         what = self.last_find
         if what == "":
-            cursor = self.cursor()
+            cursor = self.get_cursor()
             search = "^([\w\-]+)"
             line = self.lines[cursor.y][cursor.x:]
             matches = re.match(search, line)
