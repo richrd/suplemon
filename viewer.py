@@ -163,7 +163,7 @@ class Viewer:
     def set_config(self, config):
         """Set the viewer configuration dict."""
         self.config = config
-        self.set_cursor(self.config["cursor"])
+        self.set_cursor_style(self.config["cursor"])
 
     def set_cursor_style(self, cursor):
         """Set cursor style.
