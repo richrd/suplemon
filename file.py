@@ -74,7 +74,7 @@ class File:
         """Does checks after file is loaded."""
         self.writable = os.access(self._path(), os.W_OK)
         if not self.writable:
-            self.log("File not writable?!")
+            self.log("File not writable.")
 
     def update_editor_extension(self):
         """Set the editor file extension from the current file name."""
