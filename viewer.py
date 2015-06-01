@@ -1,6 +1,6 @@
 #-*- encoding: utf-8
 """
-Text Viewer component subclassed by Editor.
+Text viewer component subclassed by Editor.
 """
 
 import os
@@ -16,6 +16,12 @@ from helpers import *
 
 class Viewer:
     def __init__(self, app, window):
+        """
+        Handle Viewer initialization
+        
+        :param App app: The main App class of Suplemon
+        :param Window window: The ui window to use for the viewer
+        """
         self.app = app
         self.window = window
         self.config = {}
@@ -23,6 +29,7 @@ class Viewer:
         self.lines = [Line()]
         self.file_extension = ""
         
+        # Map special extensions to generic ones for highlighting
         self.extension_map = {
             "scss": "css",
         }
@@ -34,13 +41,13 @@ class Viewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
-        #self.linelighter = lambda line: 0 # Dummy linelighter returns default color
         self.syntax = None
         self.setup_linelight()
 
-    def set_config(self, config):
-        self.config = config
-        self.set_cursor(self.config["cursor"])
+    def log(self, s):
+        """Log to the app."""
+        #TODO: log types: ERROR | WARNING | NOTICE
+        self.app.log(s)
 
     def setup_linelight(self):
         """Setup line based highlighting."""
@@ -68,21 +75,79 @@ class Viewer:
         if not module or not "Syntax" in dir(module):
             self.app.log("File doesn't match API!")
             return False
-            
-        #self.linelighter = mod.parse
         self.syntax = module.Syntax()
 
     def size(self):
+        """Get editor size (x,y). (Deprecated, use get_size)."""
+        self.log("size() is deprecated, please use get_size()")
+        return self.get_size()
+        
+    def cursor(self):
+        """Return the main cursor. (Deprecated, use get_cursor)"""
+        self.log("cursor() is deprecated, please use get_cursor()")
+        return self.get_cursor()
+
+    def get_size(self):
         """Get editor size (x,y)."""
         y,x = self.window.getmaxyx()
         return (x,y)
-
-    def cursor(self):
+        
+    def get_cursor(self):
         """Return the main cursor."""
         return self.cursors[0]
 
+    def get_cursors(self):
+        """Return list of all cursors."""
+        return self.cursors[0]
+
+    def get_first_cursor(self):
+        """Get the first (primary) cursor."""
+        highest = None
+        for cursor in self.cursors:
+            if highest == None or cursor.y <  highest.y:
+                highest = cursor
+        return highest
+
+    def get_last_cursor(self):
+        """Get the last cursor."""
+        lowest = None
+        for cursor in self.cursors:
+            if lowest == None:
+                lowest = cursor
+            elif cursor.y > lowest.y:
+                lowest = cursor
+            elif cursor.y == lowest.y and cursor.x > lowest.x:
+                 lowest = cursor
+        return lowest
+
+    def get_cursors_on_line(self, line_no):
+        """Return all cursors on a specific line."""
+        cursors = []
+        for cursor in self.cursors:
+            if cursor.y == line_no:
+                cursors.append(cursor)
+        return cursors
+
+    def get_lines_with_cursors(self):
+        """Return all line indices that have cursors.
+
+        :return: A list of line numbers that have cursors.
+        :rtype: list
+        """
+        line_nums = []
+        for cursor in self.cursors:
+            if not cursor.y in line_nums:
+                line_nums.append(cursor.y)
+        line_nums.sort()
+        return line_nums
+
     def get_line_color(self, raw_line):
-        """Return a color based on line contents."""
+        """Return a color based on line contents.
+        
+        :param str raw_line: The line from which to get a color value.
+        :return: A color value for given raw_data.
+        :rtype: int
+        """
         if self.syntax:
             try:
                 return self.syntax.get_color(raw_line)
@@ -90,34 +155,45 @@ class Viewer:
                 return 0
         return 0
 
-    def log(self, s):
-        """Log to the app."""
-        #TODO: log types: ERROR | WARNING | NOTICE
-        self.app.log(s)
-
-    def set_data(self, data):
-        """Set editor data or contents."""
-        self.data = data
-        self.lines = []
-        lines = self.data.split("\n")
-        for line in lines:
-            self.lines.append(Line(line))
-
     def get_data(self):
-        """Get editor contents."""
-        # FIXME: Unify storing lines as Line instances
+        """Get editor contents.
+        
+        :return: Editor contents.
+        :rtype: str
+        """
         str_lines = []
         for line in self.lines:
             if type(line) == type(""):
                 str_lines.append(line)
             else:
-                str_lines.append(line.data)
-        #data = u"\n".join(str_lines)
-        data = str("\n".join(str_lines))
+                str_lines.append(line.get_data())
+        data = str(self.config["end_of_line"].join(str_lines))
         return data
 
-    def set_cursor(self, cursor):
-        """Set cursor style."""
+    def set_data(self, data):
+        """Set editor data or contents.
+        
+        :param str data: Set the editor contents to data.
+        """
+        self.data = data
+        self.lines = []
+        lines = self.data.split(self.config["end_of_line"])
+        for line in lines:
+            self.lines.append(Line(line))
+
+    def set_config(self, config):
+        """Set the viewer configuration dict.
+        
+        :param dict config: Editor config dict with any supported fields. See config.py.
+        """
+        self.config = config
+        self.set_cursor_style(self.config["cursor"])
+
+    def set_cursor_style(self, cursor):
+        """Set cursor style.
+        
+        :param str cursor: Cursor type, either 'underline' or 'reverse'.
+        """
         if cursor == "underline":
             self.cursor_style = curses.A_UNDERLINE
         elif cursor == "reverse":
@@ -125,6 +201,18 @@ class Viewer:
         else:
             return False
         return True
+        
+    def set_cursor(self, cursor):
+        self.log("set_cursor is deprecated, use set_cursor_style instead.")
+        return self.set_cursor_style(cursor)
+
+    def set_single_cursor(self, cursor):
+        """Discard all cursors and place a new one."""
+        self.cursors = [Cursor(cursor)]
+
+    def set_cursors(self, cursors):
+        """Replace cursors with new cursor list."""
+        self.cursors = cursors
 
     def set_file_extension(self, ext):
         """Set the file extension."""
@@ -135,6 +223,7 @@ class Viewer:
 
     def pad_lnum(self, n):
         """Pad line number with zeroes."""
+        #TODO: move to helpers
         s = str(n)
         while len(s) < self.line_offset()-1:
             s = "0" + s
@@ -142,7 +231,7 @@ class Viewer:
 
     def max_line_length(self):
         """Get maximum line length that fits in the editor."""
-        return self.size()[0]-self.line_offset()-1
+        return self.get_size()[0]-self.line_offset()-1
 
     def line_offset(self):
         """Get the x coordinate of beginning of line."""
@@ -173,27 +262,22 @@ class Viewer:
         """Toggle syntax highlighting."""
         return False
 
-    def set_single_cursor(self, cursor):
-        """Discard all cursors and place a new one."""
-        self.cursors = [Cursor(cursor)]
-
     def render(self):
         """Render the editor curses window."""
         self.window.clear()
-        #self.window.erase()
-        max_y = self.size()[1]
+        max_y = self.get_size()[1]
         i = 0
         x_offset = self.line_offset()
         max_len = self.max_line_length()
+        # Iterate through visible lines
         while i < max_y:
             lnum = i + self.y_scroll
             if lnum >= len(self.lines): # Make sure we have a line to show
                 break
-
+            
+            # Get line for current row
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
-                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(1))
-                #self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(7))
                 self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(8))
 
             # Normal rendering
@@ -201,6 +285,7 @@ class Viewer:
             if self.show_line_ends:
                 line_part += self.config["line_end_char"]
             if len(line_part) >= max_len:
+                # Clamp line length to view width
                 line_part = line_part[:max_len]
 
             # Replace unsafe whitespace with normal space or visible replacement
@@ -210,6 +295,7 @@ class Viewer:
                 if self.config["show_white_space"]:
                     char = self.config["white_space_map"][key]
                 line_part = line_part.replace(key, char);
+            # Use unicode support on Python 3.3 and higher
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
             try:
@@ -223,12 +309,11 @@ class Viewer:
                 self.log(inst)          # __str__ allows args to be printed directly,
             i += 1
         self.render_cursors()
-        #self.window.refresh()
 
     def render_cursors(self):
         """Render editor window cursors."""
-        max_x, max_y = self.size()
-        main = self.cursor()
+        max_x, max_y = self.get_size()
+        main = self.get_cursor()
         for cursor in self.cursors:
             x = cursor.x - self.x_scroll + self.line_offset()
             y = cursor.y - self.y_scroll
@@ -262,36 +347,39 @@ class Viewer:
     def move_y_scroll(self, delta):
         """Add delta the y scroll axis scroll"""
         self.y_scroll += delta
+        
+    def scroll_up(self):
+        """Scroll view up if neccesary."""
+        cursor = self.get_first_cursor()
+        if cursor.y - self.y_scroll < 0:
+            # Scroll up
+            self.y_scroll = cursor.y
+    
+    def scroll_down(self):
+        """Scroll view up if neccesary."""
+        cursor = self.get_last_cursor()
+        size = self.get_size()
+        if cursor.y - self.y_scroll >= size[1]:
+            # Scroll down
+            self.y_scroll = cursor.y - size[1]+1
 
     def move_cursors(self, delta=None, noupdate=False):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
         for cursor in self.cursors:
-            if delta != None:
+            if delta:
                 if delta[0] != 0 and cursor.x >= 0:
-                    cursor.x += delta[0]
+                    cursor.move_right(delta[0])
                 if delta[1] != 0 and cursor.y >= 0:
-                    cursor.y += delta[1]
+                    cursor.move_down(delta[1])
 
             if cursor.x < 0: cursor.x = 0
             if cursor.y < 0: cursor.y = 0
             if cursor.y >= len(self.lines)-1: cursor.y = len(self.lines)-1
             if cursor.x >= len(self.lines[cursor.y]): cursor.x = len(self.lines[cursor.y])
 
-        cur = self.cursor() # Main cursor
-        size = self.size()
+        cur = self.get_cursor() # Main cursor
+        size = self.get_size()
         offset = self.line_offset()
-
-        # Check if cursors moved vertically and scroll if necessary
-        if delta:
-            if delta[1] > 0:
-                if self.cursors[-1].y - self.y_scroll >= size[1]:
-                    # Scroll down
-                    self.y_scroll = self.cursors[-1].y - size[1]+1
-            elif delta[1] < 0:
-                if cur.y - self.y_scroll < 0:
-                    # Scroll up
-                    self.y_scroll = cur.y
-
         # Check if we should scroll horizontally
         if cur.x - self.x_scroll+offset > size[0] - 1:
             # -1 to allow space for cursor at line end
@@ -299,7 +387,7 @@ class Viewer:
         if cur.x - self.x_scroll < 0:
             self.x_scroll  -= abs(cur.x - self.x_scroll) # FIXME
         if cur.x - self.x_scroll+offset < offset:
-            self.x_scroll -= 1
+            self.x_scroll -= 1            
         if not noupdate:
             self.purge_cursors()
 
@@ -307,7 +395,7 @@ class Viewer:
         """Center the viewport on line_no."""
         if line_no >= len(self.lines):
             line_no = len(self.lines)-1
-        new_y = line_no - int(self.size()[1] / 2)
+        new_y = line_no - int(self.get_size()[1] / 2)
         if new_y < 0:
             new_y = 0
         self.y_scroll = new_y
@@ -317,52 +405,16 @@ class Viewer:
         for cursor in self.cursors:
             if cursor.y == line:
                 if cursor.x > col:
-                    cursor.x += delta
+                    cursor.move_right(delta)
 
     def move_y_cursors(self, line, delta, exclude = None):
         """Move all cursors starting at line and col with delta on the y axis.
         Exlude a cursor by passing it via the exclude argument."""
         for cursor in self.cursors:
-            if cursor == exclude: continue
+            if cursor == exclude:
+                continue
             if cursor.y > line:
-                    cursor.y += delta
-
-    def get_first_cursor(self):
-        """Get the first (primary) cursor."""
-        highest = None
-        for cursor in self.cursors:
-            if highest == None or cursor.y <  highest.y:
-                highest = cursor
-        return highest
-
-    def get_last_cursor(self):
-        """Get the last cursor."""
-        lowest = None
-        for cursor in self.cursors:
-            if lowest == None:
-                lowest = cursor
-            elif cursor.y > lowest.y:
-                lowest = cursor
-            elif cursor.y == lowest.y and cursor.x > lowest.x:
-                 lowest = cursor
-        return lowest
-
-    def get_cursors_on_line(self, line_no):
-        """Return all cursors on a specific line."""
-        cursors = []
-        for cursor in self.cursors:
-            if cursor.y == line_no:
-                cursors.append(cursor)
-        return cursors
-
-    def get_lines_with_cursors(self):
-        """Return all line indices that have cursors."""
-        line_nums = []
-        for cursor in self.cursors:
-            if not cursor.y in line_nums:
-                line_nums.append(cursor.y)
-        line_nums.sort()
-        return line_nums
+                cursor.move_down(delta)
 
     def cursor_exists(self, cursor):
         """Check if a given cursor exists."""
@@ -385,7 +437,7 @@ class Viewer:
         ref = []
         for cursor in self.cursors:
             if not cursor.tuple() in ref:
-                ref.append( cursor.tuple() )
+                ref.append(cursor.tuple())
                 new.append(cursor)
         self.cursors = new
         self.render()

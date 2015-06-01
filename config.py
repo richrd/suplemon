@@ -46,6 +46,8 @@ class Config:
             "editor": {
                 # Indent new lines to same level as previous line
                 "auto_indent_newline": True,
+                # Character to use for end of line
+                "end_of_line": "\n",
                 # Unindent with backspace
                 "backspace_unindent": True,
                 # Cursor style. 'reverse' or 'underline'
@@ -56,7 +58,7 @@ class Config:
                 # Amount of undo states to store
                 "max_history": 50,
                 # Characters considered to separate words
-                "punctuation": " (){}[]'\"=+-/*.:,;_",
+                "punctuation": " (){}[]'\"=+-/*.:,;_\n\r",
                 # Character to use to visualize end of line
                 "line_end_char": "",
                 # White space characters and their visual matches
@@ -102,12 +104,14 @@ class Config:
                     557: "new_cursor_right",              # Alt + Right
                     "kUP3": "new_cursor_up",              # Alt + Up
                     "kDN3": "new_cursor_down",            # Alt + Down
-                    "kLFT5": "jump_left",                 # Ctrl + Left
-                    "kRIT5": "jump_right",                # Ctrl + Right
-                    curses.KEY_NPAGE: "page_up",          # Page Up
-                    curses.KEY_PPAGE: "page_down",        # Page Down
+                    "kLFT3": "new_cursor_left",           # Alt + Left
+                    "kRIT3": "new_cursor_right",          # Alt + Right
+                    curses.KEY_PPAGE: "page_up",          # Page Up
+                    curses.KEY_NPAGE: "page_down",        # Page Down
                     552: "push_up",                       # Alt + Page Up
                     547: "push_down",                     # Alt + Page Down
+                    "kPRV3": "push_up",                   # Alt + Page Up
+                    "kNXT3": "push_down",                 # Alt + Page Down
                     269: "undo",                          # F5
                     270: "redo",                          # F6
                     273: "toggle_line_nums",              # F9
@@ -122,6 +126,11 @@ class Config:
                     559: "jump_right",                    # Ctrl + Right
                     565: "jump_up",                       # Ctrl + Up
                     524: "jump_down",                     # Ctrl + Down
+                    "kLFT5": "jump_left",                 # Ctrl + Left
+                    "kRIT5": "jump_right",                # Ctrl + Right
+                    "kUP5": "jump_up",                    # Ctrl + Up
+                    "kDN5": "jump_down",                  # Ctrl + Down
+                    
                 }
             },
             "display": {

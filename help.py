@@ -8,8 +8,8 @@ help_text = """
 *Contents*
 1. General description
 2. User interface
-3. Commands
-4. Default keyboard shortcuts
+3. Default keyboard shortcuts
+4. Commands
 
 ## 1. General description
 Suplemon is designed to be an easy, intuitive and powerful text editor.
@@ -24,13 +24,7 @@ shows the program version, a clock, and a list of opened files. The bottom bar
 shows status messages and handles input for commands. Above the bottom status
 bar there is a list of most common keyboard shortcuts.
 
-## 3. Commands
-Commands are special operations that can be performed (e.g. remove whitespace
-or convert line to uppercase). Each command can be run by pressing Ctrl + E
-and then typing the command name. Commands are extensions and are stored in
-the modules folder in the Suplemon installation.
-
-## 4. Default keyboard shortcuts
+## 3. Default keyboard shortcuts
 The default keyboard shortcuts imitate those of common graphical editors.
 Most shortcuts are also shown at the bottom in the legend area. Here's
 the complete reference.
@@ -104,5 +98,13 @@ the complete reference.
 
  * F11
    > Toggle full screen
+
+## 4. Commands
+Commands are special operations that can be performed (e.g. remove whitespace
+or convert line to uppercase). Each command can be run by pressing Ctrl + E
+and then typing the command name. Commands are extensions and are stored in
+the modules folder in the Suplemon installation.
+
+
 
 """

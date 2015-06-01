@@ -3,6 +3,7 @@
 Various helper constants and functions.
 """
 
+import re
 import sys
 import time
 import traceback
@@ -39,6 +40,10 @@ def ends(s, what):
         if s.find(item[::-1]) == 0:
             return True
     return False
+
+def multisplit(data, delimiters):
+    pattern = '|'.join(map(re.escape, delimiters))
+    return re.split(pattern, data)
 
 def get_error_info():
     """Return info about last error."""

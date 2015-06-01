@@ -1,10 +1,10 @@
-#!/usr/bin/python3
 #-*- encoding: utf-8
+
 """
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.11"
+__version__ = "0.1.2"
 
 import os
 import sys
@@ -12,15 +12,21 @@ import time
 
 import ui
 import modules
+import helpers
 
-from helpers import *
 from logger import *
 from config import *
 from editor import *
 from file import *
 
 class App:
-    def __init__(self):
+    def __init__(self, filenames=None):
+        """
+        Handle App initialization
+
+        :param list filenames: Names of files to load initially
+        :param str filenames[*]: Path to a file to load
+        """
         self.version = __version__
         self.inited = 0
         self.running = 0
@@ -32,7 +38,7 @@ class App:
         self.status_msg = ""
         self.last_input = None
         self.global_buffer = []
-        self.init_keys()
+        self.event_bindings = {}
 
         # Define core operations
         self.operations = {
@@ -58,44 +64,34 @@ class App:
         self.config = Config(self)
         self.config.load()
         self.ui = ui.UI(self) # Load user interface
+        self.ui.init()
 
         # Load extension modules
         self.modules = modules.ModuleLoader(self)
         self.modules.load()
 
+        # Save filenames for later
+        self.filenames = filenames
+
         # Indicate that windows etc. have been created.
         self.inited = 1
-
-    def init_keys(self):
-        # Reserving this for future use
-        pass
-
-    def set_key_binding(self, key, operation):
-        """Bind a key to an operation."""
-        self.get_key_bindings()[key] = operation
 
     def log(self, text, log_type=LOG_ERROR):
         """Add text to the log buffer."""
         self.logger.log(text, log_type)
 
-    def load(self):
-        """Load the app."""
-        if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
-            ver = ".".join(map(str, sys.version_info[0:2]))
-            self.log("Running Suplemon with Python "+ver+" which isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
-        self.ui.load()
-        self.load_files()
-        loaded = True
+    def init(self):
+        """Run the app via the ui wrapper."""
+        self.ui.run(self.run)
 
     def exit(self):
         """Stop the main loop and exit."""
         self.running = 0
 
-    def run(self):
+    def run(self, *args):
         """Run the app."""
         # Load ui and files etc
         self.load()
-        self.running = 1
         # Initial render
         self.get_editor().resize()
         self.ui.refresh()
@@ -103,6 +99,16 @@ class App:
         self.main_loop()
         # Unload ui
         self.ui.unload()
+
+    def load(self):
+        """Load the app."""
+        self.ui.load()
+        if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
+            ver = ".".join(map(str, sys.version_info[0:2]))
+            self.log("Running Suplemon with Python "+ver+" which isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
+        self.load_files()
+        self.running = 1
+        self.trigger_event("app_loaded")
 
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
@@ -121,10 +127,6 @@ class App:
                 self.get_editor().resize()
                 self.ui.refresh()
 
-    def set_status(self, s):
-        """Set the status message."""
-        self.status_msg = str(s)
-
     def get_status(self):
         """Set the status message."""
         return self.status_msg
@@ -134,7 +136,28 @@ class App:
         return self.files.index(file_obj)
     
     def get_key_bindings(self):
+        """Returns the list of key bindings."""
         return self.config["app"]["keys"]
+
+    def get_event_bindings(self):
+        """Returns the dict of event bindings."""
+        return self.event_bindings
+
+    def set_key_binding(self, key, operation):
+        """Bind a key to an operation."""
+        self.get_key_bindings()[key] = operation
+
+    def set_event_binding(self, event, callback):
+        """Bind a key to an operatio n."""
+        event_bindings = self.get_event_bindings()
+        if event in event_bindings.keys():
+            event_bindings[event].append(callback)
+        else:
+            event_bindings[event] = [callback]
+
+    def set_status(self, s):
+        """Set the status message."""
+        self.status_msg = str(s)
 
     def unsaved_changes(self):
         """Check if there are unsaved changes in any file."""
@@ -308,8 +331,23 @@ class App:
         if hasattr(operation, '__call__'):
             operation()
         elif operation in self.operations.keys():
-            return self.operations[operation]()
+            cancel = self.trigger_event(operation)
+            if not cancel:
+                result = self.operations[operation]()
+                return result
         return False
+
+    def trigger_event(self, event):
+        """Triggers event and runs registered callbacks."""
+        status = False
+        bindings = self.get_event_bindings()
+        if event in bindings.keys():
+            callbacks = bindings[event]
+            for cb in callbacks:
+                val = cb(event)
+                if val:
+                    status = True
+        return status
 
     def toggle_fullscreen(self):
         """Toggle full screen editor."""
@@ -376,10 +414,9 @@ class App:
 
     def close_file(self):
         """Close current file if user confirms action."""
-        flag = True
         if self.get_file().is_changed():
             if not self.ui.query_bool("Close file?"):
-                flag = False
+                return False
         self.files.pop(self.current_file)
         if not len(self.files):
             self.new_file()
@@ -393,7 +430,7 @@ class App:
         if not f.get_name():
             return self.save_file_as(f)
         if f.save():
-            self.set_status("Saved [" + curr_time_sec() + "] '" + f.name + "'")
+            self.set_status("Saved [" + helpers.curr_time_sec() + "] '" + f.name + "'")
             if f.path() == self.config.path():
                 self.reload_config()
             return True
@@ -445,10 +482,8 @@ class App:
 
     def load_files(self):
         """Try to load all files specified in arguments."""
-        #TODO: Maybe use argparse for this
-        if len(sys.argv) > 1:
-            names = sys.argv[1:]
-            for name in names:
+        if self.filenames:
+            for name in self.filenames:
                 if self.file_is_open(name): continue
                 if self.open_file(name):
                     loaded = True
@@ -478,16 +513,3 @@ class App:
         # Set markdown as the default file type
         file.editor.set_file_extension("md")
         return file
-
-
-def main(*args):
-    global app
-    app = App()
-    app.run()
-
-if __name__ == "__main__":
-    """Only run the app if it's run directly (not imported)."""
-    ui.wrapper(main)
-    # Output log info
-    if app.config["app"]["debug"]:
-        app.logger.output()

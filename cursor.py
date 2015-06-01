@@ -30,6 +30,31 @@ class Cursor:
         
     def set_y(self, y):
         self.y = y
+
+    def move_left(self, delta=1):
+        """Move the cursor left with delta."""
+        self.x -= delta
+        if self.x < 0:
+            self.x = 0
+        return
+
+    def move_right(self, delta=1):
+        """Move the cursor right with delta."""
+        self.x += delta
+        return
+
+    def move_up(self, delta=1):
+        """Move the cursor up with delta."""
+        self.y -= 1
+        if self.y < 0:
+            self.y = 0
+        return
+
+    def move_down(self, delta=1):
+        """Move the cursor down with delta."""
+        self.y += delta
+        return
+
         
     def __getitem__(self, i):
         # TODO: Deprecate in favor of proper access methods.
@@ -38,15 +63,6 @@ class Cursor:
             return self.x
         elif i == 1:
             return self.y
-
-    # Deprecated
-    #def __setitem__(self, i, v):
-    #    # TODO: Deprecate in favor of proper access methods.
-    #    """Set coordinates with list indices."""
-    #    if i == 0:
-    #        self.x = v
-    #    elif i == 1:
-    #        self.y = v
 
     def __eq__(self, item):
         """Check for equality."""

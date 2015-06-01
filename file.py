@@ -18,6 +18,7 @@ class File:
         self.last_save = None
         self.opened = time.time()
         self.editor = None
+        self.writable = True
 
     def _path(self):
         """Get the full path of the file."""
@@ -43,6 +44,10 @@ class File:
         """Get the file name."""
         return self.name
 
+    def get_editor(self):
+        """Get the associated editor."""
+        return self.editor
+
     def set_name(self, name):
         """Set the file name."""
         # TODO: sanitize
@@ -65,7 +70,14 @@ class File:
         self.editor = editor
         self.update_editor_extension()
 
+    def on_load(self):
+        """Does checks after file is loaded."""
+        self.writable = os.access(self._path(), os.W_OK)
+        if not self.writable:
+            self.log("File not writable.")
+
     def update_editor_extension(self):
+        """Set the editor file extension from the current file name."""
         if not self.editor:
             return False
         ext = self.name.split(".")
@@ -103,6 +115,7 @@ class File:
             return False
         self.data = data
         self.editor.set_data(data)
+        self.on_load()
         return True
 
     def _read_text(self, file):
@@ -138,7 +151,12 @@ class File:
     def reload(self):
         """Reload file data."""
         return self.load()
-        
+
     def is_changed(self):
         """Check if the editor data is different from the file."""
         return self.editor.get_data() != self.data
+
+    def is_writable(self):
+        """Check if the file is writable."""
+        return self.writable
+        

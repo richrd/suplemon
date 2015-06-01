@@ -7,18 +7,6 @@ import os
 
 from helpers import *
 
-def wrapper(func):
-    global curses
-
-    # Force enabling colors
-    #os.environ["TERM"] = "xterm-256color"
-    # Reduce ESC detection time to 100ms
-    os.environ["ESCDELAY"] = "100"
-    # Now import curses
-    import curses
-    import curses.textpad
-    curses.wrapper(func)
-
 class InputEvent:
     """Represents a keyboard or mouse event."""
     def __init__(self):
@@ -76,9 +64,22 @@ class UI:
     def __init__(self, app):
         self.app = app
         self.warned_old_curses = 0
+
+    def init(self):
+        """Set ESC delay and then import curses."""
+        global curses
+        # Set ESC detection time
+        os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
+        # Now import curses, otherwise ESCDELAY won't have any effect
+        import curses
+        import curses.textpad
+
+    def run(self, func):
+        """Run the application main function via the curses wrapper for safety."""
+        curses.wrapper(func)
         
-    def load(self):
-        """Load an setup curses."""
+    def load(self, *args):
+        """Setup curses."""
         # Log the terminal type
         self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), LOG_INFO)
 
@@ -87,7 +88,11 @@ class UI:
 
         curses.cbreak()
         curses.noecho()
-        curses.curs_set(0)
+        try:
+            # Might fail on vt100 terminal emulators
+            curses.curs_set(0)
+        except:
+            self.app.log("curses.curs_set(0) failed!", LOG_WARNING)
 
         self.screen.keypad(1)
 
@@ -110,7 +115,11 @@ class UI:
     def setup_colors(self):
         """Initialize color support and define colors."""
         curses.start_color()
-        curses.use_default_colors()
+        try:
+            curses.use_default_colors()
+        except:
+            self.app.logger.log("Failed to load curses default colors. You could try 'export TERM=xterm-256color'.")
+            return False
 
         fg = -1 # Default foreground color (could also be set to curses.COLOR_WHITE)
         bg = -1 # Default background color (could also be set to curses.COLOR_BLACK)
@@ -191,7 +200,7 @@ class UI:
             self.app.get_editor().resize( (yx[0]-y_sub, yx[1]) )
             self.app.get_editor().move_win( (y_start, 0) )
 
-    def size(self):
+    def get_size(self):
         """Get terminal size."""
         y, x = self.screen.getmaxyx()
         return (x, y)
@@ -231,7 +240,7 @@ class UI:
     def show_top_status(self):
         """Show top status row."""
         self.header_win.erase()
-        size = self.size()
+        size = self.get_size()
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
@@ -262,7 +271,9 @@ class UI:
         file_list = files[curr_file_index:] + files[:curr_file_index]
         str_list = []
         for f in file_list:
-            fname = f.name + (["", "*"][f.is_changed()])
+            prepend = ["!", ""][f.is_writable()]
+            append = ["", "*"][f.is_changed()]
+            fname = prepend + f.name + append
             if not str_list:
                 str_list.append("[" + fname + "]")
             else:
@@ -272,8 +283,8 @@ class UI:
     def show_bottom_status(self):
         """Show bottom status line."""
         editor = self.app.get_editor()
-        size = self.size()
-        cur = editor.cursor()
+        size = self.get_size()
+        cur = editor.get_cursor()
         data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
             "cur:"+str(len(editor.cursors))+" "+\
             "buf:"+str(len(editor.get_buffer()))
@@ -327,7 +338,7 @@ class UI:
         y = 0
         max_y = 1
         for key in keys:
-            if x+len(" ".join(key)) >= self.size()[0]:
+            if x+len(" ".join(key)) >= self.get_size()[0]:
                 x = 0
                 y += 1
                 if y > max_y:
