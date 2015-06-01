@@ -3,6 +3,9 @@
 """
 Start a Suplemon instance in the current window
 """
+
+import sys
+
 try:
     import argparse
 except:
