@@ -244,7 +244,24 @@ class UI:
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
-            head_parts.append("Suplemon Editor v" + self.app.version + " -")
+            name_str = "Suplemon Editor v" + self.app.version + " -"
+            if self.app.config["app"]["use_unicode_symbols"]:
+                # Possible logos
+                #logo = "\u265B"     # Crown
+                #logo = "\u232C"     # Benzene
+                ##logo = "\u26C4"    # Snowman without snow
+                ##logo = "\u26FD"    # Gas pump
+                #logo = "\u2692"     # Two crossed hammers
+                #logo = "\u2698"     # Flower
+                #logo = "\u0001F34B" # Lemon
+                #logo = "\u2603"     # Snowman
+                #logo = "\u2400"     # NULL
+                #logo = "\uFE95"     # Smiley
+                #logo = "\uE016"     # Floppy
+                #logo = "\u2686"     # Simple lemon 
+                logo = "\u2688"      # Simple lemon (filled)
+                name_str = " " + logo + " " + name_str
+            head_parts.append(name_str)
         
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
@@ -261,7 +278,10 @@ class UI:
         head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
         if len(head) >= size[0]:
             head = head[:size[0]-1]
-        self.header_win.addstr(0,0, head, curses.color_pair(0) | curses.A_REVERSE)
+        if self.app.config["display"]["invert_status_bars"]:
+            self.header_win.addstr(0,0, head, curses.color_pair(0) | curses.A_REVERSE)
+        else:
+            self.header_win.addstr(0,0, head, curses.color_pair(0))
         self.header_win.refresh()
         
     def file_list_str(self):
@@ -270,9 +290,11 @@ class UI:
         files = self.app.get_files();
         file_list = files[curr_file_index:] + files[:curr_file_index]
         str_list = []
+        no_write_symbol = ["!", "\u2715"][self.app.config["app"]["use_unicode_symbols"]]
+        is_changed_symbol = ["*", "\u2732"][self.app.config["app"]["use_unicode_symbols"]]
         for f in file_list:
-            prepend = ["!", ""][f.is_writable()]
-            append = ["", "*"][f.is_changed()]
+            prepend = [no_write_symbol, ""][f.is_writable()]
+            append = ["", is_changed_symbol][f.is_changed()]
             fname = prepend + f.name + append
             if not str_list:
                 str_list.append("[" + fname + "]")
@@ -308,8 +330,11 @@ class UI:
 
         if len(line) >= size[0]:
             line = line[:size[0]-1]
-
-        self.status_win.addstr(0,0, line, curses.color_pair(0) | curses.A_REVERSE)
+        if self.app.config["display"]["invert_status_bars"]:
+            self.status_win.addstr(0,0, line, curses.color_pair(0) | curses.A_REVERSE)
+        else:
+            self.status_win.addstr(0,0, line, curses.color_pair(0))
+        
         self.status_win.refresh()
         
     def show_legend(self):
