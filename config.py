@@ -138,7 +138,8 @@ class Config:
                 "show_app_name": True,
                 "show_file_list": True,
                 "show_legend": True,
-                "show_bottom_bar": True
+                "show_bottom_bar": True,
+                "invert_status_bars": True,
             },
         }
 
