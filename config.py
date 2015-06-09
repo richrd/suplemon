@@ -58,7 +58,7 @@ class Config:
                 # Amount of undo states to store
                 "max_history": 50,
                 # Characters considered to separate words
-                "punctuation": " (){}[]'\"=+-/*.:,;_\n\r",
+                "punctuation": " (){}[]<>$@!%'\"=+-/*.:,;_\n\r",
                 # Character to use to visualize end of line
                 "line_end_char": "",
                 # White space characters and their visual matches
