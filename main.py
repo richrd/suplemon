@@ -203,9 +203,9 @@ class App:
         editor = self.get_editor()
         if event.mouse_code == 1:                    # Left mouse button release
             editor.set_single_cursor(event.mouse_pos)
-        elif event.mouse_code == 134217728:          # Wheel up (and unfortunately left button drag)
+        elif event.mouse_code == 524288:             # Wheel up
             editor.page_up()
-        elif event.mouse_code == 524288:             # Wheel down
+        elif event.mouse_code == 134217728:          # Wheel down(and unfortunately left button drag)
             editor.page_down()
         else:
             return False
