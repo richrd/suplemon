@@ -484,14 +484,12 @@ class App:
         """Try to load all files specified in arguments."""
         if self.filenames:
             for name in self.filenames:
-                self.log(name)
                 if os.path.isdir(name):
                     continue
                 if self.file_is_open(name):
                     continue
                 if not self.open_file(name):
                     self.new_file(name)
-
         # If nothing was loaded
         if not self.files:
             self.load_default()
