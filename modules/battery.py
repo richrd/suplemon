@@ -81,7 +81,10 @@ class Battery(Command):
             return None
         raw_str = raw_str.decode("utf-8")
         part = get_string_between("percentage:", "%", raw_str)
-        return int(part.strip())
+           
+        if part:
+            return int(part.strip())
+        return False
 
     def readf(self, path):
         """Read and return file contents at path."""
