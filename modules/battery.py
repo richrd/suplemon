@@ -70,8 +70,13 @@ class Battery(Command):
         except:
             return None
         raw_str = raw_str.decode("utf-8")
-        part = get_string_between(",", "%", raw_str)	
-        return int(part)
+        part = get_string_between(",", "%", raw_str)
+        if part:
+            try:
+                return int(part)
+            except:
+                return None
+        return None
 
     def battery_status_upower(self):
         """Get the battery status via upower."""
@@ -81,10 +86,12 @@ class Battery(Command):
             return None
         raw_str = raw_str.decode("utf-8")
         part = get_string_between("percentage:", "%", raw_str)
-           
         if part:
-            return int(part.strip())
-        return False
+            try:
+                return int(part)
+            except:
+                return None
+        return None
 
     def readf(self, path):
         """Read and return file contents at path."""

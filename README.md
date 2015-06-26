@@ -65,6 +65,7 @@ Suplemon is licensed under the MIT license.
 
 ## Support
 
+If you experience problems, please submit a new issue.
 If you have a question, need help, or just want to chat head over to the IRC channel #suplemon @ Freenode.
 I'll be happy to chat with you, see you there!
 
