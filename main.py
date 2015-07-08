@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.2"
+__version__ = "0.1.21"
 
 import os
 import sys
@@ -205,9 +205,9 @@ class App:
             editor.set_single_cursor(event.mouse_pos)
         elif event.mouse_code == 4096:               # Right mouse button release
             editor.add_cursor(event.mouse_pos)
-        elif event.mouse_code == 134217728:          # Wheel up (and unfortunately left button drag)
+        elif event.mouse_code == 524288:             # Wheel up
             editor.page_up()
-        elif event.mouse_code == 524288:             # Wheel down
+        elif event.mouse_code == 134217728:          # Wheel down(and unfortunately left button drag)
             editor.page_down()
         else:
             return False
@@ -486,12 +486,14 @@ class App:
         """Try to load all files specified in arguments."""
         if self.filenames:
             for name in self.filenames:
-                if self.file_is_open(name): continue
-                if self.open_file(name):
-                    loaded = True
-                else:
+                if os.path.isdir(name):
+                    continue
+                if self.file_is_open(name):
+                    continue
+                if not self.open_file(name):
                     self.new_file(name)
-        else:
+        # If nothing was loaded
+        if not self.files:
             self.load_default()
 
     def file_is_open(self, path):

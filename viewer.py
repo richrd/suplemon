@@ -32,6 +32,7 @@ class Viewer:
         # Map special extensions to generic ones for highlighting
         self.extension_map = {
             "scss": "css",
+            "less": "css",
         }
         self.show_line_ends = True
 
