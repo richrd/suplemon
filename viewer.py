@@ -221,6 +221,10 @@ class Viewer:
             self.file_extension = ext
             self.setup_linelight()
 
+    def add_cursor(self, cursor):
+        """Add a new cursor. Accepts a x,y tuple or a Cursor instance."""
+        self.cursors.append(Cursor(cursor))
+
     def pad_lnum(self, n):
         """Pad line number with zeroes."""
         #TODO: move to helpers
