@@ -144,6 +144,17 @@ I'll be happy to chat with you, see you there!
  * F11
    > Toggle full screen
 
+## Mouse shortcuts
+
+ * Left Click
+   > Set cursor at mouse position. Reverts to a single cursor.
+
+ * Right Click
+   > Add a cursor at mouse position.
+
+ * Scroll Wheel Up / Down
+   > Scroll up & down.
+
 ## Todo
  * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Design proper API for plugins/extensions/macros
