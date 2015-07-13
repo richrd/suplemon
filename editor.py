@@ -3,6 +3,7 @@
 Editor class for extending viewer with text editing features.
 """
 
+
 import os
 import re
 import sys
@@ -14,6 +15,7 @@ from cursor import *
 from helpers import *
 from viewer import *
 
+
 class State:
     """Store editor state for undo/redo."""
     def __init__(self, editor=None):
@@ -22,7 +24,7 @@ class State:
         self.y_scroll = 0
         self.x_scroll = 0
         self.last_find = ""
-        if editor != None:
+        if editor is not None:
             self.store(editor)
 
     def store(self, editor):
@@ -51,11 +53,11 @@ class Editor(Viewer):
             window: A window object to use for the ui.
         """
         Viewer.__init__(self, app, window)
-        self.buffer = []               # Copy/paste buffer
-        self.last_find = ""            # Last search used in 'find'
-        self.history = [State()]       # History of editor states for undo/redo
-        self.current_state = 0         # Current state index of the editor
-        self.last_action = None        # Last editor action that was used (for undo/redo)
+        self.buffer = []           # Copy/paste buffer
+        self.last_find = ""        # Last search used in 'find'
+        self.history = [State()]   # History of editor states for undo/redo
+        self.current_state = 0     # Current state index of the editor
+        self.last_action = None    # Last editor action that was used (for undo/redo)
 
         self.operations = {
             "home": self.home,                            # Home
