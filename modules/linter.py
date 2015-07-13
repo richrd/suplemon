@@ -6,13 +6,24 @@ from mod_base import *
 
 class Linter(Command):
     def init(self):
-        self.bind_event("app_loaded", self.lint_files)
-        self.bind_event("mainloop", self.mainloop)
-        self.bind_event("after:save_file", self.lint_files)
-        self.bind_event("after:save_file_as", self.lint_files)
+        if not self.has_flake8_support():
+            self.log("Flake8 not available. Can't show linting.")
 
-    def lint_files(self, event):
-        self.log("LINTER EVENT " + str(event))
+        self.bind_event("mainloop", self.mainloop)
+        self.bind_event("app_loaded", self.lint_all_files)
+
+        self.bind_event("after:save_file", self.lint_current_file)
+        self.bind_event("after:save_file_as", self.lint_current_file)
+        self.bind_event("after:reload_file", self.lint_current_file)
+        self.bind_event("after:open_file", self.lint_current_file)
+
+    def has_flake8_support(self):
+        return self.get_output(["flake8"])
+
+    def lint_current_file(self, event):
+        self.lint_file(self.app.get_file())
+
+    def lint_all_files(self, event):
         """Do linting check for all open files and store results."""
         for file in self.app.files:
             self.lint_file(file)
@@ -22,9 +33,12 @@ class Linter(Command):
         path = file.get_path()
         if not path: # Unsaved file
             return False
+        if file.get_extension().lower() != "py": # Only lint Python files
+            return False
         linting = self.get_file_linting(path)
+        if not linting: # Linting failed
+            return False
         editor = file.get_editor()
-        #for line_no in linting.keys():
         line_no = 0
         while line_no < len(editor.lines):
             line = editor.lines[line_no]
@@ -59,13 +73,19 @@ class Linter(Command):
             self.app.set_status("Line " + str(line_no) + ": " + msg)
 
     def get_output(self, cmd):
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        try:
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        except FileNotFoundError:
+            return False
         out, err = process.communicate()
         return out
 
     def get_file_linting(self, path):
         """Do linting check for given file path."""
-        output = self.get_output(["flake8", path]).decode("utf-8")
+        output = self.get_output(["flake8", path])
+        if not output:
+            return False
+        output = output.decode("utf-8")
         # Remove file paths from output
         output = output.replace(path+":", "")
         lines = output.split("\n")
