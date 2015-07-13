@@ -283,7 +283,7 @@ class Viewer:
             # Get line for current row
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(8))
+                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(line.number_color))
 
             # Normal rendering
             line_part = line[min(self.x_scroll, len(line)):]
