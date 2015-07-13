@@ -8,6 +8,7 @@ import time
 
 from helpers import *
 
+
 class File:
     def __init__(self, app = None):
         self.app = app
@@ -26,6 +27,7 @@ class File:
 
     def path(self):
         """Get the full path of the file."""
+        # TODO: deprecate in favour of get_path()
         return self._path()
 
     def parse_path(self, path):
@@ -43,6 +45,16 @@ class File:
     def get_name(self):
         """Get the file name."""
         return self.name
+
+    def get_path(self):
+        """Get the full path of the file."""
+        return self._path()
+
+    def get_extension(self):
+        parts = self.name.split(".")
+        if len(parts) < 2:
+            return ""
+        return parts[-1]
 
     def get_editor(self):
         """Get the associated editor."""
@@ -80,9 +92,9 @@ class File:
         """Set the editor file extension from the current file name."""
         if not self.editor:
             return False
-        ext = self.name.split(".")
+        ext = self.get_extension()
         if len(ext) > 1:
-            self.editor.set_file_extension(ext[-1])
+            self.editor.set_file_extension(ext)
 
     def save(self):
         """Write the editor data to file."""
