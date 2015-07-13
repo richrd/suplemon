@@ -344,7 +344,9 @@ class App:
             cancel = self.trigger_event(operation)
             if not cancel:
                 result = self.operations[operation]()
-                return result
+            # Run post action event
+            self.trigger_event("after:" + operation)
+            return result
         return False
 
     def trigger_event(self, event):

@@ -7,9 +7,9 @@ from mod_base import *
 class Linter(Command):
     def init(self):
         self.bind_event("app_loaded", self.lint_files)
-        self.bind_event("save_file", self.lint_files)
-        self.bind_event("save_file_as", self.lint_files)
         self.bind_event("mainloop", self.mainloop)
+        self.bind_event("after:save_file", self.lint_files)
+        self.bind_event("after:save_file_as", self.lint_files)
 
     def lint_files(self, event):
         self.log("LINTER EVENT " + str(event))
@@ -20,6 +20,8 @@ class Linter(Command):
 
     def lint_file(self, file):
         path = file.get_path()
+        if not path: # Unsaved file
+            return False
         linting = self.get_file_linting(path)
         editor = file.get_editor()
         #for line_no in linting.keys():
