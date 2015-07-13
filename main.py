@@ -127,7 +127,9 @@ class App:
                 if not self.handle_input(event):
                     # Pass the input to the editor component
                     self.get_editor().handle_input(event)
-                # TODO: why do I need resize here? (View won't update after switching files, WTF)
+                # TODO: why do I need resize here?
+                # (View won't update after switching files, WTF)
+                self.trigger_event("mainloop")
                 self.get_editor().resize()
                 self.ui.refresh()
 
@@ -352,7 +354,11 @@ class App:
         if event in bindings.keys():
             callbacks = bindings[event]
             for cb in callbacks:
-                val = cb(event)
+                try:
+                    val = cb(event)
+                except:
+                    self.log(get_error_info())
+                    continue
                 if val:
                     status = True
         return status
