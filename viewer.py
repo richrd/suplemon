@@ -158,13 +158,13 @@ class Viewer:
 
     def get_data(self):
         """Get editor contents.
-        
+
         :return: Editor contents.
         :rtype: str
         """
         str_lines = []
         for line in self.lines:
-            if type(line) == type(""):
+            if isinstance(line, str):
                 str_lines.append(line)
             else:
                 str_lines.append(line.get_data())
