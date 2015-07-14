@@ -187,6 +187,10 @@ class Editor(Viewer):
         index = self.current_state+1
         self.restore_state(index)
 
+    #
+    # Cursor operations
+    #
+
     def arrow_right(self):
         """Move cursors right."""
         for cursor in self.cursors:
@@ -358,6 +362,10 @@ class Editor(Viewer):
             cursor.set_x(len(self.lines[cursor.y]))
         self.move_cursors()
 
+    #
+    # Text editing operations
+    #
+
     def replace_all(self, what, replacement):
         """Replaces what with replacement on each line."""
         for line in self.lines:
@@ -376,12 +384,12 @@ class Editor(Viewer):
             if len(self.lines) > 1 and cursor.x == len(line) and cursor.y != len(self.lines) - 1:
                 data = self.lines[cursor.y]
                 self.lines.pop(cursor.y)
-                self.lines[cursor.y] = Line(data+self.lines[cursor.y])
+                self.lines[cursor.y].set_data(data+self.lines[cursor.y])
                 self.move_x_cursors(cursor.y, cursor.x, -1)
             else:
                 start = line[:cursor.x]
                 end = line[cursor.x+1:]
-                self.lines[cursor.y] = Line(start+end)
+                self.lines[cursor.y].set_data(start+end)
                 self.move_x_cursors(cursor.y, cursor.x, -1)
         self.move_cursors()
         # Add a restore point if previous action != delete
@@ -403,7 +411,9 @@ class Editor(Viewer):
                 length = len(prev_line)  # Get the length of previous line
 
                 # Add the current line to the previous one
-                self.lines[cursor.y-1] += curr_line
+                new_data = self.lines[cursor.y-1] + curr_line
+                self.lines[cursor.y-1].set_data(new_data)
+
                 # Get all cursors on current line
                 line_cursors = self.get_cursors_on_line(line_no)
 
@@ -433,7 +443,7 @@ class Editor(Viewer):
                 start = curr_line[:cursor.x-del_n_chars]
                 end = curr_line[cursor.x:]
                 # Store the new line
-                self.lines[line_no] = Line(start+end)
+                self.lines[line_no].set_data(start+end)
                 # Move the operating curser back the deleted amount
                 cursor.move_left(del_n_chars)
                 # Do the same to the rest
@@ -462,7 +472,7 @@ class Editor(Viewer):
             end = line[cursor.x:]
 
             # Leave the beginning of the line
-            self.lines[cursor.y] = Line(start)
+            self.lines[cursor.y].set_data(start)
             wspace = ""
             if self.config["auto_indent_newline"]:
                 wspace = self.whitespace(self.lines[cursor.y])*" "
@@ -492,7 +502,7 @@ class Editor(Viewer):
                 line = self.lines[cursor.y]
                 buf = buffer[0]
                 line = line[:cursor.x] + buf + line[cursor.x:]
-                self.lines[cursor.y] = Line(line)
+                self.lines[cursor.y].set_data(line)
                 buffer.pop(0)
                 self.move_x_cursors(cursor.y, cursor.x-1, len(buf))
         # If we have one cursor and multiple lines
@@ -519,8 +529,8 @@ class Editor(Viewer):
             if cursor.y == 0:
                 break
             old = self.lines[cursor.y-1]
-            self.lines[cursor.y-1] = Line(self.lines[cursor.y])
-            self.lines[cursor.y] = Line(old)
+            self.lines[cursor.y-1] = self.lines[cursor.y]
+            self.lines[cursor.y] = old
         self.move_cursors((0, -1))
         self.scroll_up()
         # Add a restore point if previous action != push_up
@@ -537,8 +547,9 @@ class Editor(Viewer):
                 break
             used_y.append(cursor.y)
             old = self.lines[cursor.y+1]
-            self.lines[cursor.y+1] = Line(self.lines[cursor.y])
-            self.lines[cursor.y] = Line(old)
+            self.lines[cursor.y+1] = self.lines[cursor.y]
+            self.lines[cursor.y] = old
+
         self.move_cursors((0, 1))
         self.scroll_down()
         # Add a restore point if previous action != push_down
@@ -610,7 +621,7 @@ class Editor(Viewer):
         line = self.lines[cursor.y]
         start = line[:cursor.x]
         end = line[cursor.x:]
-        self.lines[cursor.y] = Line(start + data + end)
+        self.lines[cursor.y].set_data(start + data + end)
         self.move_x_cursors(cursor.y, cursor.x, len(data))
         cursor.move_right(len(data))
 
@@ -632,7 +643,7 @@ class Editor(Viewer):
 
     def find(self, what, findall=False):
         """Find what in data (from top to bottom). Adds a cursor when found."""
-        # Sorry for this collosal function
+        # Sorry for this colossal function
         if not what:
             return
         last_cursor = self.get_last_cursor()
@@ -649,14 +660,15 @@ class Editor(Viewer):
                 x_offset = last_cursor.x
 
             # Find all occurances of search string
+            s = str(line[x_offset:])  # Data to search in
             pattern = re.escape(what)  # Default to non regex pattern
             if self.config["regex_find"]:
                 try:  # Try to search with the actual regex
-                    indices = [match.start() for match in re.finditer(what, str(line[x_offset:]))]
+                    indices = [match.start() for match in re.finditer(what, s)]
                 except:  # Revert to normal search
-                    indices = [match.start() for match in re.finditer(pattern, str(line[x_offset:]))]
+                    indices = [match.start() for match in re.finditer(pattern, s)]
             else:
-                indices = [match.start() for match in re.finditer(pattern, str(line[x_offset:]))]
+                indices = [match.start() for match in re.finditer(pattern, s)]
 
             # Loop through the indices and add cursors if they don't exist yet
             for i in indices:
