@@ -34,6 +34,8 @@ class Line:
         return self.data
 
     def set_data(self, data):
+        if isinstance(data, Line):
+            data = data.get_data()
         self.data = data
 
     def set_number_color(self, color):
