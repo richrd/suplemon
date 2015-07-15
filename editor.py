@@ -755,7 +755,7 @@ class Editor(Viewer):
             self.run_operation(operation)
         # Try to type the key into the editor
         else:
-            if type(key) == type(""):
+            if isinstance(key, str):
                 self.type(key)
             elif name and not name.startswith("KEY_"):
                 self.type(name)
@@ -764,7 +764,7 @@ class Editor(Viewer):
     def run_operation(self, operation):
         """Run an editor core operation."""
         if operation in self.operations.keys():
-            cancel = self.app.trigger_event(operation)
+            cancel = self.app.trigger_event_before(operation)
             if not cancel:
                 result = self.operations[operation]()
                 return result
