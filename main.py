@@ -112,7 +112,7 @@ class App:
             self.log(msg, LOG_WARNING)
         self.load_files()
         self.running = 1
-        self.trigger_event("app_loaded")
+        self.trigger_event_after("app_loaded")
 
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
@@ -129,7 +129,7 @@ class App:
                     self.get_editor().handle_input(event)
                 # TODO: why do I need resize here?
                 # (View won't update after switching files, WTF)
-                self.trigger_event("mainloop")
+                self.trigger_event_after("mainloop")
                 self.get_editor().resize()
                 self.ui.refresh()
 
@@ -153,13 +153,15 @@ class App:
         """Bind a key to an operation."""
         self.get_key_bindings()[key] = operation
 
-    def set_event_binding(self, event, callback):
-        """Bind a key to an operatio n."""
+    def set_event_binding(self, event, when, callback):
+        """Bind a callbacks to be run before or after an event."""
         event_bindings = self.get_event_bindings()
-        if event in event_bindings.keys():
-            event_bindings[event].append(callback)
+        if when not in event_bindings.keys():
+            event_bindings[when] = {}
+        if event in event_bindings[when].keys():
+            event_bindings[when][event].append(callback)
         else:
-            event_bindings[event] = [callback]
+            event_bindings[when][event] = [callback]
 
     def set_status(self, s):
         """Set the status message."""
@@ -341,20 +343,24 @@ class App:
         if hasattr(operation, '__call__'):
             operation()
         elif operation in self.operations.keys():
-            cancel = self.trigger_event(operation)
+            # cancel = self.trigger_event(operation)
+            cancel = self.trigger_event_before(operation)
             if not cancel:
                 result = self.operations[operation]()
             # Run post action event
-            self.trigger_event("after:" + operation)
+            # self.trigger_event("after:" + operation)
+            self.trigger_event_after(operation)
             return result
         return False
 
-    def trigger_event(self, event):
+    def trigger_event(self, event, when):
         """Triggers event and runs registered callbacks."""
         status = False
         bindings = self.get_event_bindings()
-        if event in bindings.keys():
-            callbacks = bindings[event]
+        if not when in bindings.keys():
+            return False
+        if event in bindings[when].keys():
+            callbacks = bindings[when][event]
             for cb in callbacks:
                 try:
                     val = cb(event)
@@ -364,6 +370,12 @@ class App:
                 if val:
                     status = True
         return status
+
+    def trigger_event_before(self, event):
+        return self.trigger_event(event, "before")
+
+    def trigger_event_after(self, event):
+        return self.trigger_event(event, "after")
 
     def toggle_fullscreen(self):
         """Toggle full screen editor."""
