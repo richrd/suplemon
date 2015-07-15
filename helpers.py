@@ -14,6 +14,7 @@ LOG_INFO = 1
 LOG_WARNING = 2
 LOG_ERROR = 3
 
+
 def curr_time():
     """Current time in %H:%M"""
     return time.strftime("%H:%M")
