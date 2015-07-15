@@ -1,13 +1,14 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 Cursor object for storing cursor data.
 """
-    
+
+
 class Cursor:
     def __init__(self, x=0, y=0):
         # Handle coords as a tuple
-        if type(x) == type((0,)):
-            x,y = x
+        if isinstance(x, tuple):
+            x, y = x
             self.x = x
             self.y = y
         # Handle coords from existing Cursor
@@ -20,14 +21,14 @@ class Cursor:
             self.y = y
 
     def get_x(self):
-        return x
-        
+        return self.x
+
     def get_y(self):
-        return y
-        
+        return self.y
+
     def set_x(self, x):
         self.x = x
-        
+
     def set_y(self, y):
         self.y = y
 
@@ -55,7 +56,6 @@ class Cursor:
         self.y += delta
         return
 
-        
     def __getitem__(self, i):
         # TODO: Deprecate in favor of proper access methods.
         """Get coordinates with list indices."""
