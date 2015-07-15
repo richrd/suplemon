@@ -88,9 +88,9 @@ class Config:
                     curses.KEY_RIGHT: "arrow_right",      # Right
                     curses.KEY_ENTER: "enter",            # Enter
                     "\n": "enter",                        # Enter
-                    "^J": "enter",                        # Enter (fallback for 'getch')
+                    "^J": "enter",                        # Enter (for 'getch')
                     curses.KEY_BACKSPACE: "backspace",    # Backspace
-                    "^?": "backspace",                    # Backspace (fix for Mac)
+                    "^?": "backspace",                    # Backspace (Mac fix)
                     curses.KEY_DC: "delete",              # Delete
                     331: "insert",                        # Insert
                     "\t": "tab",                          # Tab

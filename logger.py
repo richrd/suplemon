@@ -1,10 +1,11 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 Basic logging to delay printing until curses is unloaded.
 """
 import time
 
 from helpers import *
+
 
 class Logger:
     def __init__(self, filename="log.txt"):
@@ -18,9 +19,9 @@ class Logger:
         }
 
     def log(self, data, log_type=None):
-        if log_type == None:
+        if log_type is None:
             log_type = LOG_ERROR
-        self.entries.append( (log_type, str(data), time.time()) )
+        self.entries.append((log_type, str(data), time.time()))
 
     def output(self):
         for entry in self.entries:
@@ -29,10 +30,10 @@ class Logger:
                 stamp = time.strftime("%H:%M:%S", time.localtime(entry[2]))
                 print("[" + stamp + " " + log_type + "] " + str(entry[1]))
             except:
-                print("Shit! Failed to print a log entry and forgot to write it in a file :(")
+                print("Failed to print a log entry and forgot to write it in a file :(")
                 print("Here's why:")
                 print(get_error_info())
-            
+
     def get_type_str(self, log_type):
         if log_type in self.labels.keys():
             return self.labels[log_type]
