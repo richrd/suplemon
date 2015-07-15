@@ -1,5 +1,6 @@
-#-*- coding:utf-8
+# -*- coding:utf-8
 from mod_base import *
+
 
 class ReplaceAll(Command):
     def run(self, app, editor):

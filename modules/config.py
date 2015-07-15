@@ -1,5 +1,6 @@
 from mod_base import *
 
+
 class Config(Command):
     def run(self, app, editor):
         path = app.config.path()
@@ -10,7 +11,7 @@ class Config(Command):
             if not app.open_file(path):
                 app.new_file(path)
             app.switch_to_file(app.last_file_index())
- 
+
 module = {
     "class": Config,
     "name": "config",

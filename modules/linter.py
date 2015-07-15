@@ -70,7 +70,8 @@ class Linter(Command):
         """Run the linting command."""
         editor = self.app.get_file().get_editor()
         count = self.get_msg_count(editor)
-        self.app.set_status(str(count) + " lines with linting errors in this file.")
+        status = str(count) + " lines with linting errors in this file."
+        self.app.set_status(status)
 
     def mainloop(self, event):
         """Run the linting command."""
