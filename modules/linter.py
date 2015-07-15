@@ -9,13 +9,15 @@ class Linter(Command):
         if not self.has_flake8_support():
             self.log("Flake8 not available. Can't show linting.")
 
-        self.bind_event("mainloop", self.mainloop)
-        self.bind_event("app_loaded", self.lint_all_files)
-
-        self.bind_event("after:save_file", self.lint_current_file)
-        self.bind_event("after:save_file_as", self.lint_current_file)
-        self.bind_event("after:reload_file", self.lint_current_file)
-        self.bind_event("after:open_file", self.lint_current_file)
+        # Lint all files after app is loaded
+        self.bind_event_after("app_loaded", self.lint_all_files)
+        # Show linting messages in status bar
+        self.bind_event_after("mainloop", self.mainloop)
+        # Re-lint current file when appropriate
+        self.bind_event_after("save_file", self.lint_current_file)
+        self.bind_event_after("save_file_as", self.lint_current_file)
+        self.bind_event_after("reload_file", self.lint_current_file)
+        self.bind_event_after("open_file", self.lint_current_file)
 
     def has_flake8_support(self):
         return self.get_output(["flake8"])
@@ -31,12 +33,12 @@ class Linter(Command):
 
     def lint_file(self, file):
         path = file.get_path()
-        if not path: # Unsaved file
+        if not path:  # Unsaved file
             return False
-        if file.get_extension().lower() != "py": # Only lint Python files
+        if file.get_extension().lower() != "py":  # Only lint Python files
             return False
         linting = self.get_file_linting(path)
-        if not linting: # Linting failed
+        if not linting:  # Linting failed
             return False
         editor = file.get_editor()
         line_no = 0
@@ -56,9 +58,19 @@ class Linter(Command):
             return False
         return line.linting[0][1]
 
+    def get_msg_count(self, editor):
+        count = 0
+        for line in editor.lines:
+            if hasattr(line, "linting"):
+                if line.linting:
+                    count += 1
+        return count
+
     def run(self, app, editor):
         """Run the linting command."""
-        pass
+        editor = self.app.get_file().get_editor()
+        count = self.get_msg_count(editor)
+        self.app.set_status(str(count) + " lines with linting errors in this file.")
 
     def mainloop(self, event):
         """Run the linting command."""
@@ -97,7 +109,7 @@ class Linter(Command):
             line_no = int(parts[0])
             char_no = int(parts[1])
             message = ":".join(parts[2:]).strip()
-            if not line_no in linting.keys():
+            if line_no not in linting.keys():
                 linting[line_no] = []
             linting[line_no].append((char_no, message))
         return linting
