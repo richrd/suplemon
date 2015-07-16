@@ -8,9 +8,11 @@ import sys
 import imp
 import curses
 
-from line import *
-from cursor import *
-from helpers import *
+import helpers
+import constants
+
+from line import Line
+from cursor import Cursor
 
 
 class Viewer:
@@ -63,12 +65,12 @@ class Viewer:
 
         module = False
         if os.path.isfile(path):
-            self.app.log("Syntax file found...", LOG_INFO)
+            self.app.log("Syntax file found...", constants.LOG_INFO)
             try:
                 module = imp.load_source(ext, path)
-                self.app.log("File loaded...", LOG_INFO)
+                self.app.log("File loaded...", constants.LOG_INFO)
             except:
-                self.app.log(get_error_info())
+                self.app.log(helpers.get_error_info())
         else:
             return False
 
@@ -350,7 +352,7 @@ class Viewer:
         try:
             self.window.mvwin(yx[0], yx[1])
         except:
-            self.app.log(get_error_info(), LOG_WONTFIX)
+            self.app.log(helpers.get_error_info(), constants.LOG_WONTFIX)
 
     def move_y_scroll(self, delta):
         """Add delta the y scroll axis scroll"""

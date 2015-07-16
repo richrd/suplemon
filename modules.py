@@ -5,7 +5,8 @@ Addon module loader.
 import os
 import imp
 
-from helpers import *
+import helpers
+import constants
 
 
 class ModuleLoader:
@@ -26,7 +27,7 @@ class ModuleLoader:
 
     def load(self):
         """Find and load available modules."""
-        self.log("Loading modules...", LOG_INFO)
+        self.log("Loading modules...", constants.LOG_INFO)
         dirlist = os.listdir(self.module_path)
         for item in dirlist:
             # Skip 'hidden' dot files
@@ -56,7 +57,7 @@ class ModuleLoader:
             return inst
         except:
             self.log("Initializing module failed: " + module[0])
-            self.log(get_error_info())
+            self.log(helpers.get_error_info())
         return False
 
     def load_single(self, name):

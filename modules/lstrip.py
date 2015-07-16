@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class LStrip(Command):
+class LStrip(Module):
     def init(self):
         self.bind_key("kHOM7")  # Used to bind a key to the run-method
 

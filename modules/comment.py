@@ -1,8 +1,8 @@
-from line import *
-from mod_base import *
+import helpers
+from suplemon_module import Module
 
 
-class Comment(Command):
+class Comment(Module):
     def init(self):
         self.bind_key("^P")
 
@@ -23,16 +23,17 @@ class Comment(Command):
             target = str(line).strip()
             w = editor.whitespace(line)  # Amount of whitespace at line start
             # If the line starts with comment syntax
-            if starts(target, comment[0]):
+            if helpers.starts(target, comment[0]):
                 # Reconstruct the whitespace and add the line
                 new_line = (" "*w) + line[w+len(comment[0]):]
                 # If comment end syntax exists
                 if comment[1]:
                     # Try to remove it from the end of the line
-                    if ends(new_line, comment[1]):
+                    if helpers.ends(new_line, comment[1]):
                         new_line = new_line[:-1*len(comment[1])]
                 # Store the modified line
-                editor.lines[lnum] = Line(new_line)
+                # editor.lines[lnum] = Line(new_line)
+                editor.lines[lnum].set_data(new_line)
             # If the line isn't commented
             else:
                 # Slice out the prepended whitespace
@@ -43,7 +44,8 @@ class Comment(Command):
                     # Add comment end syntax if needed
                     new_line += comment[1]
                 # Store modified line
-                editor.lines[lnum] = Line(new_line)
+                # editor.lines[lnum] = Line(new_line)
+                editor.lines[lnum].set_data(new_line)
         # Keep cursors under control, same as usual...
         editor.move_cursors()
         editor.store_action_state("comment")

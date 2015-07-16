@@ -1,10 +1,10 @@
 # -*- encoding:utf-8
 
 import subprocess
-from mod_base import *
+from suplemon_module import Module
 
 
-class Linter(Command):
+class Linter(Module):
     def init(self):
         if not self.has_flake8_support():
             self.log("Flake8 not available. Can't show linting.")

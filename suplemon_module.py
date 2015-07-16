@@ -2,11 +2,9 @@
 """
 Base class for extension modules to inherit.
 """
-from helpers import *
 
 
-class Command:
-    # TODO: rename to Module and add subclass Command if needed
+class Module:
     def __init__(self, app):
         self.app = app
         self.init()

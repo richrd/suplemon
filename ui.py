@@ -5,7 +5,8 @@ Curses user interface.
 
 import os
 
-from helpers import *
+import helpers
+import constants
 
 
 class InputEvent:
@@ -82,7 +83,7 @@ class UI:
     def load(self, *args):
         """Setup curses."""
         # Log the terminal type
-        self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), LOG_INFO)
+        self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), constants.LOG_INFO)
 
         self.screen = curses.initscr()
         self.setup_colors()
@@ -93,7 +94,7 @@ class UI:
             # Might fail on vt100 terminal emulators
             curses.curs_set(0)
         except:
-            self.app.log("curses.curs_set(0) failed!", LOG_WARNING)
+            self.app.log("curses.curs_set(0) failed!", constants.LOG_WARNING)
 
         self.screen.keypad(1)
 
@@ -160,7 +161,7 @@ class UI:
             except:
                 self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
         else:
-            self.app.logger.log("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.", LOG_INFO)
+            self.app.logger.log("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.", constants.LOG_INFO)
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
@@ -173,7 +174,7 @@ class UI:
         if "get_wch" not in dir(self.header_win):
             # Notify only once
             if not self.warned_old_curses:
-                self.app.log("Using old curses! Some keys and special characters might not work.", LOG_WARNING)
+                self.app.log("Using old curses! Some keys and special characters might not work.", constants.LOG_WARNING)
                 self.warned_old_curses = 1
 
         y_sub = 0
@@ -367,7 +368,7 @@ class UI:
         """Process keystrokes from the Textbox window."""
         # TODO: implement this to improve interacting in the input box
         if self.app.config["app"]["debug"]:
-            self.app.log("Query key input:"+str(key), LOG_INFO)
+            self.app.log("Query key input:"+str(key), constants.LOG_INFO)
         return key
 
     def _query(self, text, initial=""):
@@ -449,7 +450,7 @@ class UI:
         try:
             mouse_state = curses.getmouse()
         except:
-            self.app.log(get_error_info())
+            self.app.log(helpers.get_error_info())
             return False
         # Translate the coordinates to the editor coordinate system
         return self._translate_mouse_to_editor(mouse_state)

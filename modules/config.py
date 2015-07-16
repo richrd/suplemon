@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class Config(Command):
+class Config(Module):
     def run(self, app, editor):
         path = app.config.path()
         f = app.file_is_open(path)

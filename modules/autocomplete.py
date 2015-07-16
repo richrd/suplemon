@@ -1,10 +1,10 @@
 # -*- encoding:utf-8
 import re
+import helpers
+import suplemon_module
 
-from mod_base import *
 
-
-class AutoComplete(Command):
+class AutoComplete(suplemon_module.Module):
     def init(self):
         self.word_list = []
         self.bind_event("tab", self.auto_complete)
@@ -23,7 +23,7 @@ class AutoComplete(Command):
         word_list = []
         for file in self.app.files:
             data = file.get_editor().get_data()
-            words = multisplit(data, self.get_separators())
+            words = helpers.multisplit(data, self.get_separators())
             for word in words:
                 # Discard undesired whitespace
                 word = word.strip()
@@ -40,7 +40,7 @@ class AutoComplete(Command):
         # Build list of suitable matches
         candidates = []
         for candidate in self.word_list:
-            if starts(candidate, word) and len(candidate) > len(word):
+            if helpers.starts(candidate, word) and len(candidate) > len(word):
                 candidates.append(candidate)
         # Find the shortest match
         shortest = ""

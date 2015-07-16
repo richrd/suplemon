@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class TabsToSpaces(Command):
+class TabsToSpaces(Module):
     def run(self, app, editor):
         i = 0
         for line in editor.lines:

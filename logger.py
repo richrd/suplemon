@@ -4,7 +4,8 @@ Basic logging to delay printing until curses is unloaded.
 """
 import time
 
-from helpers import *
+import helpers
+import constants
 
 
 class Logger:
@@ -12,15 +13,15 @@ class Logger:
         self.filename = None
         self.entries = []
         self.labels = {
-            LOG_WONTFIX: "WONTFIX",
-            LOG_INFO: "INFO",
-            LOG_WARNING: "WARNING",
-            LOG_ERROR: "ERROR",
+            constants.LOG_WONTFIX: "WONTFIX",
+            constants.LOG_INFO: "INFO",
+            constants.LOG_WARNING: "WARNING",
+            constants.LOG_ERROR: "ERROR",
         }
 
     def log(self, data, log_type=None):
         if log_type is None:
-            log_type = LOG_ERROR
+            log_type = constants.LOG_ERROR
         self.entries.append((log_type, str(data), time.time()))
 
     def output(self):
@@ -32,7 +33,7 @@ class Logger:
             except:
                 print("Failed to print a log entry and forgot to write it in a file :(")
                 print("Here's why:")
-                print(get_error_info())
+                print(helpers.get_error_info())
 
     def get_type_str(self, log_type):
         if log_type in self.labels.keys():

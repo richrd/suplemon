@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class ToggleWhitespace(Command):
+class ToggleWhitespace(Module):
     def init(self):
         # Bind a key to the run-method
         self.bind_key(271)  # F7

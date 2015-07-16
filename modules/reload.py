@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class Reload(Command):
+class Reload(Module):
     def run(self, app, editor):
         self.app.modules.load()
 

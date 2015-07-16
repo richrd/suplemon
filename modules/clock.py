@@ -1,9 +1,9 @@
 import time
 
-from mod_base import *
+from suplemon_module import Module
 
 
-class Clock(Command):
+class Clock(Module):
     def get_status(self):
         s = time.strftime("%H:%M")
         if self.app.config["app"]["use_unicode_symbols"]:

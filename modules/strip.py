@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class Strip(Command):
+class Strip(Module):
     def init(self):
         self.bind_key("^B")  # Used to bind a key to the run method
 
@@ -9,7 +9,7 @@ class Strip(Command):
         line_nums = editor.get_lines_with_cursors()
         for n in line_nums:
             line = editor.lines[n]
-            line.data = line.data.strip()
+            line.set_data(line.data.strip())
 
 module = {
     "class": Strip,

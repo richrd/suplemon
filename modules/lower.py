@@ -1,7 +1,7 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class Lower(Command):
+class Lower(Module):
     def run(self, app, editor):
         line_nums = []
         for cursor in editor.cursors:

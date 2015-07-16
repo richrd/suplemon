@@ -1,13 +1,14 @@
-from mod_base import *
+from suplemon_module import Module
 
 
-class Upper(Command):
+class Upper(Module):
     def run(self, app, editor):
         line_nums = []
         for cursor in editor.cursors:
             if cursor.y not in line_nums:
                 line_nums.append(cursor.y)
-                editor.lines[cursor.y].data = editor.lines[cursor.y].data.upper()
+                data = editor.lines[cursor.y].get_data().upper()
+                editor.lines[cursor.y].set_data(data)
 
 module = {
     "class": Upper,

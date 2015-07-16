@@ -1,4 +1,4 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 Various helper constants and functions.
 """
@@ -7,12 +7,6 @@ import re
 import sys
 import time
 import traceback
-
-# Logging constants
-LOG_WONTFIX = 0
-LOG_INFO = 1
-LOG_WARNING = 2
-LOG_ERROR = 3
 
 
 def curr_time():

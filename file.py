@@ -6,7 +6,7 @@ File object for storing an opened file and editor.
 import os
 import time
 
-from helpers import *
+import constants
 
 
 class File:
@@ -119,10 +119,10 @@ class File:
             return False
         data = self._read_text(path)
         if data is False:
-            self.log("Normal file read failed.", LOG_WARNING)
+            self.log("Normal file read failed.", constants.LOG_WARNING)
             data = self._read_binary(path)
         if data is False:
-            self.log("Fallback file read failed.", LOG_WARNING)
+            self.log("Fallback file read failed.", constants.LOG_WARNING)
             return False
         self.data = data
         self.editor.set_data(data)
@@ -149,9 +149,9 @@ class File:
             detection = chardet.detect(data)
             charenc = detection['encoding']
             if charenc is None:
-                self.log("Failed to detect file encoding.", LOG_WARNING)
+                self.log("Failed to detect file encoding.", constants.LOG_WARNING)
                 return False
-            self.log("Trying to decode with encoding '" + charenc + "'", LOG_INFO)
+            self.log("Trying to decode with encoding '" + charenc + "'", constants.LOG_INFO)
             return data.decode(charenc)
         except Exception as inst:
             self.log(type(inst))    # the exception instance

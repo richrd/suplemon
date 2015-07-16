@@ -7,7 +7,7 @@ import os
 import json
 import curses  # Get key definitons
 
-from helpers import *
+import helpers
 
 
 class Config:
@@ -163,7 +163,7 @@ class Config:
                 return True
             except:
                 self.log("Failed to load config file!")
-                self.log(get_error_info())
+                self.log(helpers.get_error_info())
         return False
 
     def reload(self):

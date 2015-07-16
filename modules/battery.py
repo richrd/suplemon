@@ -1,10 +1,10 @@
 import time
 import subprocess
+import helpers
+import suplemon_module
 
-from mod_base import *
 
-
-class Battery(Command):
+class Battery(suplemon_module.Module):
     def init(self):
         self.last_value = -1
         self.checked = time.time()
@@ -57,8 +57,8 @@ class Battery(Command):
         except:
             return None
         try:
-            max_cap = float(get_string_between("last full capacity:", "mWh", path_info))
-            cur_cap = float(get_string_between("remaining capacity:", "mWh", path_state))
+            max_cap = float(helpers.get_string_between("last full capacity:", "mWh", path_info))
+            cur_cap = float(helpers.get_string_between("remaining capacity:", "mWh", path_state))
             return int(cur_cap / max_cap * 100)
         except:
             return None
@@ -70,7 +70,7 @@ class Battery(Command):
         except:
             return None
         raw_str = raw_str.decode("utf-8")
-        part = get_string_between(",", "%", raw_str)
+        part = helpers.get_string_between(",", "%", raw_str)
         if part:
             try:
                 return int(part)
@@ -86,7 +86,7 @@ class Battery(Command):
         except:
             return None
         raw_str = raw_str.decode("utf-8")
-        part = get_string_between("percentage:", "%", raw_str)
+        part = helpers.get_string_between("percentage:", "%", raw_str)
         if part:
             try:
                 return int(part)

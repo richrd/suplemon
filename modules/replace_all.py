@@ -1,8 +1,8 @@
 # -*- coding:utf-8
-from mod_base import *
+from suplemon_module import Module
 
 
-class ReplaceAll(Command):
+class ReplaceAll(Module):
     def run(self, app, editor):
         r_from = self.app.ui.query("Replace text:")
         if not r_from:

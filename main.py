@@ -12,11 +12,12 @@ import sys
 import ui
 import modules
 import helpers
+import constants
 
-from logger import *
-from config import *
-from editor import *
-from file import *
+from file import File
+from logger import Logger
+from config import Config
+from editor import Editor
 
 
 class App:
@@ -76,7 +77,7 @@ class App:
         # Indicate that windows etc. have been created.
         self.inited = 1
 
-    def log(self, text, log_type=LOG_ERROR):
+    def log(self, text, log_type=constants.LOG_ERROR):
         """Add text to the log buffer."""
         self.logger.log(text, log_type)
 
@@ -109,7 +110,7 @@ class App:
             msg = "Running Suplemon with Python "+ver
             msg += " which isn't officialy supported. "
             msg += "Please use Python 3.3 or higher."
-            self.log(msg, LOG_WARNING)
+            self.log(msg, constants.LOG_WARNING)
         self.load_files()
         self.running = 1
         self.trigger_event_after("app_loaded")
@@ -122,7 +123,7 @@ class App:
             # See if we have input to process
             event = self.ui.get_input()
             if event:
-                # self.log("INPUT:"+str(event), LOG_INFO)
+                # self.log("INPUT:"+str(event), constants.LOG_INFO)
                 # Handle the input or give it to the editor
                 if not self.handle_input(event):
                     # Pass the input to the editor component
@@ -328,9 +329,9 @@ class App:
             return False
         parts = data.split(" ")
         cmd = parts[0].lower()
-        self.logger.log("Looking for command '" + cmd + "'", LOG_INFO)
+        self.logger.log("Looking for command '" + cmd + "'", constants.LOG_INFO)
         if cmd in self.modules.modules.keys():
-            self.logger.log("Trying to run command '" + cmd + "'", LOG_INFO)
+            self.logger.log("Trying to run command '" + cmd + "'", constants.LOG_INFO)
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor())
         else:
@@ -365,7 +366,7 @@ class App:
                 try:
                     val = cb(event)
                 except:
-                    self.log(get_error_info())
+                    self.log(helpers.get_error_info())
                     continue
                 if val:
                     status = True
