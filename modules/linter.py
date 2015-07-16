@@ -8,6 +8,7 @@ class Linter(Command):
     def init(self):
         if not self.has_flake8_support():
             self.log("Flake8 not available. Can't show linting.")
+            return False
 
         # Lint all files after app is loaded
         self.bind_event_after("app_loaded", self.lint_all_files)
@@ -88,7 +89,8 @@ class Linter(Command):
     def get_output(self, cmd):
         try:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        except FileNotFoundError:
+        except EnvironmentError:
+            # cant use FileNotFoundError in Python 2
             return False
         out, err = process.communicate()
         return out
