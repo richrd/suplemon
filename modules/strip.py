@@ -1,8 +1,9 @@
 from mod_base import *
 
+
 class Strip(Command):
     def init(self):
-        self.bind_key("") # Used to bind a key to the run-method
+        self.bind_key("^B")  # Used to bind a key to the run method
 
     def run(self, app, editor):
         line_nums = editor.get_lines_with_cursors()

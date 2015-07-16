@@ -1,7 +1,8 @@
-#-*- encoding:utf-8
+# -*- encoding:utf-8
 import re
 
 from mod_base import *
+
 
 class AutoComplete(Command):
     def init(self):
@@ -20,14 +21,14 @@ class AutoComplete(Command):
     def build_word_list(self, *args):
         """Build word list based on contents of open files."""
         word_list = []
-        for file in self.app.files:            
+        for file in self.app.files:
             data = file.get_editor().get_data()
             words = multisplit(data, self.get_separators())
             for word in words:
                 # Discard undesired whitespace
                 word = word.strip()
                 # Must be longer than 1 and not yet in word_list
-                if len(word) > 1 and not word in word_list:
+                if len(word) > 1 and word not in word_list:
                     word_list.append(word)
         self.word_list = word_list
         return False

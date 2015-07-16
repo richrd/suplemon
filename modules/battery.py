@@ -1,9 +1,9 @@
-import os
 import time
 import subprocess
 
 from mod_base import *
- 
+
+
 class Battery(Command):
     def init(self):
         self.last_value = -1
@@ -45,10 +45,10 @@ class Battery(Command):
         ]
         for m in methods:
             value = m()
-            if value != None:
+            if value is None:
                 break
         return value
-        
+
     def battery_status_read(self):
         """Get the battery status via proc/acpi."""
         try:
@@ -57,8 +57,8 @@ class Battery(Command):
         except:
             return None
         try:
-            max_cap = float( get_string_between("last full capacity:", "mWh", path_info) )
-            cur_cap = float( get_string_between("remaining capacity:", "mWh", path_state) )
+            max_cap = float(get_string_between("last full capacity:", "mWh", path_info))
+            cur_cap = float(get_string_between("remaining capacity:", "mWh", path_state))
             return int(cur_cap / max_cap * 100)
         except:
             return None
@@ -80,8 +80,9 @@ class Battery(Command):
 
     def battery_status_upower(self):
         """Get the battery status via upower."""
+        path = "/org/freedesktop/UPower/devices/battery_BAT0"
         try:
-            raw_str = subprocess.check_output(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT0"])
+            raw_str = subprocess.check_output(["upower", "-i", path])
         except:
             return None
         raw_str = raw_str.decode("utf-8")
@@ -99,7 +100,7 @@ class Battery(Command):
         data = f.read()
         f.close()
         return data
- 
+
 module = {
     "class": Battery,
     "name": "battery",

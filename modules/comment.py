@@ -1,6 +1,7 @@
 from line import *
 from mod_base import *
 
+
 class Comment(Command):
     def init(self):
         self.bind_key("^P")
@@ -17,13 +18,13 @@ class Comment(Command):
         for lnum in line_nums:
             line = editor.lines[lnum]
             if not len(line):
-                continue # Skip empty lines
+                continue  # Skip empty lines
             # Look for comment syntax in stripped line (TODO:Make this smarter)
             target = str(line).strip()
-            w = editor.whitespace(line) # Amount of whitespace at line start
+            w = editor.whitespace(line)  # Amount of whitespace at line start
             # If the line starts with comment syntax
             if starts(target, comment[0]):
-                # Reconstruct the whitespace and add the line without whitespace
+                # Reconstruct the whitespace and add the line
                 new_line = (" "*w) + line[w+len(comment[0]):]
                 # If comment end syntax exists
                 if comment[1]:

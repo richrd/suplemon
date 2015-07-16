@@ -1,13 +1,14 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 Config handler.
 """
 
 import os
 import json
-import curses # Get key definitons
+import curses  # Get key definitons
 
 from helpers import *
+
 
 class Config:
     def __init__(self, app):
@@ -63,11 +64,11 @@ class Config:
                 "line_end_char": "",
                 # White space characters and their visual matches
                 "white_space_map": {
-                    " ": "\u00B7",        # Show space as interpunct
-                    "\t": "\u21B9",       # Tab as tab symbol
-                    "\u00A0": "\u00B7",   # Show non breaking space as interpunct
-                    "\u00AD": "\u2423",   # Soft hyphen as letter shelf
-                    "\u200B": "\u00B7"    # Zero width space as interpunct
+                    " ": "\u00B7",       # Show space as interpunct
+                    "\t": "\u21B9",      # Tab as tab symbol
+                    "\u00A0": "\u00B7",  # Show nonbreaking space as interpunct
+                    "\u00AD": "\u2423",  # Soft hyphen as letter shelf
+                    "\u200B": "\u00B7"   # Zero width space as interpunct
                 },
                 # Wether to visually show white space chars
                 "show_white_space": False,
@@ -87,9 +88,9 @@ class Config:
                     curses.KEY_RIGHT: "arrow_right",      # Right
                     curses.KEY_ENTER: "enter",            # Enter
                     "\n": "enter",                        # Enter
-                    "^J": "enter",                        # Enter (fallback for 'getch')
+                    "^J": "enter",                        # Enter (for 'getch')
                     curses.KEY_BACKSPACE: "backspace",    # Backspace
-                    "^?": "backspace",                    # Backspace (fix for Mac)
+                    "^?": "backspace",                    # Backspace (Mac fix)
                     curses.KEY_DC: "delete",              # Delete
                     331: "insert",                        # Insert
                     "\t": "tab",                          # Tab
@@ -130,7 +131,6 @@ class Config:
                     "kRIT5": "jump_right",                # Ctrl + Right
                     "kUP5": "jump_up",                    # Ctrl + Up
                     "kDN5": "jump_down",                  # Ctrl + Down
-                    
                 }
             },
             "display": {
@@ -169,7 +169,7 @@ class Config:
     def reload(self):
         """Reload the config file."""
         return self.load()
-        
+
     def store(self):
         """Write current config state to file."""
         data = json.dumps(self.config)
@@ -185,11 +185,11 @@ class Config:
                 config[prim_key] = dict(curr_item)
                 continue
             for sec_key in curr_item.keys():
-                if not sec_key in config[prim_key].keys():
+                if sec_key not in config[prim_key].keys():
                     config[prim_key][sec_key] = curr_item[sec_key]
         self.merge_keys(config)
         return config
-        
+
     def merge_keys(self, config):
         """Fill in config with default keys."""
         # Do merge for app and editor keys
@@ -198,7 +198,7 @@ class Config:
             key_defaults = self.defaults[dest]["keys"]
             for key in key_defaults.keys():
                 # Fill in each key that's not defined yet
-                if not key in key_config.keys():
+                if key not in key_config.keys():
                     key_config[key] = key_defaults[key]
 
     def __getitem__(self, i):
@@ -210,7 +210,7 @@ class Config:
         self.config[i] = v
 
     def __str__(self):
-        """Convert entire config array to string.""" 
+        """Convert entire config array to string."""
         return str(self.config)
 
     def __len__(self):

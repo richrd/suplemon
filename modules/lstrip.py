@@ -1,8 +1,9 @@
 from mod_base import *
 
+
 class LStrip(Command):
     def init(self):
-        self.bind_key("kHOM7") # Used to bind a key to the run-method
+        self.bind_key("kHOM7")  # Used to bind a key to the run-method
 
     def run(self, app, editor):
         # TODO: move cursors in sync with line contents
