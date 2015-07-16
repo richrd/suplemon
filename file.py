@@ -1,4 +1,4 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 File object for storing an opened file and editor.
 """
@@ -8,13 +8,14 @@ import time
 
 from helpers import *
 
+
 class File:
-    def __init__(self, app = None):
+    def __init__(self, app=None):
         self.app = app
         self.name = ""
         self.fpath = ""
         self.data = None
-        self.read_only = False # Currently unused
+        self.read_only = False  # Currently unused
         self.last_save = None
         self.opened = time.time()
         self.editor = None
@@ -26,12 +27,13 @@ class File:
 
     def path(self):
         """Get the full path of the file."""
+        # TODO: deprecate in favour of get_path()
         return self._path()
 
     def parse_path(self, path):
         """Parse a relative path and return full directory and filename as a tuple."""
         if path[:2] == "~" + os.sep:
-            p  = os.path.expanduser("~")
+            p = os.path.expanduser("~")
             path = os.path.join(p+os.sep, path[2:])
         ab = os.path.abspath(path)
         parts = os.path.split(ab)
@@ -44,6 +46,16 @@ class File:
         """Get the file name."""
         return self.name
 
+    def get_path(self):
+        """Get the full path of the file."""
+        return self._path()
+
+    def get_extension(self):
+        parts = self.name.split(".")
+        if len(parts) < 2:
+            return ""
+        return parts[-1]
+
     def get_editor(self):
         """Get the associated editor."""
         return self.editor
@@ -53,7 +65,7 @@ class File:
         # TODO: sanitize
         self.name = name
         self.update_editor_extension()
-        
+
     def set_path(self, path):
         """Set the file path. Relative paths are sanitized."""
         self.fpath, self.name = self.parse_path(path)
@@ -64,7 +76,7 @@ class File:
         self.data = data
         if self.editor:
             self.editor.set_data(data)
-                
+
     def set_editor(self, editor):
         """The editor instance set its file extension."""
         self.editor = editor
@@ -80,13 +92,12 @@ class File:
         """Set the editor file extension from the current file name."""
         if not self.editor:
             return False
-        ext = self.name.split(".")
+        ext = self.get_extension()
         if len(ext) > 1:
-            self.editor.set_file_extension(ext[-1])
+            self.editor.set_file_extension(ext)
 
     def save(self):
         """Write the editor data to file."""
-        path = self._path()
         data = self.editor.get_data()
         try:
             f = open(self._path(), "w")
@@ -107,10 +118,10 @@ class File:
             self.log("Given path isn't a file.")
             return False
         data = self._read_text(path)
-        if data == False:
+        if data is False:
             self.log("Normal file read failed.", LOG_WARNING)
             data = self._read_binary(path)
-        if data == False:
+        if data is False:
             self.log("Fallback file read failed.", LOG_WARNING)
             return False
         self.data = data
@@ -137,7 +148,7 @@ class File:
             import chardet
             detection = chardet.detect(data)
             charenc = detection['encoding']
-            if charenc == None:
+            if charenc is None:
                 self.log("Failed to detect file encoding.", LOG_WARNING)
                 return False
             self.log("Trying to decode with encoding '" + charenc + "'", LOG_INFO)
@@ -145,7 +156,7 @@ class File:
         except Exception as inst:
             self.log(type(inst))    # the exception instance
             self.log(inst.args)     # arguments stored in .args
-            self.log(inst)          # __str__ allows args to be printed directly,
+            self.log(inst)          # __str__ allows args to be printed
         return False
 
     def reload(self):
@@ -159,4 +170,3 @@ class File:
     def is_writable(self):
         """Check if the file is writable."""
         return self.writable
-        

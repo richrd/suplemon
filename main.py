@@ -1,14 +1,13 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 
 """
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.21"
+__version__ = "0.1.22"
 
 import os
 import sys
-import time
 
 import ui
 import modules
@@ -18,6 +17,7 @@ from logger import *
 from config import *
 from editor import *
 from file import *
+
 
 class App:
     def __init__(self, filenames=None):
@@ -63,7 +63,7 @@ class App:
         self.logger = Logger()
         self.config = Config(self)
         self.config.load()
-        self.ui = ui.UI(self) # Load user interface
+        self.ui = ui.UI(self)  # Load user interface
         self.ui.init()
 
         # Load extension modules
@@ -103,12 +103,16 @@ class App:
     def load(self):
         """Load the app."""
         self.ui.load()
-        if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 3):
+        ver = sys.version_info
+        if ver[0] < 3 or (ver[0] == 3 and ver[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
-            self.log("Running Suplemon with Python "+ver+" which isn't officialy supported. Please use Python 3.3 or higher.", LOG_WARNING)
+            msg = "Running Suplemon with Python "+ver
+            msg += " which isn't officialy supported. "
+            msg += "Please use Python 3.3 or higher."
+            self.log(msg, LOG_WARNING)
         self.load_files()
         self.running = 1
-        self.trigger_event("app_loaded")
+        self.trigger_event_after("app_loaded")
 
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
@@ -118,12 +122,14 @@ class App:
             # See if we have input to process
             event = self.ui.get_input()
             if event:
-                #self.log("INPUT:"+str(event), LOG_INFO)
+                # self.log("INPUT:"+str(event), LOG_INFO)
                 # Handle the input or give it to the editor
                 if not self.handle_input(event):
                     # Pass the input to the editor component
                     self.get_editor().handle_input(event)
-                #TODO: why do I need resize here? (View won't update after switching files, WTF)
+                # TODO: why do I need resize here?
+                # (View won't update after switching files, WTF)
+                self.trigger_event_after("mainloop")
                 self.get_editor().resize()
                 self.ui.refresh()
 
@@ -134,7 +140,7 @@ class App:
     def get_file_index(self, file_obj):
         """Get file index by file object."""
         return self.files.index(file_obj)
-    
+
     def get_key_bindings(self):
         """Returns the list of key bindings."""
         return self.config["app"]["keys"]
@@ -147,13 +153,15 @@ class App:
         """Bind a key to an operation."""
         self.get_key_bindings()[key] = operation
 
-    def set_event_binding(self, event, callback):
-        """Bind a key to an operatio n."""
+    def set_event_binding(self, event, when, callback):
+        """Bind a callbacks to be run before or after an event."""
         event_bindings = self.get_event_bindings()
-        if event in event_bindings.keys():
-            event_bindings[event].append(callback)
+        if when not in event_bindings.keys():
+            event_bindings[when] = {}
+        if event in event_bindings[when].keys():
+            event_bindings[when][event].append(callback)
         else:
-            event_bindings[event] = [callback]
+            event_bindings[when][event] = [callback]
 
     def set_status(self, s):
         """Set the status message."""
@@ -203,6 +211,8 @@ class App:
         editor = self.get_editor()
         if event.mouse_code == 1:                    # Left mouse button release
             editor.set_single_cursor(event.mouse_pos)
+        elif event.mouse_code == 4096:               # Right mouse button release
+            editor.add_cursor(event.mouse_pos)
         elif event.mouse_code == 524288:             # Wheel up
             editor.page_up()
         elif event.mouse_code == 134217728:          # Wheel down(and unfortunately left button drag)
@@ -249,7 +259,8 @@ class App:
 
     def next_file(self):
         """Switch to next file."""
-        if len(self.files) < 2: return
+        if len(self.files) < 2:
+            return
         cur = self.current_file
         cur += 1
         if cur > len(self.files)-1:
@@ -258,7 +269,8 @@ class App:
 
     def prev_file(self):
         """Switch to previous file."""
-        if len(self.files) < 2: return
+        if len(self.files) < 2:
+            return
         cur = self.current_file
         cur -= 1
         if cur < 0:
@@ -270,7 +282,7 @@ class App:
         input_str = self.ui.query("Go to:")
         lineno = None
         fname = None
-        if input_str == False:
+        if input_str is False:
             return False
         if input_str.find(":") != -1:
             parts = input_str.split(":")
@@ -316,9 +328,9 @@ class App:
             return False
         parts = data.split(" ")
         cmd = parts[0].lower()
-        self.logger.log("Looking for command '" + cmd +"'", LOG_INFO)
+        self.logger.log("Looking for command '" + cmd + "'", LOG_INFO)
         if cmd in self.modules.modules.keys():
-            self.logger.log("Trying to run command '" + cmd +"'", LOG_INFO)
+            self.logger.log("Trying to run command '" + cmd + "'", LOG_INFO)
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor())
         else:
@@ -331,23 +343,39 @@ class App:
         if hasattr(operation, '__call__'):
             operation()
         elif operation in self.operations.keys():
-            cancel = self.trigger_event(operation)
+            # cancel = self.trigger_event(operation)
+            cancel = self.trigger_event_before(operation)
             if not cancel:
                 result = self.operations[operation]()
-                return result
+            # Run post action event
+            # self.trigger_event("after:" + operation)
+            self.trigger_event_after(operation)
+            return result
         return False
 
-    def trigger_event(self, event):
+    def trigger_event(self, event, when):
         """Triggers event and runs registered callbacks."""
         status = False
         bindings = self.get_event_bindings()
-        if event in bindings.keys():
-            callbacks = bindings[event]
+        if not when in bindings.keys():
+            return False
+        if event in bindings[when].keys():
+            callbacks = bindings[when][event]
             for cb in callbacks:
-                val = cb(event)
+                try:
+                    val = cb(event)
+                except:
+                    self.log(get_error_info())
+                    continue
                 if val:
                     status = True
         return status
+
+    def trigger_event_before(self, event):
+        return self.trigger_event(event, "before")
+
+    def trigger_event_after(self, event):
+        return self.trigger_event(event, "after")
 
     def toggle_fullscreen(self):
         """Toggle full screen editor."""
@@ -424,7 +452,7 @@ class App:
         if self.current_file == len(self.files):
             self.current_file -= 1
 
-    def save_file(self, file = False):
+    def save_file(self, file=False):
         """Save current file."""
         f = file or self.get_file()
         if not f.get_name():
@@ -437,7 +465,7 @@ class App:
         self.set_status("Couldn't write to '" + f.name + "'")
         return False
 
-    def save_file_as(self, file = False):
+    def save_file_as(self, file=False):
         """Save current file."""
         f = file or self.get_file()
         name = self.ui.query("Save as:", f.name)
@@ -452,7 +480,7 @@ class App:
             if self.get_file().reload():
                 return True
         return False
-        
+
     def get_files(self):
         """Return list of open files."""
         return self.files

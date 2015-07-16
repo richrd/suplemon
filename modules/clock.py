@@ -1,7 +1,8 @@
 import time
 
 from mod_base import *
- 
+
+
 class Clock(Command):
     def get_status(self):
         s = time.strftime("%H:%M")

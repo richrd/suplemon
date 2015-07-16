@@ -1,4 +1,4 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 Curses user interface.
 """
@@ -7,10 +7,11 @@ import os
 
 from helpers import *
 
+
 class InputEvent:
     """Represents a keyboard or mouse event."""
     def __init__(self):
-        self.type = None # 'key' or 'mouse'
+        self.type = None  # 'key' or 'mouse'
         self.key_name = None
         self.key_code = None
         self.mouse_code = None
@@ -19,7 +20,6 @@ class InputEvent:
     def parse_key_code(self, code):
         """Parse a key namoe or code from curses."""
         self.type = "key"
-        #if type(code) == type(1):
         self.key_code = code
         self.key_name = self._key_name(code)
 
@@ -37,13 +37,13 @@ class InputEvent:
     def _key_name(self, key):
         """Return the curses key name for keys received from get_wch (and getch)."""
         # Handle multibyte get_wch input in Python 3.3
-        if type(key) == type(""):
+        if isinstance(key, str):
             return str(curses.keyname(ord(key)).decode("utf-8"))
         # Fallback to try and handle Python < 3.3
-        if type(key) == type(1): # getch fallback
-            try: # Try to convert to a curses key name
+        if isinstance(key, int):  # getch fallback
+            try:  # Try to convert to a curses key name
                 return str(curses.keyname(key).decode("utf-8"))
-            except: # Otherwise try to convert to a character
+            except:  # Otherwise try to convert to a character
                 try:
                     return chr(key)
                 except:
@@ -59,6 +59,7 @@ class InputEvent:
             str(self.mouse_pos)
         ]
         return " ".join(parts)
+
 
 class UI:
     def __init__(self, app):
@@ -77,7 +78,7 @@ class UI:
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
         curses.wrapper(func)
-        
+
     def load(self, *args):
         """Setup curses."""
         # Log the terminal type
@@ -96,7 +97,7 @@ class UI:
 
         self.screen.keypad(1)
 
-        self.current_yx = self.screen.getmaxyx() # For checking resize
+        self.current_yx = self.screen.getmaxyx()  # For checking resize
         self.setup_mouse()
         self.setup_windows()
 
@@ -108,9 +109,9 @@ class UI:
         # Mouse support
         curses.mouseinterval(10)
         if self.app.config["editor"]["use_mouse"]:
-            curses.mousemask(-1) # All events
+            curses.mousemask(-1)  # All events
         else:
-            curses.mousemask(0) # All events
+            curses.mousemask(0)  # All events
 
     def setup_colors(self):
         """Initialize color support and define colors."""
@@ -121,11 +122,13 @@ class UI:
             self.app.logger.log("Failed to load curses default colors. You could try 'export TERM=xterm-256color'.")
             return False
 
-        fg = -1 # Default foreground color (could also be set to curses.COLOR_WHITE)
-        bg = -1 # Default background color (could also be set to curses.COLOR_BLACK)
-        
+        # Default foreground color (could also be set to curses.COLOR_WHITE)
+        fg = -1
+        # Default background color (could also be set to curses.COLOR_BLACK)
+        bg = -1
+
         # This gets colors working in TTY's as well as terminal emulators
-        #curses.init_pair(10, -1, -1) # Default (white on black)
+        # curses.init_pair(10, -1, -1) # Default (white on black)
         # Colors for xterm (not xterm-256color)
         # Dark Colors
         curses.init_pair(0, curses.COLOR_BLACK, bg)      # 0 Black
@@ -135,32 +138,24 @@ class UI:
         curses.init_pair(4, curses.COLOR_BLUE, bg)       # 4 Blue
         curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
         curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
-        curses.init_pair(7, fg, bg) # White on Black
-        curses.init_pair(8, fg, curses.COLOR_BLACK) # White on Black (Line number color)
-        
-        # Light Colors (only work on xterm-256color)
-        #curses.init_pair(1, 9, bg) # Red
-        #curses.init_pair(2, 10, bg) # Green
-        #curses.init_pair(3, 11, bg) # Yellow
-        #curses.init_pair(4, 12, bg) # Blue
-        #curses.init_pair(5, 13, bg) # Magenta
-        #curses.init_pair(6, 14, bg) # Cyan
+        curses.init_pair(7, fg, bg)                      # White on Black
+        curses.init_pair(8, fg, curses.COLOR_BLACK)  # White on Black (Line number color)
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
             try:
-                # TODO: Define RGB forthese to avoid getting
+                # TODO: Define RGB for these to avoid getting
                 # different results in different terminals
                 # xterm-256color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
-                curses.init_pair(0, 242, bg) # 0 Black
-                curses.init_pair(1, 204, bg) # 1 Red
-                curses.init_pair(2, 119, bg) # 2 Green
-                curses.init_pair(3, 221, bg) # 3 Yellow
-                curses.init_pair(4, 69, bg)  # 4 Blue
-                curses.init_pair(5, 171, bg) # 5 Magenta
-                curses.init_pair(6, 81, bg)  # 6 Cyan
-                curses.init_pair(7, 15, bg)  # 7 White
-                #curses.init_pair(8, 8, bg)  # 8 Gray (Line number color)
+                curses.init_pair(0, 242, bg)  # 0 Black
+                curses.init_pair(1, 204, bg)  # 1 Red
+                curses.init_pair(2, 119, bg)  # 2 Green
+                curses.init_pair(3, 221, bg)  # 3 Yellow
+                curses.init_pair(4, 69, bg)   # 4 Blue
+                curses.init_pair(5, 171, bg)  # 5 Magenta
+                curses.init_pair(6, 81, bg)   # 6 Cyan
+                curses.init_pair(7, 15, bg)   # 7 White
+                # curses.init_pair(8, 8, bg)   # 8 Gray (Line number color)
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
             except:
                 self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
@@ -173,14 +168,14 @@ class UI:
         self.text_input = None
         self.header_win = curses.newwin(1, yx[1], 0, 0)
         self.status_win = curses.newwin(1, yx[1], yx[0]-1, 0)
-        
+
         # Test for new curses
-        if not "get_wch" in dir(self.header_win):
+        if "get_wch" not in dir(self.header_win):
             # Notify only once
             if not self.warned_old_curses:
                 self.app.log("Using old curses! Some keys and special characters might not work.", LOG_WARNING)
                 self.warned_old_curses = 1
-            
+
         y_sub = 0
         y_start = 0
         if self.app.config["display"]["show_top_bar"]:
@@ -197,8 +192,8 @@ class UI:
             self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub, 0)
 
         if resize:
-            self.app.get_editor().resize( (yx[0]-y_sub, yx[1]) )
-            self.app.get_editor().move_win( (y_start, 0) )
+            self.app.get_editor().resize((yx[0]-y_sub, yx[1]))
+            self.app.get_editor().move_win((y_start, 0))
 
     def get_size(self):
         """Get terminal size."""
@@ -214,11 +209,11 @@ class UI:
 
     def resize(self, yx=None):
         """Resize UI to yx."""
-        if yx == None:
+        if yx is None:
             yx = self.screen.getmaxyx()
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
-        self.setup_windows(resize = True)
+        self.setup_windows(resize=True)
         self.screen.refresh()
 
     def check_resize(self):
@@ -246,23 +241,10 @@ class UI:
         if display["show_app_name"]:
             name_str = "Suplemon Editor v" + self.app.version + " -"
             if self.app.config["app"]["use_unicode_symbols"]:
-                # Possible logos
-                #logo = "\u265B"     # Crown
-                #logo = "\u232C"     # Benzene
-                ##logo = "\u26C4"    # Snowman without snow
-                ##logo = "\u26FD"    # Gas pump
-                #logo = "\u2692"     # Two crossed hammers
-                #logo = "\u2698"     # Flower
-                #logo = "\u0001F34B" # Lemon
-                #logo = "\u2603"     # Snowman
-                #logo = "\u2400"     # NULL
-                #logo = "\uFE95"     # Smiley
-                #logo = "\uE016"     # Floppy
-                #logo = "\u2686"     # Simple lemon 
                 logo = "\u2688"      # Simple lemon (filled)
                 name_str = " " + logo + " " + name_str
             head_parts.append(name_str)
-        
+
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
@@ -270,24 +252,24 @@ class UI:
                 status = module.get_status()
                 if status:
                     head_parts.append(status)
-                
+
         if display["show_file_list"]:
             head_parts.append(self.file_list_str())
 
         head = " ".join(head_parts)
-        head = head + ( " " * (self.screen.getmaxyx()[1]-len(head)-1) )
+        head = head + (" " * (self.screen.getmaxyx()[1]-len(head)-1))
         if len(head) >= size[0]:
             head = head[:size[0]-1]
         if self.app.config["display"]["invert_status_bars"]:
-            self.header_win.addstr(0,0, head, curses.color_pair(0) | curses.A_REVERSE)
+            self.header_win.addstr(0, 0, head, curses.color_pair(0) | curses.A_REVERSE)
         else:
-            self.header_win.addstr(0,0, head, curses.color_pair(0))
+            self.header_win.addstr(0, 0, head, curses.color_pair(0))
         self.header_win.refresh()
-        
+
     def file_list_str(self):
         """Return rotated file list beginning at current file as a string."""
         curr_file_index = self.app.current_file_index()
-        files = self.app.get_files();
+        files = self.app.get_files()
         file_list = files[curr_file_index:] + files[:curr_file_index]
         str_list = []
         no_write_symbol = ["!", "\u2715"][self.app.config["app"]["use_unicode_symbols"]]
@@ -307,21 +289,21 @@ class UI:
         editor = self.app.get_editor()
         size = self.get_size()
         cur = editor.get_cursor()
-        data = "@ "+str(cur[0])+","+str(cur[1])+" "+\
-            "cur:"+str(len(editor.cursors))+" "+\
-            "buf:"+str(len(editor.get_buffer()))
+        data = "@ " + str(cur[0]) + "," + str(cur[1]) + " " + \
+            "cur:" + str(len(editor.cursors)) + " " + \
+            "buf:" + str(len(editor.get_buffer()))
         if self.app.config["app"]["debug"]:
             data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
-        #if editor.last_find:
-        #    find = editor.last_find
-        #    if len(find) > 10:find = find[:10]+"..."
-        #    data = "find:'"+find+"' " + data
+        # if editor.last_find:
+        #     find = editor.last_find
+        #     if len(find) > 10:find = find[:10]+"..."
+        #     data = "find:'"+find+"' " + data
 
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "bottom":
-                data += " " + module.get_status();
+                data += " " + module.get_status()
 
         self.status_win.erase()
         status = self.app.get_status()
@@ -331,14 +313,15 @@ class UI:
         if len(line) >= size[0]:
             line = line[:size[0]-1]
         if self.app.config["display"]["invert_status_bars"]:
-            self.status_win.addstr(0,0, line, curses.color_pair(0) | curses.A_REVERSE)
+            self.status_win.addstr(0, 0, line, curses.color_pair(0) | curses.A_REVERSE)
         else:
-            self.status_win.addstr(0,0, line, curses.color_pair(0))
-        
+            self.status_win.addstr(0, 0, line, curses.color_pair(0))
+
         self.status_win.refresh()
-        
+
     def show_legend(self):
         """Show keyboard legend."""
+        # TODO: get from key bindings
         self.legend_win.erase()
         keys = [
             ("^S", "Save"),
@@ -383,8 +366,8 @@ class UI:
     def _process_query_key(self, key):
         """Process keystrokes from the Textbox window."""
         # TODO: implement this to improve interacting in the input box
-        #if app.config["app"]["debug"]:
-        self.app.log("Query key input:"+str(key), LOG_INFO)
+        if self.app.config["app"]["debug"]:
+            self.app.log("Query key input:"+str(key), LOG_INFO)
         return key
 
     def _query(self, text, initial=""):
@@ -393,15 +376,15 @@ class UI:
         self.text_input = curses.textpad.Textbox(self.status_win)
         try:
             out = self.text_input.edit(self._process_query_key)
-            #out = self.text_input.edit()
         except:
             return False
 
         # If input begins with prompt, remove the prompt text
         if len(out) >= len(text):
-           if out[:len(text)] == text:
+            if out[:len(text)] == text:
                 out = out[len(text):]
-        if len(out) > 0 and out[-1] == " ": out = out[:-1]
+        if len(out) > 0 and out[-1] == " ":
+            out = out[:-1]
         out = out.rstrip("\r\n")
         return out
 
@@ -410,7 +393,7 @@ class UI:
         result = self._query(text, initial)
         return result
 
-    def query_bool(self, text, default = False):
+    def query_bool(self, text, default=False):
         """Get a boolean from the user."""
         indicator = "[y/N]"
         initial = ""
@@ -427,7 +410,7 @@ class UI:
 
     def get_input(self):
         """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""
-        event = InputEvent() # Initialize new empty event
+        event = InputEvent()  # Initialize new empty event
         char = False
         input_func = None
         if "get_wch" in dir(self.screen):
@@ -436,7 +419,7 @@ class UI:
         else:
             # Old Python fallback. No multibyte characters.
             input_func = self.screen.getch
-        try: 
+        try:
             char = input_func()
         except KeyboardInterrupt:
             # Handle KeyboardInterrupt as Ctrl+C
@@ -472,9 +455,9 @@ class UI:
         return self._translate_mouse_to_editor(mouse_state)
 
     def _translate_mouse_to_editor(self, state):
-        """Translate the screen coordinates to a position in the editor view."""
+        """Translate the screen coordinates to position in the editor view."""
         editor = self.app.get_editor()
-        x,y = (state[1], state[2])
+        x, y = (state[1], state[2])
         if self.app.config["display"]["show_top_bar"]:
             y -= 1
         x -= editor.line_offset()

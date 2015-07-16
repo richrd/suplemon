@@ -1,8 +1,9 @@
 from helpers import *
 
+
 class Syntax:
     def get_comment(self):
-        return ("#","")
+        return ("# ", "")
 
     def get_color(self, raw_line):
         color = 7

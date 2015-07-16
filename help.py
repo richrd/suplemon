@@ -105,6 +105,4 @@ or convert line to uppercase). Each command can be run by pressing Ctrl + E
 and then typing the command name. Commands are extensions and are stored in
 the modules folder in the Suplemon installation.
 
-
-
 """
