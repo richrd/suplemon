@@ -5,6 +5,7 @@ File object for storing an opened file and editor.
 
 import os
 import time
+import logging
 
 import constants
 
@@ -12,6 +13,7 @@ import constants
 class File:
     def __init__(self, app=None):
         self.app = app
+        self.logger = logging.getLogger(__name__)
         self.name = ""
         self.fpath = ""
         self.data = None
@@ -38,9 +40,6 @@ class File:
         ab = os.path.abspath(path)
         parts = os.path.split(ab)
         return parts
-
-    def log(self, s, type=None):
-        self.app.logger.log(s, type)
 
     def get_name(self):
         """Get the file name."""
@@ -86,7 +85,7 @@ class File:
         """Does checks after file is loaded."""
         self.writable = os.access(self._path(), os.W_OK)
         if not self.writable:
-            self.log("File not writable.")
+            self.logger.info("File not writable.")
 
     def update_editor_extension(self):
         """Set the editor file extension from the current file name."""
@@ -115,14 +114,14 @@ class File:
             return True
         path = self._path()
         if not os.path.isfile(path):
-            self.log("Given path isn't a file.")
+            self.logger.info("Given path isn't a file.")
             return False
         data = self._read_text(path)
         if data is False:
-            self.log("Normal file read failed.", constants.LOG_WARNING)
+            self.logger.warning("Normal file read failed.")
             data = self._read_binary(path)
         if data is False:
-            self.log("Fallback file read failed.", constants.LOG_WARNING)
+            self.logger.warning("Fallback file read failed.")
             return False
         self.data = data
         self.editor.set_data(data)
@@ -149,14 +148,12 @@ class File:
             detection = chardet.detect(data)
             charenc = detection['encoding']
             if charenc is None:
-                self.log("Failed to detect file encoding.", constants.LOG_WARNING)
+                self.logger.warning("Failed to detect file encoding.")
                 return False
-            self.log("Trying to decode with encoding '" + charenc + "'", constants.LOG_INFO)
+            self.logger.info("Trying to decode with encoding '{}'".format(charenc))
             return data.decode(charenc)
         except Exception as inst:
-            self.log(type(inst))    # the exception instance
-            self.log(inst.args)     # arguments stored in .args
-            self.log(inst)          # __str__ allows args to be printed
+            self.logger.warning("Failed reading binary file!", exc_info=True)
         return False
 
     def reload(self):

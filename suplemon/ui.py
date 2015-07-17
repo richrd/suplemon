@@ -4,6 +4,7 @@ Curses user interface.
 """
 
 import os
+import logging
 
 import helpers
 import constants
@@ -65,6 +66,7 @@ class InputEvent:
 class UI:
     def __init__(self, app):
         self.app = app
+        self.logger = logging.getLogger(__name__)
         self.warned_old_curses = 0
 
     def init(self):
@@ -83,7 +85,8 @@ class UI:
     def load(self, *args):
         """Setup curses."""
         # Log the terminal type
-        self.app.log("Loading UI for terminal: " + curses.termname().decode("utf-8"), constants.LOG_INFO)
+        termname = curses.termname().decode("utf-8")
+        self.logger.info("Loading UI for terminal: {}".format(termname))
 
         self.screen = curses.initscr()
         self.setup_colors()
@@ -94,7 +97,7 @@ class UI:
             # Might fail on vt100 terminal emulators
             curses.curs_set(0)
         except:
-            self.app.log("curses.curs_set(0) failed!", constants.LOG_WARNING)
+            self.logger.warning("curses.curs_set(0) failed!")
 
         self.screen.keypad(1)
 
@@ -120,7 +123,7 @@ class UI:
         try:
             curses.use_default_colors()
         except:
-            self.app.logger.log("Failed to load curses default colors. You could try 'export TERM=xterm-256color'.")
+            self.logger.warning("Failed to load curses default colors. You could try 'export TERM=xterm-256color'.")
             return False
 
         # Default foreground color (could also be set to curses.COLOR_WHITE)
@@ -159,9 +162,9 @@ class UI:
                 # curses.init_pair(8, 8, bg)   # 8 Gray (Line number color)
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
             except:
-                self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
+                self.logger.warning("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
         else:
-            self.app.logger.log("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.", constants.LOG_INFO)
+            self.logger.warning("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.")
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
@@ -174,7 +177,7 @@ class UI:
         if "get_wch" not in dir(self.header_win):
             # Notify only once
             if not self.warned_old_curses:
-                self.app.log("Using old curses! Some keys and special characters might not work.", constants.LOG_WARNING)
+                self.logger.warning("Using old curses! Some keys and special characters might not work.")
                 self.warned_old_curses = 1
 
         y_sub = 0
@@ -368,7 +371,7 @@ class UI:
         """Process keystrokes from the Textbox window."""
         # TODO: implement this to improve interacting in the input box
         if self.app.config["app"]["debug"]:
-            self.app.log("Query key input:"+str(key), constants.LOG_INFO)
+            self.logger.debug("Query key input: {}".format(str(key)))
         return key
 
     def _query(self, text, initial=""):
@@ -450,8 +453,9 @@ class UI:
         try:
             mouse_state = curses.getmouse()
         except:
-            self.app.log(helpers.get_error_info())
+            self.logger.error("curses.getmouse() failed!", exc_info=True)
             return False
+
         # Translate the coordinates to the editor coordinate system
         return self._translate_mouse_to_editor(mouse_state)
 

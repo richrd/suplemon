@@ -4,6 +4,7 @@ Addon module loader.
 """
 import os
 import imp
+import logging
 
 import helpers
 import constants
@@ -12,6 +13,7 @@ import constants
 class ModuleLoader:
     def __init__(self, app=None):
         self.app = app
+        self.logger = logging.getLogger(__name__)
         # The app root directory
         self.curr_path = os.path.dirname(os.path.realpath(__file__))
         # The modules subdirectory
@@ -19,15 +21,9 @@ class ModuleLoader:
         # Module instances
         self.modules = {}
 
-    def log(self, data, type=None):
-        if self.app:
-            self.app.log(data, type)
-        else:
-            print(data)
-
     def load(self):
         """Find and load available modules."""
-        self.log("Loading modules...", constants.LOG_INFO)
+        self.logger.info("Loading modules...")
         dirlist = os.listdir(self.module_path)
         for item in dirlist:
             # Skip 'hidden' dot files
@@ -56,8 +52,7 @@ class ModuleLoader:
             inst.options = module[1]
             return inst
         except:
-            self.log("Initializing module failed: " + module[0])
-            self.log(helpers.get_error_info())
+            self.logger.error("Initializing module failed: {}".format(module[0]), exc_info=True)
         return False
 
     def load_single(self, name):
@@ -66,9 +61,7 @@ class ModuleLoader:
         try:
             mod = imp.load_source(name, path)
         except:
-            self.log("Failed loading module:"+str(name))
-            self.log(traceback.format_exc())
-            self.log(sys.exc_info()[0])
+            self.logger.error("Failed loading module: {}".format(name), exc_info=True)
             return False
         if "module" not in dir(mod):
             return False

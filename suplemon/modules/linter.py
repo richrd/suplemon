@@ -1,13 +1,14 @@
 # -*- encoding:utf-8
-
 import subprocess
+
 from suplemon_module import Module
 
 
 class Linter(Module):
     def init(self):
+        self.init_logging(__name__)
         if not self.has_flake8_support():
-            self.log("Flake8 not available. Can't show linting.")
+            self.logger.warning("Flake8 not available. Can't show linting.")
             return False
 
         # Lint all files after app is loaded

@@ -7,6 +7,7 @@ import os
 import sys
 import imp
 import curses
+import logging
 
 import helpers
 import constants
@@ -25,6 +26,7 @@ class Viewer:
         """
         self.app = app
         self.window = window
+        self.logger = logging.getLogger(__name__)
         self.config = {}
         self.data = ""
         self.lines = [Line()]
@@ -46,11 +48,6 @@ class Viewer:
         self.syntax = None
         self.setup_linelight()
 
-    def log(self, s):
-        """Log to the app."""
-        # TODO: log types: ERROR | WARNING | NOTICE
-        self.app.log(s)
-
     def setup_linelight(self):
         """Setup line based highlighting."""
         ext = self.file_extension
@@ -65,28 +62,28 @@ class Viewer:
 
         module = False
         if os.path.isfile(path):
-            self.app.log("Syntax file found...", constants.LOG_INFO)
+            self.logger.info("Syntax file found...")
             try:
                 module = imp.load_source(ext, path)
-                self.app.log("File loaded...", constants.LOG_INFO)
+                self.logger.info("File loaded...")
             except:
-                self.app.log(helpers.get_error_info())
+                self.logger.error("Failed to load syntax file '{}'!".format(path), exc_info=True)
         else:
             return False
 
         if not module or "Syntax" not in dir(module):
-            self.app.log("File doesn't match API!")
+            self.logger.error("File doesn't match API!")
             return False
         self.syntax = module.Syntax()
 
     def size(self):
         """Get editor size (x,y). (Deprecated, use get_size)."""
-        self.log("size() is deprecated, please use get_size()")
+        self.logger.warning("size() is deprecated, please use get_size()")
         return self.get_size()
 
     def cursor(self):
         """Return the main cursor. (Deprecated, use get_cursor)"""
-        self.log("cursor() is deprecated, please use get_cursor()")
+        self.logger.warning("cursor() is deprecated, please use get_cursor()")
         return self.get_cursor()
 
     def get_size(self):
@@ -205,7 +202,7 @@ class Viewer:
         return True
 
     def set_cursor(self, cursor):
-        self.log("set_cursor is deprecated, use set_cursor_style instead.")
+        self.logger.warning("set_cursor is deprecated, use set_cursor_style instead.")
         return self.set_cursor_style(cursor)
 
     def set_single_cursor(self, cursor):
@@ -311,9 +308,7 @@ class Viewer:
                 else:
                     self.window.addstr(i, x_offset, line_part)
             except Exception as inst:
-                self.log(type(inst))    # the exception instance
-                self.log(inst.args)     # arguments stored in .args
-                self.log(inst)          # __str__ allows args to be printed
+                self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
             i += 1
         self.render_cursors()
 
@@ -345,19 +340,6 @@ class Viewer:
         self.move_cursors()
         self.refresh()
 
-    def move_win(self, yx):
-        """Move the editor window to position yx."""
-        # Must try & catch since mvwin might
-        # crash with incorrect coordinates
-        try:
-            self.window.mvwin(yx[0], yx[1])
-        except:
-            self.app.log(helpers.get_error_info(), constants.LOG_WONTFIX)
-
-    def move_y_scroll(self, delta):
-        """Add delta the y scroll axis scroll"""
-        self.y_scroll += delta
-
     def scroll_up(self):
         """Scroll view up if neccesary."""
         cursor = self.get_first_cursor()
@@ -372,6 +354,28 @@ class Viewer:
         if cursor.y - self.y_scroll >= size[1]:
             # Scroll down
             self.y_scroll = cursor.y - size[1]+1
+
+    def scroll_to_line(self, line_no):
+        """Center the viewport on line_no."""
+        if line_no >= len(self.lines):
+            line_no = len(self.lines)-1
+        new_y = line_no - int(self.get_size()[1] / 2)
+        if new_y < 0:
+            new_y = 0
+        self.y_scroll = new_y
+
+    def move_win(self, yx):
+        """Move the editor window to position yx."""
+        # Must try & catch since mvwin might
+        # crash with incorrect coordinates
+        try:
+            self.window.mvwin(yx[0], yx[1])
+        except:
+            self.logger.warning("Moving window failed!", exc_info=True)
+
+    def move_y_scroll(self, delta):
+        """Add delta the y scroll axis scroll"""
+        self.y_scroll += delta
 
     def move_cursors(self, delta=None, noupdate=False):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
@@ -404,15 +408,6 @@ class Viewer:
             self.x_scroll -= 1
         if not noupdate:
             self.purge_cursors()
-
-    def scroll_to_line(self, line_no):
-        """Center the viewport on line_no."""
-        if line_no >= len(self.lines):
-            line_no = len(self.lines)-1
-        new_y = line_no - int(self.get_size()[1] / 2)
-        if new_y < 0:
-            new_y = 0
-        self.y_scroll = new_y
 
     def move_x_cursors(self, line, col, delta):
         """Move all cursors starting at line and col with delta on the x axis."""

@@ -6,6 +6,7 @@ Config handler.
 import os
 import json
 import curses  # Get key definitons
+import logging
 
 import helpers
 import constants
@@ -14,6 +15,7 @@ import constants
 class Config:
     def __init__(self, app):
         self.app = app
+        self.logger = logging.getLogger(__name__)
         self.filename = "suplemon-config.json"
         self.home_dir = os.path.expanduser("~")
         self.fpath = os.path.join(self.home_dir, ".config", "suplemon")
@@ -148,11 +150,6 @@ class Config:
 
         self.config = dict(self.defaults)
 
-    def log(self, s, log_type=None):
-        if log_type is None:
-            log_type = constants.LOG_ERROR
-        self.app.log(s, log_type)
-
     def path(self):
         return os.path.join(self.fpath, self.filename)
 
@@ -165,12 +162,11 @@ class Config:
                 f.close()
                 self.config = json.loads(data)
                 self.merge_defaults(self.config)
-                self.log("Loaded configuration file '{}'".format(path), constants.LOG_INFO)
+                self.logger.info("Loaded configuration file '{}'".format(path))
                 return True
             except:
-                self.log("Failed to load config file!")
-                self.log(helpers.get_error_info())
-        self.log("Configuration file '{}' doesn't exist.".format(path), constants.LOG_INFO)
+                self.logger.warning("Failed to load config file!", exc_info=True)
+        self.logger.info("Configuration file '{}' doesn't exist.".format(path))
         return False
 
     def reload(self):

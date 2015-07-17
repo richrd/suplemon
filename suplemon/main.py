@@ -8,6 +8,7 @@ __version__ = "0.1.22"
 
 import os
 import sys
+import logging
 
 import ui
 import modules
@@ -15,7 +16,7 @@ import helpers
 import constants
 
 from file import File
-from logger import Logger
+from logger import LoggingHandler
 from config import Config
 from editor import Editor
 
@@ -60,8 +61,18 @@ class App:
             "toggle_fullscreen": self.toggle_fullscreen,
         }
 
+        # Initialize logging
+        logging.basicConfig(level=logging.NOTSET)
+        self.logger = logging.getLogger()
+        self.logger.handlers = []
+        self.logger_handler = LoggingHandler()
+        fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        self.logger_formatter = logging.Formatter(fmt)
+        self.logger_handler.setFormatter(self.logger_formatter)
+        self.logger.addHandler(self.logger_handler)
+        self.logger.info("Starting Suplemon...")
+
         # Load core components
-        self.logger = Logger()
         self.config = Config(self)
         self.config.load()
         self.ui = ui.UI(self)  # Load user interface
@@ -76,10 +87,6 @@ class App:
 
         # Indicate that windows etc. have been created.
         self.inited = 1
-
-    def log(self, text, log_type=constants.LOG_ERROR):
-        """Add text to the log buffer."""
-        self.logger.log(text, log_type)
 
     def init(self):
         """Run the app via the ui wrapper."""
@@ -107,10 +114,11 @@ class App:
         ver = sys.version_info
         if ver[0] < 3 or (ver[0] == 3 and ver[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
-            msg = "Running Suplemon with Python "+ver
-            msg += " which isn't officialy supported. "
-            msg += "Please use Python 3.3 or higher."
-            self.log(msg, constants.LOG_WARNING)
+            self.logger.warning("Running Suplemon with Python {version} "
+                                    "isn't officialy supported. Please use "
+                                    "Python 3.3 or higher."
+                                    .format(version=ver))
+            # constants.LOG_WARNING)
         self.load_files()
         self.running = 1
         self.trigger_event_after("app_loaded")
@@ -123,7 +131,6 @@ class App:
             # See if we have input to process
             event = self.ui.get_input()
             if event:
-                # self.log("INPUT:"+str(event), constants.LOG_INFO)
                 # Handle the input or give it to the editor
                 if not self.handle_input(event):
                     # Pass the input to the editor component
@@ -329,9 +336,9 @@ class App:
             return False
         parts = data.split(" ")
         cmd = parts[0].lower()
-        self.logger.log("Looking for command '" + cmd + "'", constants.LOG_INFO)
+        self.logger.debug("Looking for command '{}'".format(cmd))
         if cmd in self.modules.modules.keys():
-            self.logger.log("Trying to run command '" + cmd + "'", constants.LOG_INFO)
+            self.logger.debug("Trying to run command '{}'".format(cmd))
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor())
         else:
@@ -366,7 +373,7 @@ class App:
                 try:
                     val = cb(event)
                 except:
-                    self.log(helpers.get_error_info())
+                    self.logger.error("Failed running callback: {}".format(cb), exc_info=True)
                     continue
                 if val:
                     status = True

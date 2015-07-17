@@ -2,6 +2,7 @@
 """
 Base class for extension modules to inherit.
 """
+import logging
 
 
 class Module:
@@ -12,11 +13,11 @@ class Module:
     def init(self):
         pass
 
+    def init_logging(self, name):
+        self.logger = logging.getLogger("module.{}".format(name))
+
     def run(self, app, editor):
         pass
-
-    def log(self, data):
-        self.app.log(data)
 
     def bind_key(self, key):
         """Shortcut for binding run method to a key."""
