@@ -1,10 +1,10 @@
 # -*- encoding:utf-8
 import re
 import helpers
-import suplemon_module
+from suplemon_module import Module
 
 
-class AutoComplete(suplemon_module.Module):
+class AutoComplete(Module):
     def init(self):
         self.word_list = []
         self.bind_event("tab", self.auto_complete)

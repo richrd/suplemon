@@ -1,10 +1,10 @@
 import time
 import subprocess
 import helpers
-import suplemon_module
+from suplemon_module import Module
 
 
-class Battery(suplemon_module.Module):
+class Battery(Module):
     def init(self):
         self.last_value = -1
         self.checked = time.time()
@@ -45,7 +45,7 @@ class Battery(suplemon_module.Module):
         ]
         for m in methods:
             value = m()
-            if value is None:
+            if value is not None:
                 break
         return value
 
