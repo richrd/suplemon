@@ -8,13 +8,16 @@ import json
 import curses  # Get key definitons
 
 import helpers
+import constants
 
 
 class Config:
     def __init__(self, app):
         self.app = app
-        self.filename = ".suplemon-config.json"
-        self.fpath = os.path.expanduser("~")
+        self.filename = "suplemon-config.json"
+        self.home_dir = os.path.expanduser("~")
+        self.fpath = os.path.join(self.home_dir, ".config", "suplemon")
+
         self.defaults = {
             "app": {
                 # Print debug logging
@@ -31,7 +34,7 @@ class Config:
                     "^F": "find",               # Ctrl + F
                     "^G": "go_to",              # Ctrl + G
                     "^O": "open",               # Ctrl + O
-                    "^K": "close_file",         # Ctrl + K
+                    "^W": "close_file",         # Ctrl + W
                     "^N": "new_file",           # Ctrl + N
                     "^X": "ask_exit",           # Ctrl + X
                     554: "next_file",           # Ctrl + Page Up
@@ -119,7 +122,7 @@ class Config:
                     274: "toggle_line_ends",              # F10
                     275: "toggle_highlight",              # F11
                     "^C": "cut",                          # Ctrl + C
-                    "^W": "duplicate_line",               # Ctrl + W
+                    "^K": "duplicate_line",               # Ctrl + K
                     "^V": "insert",                       # Ctrl + V
                     "^D": "find_next",                    # Ctrl + D
                     "^A": "find_all",                     # Ctrl + A
@@ -145,8 +148,10 @@ class Config:
 
         self.config = dict(self.defaults)
 
-    def log(self, s):
-        self.app.log(s)
+    def log(self, s, log_type=None):
+        if log_type is None:
+            log_type = constants.LOG_ERROR
+        self.app.log(s, log_type)
 
     def path(self):
         return os.path.join(self.fpath, self.filename)
@@ -160,10 +165,12 @@ class Config:
                 f.close()
                 self.config = json.loads(data)
                 self.merge_defaults(self.config)
+                self.log("Loaded configuration file '{}'".format(path), constants.LOG_INFO)
                 return True
             except:
                 self.log("Failed to load config file!")
                 self.log(helpers.get_error_info())
+        self.log("Configuration file '{}' doesn't exist.".format(path), constants.LOG_INFO)
         return False
 
     def reload(self):
