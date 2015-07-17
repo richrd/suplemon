@@ -638,6 +638,7 @@ class Editor(Viewer):
         cur.y = line_no
         if cur.y >= len(self.lines):
             cur.y = len(self.lines)-1
+        self.scroll_to_line(cur.y)
         self.move_cursors()
 
     def find(self, what, findall=False):
