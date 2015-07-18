@@ -376,7 +376,7 @@ class App:
         elif operation in self.modules.modules.keys():
             cancel = self.trigger_event_before(operation)
             if not cancel:
-                result = self.modules.modules[operation].run(self, self.get_editor())
+                result = self.modules.modules[operation].run(self, self.get_editor(), "")
             self.trigger_event_after(operation)
             return result
             
