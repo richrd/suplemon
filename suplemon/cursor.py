@@ -70,6 +70,9 @@ class Cursor:
         :param int delta: How much to move. Defaults to 1.
         """
         self.x += delta
+        # Check in case of negative values
+        if self.x < 0:
+            self.x = 0
         self.persistent_x = self.x
         return
 
@@ -116,6 +119,9 @@ class Cursor:
         if isinstance(item, Cursor):
             if item.x != self.x or item.y != self.x:
                 return False
+
+    def __str__(self):
+        return "Cursor({x},{y})".format(x=self.x, y=self.y)
 
     def tuple(self):
         """Return the cursor as a tuple.
