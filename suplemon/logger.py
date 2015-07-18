@@ -1,4 +1,3 @@
-# -*- encoding: utf-8
 """
 Basic logging to delay printing until curses is unloaded.
 """
@@ -15,7 +14,6 @@ class LoggingHandler(logging.Handler):
         self.messages.append(msg)
 
     def close(self):
-        # self.print()
         logging.Handler.close(self)
 
     def print(self):
