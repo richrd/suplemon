@@ -79,4 +79,4 @@ class Module:
 
     def _proxy_run(self):
         """Calls the run method with necessary arguments."""
-        self.run(self.app, self.app.get_editor())
+        self.run(self.app, self.app.get_editor(), "")
