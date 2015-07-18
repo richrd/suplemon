@@ -175,11 +175,26 @@ class App:
         return self.event_bindings
 
     def set_key_binding(self, key, operation):
-        """Bind a key to an operation."""
+        """Bind a key to an operation.
+
+        Bind operation to be run when key is pressed.
+
+        :param key: What key or key combination to bind.
+        :param str operation: Which operation to run.
+        """
         self.get_key_bindings()[key] = operation
 
     def set_event_binding(self, event, when, callback):
-        """Bind a callbacks to be run before or after an event."""
+        """Bind a callbacks to be run before or after an event.
+
+        Bind callback to run before or after event occurs. Th when parameter
+        should be 'before' or 'after'. If using 'before' the callback can
+        inhibit running the event if it returns True
+
+        :param str event: Event to bind to.
+        :param str when: String with 'before' or 'after'.
+        :param callback: Callback to bind.
+        """
         event_bindings = self.get_event_bindings()
         if when not in event_bindings.keys():
             event_bindings[when] = {}
@@ -188,12 +203,15 @@ class App:
         else:
             event_bindings[when][event] = [callback]
 
-    def set_status(self, s):
-        """Set the status message."""
-        self.status_msg = str(s)
+    def set_status(self, status):
+        """Set app status message.
+
+        :param str status: Status message to show in status bar.
+        """
+        self.status_msg = str(status)
 
     def unsaved_changes(self):
-        """Check if there are unsaved changes in any file."""
+        """Return True if there are unsaved changes in any file."""
         for f in self.files:
             if f.is_changed():
                 return True
@@ -208,7 +226,14 @@ class App:
         self.ui.refresh()
 
     def handle_input(self, event):
-        """Handle an input event."""
+        """Handle an input event.
+
+        Runs relevant actions based on the event received.
+
+        :param event: An event instance.
+        :return: Boolean indicating if the event was handled.
+        :rtype: boolean
+        """
         if not event:
             return False
         self.last_input = event
@@ -220,7 +245,12 @@ class App:
         return False
 
     def handle_key(self, event):
-        """Handle a keyboard event."""
+        """Handle a key input event.
+
+        :param event: Event instance.
+        :return: Boolean indicating if event was handled.
+        :rtype: boolean
+        """
         key_bindings = self.get_key_bindings()
         if event.key_name in key_bindings.keys():
             operation = key_bindings[event.key_name]
@@ -232,7 +262,12 @@ class App:
         return True
 
     def handle_mouse(self, event):
-        """Handle a mouse event."""
+        """Handle a mouse input event.
+
+        :param event: Event instance.
+        :return: Boolean indicating if event was handled.
+        :rtype: boolean
+        """
         editor = self.get_editor()
         if event.mouse_code == 1:                    # Left mouse button release
             editor.set_single_cursor(event.mouse_pos)
@@ -251,7 +286,7 @@ class App:
     ###########################################################################
 
     def help(self):
-        """Open help file."""
+        """Open a new file with help text."""
         f = self.default_file()
         import help
         f.set_data(help.help_text)
@@ -259,7 +294,12 @@ class App:
         self.switch_to_file(self.last_file_index())
 
     def new_file(self, path=None):
-        """Open new empty file."""
+        """Open a new empty file.
+
+        Open a new file and optionally set it's path.
+
+        :param str path: Optional. Path for file.
+        """
         new_file = self.default_file()
         if path:
             new_file.set_path(path)
