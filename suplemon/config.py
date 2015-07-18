@@ -8,9 +8,6 @@ import json
 import curses  # Get key definitons
 import logging
 
-import helpers
-import constants
-
 
 class Config:
     def __init__(self, app):

@@ -13,7 +13,6 @@ import logging
 import ui
 import modules
 import helpers
-import constants
 
 from file import File
 from logger import LoggingHandler

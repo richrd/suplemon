@@ -7,8 +7,6 @@ import os
 import time
 import logging
 
-import constants
-
 
 class File:
     def __init__(self, app=None):

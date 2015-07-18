@@ -9,9 +9,6 @@ import imp
 import curses
 import logging
 
-import helpers
-import constants
-
 from line import Line
 from cursor import Cursor
 
@@ -62,10 +59,8 @@ class Viewer:
 
         module = False
         if os.path.isfile(path):
-            self.logger.info("Syntax file found...")
             try:
                 module = imp.load_source(ext, path)
-                self.logger.info("File loaded...")
             except:
                 self.logger.error("Failed to load syntax file '{}'!".format(path), exc_info=True)
         else:

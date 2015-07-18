@@ -6,9 +6,6 @@ import os
 import imp
 import logging
 
-import helpers
-import constants
-
 
 class ModuleLoader:
     def __init__(self, app=None):

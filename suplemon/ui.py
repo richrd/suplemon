@@ -6,9 +6,6 @@ Curses user interface.
 import os
 import logging
 
-import helpers
-import constants
-
 
 class InputEvent:
     """Represents a keyboard or mouse event."""
