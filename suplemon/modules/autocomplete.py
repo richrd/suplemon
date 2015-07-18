@@ -8,9 +8,9 @@ class AutoComplete(Module):
     def init(self):
         self.word_list = []
         self.bind_event("tab", self.auto_complete)
-        self.bind_event("app_loaded", self.build_word_list)
-        self.bind_event("save_file", self.build_word_list)
-        self.bind_event("save_file_as", self.build_word_list)
+        self.bind_event_after("app_loaded", self.build_word_list)
+        self.bind_event_after("save_file", self.build_word_list)
+        self.bind_event_after("save_file_as", self.build_word_list)
 
     def get_separators(self):
         separators = self.app.config["editor"]["punctuation"]
