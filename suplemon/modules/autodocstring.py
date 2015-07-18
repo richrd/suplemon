@@ -10,14 +10,15 @@ class AutoDocstring(Module):
         self.default_values = {
             "short_desc": "Short description.",
             "long_desc": "Long description.",
-            "args": "...",
-            "returns": "...",
+            "args": "",
+            "returns": "",
         }
         self.docstring_template = "{short_desc}\n" + \
             "\n" + \
             "{long_desc}\n" + \
             "\n" + \
-            "{args}"
+            "{args}" + \
+            "{returns}"
 
     def run(self, app, editor):
         """Run the autosphinx command."""
@@ -25,11 +26,13 @@ class AutoDocstring(Module):
         line = editor.get_line(cursor.y)
         line_data = line.get_data()
         if not helpers.starts(line_data.strip(), "def "):
-            app.set_status("Line isn't a function definition.")
+            app.set_status("Current line isn't a function definition.")
             return False
 
         func_args = self.get_function_args(line_data)
-        docstring = self.get_docstring(func_args=func_args)
+        func_returns = self.get_function_returns(editor, cursor.y)
+        docstring = self.get_docstring(func_args=func_args, func_returns=func_returns)
+
         indent = self.get_docstring_indent(line_data)
         indent = indent * self.app.config["editor"]["tab_width"] * " "
         self.insert_docstring(editor, cursor.y+1, indent, docstring)
@@ -72,10 +75,14 @@ class AutoDocstring(Module):
         for key in self.default_values.keys():
             if key not in values.keys():
                 values[key] = self.default_values[key]
+
         args = ""
         for arg in values["func_args"]:
             args += ":param {}:\n".format(arg)
         values["args"] = args
+
+        if values["func_returns"]:
+            values["returns"] = ":return:\n"
 
         doc = self.docstring_template
         doc = doc.format(**values)
@@ -104,8 +111,22 @@ class AutoDocstring(Module):
         return args
 
     def get_function_returns(self, editor, line_number):
-        # Not Implemented
-        pass
+        """Returns True if function at line_number returns something.
+
+        :param editor: Editor instance to get lines from.
+        :param line_number: Line number of the function definition.
+        :return: Boolean indicating wether the function something.
+        """
+        i = line_number+1
+        while i < len(editor.lines):
+            line = editor.get_line(i)
+            data = line.get_data().strip()
+            if helpers.starts(data, "def "):
+                break
+            if helpers.starts(data, "return "):
+                return True
+            i += 1
+        return False
 
 module = {
     "class": AutoDocstring,
