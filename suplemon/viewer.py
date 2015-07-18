@@ -383,9 +383,9 @@ class Viewer:
                 cursor.y = len(self.lines)-1
             if cursor.x >= len(self.lines[cursor.y]):
                 cursor.x = len(self.lines[cursor.y])
-            elif cursor.persistent_x < len(self.lines[cursor.y]):
+            elif cursor.persistent_x != cursor.x:
                 # Retain the 'desired' x coordinate
-                cursor.x = cursor.persistent_x
+                cursor.x = min(cursor.persistent_x, len(self.lines[cursor.y]))
 
         cur = self.get_cursor()  # Main cursor
         size = self.get_size()
