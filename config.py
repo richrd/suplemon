@@ -140,6 +140,7 @@ class Config:
                 "show_legend": True,
                 "show_bottom_bar": True,
                 "invert_status_bars": True,
+                "theme": "monokai"
             },
         }
 

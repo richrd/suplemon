@@ -162,6 +162,8 @@ class UI:
         else:
             self.app.logger.log("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.", LOG_INFO)
 
+        self.app.themes.use(self.app.config["display"]["theme"])
+
     def setup_windows(self, resize=False):
         """Initialize windows."""
         yx = self.screen.getmaxyx()
