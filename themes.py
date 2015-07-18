@@ -5,11 +5,48 @@ Theme loader
 import os
 import imp
 from helpers import *
+import curses
 
 try:
     import xml.etree.cElementTree as ET
 except:
     import xml.etree.ElementTree as ET
+
+# Map scope name to its color pair index
+scope_to_pair = {
+    "global": 21,
+    "comment": 22,
+    "string": 23,
+    "constant.numeric": 24,
+    "constant.language": 25,
+    "constant.character": 26,
+    "constant.other": 27,
+    "variable": 28,
+    "keyword": 29,
+    "storage": 30,
+    "storage.type": 31,
+    "entity.name.class": 32,
+    "entity.other.inherited-class": 33,
+    "entity.name.function": 34,
+    "variable.parameter": 35,
+    "entity.name.tag": 36,
+    "entity.other.attribute-name": 37,
+    "support.function": 38,
+    "support.constant": 39,
+    "support.type": 40,
+    "support.class": 41,
+    "support.other.variable": 42,
+    "invalid": 43,
+    "invalid.deprecated": 44,
+    "meta.structure.dictionary.json string.quoted.double.json": 45,
+    "meta.diff": 46,
+    "meta.diff.header": 47,
+    "markup.deleted": 48,
+    "markup.inserted": 49,
+    "markup.changed": 50,
+    "constant.numeric.line-number.find-in-files - match": 51,
+    "entity.name.filename.find-in-files": 52,
+}
 
 class Theme:
     def __init__(self, name, uuid):
@@ -61,8 +98,9 @@ class ThemeLoader:
             settings = config["settings"]
         except:
             return None
+        self.set_theme(theme, settings)
 
-        self.set(theme, settings)
+        return theme
 
 
     def use(self, name):
@@ -72,12 +110,15 @@ class ThemeLoader:
         except:
             theme = self.load(name)
             self.themes[name] = theme
-
         if theme is None:
             return
+        self.current_theme = theme
 
 
-    def set(self, theme, settings):
+    def get_scope(self, name):
+        return self.current_theme.scopes.get(name)
+
+    def set_theme(self, theme, settings):
         for entry in settings:
             if not isinstance(entry, dict): 
                 continue
