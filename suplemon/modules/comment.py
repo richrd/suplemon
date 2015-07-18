@@ -1,12 +1,16 @@
+# -*- encoding: utf-8
+
 import helpers
 from suplemon_module import Module
 
 
 class Comment(Module):
+    """Toggles line commenting based on current file syntax."""
+
     def init(self):
         self.bind_key("^P")
 
-    def run(self, app, editor):
+    def run(self, app, editor, args):
         """Comment the current line(s)."""
         try:
             # Try to get comment start and end syntax

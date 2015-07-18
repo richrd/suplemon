@@ -2,6 +2,7 @@
 """
 Base class for extension modules to inherit.
 """
+
 import logging
 
 
@@ -29,7 +30,7 @@ class Module:
         """
         self.logger = logging.getLogger("module.{}".format(name))
 
-    def run(self, app, editor):
+    def run(self, app, editor, args):
         """This is called each time the module is run.
 
         Called when command is issued via promt or key binding.

@@ -1,9 +1,10 @@
-# -*- coding:utf-8
+# -*- encoding: utf-8
+
 from suplemon_module import Module
 
 
 class ReplaceAll(Module):
-    def run(self, app, editor):
+    def run(self, app, editor, args):
         r_from = self.app.ui.query("Replace text:")
         if not r_from:
             return False

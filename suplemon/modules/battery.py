@@ -1,10 +1,15 @@
+# -*- encoding: utf-8
+
 import time
 import subprocess
+
 import helpers
 from suplemon_module import Module
 
 
 class Battery(Module):
+    """Shows remaining battery capacity in the top status bar if available."""
+
     def init(self):
         self.last_value = -1
         self.checked = time.time()

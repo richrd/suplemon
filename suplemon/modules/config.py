@@ -1,8 +1,12 @@
+# -*- encoding: utf-8
+
 from suplemon_module import Module
 
 
 class Config(Module):
-    def run(self, app, editor):
+    """Shortcut to openning the current config file."""
+
+    def run(self, app, editor, args):
         path = app.config.path()
         f = app.file_is_open(path)
         if f:

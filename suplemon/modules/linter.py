@@ -1,4 +1,5 @@
-# -*- encoding:utf-8
+# -*- encoding: utf-8
+
 import subprocess
 
 from suplemon_module import Module
@@ -21,7 +22,7 @@ class Linter(Module):
         self.bind_event_after("reload_file", self.lint_current_file)
         self.bind_event_after("open_file", self.lint_current_file)
 
-    def run(self, app, editor):
+    def run(self, app, editor, args):
         """Run the linting command."""
         editor = self.app.get_file().get_editor()
         count = self.get_msg_count(editor)

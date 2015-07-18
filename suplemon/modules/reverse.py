@@ -1,8 +1,10 @@
+# -*- encoding: utf-8
+
 from suplemon_module import Module
 
 
 class Reverse(Module):
-    def run(self, app, editor):
+    def run(self, app, editor, args):
         line_nums = []
         for cursor in editor.cursors:
             if cursor.y not in line_nums:

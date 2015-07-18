@@ -1,10 +1,19 @@
-# -*- encoding:utf-8
+# -*- encoding: utf-8
 
 import helpers
 from suplemon_module import Module
 
 
 class AutoDocstring(Module):
+    """
+    Simple module for adding docstring placeholders.
+
+    This module is intended to generate docstrings for Python functions.
+    It adds placeholders for descriptions, arguments and return data.
+    Function arguments are crudely parsed from the function definition
+    and return statements are scanned from the function body.
+    """
+
     def init(self):
         self.init_logging(__name__)
         self.default_values = {
@@ -20,7 +29,7 @@ class AutoDocstring(Module):
             "{args}" + \
             "{returns}"
 
-    def run(self, app, editor):
+    def run(self, app, editor, args):
         """Run the autosphinx command."""
         cursor = editor.get_cursor()
         line = editor.get_line(cursor.y)

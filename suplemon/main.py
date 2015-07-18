@@ -96,7 +96,13 @@ class App:
         self.running = 0
 
     def run(self, *args):
-        """Run the app."""
+        """Actually run the app and start mainloop.
+
+        This shouldn't be called directly. Instead it's passed to the UI wich
+        calls it in a safe curses wrapper.
+
+        :param *args: Not used. Takes any args the wrapper might pass in.
+        """
         # Load ui and files etc
         self.load()
         # Initial render
@@ -108,16 +114,19 @@ class App:
         self.ui.unload()
 
     def load(self):
-        """Load the app."""
+        """Load the app.
+
+        Load the UI, open files in self.filenames and finally trigger
+        the 'app_loaded' event.
+        """
         self.ui.load()
         ver = sys.version_info
         if ver[0] < 3 or (ver[0] == 3 and ver[1] < 3):
             ver = ".".join(map(str, sys.version_info[0:2]))
             self.logger.warning("Running Suplemon with Python {version} "
-                                    "isn't officialy supported. Please use "
-                                    "Python 3.3 or higher."
-                                    .format(version=ver))
-            # constants.LOG_WARNING)
+                                "isn't officialy supported. Please use "
+                                "Python 3.3 or higher."
+                                .format(version=ver))
         self.load_files()
         self.running = 1
         self.trigger_event_after("app_loaded")
@@ -141,19 +150,28 @@ class App:
                 self.ui.refresh()
 
     def get_status(self):
-        """Set the status message."""
+        """Get the current status message.
+
+        :return: Current status message.
+        :rtype: str
+        """
         return self.status_msg
 
     def get_file_index(self, file_obj):
-        """Get file index by file object."""
+        """Return the index of file_obj in the file list.
+
+        :param file_obj: File instance.
+        :return: Index of file_obj.
+        :rtype: int
+        """
         return self.files.index(file_obj)
 
     def get_key_bindings(self):
-        """Returns the list of key bindings."""
+        """Return the list of key bindings."""
         return self.config["app"]["keys"]
 
     def get_event_bindings(self):
-        """Returns the dict of event bindings."""
+        """Return the dict of event bindings."""
         return self.event_bindings
 
     def set_key_binding(self, key, operation):
@@ -332,11 +350,12 @@ class App:
         """Run editor commands."""
         parts = data.split(" ")
         cmd = parts[0].lower()
+        args = " ".join(parts[1:])
         self.logger.debug("Looking for command '{}'".format(cmd))
         if cmd in self.modules.modules.keys():
             self.logger.debug("Trying to run command '{}'".format(cmd))
             self.get_editor().store_action_state(cmd)
-            self.modules.modules[cmd].run(self, self.get_editor())
+            self.modules.modules[cmd].run(self, self.get_editor(), args)
         else:
             self.set_status("Command '" + cmd + "' not found.")
             return False
