@@ -19,6 +19,9 @@ class Cursor:
         else:
             self.x = x
             self.y = y
+        # Store the desired x position and
+        # use it if the line is long enough
+        self.persistent_x = self.x
 
     def get_x(self):
         return self.x
@@ -28,6 +31,7 @@ class Cursor:
 
     def set_x(self, x):
         self.x = x
+        self.persistent_x = x
 
     def set_y(self, y):
         self.y = y
@@ -37,11 +41,13 @@ class Cursor:
         self.x -= delta
         if self.x < 0:
             self.x = 0
+        self.persistent_x = self.x
         return
 
     def move_right(self, delta=1):
         """Move the cursor right with delta."""
         self.x += delta
+        self.persistent_x = self.x
         return
 
     def move_up(self, delta=1):
