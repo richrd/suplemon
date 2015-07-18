@@ -46,7 +46,7 @@ class App:
         self.operations = {
             "help": self.help,
             "save_file": self.save_file,
-            "run_command": self.run_command,
+            "run_command": self.query_command,
             "find": self.find,
             "go_to": self.go_to,
             "open": self.open,
@@ -329,11 +329,8 @@ class App:
             i += 1
         return -1
 
-    def run_command(self):
+    def run_command(self, data):
         """Run editor commands."""
-        data = self.ui.query("Command:")
-        if not data:
-            return False
         parts = data.split(" ")
         cmd = parts[0].lower()
         self.logger.debug("Looking for command '{}'".format(cmd))
@@ -343,22 +340,28 @@ class App:
             self.modules.modules[cmd].run(self, self.get_editor())
         else:
             self.set_status("Command '" + cmd + "' not found.")
+            return False
         return True
 
     def run_operation(self, operation):
         """Run an app core operation."""
         # Support arbitrary callables
         if hasattr(operation, '__call__'):
-            operation()
-        elif operation in self.operations.keys():
-            # cancel = self.trigger_event(operation)
+            return operation()
+
+        if operation in self.operations.keys():
             cancel = self.trigger_event_before(operation)
             if not cancel:
                 result = self.operations[operation]()
-            # Run post action event
-            # self.trigger_event("after:" + operation)
             self.trigger_event_after(operation)
             return result
+        elif operation in self.modules.modules.keys():
+            cancel = self.trigger_event_before(operation)
+            if not cancel:
+                result = self.modules.modules[operation].run(self, self.get_editor())
+            self.trigger_event_after(operation)
+            return result
+            
         return False
 
     def trigger_event(self, event, when):
@@ -408,6 +411,13 @@ class App:
             self.set_status("Mouse enabled")
         else:
             self.set_status("Mouse disabled")
+
+    def query_command(self):
+        """Run editor commands."""
+        data = self.ui.query("Command:")
+        if not data:
+            return False
+        self.run_command(data)
 
     ###########################################################################
     # Editor operations
