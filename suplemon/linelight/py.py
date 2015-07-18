@@ -18,7 +18,7 @@ class Syntax:
             color = 1    # Red
         elif starts(line, "self."):
             color = 6    # Cyan
-        elif starts(line, ["#", "//", "\"", "'"]):
+        elif starts(line, ["#", "//", "\"", "'", ":"]):
             color = 5    # Magenta
         elif starts(line, ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue", "pass", "break"]):
             color = 3    # Yellow
