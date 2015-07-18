@@ -62,3 +62,13 @@ def get_string_between(start, stop, s):
         return False
     s = s[:i2]
     return s
+
+
+def whitespace(line):
+    """Return index of first non whitespace character on a line."""
+    i = 0
+    for char in line:
+        if char != " ":
+            break
+        i += 1
+    return i

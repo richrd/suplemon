@@ -5,6 +5,8 @@ Editor class for extending viewer with text editing features.
 
 import re
 
+import helpers
+
 from line import Line
 from cursor import Cursor
 from viewer import Viewer
@@ -348,7 +350,7 @@ class Editor(Viewer):
     def home(self):
         """Move to start of line or text on that line."""
         for cursor in self.cursors:
-            wspace = self.whitespace(self.lines[cursor.y])
+            wspace = helpers.whitespace(self.lines[cursor.y])
             if cursor.x == wspace:
                 cursor.set_x(0)
             else:
@@ -474,7 +476,7 @@ class Editor(Viewer):
             self.lines[cursor.y].set_data(start)
             wspace = ""
             if self.config["auto_indent_newline"]:
-                wspace = self.whitespace(self.lines[cursor.y])*" "
+                wspace = helpers.whitespace(self.lines[cursor.y])*" "
             self.lines.insert(cursor.y+1, Line(wspace+end))
             self.move_y_cursors(cursor.y, 1)
             cursor.set_x(len(wspace))
@@ -516,6 +518,12 @@ class Editor(Viewer):
         self.scroll_down()
         # Add a restore point if previous action != insert
         self.store_action_state("insert")
+
+    def insert_lines_at(self, lines, at):
+        rev_lines = reversed(lines)
+        for line in rev_lines:
+            self.lines.insert(at, Line(line))
+        self.move_y_cursors(at, len(lines))
 
     def push_up(self):
         """Move current lines up by one line."""
@@ -568,12 +576,12 @@ class Editor(Viewer):
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.y in linenums:
-                cursor.x = self.whitespace(line)
+                cursor.x = helpers.whitespace(line)
                 continue
             elif line[:self.config["tab_width"]] == tab:
                 line = Line(line[self.config["tab_width"]:])
                 self.lines[cursor.y] = line
-                cursor.x = self.whitespace(line)
+                cursor.x = helpers.whitespace(line)
                 linenums.append(cursor.y)
         # Add a restore point if previous action != untab
         self.store_action_state("untab")

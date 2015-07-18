@@ -21,7 +21,7 @@ class Comment(Module):
                 continue  # Skip empty lines
             # Look for comment syntax in stripped line (TODO:Make this smarter)
             target = str(line).strip()
-            w = editor.whitespace(line)  # Amount of whitespace at line start
+            w = helpers.whitespace(line)  # Amount of whitespace at line start
             # If the line starts with comment syntax
             if helpers.starts(target, comment[0]):
                 # Reconstruct the whitespace and add the line

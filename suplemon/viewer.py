@@ -127,6 +127,9 @@ class Viewer:
                 cursors.append(cursor)
         return cursors
 
+    def get_line(self, n):
+        return self.lines[n]
+
     def get_lines_with_cursors(self):
         """Return all line indices that have cursors.
 
@@ -241,15 +244,6 @@ class Viewer:
         if not self.config["show_line_nums"]:
             return 0
         return len(str(len(self.lines)))+1
-
-    def whitespace(self, line):
-        """Return index of first non whitespace character on a line."""
-        i = 0
-        for char in line:
-            if char != " ":
-                break
-            i += 1
-        return i
 
     def toggle_line_nums(self):
         """Toggle display of line numbers."""
