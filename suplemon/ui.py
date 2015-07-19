@@ -367,8 +367,14 @@ class UI:
     def _process_query_key(self, key):
         """Process keystrokes from the Textbox window."""
         # TODO: implement this to improve interacting in the input box
-        if self.app.config["app"]["debug"]:
-            self.logger.debug("Query key input: {}".format(str(key)))
+        # Standardize some keycodes
+        rewrite = {
+            127: 263,
+            8: 263,
+        }
+        self.logger.debug("Query key input: {}".format(str(key)))
+        if key in rewrite.keys():
+            key = rewrite[key]
         return key
 
     def _query(self, text, initial=""):
