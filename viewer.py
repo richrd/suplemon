@@ -11,6 +11,7 @@ import curses
 from line import *
 from cursor import *
 from helpers import *
+from themes import scope_to_pair
 
 
 class Viewer:
@@ -42,7 +43,10 @@ class Viewer:
         self.cursors = [Cursor()]
 
         self.syntax = None
-        self.setup_linelight()
+        if self.app.config["editor"]["show_highlighting"]:
+            self.setup_highlight()
+        else:
+            self.setup_linelight()
 
     def log(self, s):
         """Log to the app."""
@@ -60,7 +64,33 @@ class Viewer:
 
         filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
+        module = False
+        if os.path.isfile(path):
+            self.app.log("Syntax file found...", LOG_INFO)
+            try:
+                module = imp.load_source(ext, path)
+                self.app.log("File loaded...", LOG_INFO)
+            except:
+                self.app.log(get_error_info())
+        else:
+            return False
 
+        if not module or "Syntax" not in dir(module):
+            self.app.log("File doesn't match API!")
+            return False
+        self.syntax = module.Syntax()
+
+    def setup_highlight(self):
+        """Setup word based highlighting."""
+        ext = self.file_extension
+        # Check if a file extension is redefined
+        # Maps e.g. 'scss' to 'css'
+        if ext in self.extension_map.keys():
+            ext = self.extension_map[ext]  # Use it
+        curr_path = os.path.dirname(os.path.realpath(__file__))
+
+        filename = ext + ".py"
+        path = os.path.join(curr_path, "highlight", filename)
         module = False
         if os.path.isfile(path):
             self.app.log("Syntax file found...", LOG_INFO)
@@ -155,6 +185,15 @@ class Viewer:
                 return 0
         return 0
 
+    def get_word_scope(self, raw_word):
+        """Return the scope name based on the word."""
+        if self.syntax:
+            try:
+                return self.syntax.get_scope(raw_word)
+            except:
+                return 0
+        return 0
+
     def get_data(self):
         """Get editor contents.
 
@@ -219,7 +258,10 @@ class Viewer:
         ext = ext.lower()
         if ext and ext != self.file_extension:
             self.file_extension = ext
-            self.setup_linelight()
+            if self.app.config["editor"]["show_highlighting"]:
+                self.setup_highlight()
+            else:
+                self.setup_linelight()
 
     def add_cursor(self, cursor):
         """Add a new cursor. Accepts a x,y tuple or a Cursor instance."""
@@ -271,10 +313,10 @@ class Viewer:
         self.window.clear()
         max_y = self.get_size()[1]
         i = 0
-        x_offset = self.line_offset()
         max_len = self.max_line_length()
         # Iterate through visible lines
         while i < max_y:
+            x_offset = self.line_offset()
             lnum = i + self.y_scroll
             if lnum >= len(self.lines):  # Make sure we have a line to show
                 break
@@ -300,18 +342,46 @@ class Viewer:
                 if self.config["show_white_space"]:
                     char = self.config["white_space_map"][key]
                 line_part = line_part.replace(key, char)
-            # Use unicode support on Python 3.3 and higher
-            if sys.version_info[0] == 3 and sys.version_info[1] > 2:
-                line_part = line_part.encode("utf-8")
-            try:
-                if self.config["show_line_colors"]:
-                    self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
-                else:
-                    self.window.addstr(i, x_offset, line_part)
-            except Exception as inst:
-                self.log(type(inst))    # the exception instance
-                self.log(inst.args)     # arguments stored in .args
-                self.log(inst)          # __str__ allows args to be printed
+
+            if self.app.config["editor"]["show_highlighting"]:
+                words = line_part.split(" ")
+                for raw_word in words:
+                    word = raw_word
+                    # Use unicode support on Python 3.3 and higher
+                    if sys.version_info[0] == 3 and sys.version_info[1] > 2:
+                        word = word.encode("utf-8")
+                    try:
+                        if self.config["show_line_colors"]:
+                            scope = self.get_word_scope(raw_word)
+                            settings = self.app.themes.get_scope(scope)
+                            pair = scope_to_pair.get(scope)
+                            if settings is not None and pair is not None:
+                                fg = int(settings.get("foreground") or -1)
+                                bg = int(settings.get("background") or -1)
+                                curses.init_pair(pair, fg, bg)
+                                self.window.addstr(i, x_offset, word, curses.color_pair(pair))
+                            else:
+                                self.window.addstr(i, x_offset, word)
+                        else:
+                            self.window.addstr(i, x_offset, word)
+                    except Exception as inst:
+                        self.log(type(inst))    # the exception instance
+                        self.log(inst.args)     # arguments stored in .args
+                        self.log(inst)          # __str__ allows args to be printed
+                    x_offset += len(word) + 1
+            else:
+                # Use unicode support on Python 3.3 and higher
+                if sys.version_info[0] == 3 and sys.version_info[1] > 2:
+                    line_part = line_part.encode("utf-8")
+                try:
+                    if self.config["show_line_colors"]:
+                        self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
+                    else:
+                        self.window.addstr(i, x_offset, line_part)
+                except Exception as inst:
+                    self.log(type(inst))    # the exception instance
+                    self.log(inst.args)     # arguments stored in .args
+                    self.log(inst)          # __str__ allows args to be printed
             i += 1
         self.render_cursors()
 
