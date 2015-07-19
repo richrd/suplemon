@@ -159,10 +159,10 @@ class UI:
                 # curses.init_pair(8, 8, bg)   # 8 Gray (Line number color)
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
             except:
-                self.app.logger.log("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
+                self.app.logger.error("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
                 self.app.config["editor"]["show_highlighting"] = False
         else:
-            self.app.logger.log("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.", LOG_INFO)
+            self.app.logger.error("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.")
             self.app.config["editor"]["show_highlighting"] = False
 
         self.app.themes.use(self.app.config["editor"]["theme"])

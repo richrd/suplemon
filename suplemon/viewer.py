@@ -63,17 +63,17 @@ class Viewer:
         path = os.path.join(curr_path, "linelight", filename)
         module = False
         if os.path.isfile(path):
-            self.app.log("Syntax file found...", LOG_INFO)
+            self.app.logger.error("Syntax file found...")
             try:
                 module = imp.load_source(ext, path)
-                self.app.log("File loaded...", LOG_INFO)
+                self.app.logger.error("File loaded...")
             except:
-                self.app.log(get_error_info())
+                self.app.logger.error(get_error_info())
         else:
             return False
 
         if not module or "Syntax" not in dir(module):
-            self.app.log("File doesn't match API!")
+            self.app.logger.error("File doesn't match API!")
             return False
         self.syntax = module.Syntax()
 

@@ -66,9 +66,9 @@ class ThemeLoader:
         self.current_theme = None
 
 
-    def log(self, data, type=None):
+    def log(self, data):
         if self.app:
-            self.app.log(data, type)
+            self.app.logger.info(data)
         else:
             print(data)
 
@@ -79,7 +79,7 @@ class ThemeLoader:
         if not os.path.exists(fullpath):
             return None
 
-        self.log("Loading theme " + name, LOG_INFO)
+        self.log("Loading theme " + name)
 
         tree = ET.parse(fullpath)
         root = tree.getroot()
