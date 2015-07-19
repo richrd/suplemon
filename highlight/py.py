@@ -12,12 +12,14 @@ class Syntax:
             scope = "string"
         elif word in ["class", "def"]:
             scope = "storage.type"
-        elif word in ["#", "//", "\"", "'"]:
+        elif starts(word, ["#", "//", "\"", "'"]):
             scope = "comment"
         elif word in ["if", "elif","else", "finally", "try", "except", "for ", "while ", "continue", "pass", "break", "import", "from", "return", "yield"]:
             scope = "keyword"
-        elif word in ["+", "-", "*", "/", "+=", "-=", "/=", "*=", "and", "or", "not", "<", ">", "!="]:
+        elif word in ["+", "-", "*", "/", "+=", "-=", "/=", "*=", "=", "and", "or", "not", "<", ">", "!=", "is"]:
             scope = "keyword"
+        elif word in ["True", "False", "None"]:
+            scope = "constant.language"
         else:
             try:
                 i = int(word)

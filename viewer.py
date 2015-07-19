@@ -345,13 +345,8 @@ class Viewer:
 
             if self.app.config["editor"]["show_highlighting"]:
                 words = line_part.split(" ")
-                start = True
                 for raw_word in words:
-                    if start:
-                        start = False
-                        word = raw_word
-                    else:
-                        word = " " + raw_word
+                    word = raw_word
                     # Use unicode support on Python 3.3 and higher
                     if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                         word = word.encode("utf-8")
@@ -373,7 +368,7 @@ class Viewer:
                         self.log(type(inst))    # the exception instance
                         self.log(inst.args)     # arguments stored in .args
                         self.log(inst)          # __str__ allows args to be printed
-                    x_offset += len(raw_word)+1
+                    x_offset += len(word) + 1
             else:
                 # Use unicode support on Python 3.3 and higher
                 if sys.version_info[0] == 3 and sys.version_info[1] > 2:
