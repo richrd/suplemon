@@ -9,10 +9,13 @@ import imp
 import curses
 import logging
 
+import pygments.lexers
+
 from line import *
 from cursor import *
 from helpers import *
 from themes import scope_to_pair
+from lexer import Lexer
 
 
 class Viewer:
@@ -44,6 +47,7 @@ class Viewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
+        self.lexer = Lexer(self.app)
         self.syntax = None
         if self.app.config["editor"]["show_highlighting"]:
             self.setup_highlight()
@@ -86,21 +90,10 @@ class Viewer:
             ext = self.extension_map[ext]  # Use it
         curr_path = os.path.dirname(os.path.realpath(__file__))
 
-        filename = ext + ".py"
-        path = os.path.join(curr_path, "highlight", filename)
-        module = False
-        if os.path.isfile(path):
-            try:
-                module = imp.load_source(ext, path)
-            except:
-                self.logger.error("Failed to load syntax file '{}'!".format(path), exc_info=True)
-        else:
+        try:
+            self.syntax = pygments.lexers.get_lexer_by_name(ext)
+        except:
             return False
-
-        if not module or "Syntax" not in dir(module):
-            self.logger.error("File doesn't match API!")
-            return False
-        self.syntax = module.Syntax()
 
     def size(self):
         """Get editor size (x,y). (Deprecated, use get_size)."""
@@ -179,15 +172,6 @@ class Viewer:
         if self.syntax:
             try:
                 return self.syntax.get_color(raw_line)
-            except:
-                return 0
-        return 0
-
-    def get_word_scope(self, raw_word):
-        """Return the scope name based on the word."""
-        if self.syntax:
-            try:
-                return self.syntax.get_scope(raw_word)
             except:
                 return 0
         return 0
@@ -332,45 +316,43 @@ class Viewer:
                     char = self.config["white_space_map"][key]
                 line_part = line_part.replace(key, char)
 
+            # Use unicode support on Python 3.3 and higher
+            if sys.version_info[0] == 3 and sys.version_info[1] > 2:
+                line_part = line_part.encode("utf-8")
+
             if self.app.config["editor"]["show_highlighting"]:
-                words = line_part.split(" ")
-                for raw_word in words:
-                    word = raw_word
-                    # Use unicode support on Python 3.3 and higher
-                    if sys.version_info[0] == 3 and sys.version_info[1] > 2:
-                        word = word.encode("utf-8")
+                tokens = self.lexer.lex(line_part, self.syntax)
+                for token in tokens:
                     try:
+                        if token[1] == '\n': break
                         if self.config["show_line_colors"]:
-                            scope = self.get_word_scope(raw_word)
+                            scope = token[0]
                             settings = self.app.themes.get_scope(scope)
                             pair = scope_to_pair.get(scope)
                             if settings is not None and pair is not None:
                                 fg = int(settings.get("foreground") or -1)
                                 bg = int(settings.get("background") or -1)
                                 curses.init_pair(pair, fg, bg)
-                                self.window.addstr(i, x_offset, word, curses.color_pair(pair))
+                                self.window.addstr(i, x_offset, token[1], curses.color_pair(pair))
                             else:
-                                self.window.addstr(i, x_offset, word)
+                                self.window.addstr(i, x_offset, token[1])
                         else:
-                            self.window.addstr(i, x_offset, word)
+                            self.window.addstr(i, x_offset, token[1])
                     except Exception as inst:
-                        self.log(type(inst))    # the exception instance
-                        self.log(inst.args)     # arguments stored in .args
-                        self.log(inst)          # __str__ allows args to be printed
-                    x_offset += len(word) + 1
+                        self.app.logger.info(type(inst))    # the exception instance
+                        self.app.logger.info(inst.args)     # arguments stored in .args
+                        self.app.logger.info(inst)          # __str__ allows args to be printed
+                    x_offset += len(token[1])
             else:
-                # Use unicode support on Python 3.3 and higher
-                if sys.version_info[0] == 3 and sys.version_info[1] > 2:
-                    line_part = line_part.encode("utf-8")
                 try:
                     if self.config["show_line_colors"]:
                         self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
                     else:
                         self.window.addstr(i, x_offset, line_part)
                 except Exception as inst:
-                    self.log(type(inst))    # the exception instance
-                    self.log(inst.args)     # arguments stored in .args
-                    self.log(inst)          # __str__ allows args to be printed
+                    self.app.logger.info(type(inst))    # the exception instance
+                    self.app.logger.info(inst.args)     # arguments stored in .args
+                    self.app.logger.info(inst)          # __str__ allows args to be printed
             i += 1
         self.render_cursors()
 
