@@ -68,17 +68,20 @@ Suplemon is licensed under the MIT license.
  * Lots more...
 
 ## Goals
- 1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
+ 1. [X] Create a command line text editor with built in multi cursor support. It's awesome!
  2. [X] Usability should be as good and easy as nano.
- 3. [X] Multi cursor ~~and multi selection~~ should be comparable to Sublimetext.
- 4. [X] Develop Suplemon with Suplemon!!! I already use Suplemon for all command line editing,
-        Git commits, and a lot of developement.
+ 3. [X] Multi cursor should be comparable to Sublime Text.
+ 4. [X] Develop Suplemon with Suplemon!!! I've used Suplemon for a long time as my main
+        editor (replacing ST and nano) for all developement, Git commits etc.
 
-## Support
+## Configuration
 
-If you experience problems, please submit a new issue.
-If you have a question, need help, or just want to chat head over to the IRC channel #suplemon @ Freenode.
-I'll be happy to chat with you, see you there!
+The suplemon config file is stored at ```~/.config/suplemon/suplemon-config.json```.
+
+The best way to edit it is to run the ```config``` command (Run commands via ```Ctrl+E```).
+That way Suplemon will automatically reload the configuration when you save the file.
+You can find all the configuration options and descriptions in the suplemon/config.py file.
+
 
 ## Keyboard shortcuts
 
@@ -168,6 +171,13 @@ I'll be happy to chat with you, see you there!
 
  * Scroll Wheel Up / Down
    > Scroll up & down.
+
+
+## Support
+
+If you experience problems, please submit a new issue.
+If you have a question, need help, or just want to chat head over to the IRC channel #suplemon @ Freenode.
+I'll be happy to chat with you, see you there!
 
 ## Todo
  * [ ] Remember cursor positions in files (and restore when opened again)
