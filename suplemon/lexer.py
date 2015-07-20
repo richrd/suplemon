@@ -3,13 +3,21 @@
 import pygments
 import pygments.lexers
 
+
 class Lexer:
     def __init__(self, app):
         self.app = app
 
     def lex(self, code, lex):
-        """ Return a list of tuples (scope, word) where word is the word to be printed and 
-            scope the scope name representing the context. """
+        """Return tokenified code.
+
+        Return a list of tuples (scope, word) where word is the word to be
+        printed and scope the scope name representing the context.
+
+        :param str code: Code to tokenify.
+        :param lex: Lexer to use.
+        :return:
+        """
         if lex is None:
             return (("global", code),)
 
