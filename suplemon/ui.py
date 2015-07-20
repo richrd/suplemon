@@ -6,6 +6,8 @@ Curses user interface.
 import os
 import logging
 
+import key_mappings
+
 
 class InputEvent:
     """Represents a keyboard or mouse event."""
@@ -15,12 +17,13 @@ class InputEvent:
         self.key_code = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
+        self.logger = logging.getLogger("{}.InputEvent".format(__name__))
 
-    def parse_key_code(self, code):
-        """Parse a key namoe or code from curses."""
+    def parse_key_code(self, key_code):
+        """Parse a key code (or character) from curses."""
         self.type = "key"
-        self.key_code = code
-        self.key_name = self._key_name(code)
+        self.key_code = key_code
+        self.key_name = self._key_name(key_code)
 
     def set_key_name(self, name):
         """Manually set the event key name."""
@@ -33,21 +36,35 @@ class InputEvent:
         self.mouse_code = state[4]
         self.mouse_pos = (state[1], state[2])
 
-    def _key_name(self, key):
+    def _key_name(self, key_code):
+        """Return a normalized key name for key_code."""
+        if key_code in key_mappings.key_map.keys():
+            return key_mappings.key_map[key_code]
+
+        curs_key_name = self._curses_key_name(key_code)
+        if curs_key_name:
+            if curs_key_name in key_mappings.key_map.keys():
+                return key_mappings.key_map[curs_key_name]
+        else:
+            try:
+                return chr(key_code)
+            except:
+                return False
+        return False
+
+    def _curses_key_name(self, key):
         """Return the curses key name for keys received from get_wch (and getch)."""
         # Handle multibyte get_wch input in Python 3.3
         if isinstance(key, str):
             return str(curses.keyname(ord(key)).decode("utf-8"))
         # Fallback to try and handle Python < 3.3
+        # Special keys can also be ints on Python > 3.3
         if isinstance(key, int):  # getch fallback
             try:  # Try to convert to a curses key name
                 return str(curses.keyname(key).decode("utf-8"))
             except:  # Otherwise try to convert to a character
-                try:
-                    return chr(key)
-                except:
-                    return False
-        return key
+                return False
+        return False
 
     def __str__(self):
         parts = [
@@ -376,7 +393,7 @@ class UI:
             127: 263,
             8: 263,
         }
-        self.logger.debug("Query key input: {}".format(str(key)))
+        #self.logger.debug("Query key input: {}".format(str(key)))
         if key in rewrite.keys():
             key = rewrite[key]
         return key
@@ -434,7 +451,7 @@ class UI:
             char = input_func()
         except KeyboardInterrupt:
             # Handle KeyboardInterrupt as Ctrl+C
-            event.set_key_name("^C")
+            event.set_key_name("ctrl+c")
             return event
         except:
             # No input available

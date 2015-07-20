@@ -5,7 +5,6 @@ Config handler.
 
 import os
 import json
-import curses  # Get key definitons
 import logging
 
 
@@ -18,6 +17,7 @@ class Config:
         self.fpath = os.path.join(self.home_dir, ".config", "suplemon")
 
         self.defaults = {
+            # Global settings
             "app": {
                 # Print debug logging
                 "debug": 1,
@@ -27,25 +27,24 @@ class Config:
                 "use_unicode_symbols": 0,
                 # Key bindings for app functions
                 "keys": {
-                    "^H": "help",               # Ctrl + H
-                    "^S": "save_file",          # Ctrl + S
-                    "^E": "run_command",        # Ctrl + E
-                    "^F": "find",               # Ctrl + F
-                    "^G": "go_to",              # Ctrl + G
-                    "^O": "open",               # Ctrl + O
-                    "^W": "close_file",         # Ctrl + W
-                    "^N": "new_file",           # Ctrl + N
-                    "^X": "ask_exit",           # Ctrl + X
-                    554: "next_file",           # Ctrl + Page Up
-                    549: "prev_file",           # Ctrl + Page Down
-                    "kNXT5": "next_file",       # Ctrl + Page Up
-                    "kPRV5": "prev_file",       # Ctrl + Page Down
-                    265: "save_file_as",        # F1
-                    266: "reload_file",         # F2
-                    272: "toggle_mouse",        # F8
-                    275: "toggle_fullscreen",   # F12
+                    "ctrl+h": "help",              # Ctrl + H
+                    "ctrl+s": "save_file",         # Ctrl + S
+                    "ctrl+e": "run_command",       # Ctrl + E
+                    "ctrl+f": "find",              # Ctrl + F
+                    "ctrl+g": "go_to",             # Ctrl + G
+                    "ctrl+o": "open",              # Ctrl + O
+                    "ctrl+w": "close_file",        # Ctrl + W
+                    "ctrl+n": "new_file",          # Ctrl + N
+                    "ctrl+x": "ask_exit",          # Ctrl + X
+                    "ctrl+pageup": "next_file",    # Ctrl + Page Up
+                    "ctrl+pagedown": "prev_file",  # Ctrl + Page Down
+                    "f1": "save_file_as",          # F1
+                    "f2": "reload_file",           # F2
+                    "f8": "toggle_mouse",          # F8
+                    "f11": "toggle_fullscreen",    # F11
                 }
             },
+            # Editor settings
             "editor": {
                 # Indent new lines to same level as previous line
                 "auto_indent_newline": True,
@@ -83,6 +82,7 @@ class Config:
                 "show_highlighting": True,
                 # Syntax highlighting theme
                 "theme": "monokai",
+                # Listen for mouse events
                 "use_mouse": False,
                 # Wether to use copy/paste across multiple files
                 "use_global_buffer": True,
@@ -90,57 +90,44 @@ class Config:
                 "regex_find": False,
                 # Key bindings for editor functions
                 "keys": {
-                    curses.KEY_UP: "arrow_up",            # Up
-                    curses.KEY_DOWN: "arrow_down",        # Down
-                    curses.KEY_LEFT: "arrow_left",        # Left
-                    curses.KEY_RIGHT: "arrow_right",      # Right
-                    curses.KEY_ENTER: "enter",            # Enter
-                    "\n": "enter",                        # Enter
-                    "^J": "enter",                        # Enter (for 'getch')
-                    curses.KEY_BACKSPACE: "backspace",    # Backspace
-                    "^?": "backspace",                    # Backspace (Mac fix)
-                    curses.KEY_DC: "delete",              # Delete
-                    331: "insert",                        # Insert
-                    "\t": "tab",                          # Tab
-                    "^I": "tab",                          # Tab
-                    353: "untab",                         # Shift + Tab
-                    curses.KEY_HOME: "home",              # Home
-                    curses.KEY_END: "end",                # End
-                    "^[": "escape",                       # Escape
-                    563: "new_cursor_up",                 # Alt + Up
-                    522: "new_cursor_down",               # Alt + Down
-                    542: "new_cursor_left",               # Alt + Left
-                    557: "new_cursor_right",              # Alt + Right
-                    "kUP3": "new_cursor_up",              # Alt + Up
-                    "kDN3": "new_cursor_down",            # Alt + Down
-                    "kLFT3": "new_cursor_left",           # Alt + Left
-                    "kRIT3": "new_cursor_right",          # Alt + Right
-                    curses.KEY_PPAGE: "page_up",          # Page Up
-                    curses.KEY_NPAGE: "page_down",        # Page Down
-                    552: "push_up",                       # Alt + Page Up
-                    547: "push_down",                     # Alt + Page Down
-                    "kPRV3": "push_up",                   # Alt + Page Up
-                    "kNXT3": "push_down",                 # Alt + Page Down
-                    269: "undo",                          # F5
-                    270: "redo",                          # F6
-                    273: "toggle_line_nums",              # F9
-                    274: "toggle_line_ends",              # F10
-                    275: "toggle_highlight",              # F11
-                    "^C": "cut",                          # Ctrl + C
-                    "^K": "duplicate_line",               # Ctrl + K
-                    "^V": "insert",                       # Ctrl + V
-                    "^D": "find_next",                    # Ctrl + D
-                    "^A": "find_all",                     # Ctrl + A
-                    544: "jump_left",                     # Ctrl + Left
-                    559: "jump_right",                    # Ctrl + Right
-                    565: "jump_up",                       # Ctrl + Up
-                    524: "jump_down",                     # Ctrl + Down
-                    "kLFT5": "jump_left",                 # Ctrl + Left
-                    "kRIT5": "jump_right",                # Ctrl + Right
-                    "kUP5": "jump_up",                    # Ctrl + Up
-                    "kDN5": "jump_down",                  # Ctrl + Down
+                    "up": "arrow_up",                 # Up
+                    "down": "arrow_down",             # Down
+                    "left": "arrow_left",             # Left
+                    "right": "arrow_right",           # Right
+                    "enter": "enter",                 # Enter
+                    "backspace": "backspace",         # Backspace
+                    "delete": "delete",               # Delete
+                    "insert": "insert",               # Insert
+                    "tab": "tab",                     # Tab
+                    "shift+tab": "untab",             # Shift + Tab
+                    "home": "home",                   # Home
+                    "end": "end",                     # End
+                    "escape": "escape",               # Escape
+                    "pageup": "page_up",              # Page Up
+                    "pagedown": "page_down",          # Page Down
+                    "f5": "undo",                     # F5
+                    "f6": "redo",                     # F6
+                    "f9": "toggle_line_nums",         # F9
+                    "f10": "toggle_line_ends",        # F10
+                    "f11": "toggle_highlight",        # F11
+                    "alt+up": "new_cursor_up",        # Alt + Up
+                    "alt+down": "new_cursor_down",    # Alt + Down
+                    "alt+left": "new_cursor_left",    # Alt + Left
+                    "alt+right": "new_cursor_right",  # Alt + Right
+                    "alt+pageup": "push_up",          # Alt + Page Up
+                    "alt+pagedown": "push_down",      # Alt + Page Down
+                    "ctrl+c": "cut",                  # Ctrl + C
+                    "ctrl+k": "duplicate_line",       # Ctrl + K
+                    "ctrl+v": "insert",               # Ctrl + V
+                    "ctrl+d": "find_next",            # Ctrl + D
+                    "ctrl+a": "find_all",             # Ctrl + A
+                    "ctrl+left": "jump_left",         # Ctrl + Left
+                    "ctrl+right": "jump_right",       # Ctrl + Right
+                    "ctrl+up": "jump_up",             # Ctrl + Up
+                    "ctrl+down": "jump_down",         # Ctrl + Down
                 }
             },
+            # UI Display Settings
             "display": {
                 "show_top_bar": True,
                 "show_app_name": True,
@@ -150,7 +137,6 @@ class Config:
                 "invert_status_bars": True,
             },
         }
-
         self.config = dict(self.defaults)
 
     def path(self):
@@ -169,6 +155,7 @@ class Config:
                 return True
             except:
                 self.logger.warning("Failed to load config file!", exc_info=True)
+                return False
         self.logger.info("Configuration file '{}' doesn't exist.".format(path))
         return False
 
