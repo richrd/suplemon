@@ -66,17 +66,15 @@ class Viewer:
         path = os.path.join(curr_path, "linelight", filename)
         module = False
         if os.path.isfile(path):
-            self.app.logger.error("Syntax file found...")
             try:
                 module = imp.load_source(ext, path)
-                self.app.logger.error("File loaded...")
             except:
-                self.app.logger.error(get_error_info())
+                self.logger.error("Failed to load syntax file '{}'!".format(path), exc_info=True)
         else:
             return False
 
         if not module or "Syntax" not in dir(module):
-            self.app.logger.error("File doesn't match API!")
+            self.logger.error("File doesn't match API!")
             return False
         self.syntax = module.Syntax()
 
@@ -338,9 +336,7 @@ class Viewer:
                         else:
                             self.window.addstr(i, x_offset, token[1])
                     except Exception as inst:
-                        self.app.logger.info(type(inst))    # the exception instance
-                        self.app.logger.info(inst.args)     # arguments stored in .args
-                        self.app.logger.info(inst)          # __str__ allows args to be printed
+                        self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
                     x_offset += len(token[1])
             else:
                 try:
@@ -349,9 +345,7 @@ class Viewer:
                     else:
                         self.window.addstr(i, x_offset, line_part)
                 except Exception as inst:
-                    self.app.logger.info(type(inst))    # the exception instance
-                    self.app.logger.info(inst.args)     # arguments stored in .args
-                    self.app.logger.info(inst)          # __str__ allows args to be printed
+                    self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
             i += 1
         self.render_cursors()
 

@@ -3,6 +3,7 @@
 Theme loader
 """
 import os
+import logging
 
 try:
     import xml.etree.cElementTree as ET
@@ -54,6 +55,7 @@ class Theme:
 class ThemeLoader:
     def __init__(self, app=None):
         self.app = app
+        self.logger = logging.getLogger(__name__)
 
         self.curr_path = os.path.dirname(os.path.realpath(__file__))
         # The modules subdirectory
@@ -63,20 +65,13 @@ class ThemeLoader:
         self.current_theme = None
 
 
-    def log(self, data):
-        if self.app:
-            self.app.logger.info(data)
-        else:
-            print(data)
-
-
     def load(self, name):
         fullpath = ''.join([self.theme_path, name, '.tmTheme'])
 
         if not os.path.exists(fullpath):
             return None
 
-        self.log("Loading theme " + name)
+        self.logger.info("Loading theme " + name)
 
         tree = ET.parse(fullpath)
         root = tree.getroot()
