@@ -100,7 +100,9 @@ class Viewer:
             ext = self.extension_map[ext]  # Use it
         try:
             self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
+            self.logger.info("Loaded Pygments lexer '{}'.".format(ext))
         except:
+            self.logger.warning("Failed to load Pygments lexer '{}'.".format(ext))
             return False
 
     def size(self):
@@ -315,7 +317,7 @@ class Viewer:
             try:
                 self.render_line_contents(line, pos, x_offset, max_len)
             except:
-                self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
+                self.logger.error("Failed rendering line #{} @{} DATA:'{}'!".format(lnum+1, pos, line), exc_info=True)
             i += 1
         self.render_cursors()
 
@@ -327,7 +329,7 @@ class Viewer:
 
         :param line: Line instance to render.
         :param pos: Position (x, y) for beginning of line.
-        :param x_offset: Offset from the left edge of screen. Currently same as x position.
+        :param x_offset: Offset from left edge of screen. Currently same as x position.
         :param max_len: Maximum amount of chars that will fit on screen.
         """
         if pygments and self.app.config["editor"]["show_highlighting"]:
@@ -343,7 +345,9 @@ class Viewer:
         line_data = line.get_data()
         # Lazily prepare and slice the line,
         # even though it affects highlighting.
-        line_data = self._prepare_line_for_rendering(line_data, max_len, no_wspace=True)
+        line_data = self._prepare_line_for_rendering(line_data,
+                                                     max_len,
+                                                     no_wspace=True)
         # TODO:
         # 1) The line should not be prepared for rendering like this
         #    because it can get sliced. Sliced lines won't always get
@@ -397,9 +401,11 @@ class Viewer:
             if self.config["show_white_space"]:
                 char = self.config["white_space_map"][key]
             data = data.replace(key, char)
+        # Remove newlines, they cause curses errors
+        data = data.replace("\n", "")
         return data
 
-    def _prepare_line_for_rendering(self, line_data, max_len, no_wspace = False):
+    def _prepare_line_for_rendering(self, line_data, max_len, no_wspace=False):
         if self.show_line_ends:
             line_data += self.config["line_end_char"]
         line_data = self._slice_line_for_rendering(line_data, max_len)
