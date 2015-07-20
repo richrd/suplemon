@@ -76,7 +76,8 @@ class Config:
                 "show_white_space": False,
                 "show_line_nums": True,
                 "show_line_colors": True,
-                "show_highlighting": False,
+                "show_highlighting": True,
+                "theme": "monokai",
                 "use_mouse": False,
                 # Wether to use copy/paste across multiple files
                 "use_global_buffer": True,

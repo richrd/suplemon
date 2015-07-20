@@ -9,8 +9,12 @@ import imp
 import curses
 import logging
 
+import pygments.lexers
+
 from line import Line
 from cursor import Cursor
+from themes import scope_to_pair
+from lexer import Lexer
 
 
 class Viewer:
@@ -42,8 +46,12 @@ class Viewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
+        self.lexer = Lexer(self.app)
         self.syntax = None
-        self.setup_linelight()
+        if self.app.config["editor"]["show_highlighting"]:
+            self.setup_highlight()
+        else:
+            self.setup_linelight()
 
     def setup_linelight(self):
         """Setup line based highlighting."""
@@ -56,7 +64,6 @@ class Viewer:
 
         filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
-
         module = False
         if os.path.isfile(path):
             try:
@@ -70,6 +77,20 @@ class Viewer:
             self.logger.error("File doesn't match API!")
             return False
         self.syntax = module.Syntax()
+
+    def setup_highlight(self):
+        """Setup word based highlighting."""
+        ext = self.file_extension
+        # Check if a file extension is redefined
+        # Maps e.g. 'scss' to 'css'
+        if ext in self.extension_map.keys():
+            ext = self.extension_map[ext]  # Use it
+        curr_path = os.path.dirname(os.path.realpath(__file__))
+
+        try:
+            self.syntax = pygments.lexers.get_lexer_by_name(ext)
+        except:
+            return False
 
     def size(self):
         """Get editor size (x,y). (Deprecated, use get_size)."""
@@ -216,7 +237,10 @@ class Viewer:
         ext = ext.lower()
         if ext and ext != self.file_extension:
             self.file_extension = ext
-            self.setup_linelight()
+            if self.app.config["editor"]["show_highlighting"]:
+                self.setup_highlight()
+            else:
+                self.setup_linelight()
 
     def add_cursor(self, cursor):
         """Add a new cursor. Accepts a x,y tuple or a Cursor instance."""
@@ -259,10 +283,10 @@ class Viewer:
         self.window.clear()
         max_y = self.get_size()[1]
         i = 0
-        x_offset = self.line_offset()
         max_len = self.max_line_length()
         # Iterate through visible lines
         while i < max_y:
+            x_offset = self.line_offset()
             lnum = i + self.y_scroll
             if lnum >= len(self.lines):  # Make sure we have a line to show
                 break
@@ -288,16 +312,40 @@ class Viewer:
                 if self.config["show_white_space"]:
                     char = self.config["white_space_map"][key]
                 line_part = line_part.replace(key, char)
+
             # Use unicode support on Python 3.3 and higher
             if sys.version_info[0] == 3 and sys.version_info[1] > 2:
                 line_part = line_part.encode("utf-8")
-            try:
-                if self.config["show_line_colors"]:
-                    self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
-                else:
-                    self.window.addstr(i, x_offset, line_part)
-            except Exception as inst:
-                self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
+
+            if self.app.config["editor"]["show_highlighting"]:
+                tokens = self.lexer.lex(line_part, self.syntax)
+                for token in tokens:
+                    try:
+                        if token[1] == '\n': break
+                        if self.config["show_line_colors"]:
+                            scope = token[0]
+                            settings = self.app.themes.get_scope(scope)
+                            pair = scope_to_pair.get(scope)
+                            if settings is not None and pair is not None:
+                                fg = int(settings.get("foreground") or -1)
+                                bg = int(settings.get("background") or -1)
+                                curses.init_pair(pair, fg, bg)
+                                self.window.addstr(i, x_offset, token[1], curses.color_pair(pair))
+                            else:
+                                self.window.addstr(i, x_offset, token[1])
+                        else:
+                            self.window.addstr(i, x_offset, token[1])
+                    except Exception as inst:
+                        self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
+                    x_offset += len(token[1])
+            else:
+                try:
+                    if self.config["show_line_colors"]:
+                        self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
+                    else:
+                        self.window.addstr(i, x_offset, line_part)
+                except Exception as inst:
+                    self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
             i += 1
         self.render_cursors()
 

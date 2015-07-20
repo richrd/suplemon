@@ -160,8 +160,12 @@ class UI:
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
             except:
                 self.logger.warning("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
+                self.app.config["editor"]["theme"] = "8colors"
         else:
             self.logger.warning("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.")
+            self.app.config["editor"]["theme"] = "8colors"
+
+        self.app.themes.use(self.app.config["editor"]["theme"])
 
     def setup_windows(self, resize=False):
         """Initialize windows."""
