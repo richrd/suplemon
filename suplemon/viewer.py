@@ -93,7 +93,9 @@ class Viewer:
             self.logger.info("Pygments not available, please install it for proper syntax highlighting.") 
             return False
         self.lexer = Lexer(self.app)
-        ext = self.file_extension
+        ext = self.file_extension.lower()
+        if not ext:
+            return False
         # Check if a file extension is redefined
         # Maps e.g. 'scss' to 'css'
         if ext in self.extension_map.keys():
@@ -104,6 +106,10 @@ class Viewer:
         except:
             self.logger.warning("Failed to load Pygments lexer '{}'.".format(ext))
             return False
+        if ext == "php":
+            # Hack to highlight PHP even without <?php ?> tags
+            self.pygments_syntax.options.update({"startinline": 1})
+            self.pygments_syntax.startinline = 1
 
     def size(self):
         """Get editor size (x,y). (Deprecated, use get_size)."""
