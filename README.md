@@ -7,11 +7,11 @@ suplemon :lemon:
       _____/  /  /__/  /  /\___/  /____/  /_____/  /  /  /  /__/  /  / |   / /
      /_______/\_______/__/ /  /_______/________/__/__/__/________/__/ /|__/ /
      \_______\ \______\__\/   \_______\________\__\__\__\________\__\/ \__\/
-
+     
               Remedying the pain of command line editing since 2014
 
 
-Suplemon is a modern, slick and intuitive console text editor with multi cursor support.
+Suplemon is a modern, powerful and intuitive console text editor with multi cursor support.
 Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 http://github.com/richrd/suplemon
 
@@ -25,7 +25,16 @@ Try it out! Installation is as easy as pulling the repo.
 
 **The master branch is considered stable.**
 
-No dependencies outside the Python Standard Library needed.
+No dependencies outside the Python Standard Library required.
+
+### Optional dependencies
+
+ * Pygments
+ > For support for syntax highlighting over 300 languages.
+ 
+ * Flake8
+ > For showing linting for Python files.
+ 
 
 ## Usage
 
@@ -40,12 +49,13 @@ No dependencies outside the Python Standard Library needed.
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
 It is as easy as nano, and has much of the power of Sublime Text. It also supports extensions
-to allow all kinds of customizations. To get more help use 'Ctrl + H' in the editor.
+to allow all kinds of customizations. To get more help hit ```Ctrl + H``` in the editor.
 Suplemon is licensed under the MIT license.
 
 ## Features
  * Terminal text editing with style
- * Proper multi cursor editing, Sublime Text style. Blessed!
+ * Proper multi cursor editing, Sublime Text style.
+ * Syntax highlighting
  * Autocomplete
  * Easy Undo/Redo
  * Multiple files in tabs
@@ -260,18 +270,18 @@ I'll be happy to chat with you, see you there!
 
 ## API plans
  * [ ] Refactor main class to support views
- * [ ] Editor
+ * [X] Editor
    * [X] Define core editing operations
    * [X] Make core editing operations overidable by extensions
  * [X] Line objects
    * [X] Add set_data method
    * [X] Add get_data method
- * [ ] Cursor objects
+ * [X] Cursor objects
    * [X] Methods for moving the cursor (left, right, up, down)
    * [X] Methods for getting cursor position
-   * [ ] Make cursor manipulation more functional
- * [ ] Extensions
-   * [ ] Allow extensions to be run at a desired interval
+   * [X] Make cursor manipulation more functional
+ * [X] Extensions
+   * [X] Allow extensions to be run at a desired interval
    * [X] Implement events that can be hookend onto
     
 
