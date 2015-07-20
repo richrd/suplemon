@@ -9,12 +9,16 @@ import imp
 import curses
 import logging
 
-import pygments.lexers
 
 from line import Line
 from cursor import Cursor
 from themes import scope_to_pair
-from lexer import Lexer
+
+try:
+    import pygments.lexers
+    from lexer import Lexer
+except ImportError:
+    pygments = False
 
 
 class Viewer:
@@ -46,12 +50,16 @@ class Viewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
-        self.lexer = Lexer(self.app)
+        # Lexer for translating tokens to strings
+        self.lexer = None
+        # Built in syntax definition (for commenting etc.)
         self.syntax = None
+        # Normal Pygments lexer
+        self.pygments_syntax = None
+
+        self.setup_linelight()
         if self.app.config["editor"]["show_highlighting"]:
             self.setup_highlight()
-        else:
-            self.setup_linelight()
 
     def setup_linelight(self):
         """Setup line based highlighting."""
@@ -79,16 +87,19 @@ class Viewer:
         self.syntax = module.Syntax()
 
     def setup_highlight(self):
-        """Setup word based highlighting."""
+        """Setup Pygments based highlighting."""
+        if not pygments:
+            # If Pygments lib not available
+            self.logger.info("Pygments not available, please install it for proper syntax highlighting.") 
+            return False
+        self.lexer = Lexer(self.app)
         ext = self.file_extension
         # Check if a file extension is redefined
         # Maps e.g. 'scss' to 'css'
         if ext in self.extension_map.keys():
             ext = self.extension_map[ext]  # Use it
-        curr_path = os.path.dirname(os.path.realpath(__file__))
-
         try:
-            self.syntax = pygments.lexers.get_lexer_by_name(ext)
+            self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
         except:
             return False
 
@@ -144,6 +155,11 @@ class Viewer:
         return cursors
 
     def get_line(self, n):
+        """Return line at index n.
+
+        :param n: Index of line to get.
+        :return: The Line instance.
+        """
         return self.lines[n]
 
     def get_lines_with_cursors(self):
@@ -205,16 +221,16 @@ class Viewer:
         :param dict config: Editor config dict with any supported fields. See config.py.
         """
         self.config = config
-        self.set_cursor_style(self.config["cursor"])
+        self.set_cursor_style(self.config["cursor_style"])
 
-    def set_cursor_style(self, cursor):
+    def set_cursor_style(self, cursor_style):
         """Set cursor style.
 
-        :param str cursor: Cursor type, either 'underline' or 'reverse'.
+        :param str cursor_style: Cursor type, either 'underline' or 'reverse'.
         """
-        if cursor == "underline":
+        if cursor_style == "underline":
             self.cursor_style = curses.A_UNDERLINE
-        elif cursor == "reverse":
+        elif cursor_style == "reverse":
             self.cursor_style = curses.A_REVERSE
         else:
             return False
@@ -237,10 +253,9 @@ class Viewer:
         ext = ext.lower()
         if ext and ext != self.file_extension:
             self.file_extension = ext
+            self.setup_linelight()
             if self.app.config["editor"]["show_highlighting"]:
                 self.setup_highlight()
-            else:
-                self.setup_linelight()
 
     def add_cursor(self, cursor):
         """Add a new cursor. Accepts a x,y tuple or a Cursor instance."""
@@ -281,8 +296,8 @@ class Viewer:
     def render(self):
         """Render the editor curses window."""
         self.window.clear()
-        max_y = self.get_size()[1]
         i = 0
+        max_y = self.get_size()[1]
         max_len = self.max_line_length()
         # Iterate through visible lines
         while i < max_y:
@@ -290,64 +305,128 @@ class Viewer:
             lnum = i + self.y_scroll
             if lnum >= len(self.lines):  # Make sure we have a line to show
                 break
-
             # Get line for current row
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curses.color_pair(line.number_color))
+                curs_color = curses.color_pair(line.number_color)
+                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curs_color)
 
-            # Normal rendering
-            line_part = line[min(self.x_scroll, len(line)):]
-            if self.show_line_ends:
-                line_part += self.config["line_end_char"]
-            if len(line_part) >= max_len:
-                # Clamp line length to view width
-                line_part = line_part[:max_len]
-
-            # Replace unsafe whitespace with normal space or visible
-            # replacement. For example tab characters make cursors
-            # go out of sync with line contents
-            for key in self.config["white_space_map"].keys():
-                char = " "
-                if self.config["show_white_space"]:
-                    char = self.config["white_space_map"][key]
-                line_part = line_part.replace(key, char)
-
-            # Use unicode support on Python 3.3 and higher
-            if sys.version_info[0] == 3 and sys.version_info[1] > 2:
-                line_part = line_part.encode("utf-8")
-
-            if self.app.config["editor"]["show_highlighting"]:
-                tokens = self.lexer.lex(line_part, self.syntax)
-                for token in tokens:
-                    try:
-                        if token[1] == '\n': break
-                        if self.config["show_line_colors"]:
-                            scope = token[0]
-                            settings = self.app.themes.get_scope(scope)
-                            pair = scope_to_pair.get(scope)
-                            if settings is not None and pair is not None:
-                                fg = int(settings.get("foreground") or -1)
-                                bg = int(settings.get("background") or -1)
-                                curses.init_pair(pair, fg, bg)
-                                self.window.addstr(i, x_offset, token[1], curses.color_pair(pair))
-                            else:
-                                self.window.addstr(i, x_offset, token[1])
-                        else:
-                            self.window.addstr(i, x_offset, token[1])
-                    except Exception as inst:
-                        self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
-                    x_offset += len(token[1])
-            else:
-                try:
-                    if self.config["show_line_colors"]:
-                        self.window.addstr(i, x_offset, line_part, curses.color_pair(self.get_line_color(line)))
-                    else:
-                        self.window.addstr(i, x_offset, line_part)
-                except Exception as inst:
-                    self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
+            pos = (x_offset, i)
+            try:
+                self.render_line_contents(line, pos, x_offset, max_len)
+            except:
+                self.logger.error("Failed rendering line #{}!".format(lnum), exc_info=True)
             i += 1
         self.render_cursors()
+
+    def render_line_contents(self, line, pos, x_offset, max_len):
+        """Render the contents of a line to the screen
+
+        Renders a line to the screen with the appropriate rendering method
+        based on settings.
+
+        :param line: Line instance to render.
+        :param pos: Position (x, y) for beginning of line.
+        :param x_offset: Offset from the left edge of screen. Currently same as x position.
+        :param max_len: Maximum amount of chars that will fit on screen.
+        """
+        if pygments and self.app.config["editor"]["show_highlighting"]:
+            self.render_line_pygments(line, pos, x_offset, max_len)
+        elif self.app.config["editor"]["show_line_colors"]:
+            self.render_line_linelight(line, pos, x_offset, max_len)
+        else:
+            self.render_line_normal(line, pos, x_offset, max_len)
+
+    def render_line_pygments(self, line, pos, x_offset, max_len):
+        """Render line with Pygments syntax highlighting."""
+        x, y = pos
+        line_data = line.get_data()
+        # Lazily prepare and slice the line,
+        # even though it affects highlighting.
+        line_data = self._prepare_line_for_rendering(line_data, max_len, no_wspace=True)
+        # TODO:
+        # 1) The line should not be prepared for rendering like this
+        #    because it can get sliced. Sliced lines won't always get
+        #    completely highlighted (partial words). Syntax highlighting
+        #    should be done first and then only render visible words.
+        # 2) Additionaly highlighing should be done for all lines at once
+        #    tokens should be cached in line instances. That way we can
+        #    support multi line comment syntax etc.
+        tokens = self.lexer.lex(line_data, self.pygments_syntax)
+        for token in tokens:
+            if token[1] == '\n':
+                break
+            scope = token[0]
+            text = self.replace_whitespace(token[1])
+            settings = self.app.themes.get_scope(scope)
+            pair = scope_to_pair.get(scope)
+            if settings is not None and pair is not None:
+                fg = int(settings.get("foreground") or -1)
+                bg = int(settings.get("background") or -1)
+                curses.init_pair(pair, fg, bg)
+                curs_color = curses.color_pair(pair)
+                self.window.addstr(y, x_offset, text, curs_color)
+            else:
+                self.window.addstr(y, x_offset, text)
+            x_offset += len(text)
+
+    def render_line_linelight(self, line, pos, x_offset, max_len):
+        """Render line with naive line based highlighting."""
+        x, y = pos
+        line_data = line.get_data()
+        line_data = self._prepare_line_for_rendering(line_data, max_len)
+        curs_color = curses.color_pair(self.get_line_color(line))
+        self.window.addstr(y, x_offset, line_data, curs_color)
+
+    def render_line_normal(self, line, pos, x_offset, max_len):
+        """Render line without any highlighting."""
+        x, y = pos
+        line_data = line.get_data()
+        line_data = self._prepare_line_for_rendering(line_data, max_len)
+        self.window.addstr(y, x_offset, line_data)
+
+    def replace_whitespace(self, data):
+        """Replace unsafe whitespace with alternative safe characters
+
+        Replace unsafe whitespace with normal space or visible replacement.
+        For example tab characters make cursors go out of sync with line
+        contents.
+        """
+        for key in self.config["white_space_map"].keys():
+            char = " "
+            if self.config["show_white_space"]:
+                char = self.config["white_space_map"][key]
+            data = data.replace(key, char)
+        return data
+
+    def _prepare_line_for_rendering(self, line_data, max_len, no_wspace = False):
+        if self.show_line_ends:
+            line_data += self.config["line_end_char"]
+        line_data = self._slice_line_for_rendering(line_data, max_len)
+        if not no_wspace:
+            line_data = self.replace_whitespace(line_data)
+
+        # Use unicode support on Python 3.3 and higher
+        if sys.version_info[0] == 3 and sys.version_info[1] > 2:
+            line_data = line_data.encode("utf-8")
+        return line_data
+
+    def _slice_line_for_rendering(self, line, max_len):
+        """Return sliced line data.
+
+        Returns what's left of line data after scrolling it horizontally
+        and removing excess characters from the end.
+
+        :param line: Line to slice.
+        :param max_len: Maximum length of line.
+        :return: Sliced line.
+        """
+        line = line[min(self.x_scroll, len(line)):]
+        if not line:
+            return ""
+        # Clamp line length to view width
+        line = line[:min(len(line), max_len)]
+        return line
 
     def render_cursors(self):
         """Render editor window cursors."""

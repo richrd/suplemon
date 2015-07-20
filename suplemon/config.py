@@ -54,7 +54,8 @@ class Config:
                 # Unindent with backspace
                 "backspace_unindent": True,
                 # Cursor style. 'reverse' or 'underline'
-                "cursor": "reverse",
+                "cursor_style": "reverse",
+                # Encoding for reading and writing files
                 "default_encoding": "utf-8",
                 # Number of spaces to insert when pressing tab
                 "tab_width": 4,
@@ -74,9 +75,13 @@ class Config:
                 },
                 # Wether to visually show white space chars
                 "show_white_space": False,
+                # Line numbering
                 "show_line_nums": True,
+                # Naive line highlighting
                 "show_line_colors": True,
+                # Proper syntax highlighting
                 "show_highlighting": True,
+                # Syntax highlighting theme
                 "theme": "monokai",
                 "use_mouse": False,
                 # Wether to use copy/paste across multiple files
