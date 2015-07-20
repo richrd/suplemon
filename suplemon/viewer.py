@@ -330,7 +330,7 @@ class Viewer:
         :param x_offset: Offset from the left edge of screen. Currently same as x position.
         :param max_len: Maximum amount of chars that will fit on screen.
         """
-        if pygments and self.app.config["editor"]["show_highlighting"]:
+        if pygments and self.app.config["editor"]["show_highlighting"] and self.pygments_syntax:
             self.render_line_pygments(line, pos, x_offset, max_len)
         elif self.app.config["editor"]["show_line_colors"]:
             self.render_line_linelight(line, pos, x_offset, max_len)
