@@ -189,7 +189,7 @@ class App:
         self.get_key_bindings()[key] = operation
 
     def set_event_binding(self, event, when, callback):
-        """Bind a callbacks to be run before or after an event.
+        """Bind a callback to be run before or after an event.
 
         Bind callback to run before or after event occurs. Th when parameter
         should be 'before' or 'after'. If using 'before' the callback can
@@ -241,7 +241,6 @@ class App:
         if not event:
             return False
         self.last_input = event
-
         if event.type == "key":
             return self.handle_key(event)
         elif event.type == "mouse":
