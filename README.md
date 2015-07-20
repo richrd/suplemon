@@ -65,6 +65,7 @@ Suplemon is licensed under the MIT license.
  * Custom keyboard shortcuts
  * Mouse support
  * Extensions (easy to write your own)
+ * Lots more...
 
 ## Goals
  1. [X] Create a command line text editor with built in multi cursor support. Damn it's amazing!
@@ -145,6 +146,9 @@ I'll be happy to chat with you, see you there!
  * F6
    > Redo
 
+ * F7
+   > Toggle visible whitespace
+
  * F8
    > Toggle mouse mode
 
@@ -170,57 +174,19 @@ I'll be happy to chat with you, see you there!
  * [ ] Design proper API for plugins/extensions/macros
  * [ ] Documentation for v 1.0.0
  * [ ] Package Suplemon and upload to PIP
- * [X] Auto complete
- * [X] Indicate if file isn't writable (in status bar). Use os.access(path, os.W_OK)
- * [X] Add option to change ESCDELAY (function keys aren't detected on slow connections)
- * [X] Only confirm closing file if it's modified.
- * [X] Setup a IRC channel for Suplemon
- * [X] Trim command to get rid of trailing whitespace
- * [X] Lower/Upper/Reverse lettercase (todo: reverse case)
- * [X] Reverse line
- * [X] Regex find/search (make find configurable to do normal & regex)
- * [X] CSS highlighter
- * [X] Move the editor view (scroll) down when finding multiple occurances
- * [X] The following solved with global exit check (if any file is modified but not saved)
-   * [X] Close files one at a time with 'save?' prompt.
- * [X] Prompt for close or exit confirmation only when file(s) have been modified
- * [X] Indicate if file was saved successfully or if it failed
- * [X] Better yes/no query for exit (and in general)
- * [X] Generic linelighter for generic highlighting
- * [X] New file and close file
- * [X] Undo / Redo
- * [X] Move config file to user home directory
- * [X] File type detection for highlighting
- * [X] Duplicate line (without clipboard)
- * [X] Use semver
- * [X] Nano-like menu and keyboard shortcuts with legend. TODO: respect future custom bindings
- * [X] Go to file as well as line number
- * [X] Show if file is edited
- * [X] Copy / Paste buffer
- * [X] Proper status bar information
- * [X] Jump to end of whitespace with home key
- * [X] Command line for getting input
- * [X] Line number toggling
- * [X] Loading multiple files and switching between them
- * [X] Live config reloading when it's modified
- * [X] Line based syntax highlighting
- * [X] Syntax specific commenting.
- * [X] Custom key bindings
 
 ## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
- * [ ] Selections
- * [ ] Proper syntax higlighting
- * [ ] Default to legendary Monokai colors 
-       http://www.monokai.nl/blog/2006/07/15/textmate-color-theme/
- * [ ] List of recent files
- * [ ] Setting for enabling/disabling undo for cursor changes
- * [ ] Read only viewer
-    * ~~And disable editing~~ Don't disable editing. Instead enable save as.
- * [ ] Optimize rendering for ssh (minimal screen update)
-   * [ ] Only refresh cursors when moving around
-   * [ ] Only refresh modified lines when editing
  * [X] Display tab characters with a replacement char (tab messes up lines)
  * [X] Global clipboard (copy from one file to another)
+ * [ ] Core
+   * [ ] Optimize rendering for ssh (minimal screen update)
+   * [ ] Setting for enabling/disabling undo for cursor changes
+   * [ ] Selections
+   * [ ] List of recent files
+   * [ ] Read only viewer
+      * ~~And disable editing~~ Don't disable editing. Instead enable save as.
+   * [ ] Only refresh cursors when moving around
+   * [ ] Only refresh modified lines when editing
  * [ ] Extensions: 
    * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
    * [ ] Auto backup. Activate on n changes or every n seconds
@@ -237,53 +203,7 @@ I'll be happy to chat with you, see you there!
 ## Fix / Defects
  * [ ] Input queries can't detect trailing whitespace
  * [ ] Remember find query if occurance not found (jump to top of file)
- * [X] With multiple lines selected pressing backspace and enter makes changes (shouldn't)
- * [X] Unreliable undo/redo.
- * [X] Refine find and find_next commands.
- * [X] Don't forget string to find automatically when using Ctrl + F 
- * [X] Finish refactoring viewer.py and editor.py
- * [X] Cut command fails when multiple cursors are on or close to the last line
- * [X] Fix 'finding' empty character. Revert to 'add_cursor_right'.
- * [X] Better auto find with ctrl+d. (Find the current word or character)
- * [X] Forget last find on esc.
- * [X] Return code 0 on exit:
-       Curses forces code 130 and causes git to ignore saved commit message, argh!
- * [X] ~~Can't open files that have spaces in them.~~ Works when using 'file\ name'
- * [X] Config extension double loads config file, instead of switching to it
- * [X] Encoding errors 
- * [X] Remove "Failed to load config." when file doesn't exist
- * [X] Delete key when cursor at line end; ~~add dedicated setting~~ made to work as normal.
- * [X] Make adding cursors up and down smarter: add them at main cursor x coordinate if possible
- * [X] Saving file into a directory stores the relative path as the filename.
- * [X] Cursors sometimes left hanging at non existent coordinates (eg. when file reloaded)
-       Solved by rectifying all cursors in move_cursors. Should optimize more in callers.
- * [X] Remove debug logging in non-debug mode
- * [X] Fill in incomplete config file with defaults
- * [X] Add 'remove previous cursor' function (fixed with undo/redo)
- * [X] Can't open files like '~/.suplemon-config.json'
- * [X] Cursor invisible when at end of scrolled line
- * [X] Esc key effect is delayed
- * [X] Fixed: Find starts at top of file instead of current ~~line~~ cursor
- * [X] Start find at current line AND column
- * [X] Make editor white color brighter (not gray)
- * [X] Show editor at top of terminal when show_top_bar == False
 
-## API plans
- * [ ] Refactor main class to support views
- * [X] Editor
-   * [X] Define core editing operations
-   * [X] Make core editing operations overidable by extensions
- * [X] Line objects
-   * [X] Add set_data method
-   * [X] Add get_data method
- * [X] Cursor objects
-   * [X] Methods for moving the cursor (left, right, up, down)
-   * [X] Methods for getting cursor position
-   * [X] Make cursor manipulation more functional
- * [X] Extensions
-   * [X] Allow extensions to be run at a desired interval
-   * [X] Implement events that can be hookend onto
-    
 
 ## Rationale
 For many the command line is a different environment for text editing.
