@@ -16,6 +16,6 @@ class LoggingHandler(logging.Handler):
     def close(self):
         logging.Handler.close(self)
 
-    def print(self):
+    def output(self):
         for message in self.messages:
             print(message)

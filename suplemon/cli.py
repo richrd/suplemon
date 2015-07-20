@@ -34,7 +34,7 @@ def main():
 
     # Output log info
     if app.config["app"]["debug"]:
-        app.logger_handler.print()
+        app.logger_handler.output()
 
 if __name__ == "__main__":
     main()
