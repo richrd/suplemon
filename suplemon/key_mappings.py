@@ -43,20 +43,33 @@ key_map = {
     " ": "space",
 
     # Control
-    "^H": "ctrl+h",
-    "^S": "ctrl+s",
+    "^A": "ctrl+a",
+    "^B": "ctrl+b",
+    "^C": "ctrl+c",
+    "^D": "ctrl+d",
     "^E": "ctrl+e",
     "^F": "ctrl+f",
     "^G": "ctrl+g",
-    "^O": "ctrl+o",
-    "^W": "ctrl+w",
-    "^N": "ctrl+n",
-    "^X": "ctrl+x",
-    "^C": "ctrl+c",
+    "^H": "ctrl+h",
+    # "^I": "ctrl+i",  # Conflicts with 'tab'
+    # "^J": "ctrl+j",  # Conflicts with 'enter'
     "^K": "ctrl+k",
+    "^L": "ctrl+l",
+    # "^M": "ctrl+m",  # Conflicts with 'enter'
+    "^N": "ctrl+n",
+    "^O": "ctrl+o",
+    "^P": "ctrl+p",
+    "^Q": "ctrl+q",
+    "^R": "ctrl+r",
+    "^S": "ctrl+s",
+    "^T": "ctrl+t",
+    "^U": "ctrl+u",
     "^V": "ctrl+v",
-    "^D": "ctrl+d",
-    "^A": "ctrl+a",
+    "^W": "ctrl+w",
+    "^X": "ctrl+x",
+    "^Y": "ctrl+y",
+    # "^Z": "ctrl+z",  # Conflicts with suspend
+
     544: "ctrl+left",
     559: "ctrl+right",
     565: "ctrl+up",
