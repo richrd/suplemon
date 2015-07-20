@@ -1,4 +1,4 @@
-#-*- encoding: utf-8
+# -*- encoding: utf-8
 """
 Theme loader
 """
@@ -46,11 +46,13 @@ scope_to_pair = {
     "entity.name.filename.find-in-files": 52,
 }
 
+
 class Theme:
     def __init__(self, name, uuid):
         self.name = name
         self.uuid = uuid
         self.scopes = {}
+
 
 class ThemeLoader:
     def __init__(self, app=None):
@@ -58,12 +60,11 @@ class ThemeLoader:
         self.logger = logging.getLogger(__name__)
 
         self.curr_path = os.path.dirname(os.path.realpath(__file__))
-        # The modules subdirectory
+        # The themes subdirectory
         self.theme_path = os.path.join(self.curr_path, "themes" + os.sep)
         # Module instances
         self.themes = {}
         self.current_theme = None
-
 
     def load(self, name):
         fullpath = ''.join([self.theme_path, name, '.tmTheme'])
@@ -94,7 +95,6 @@ class ThemeLoader:
 
         return theme
 
-
     def use(self, name):
         theme = None
         try:
@@ -106,13 +106,12 @@ class ThemeLoader:
             return
         self.current_theme = theme
 
-
     def get_scope(self, name):
         return self.current_theme.scopes.get(name)
 
     def set_theme(self, theme, settings):
         for entry in settings:
-            if not isinstance(entry, dict): 
+            if not isinstance(entry, dict):
                 continue
             scope_str = entry.get("scope") or "global"
             scopes = scope_str.split(',')
@@ -120,7 +119,6 @@ class ThemeLoader:
             if settings is not None:
                 for scope in scopes:
                     theme.scopes[scope.strip()] = settings
-
 
     def parse(self, node):
         if node.tag == "dict":
@@ -131,7 +129,6 @@ class ThemeLoader:
             return node.text
 
         return None
-
 
     def parse_dict(self, node):
         d = {}
@@ -152,7 +149,6 @@ class ThemeLoader:
                 value = None
 
         return d
-
 
     def parse_array(self, node):
         l = []
