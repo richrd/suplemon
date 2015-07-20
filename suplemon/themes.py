@@ -3,9 +3,6 @@
 Theme loader
 """
 import os
-import imp
-from helpers import *
-import curses
 
 try:
     import xml.etree.cElementTree as ET

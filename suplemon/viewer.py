@@ -11,9 +11,8 @@ import logging
 
 import pygments.lexers
 
-from line import *
-from cursor import *
-from helpers import *
+from line import Line
+from cursor import Cursor
 from themes import scope_to_pair
 from lexer import Lexer
 
