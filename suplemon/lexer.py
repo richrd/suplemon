@@ -43,6 +43,8 @@ class Lexer:
                 scope = "entity.name.function"
             elif token == pygments.token.Name.Class:
                 scope = "entity.name.class"
+            elif token == pygments.token.Name.Tag:
+                scope = "entity.name.tag"
             elif token == pygments.token.Operator:
                 scope = "keyword"
             elif token == pygments.token.Name.Builtin.Pseudo:
