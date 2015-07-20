@@ -19,6 +19,9 @@ class Lexer:
         :return:
         """
         if lex is None:
+            if not type(code) is str:
+                # if not suitable lexer is found, return decoded code
+                code = code.decode("utf-8")
             return (("global", code),)
 
         words = pygments.lex(code, lex)
