@@ -12,6 +12,7 @@ import logging
 
 import ui
 import modules
+import themes
 import helpers
 
 from file import File
@@ -80,6 +81,9 @@ class App:
         # Load extension modules
         self.modules = modules.ModuleLoader(self)
         self.modules.load()
+
+        # Load themes
+        self.themes = themes.ThemeLoader(self)
 
         # Save filenames for later
         self.filenames = filenames

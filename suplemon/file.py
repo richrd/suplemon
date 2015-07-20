@@ -90,7 +90,7 @@ class File:
         if not self.editor:
             return False
         ext = self.get_extension()
-        if len(ext) > 1:
+        if len(ext) >= 1:
             self.editor.set_file_extension(ext)
 
     def save(self):
