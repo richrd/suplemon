@@ -229,6 +229,10 @@ class Editor(Viewer):
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.x == 0:
+                if cursor.y > 0:
+                    # Jump to end of previous line
+                    cursor.set_x(len(self.lines[cursor.y-1]))
+                    cursor.move_up()
                 continue
             if cursor.x <= len(line):
                 cur_chr = line[cursor.x-1]
@@ -254,6 +258,10 @@ class Editor(Viewer):
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.x == len(line):
+                if cursor.y < len(self.lines):
+                    # Jump to start of next line
+                    cursor.set_x(0)
+                    cursor.move_down()
                 continue
             cur_chr = line[cursor.x]
             while cursor.x < len(line):
