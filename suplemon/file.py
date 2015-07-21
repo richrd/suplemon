@@ -16,8 +16,8 @@ class File:
         self.fpath = ""
         self.data = None
         self.read_only = False  # Currently unused
-        self.last_save = None
-        self.opened = time.time()
+        self.last_save = None  # Time of last save
+        self.opened = time.time()  # Time of last open
         self.editor = None
         self.writable = True
 
