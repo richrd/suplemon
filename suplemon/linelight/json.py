@@ -1,4 +1,4 @@
-from helpers import *
+import helpers
 
 
 class Syntax:
@@ -8,8 +8,8 @@ class Syntax:
     def get_color(self, raw_line):
         color = 7
         line = raw_line.strip()
-        if starts(line, ["{", "}"]):
+        if helpers.starts(line, ["{", "}"]):
             color = 3    # Blue
-        elif starts(line, "\""):
+        elif helpers.starts(line, "\""):
             color = 2    # Green
         return color

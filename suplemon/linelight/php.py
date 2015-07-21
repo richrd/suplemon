@@ -1,4 +1,4 @@
-from helpers import *
+import helpers
 
 
 class Syntax:
@@ -8,18 +8,20 @@ class Syntax:
     def get_color(self, raw_line):
         color = 7
         line = raw_line.strip()
-        if starts(line, ["include", "require"]):
+        keywords = ["if", "else", "finally", "try", "catch", "foreach",
+                    "while", "continue", "pass", "break"]
+        if helpers.starts(line, ["include", "require"]):
             color = 4    # Blue
-        elif starts(line, ["class", "public", "private", "function"]):
+        elif helpers.starts(line, ["class", "public", "private", "function"]):
             color = 2    # Green
-        elif starts(line, "def"):
+        elif helpers.starts(line, "def"):
             color = 6    # Cyan
-        elif starts(line, ["return"]):
+        elif helpers.starts(line, ["return"]):
             color = 1    # Red
-        elif starts(line, "$"):
+        elif helpers.starts(line, "$"):
             color = 6    # Cyan
-        elif starts(line, ["#", "//", "/*", "*/"]):
+        elif helpers.starts(line, ["#", "//", "/*", "*/"]):
             color = 5    # Magenta
-        elif starts(line, ["if", "else", "finally", "try", "catch", "foreach", "while", "continue", "pass", "break"]):
+        elif helpers.starts(line, keywords):
             color = 3    # Yellow
         return color
