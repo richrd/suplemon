@@ -14,7 +14,8 @@ class Linter(Module):
 
         # Error codes to ignore e.g. 'E501' (line too long)
         self.ignore = []
-        self.max_line_length = 79
+        # Max length of line
+        self.max_line_length = 120  # Default is 79
 
         # Lint all files after app is loaded
         self.bind_event_after("app_loaded", self.lint_all_files)
