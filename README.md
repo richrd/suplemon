@@ -27,6 +27,8 @@ Try it out! Installation is as easy as pulling the repo.
 
 No dependencies outside the Python Standard Library required.
 
+Dev Branch Status: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=dev)](https://travis-ci.org/richrd/suplemon)
+
 ### Optional dependencies
 
  * Pygments
