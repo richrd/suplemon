@@ -42,7 +42,7 @@ the complete reference.
    > Duplicate line
 
  * Ctrl + G
-   > Go to line number or file (type the beginning of a filename to switch to it). 
+   > Go to line number or file (type the beginning of a filename to switch to it).
    > You can also use 'filena:42' to go to line 42 in filename.py etc.
 
  * Ctrl + F

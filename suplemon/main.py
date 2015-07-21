@@ -422,14 +422,14 @@ class App:
                 result = self.modules.modules[operation].run(self, self.get_editor(), "")
             self.trigger_event_after(operation)
             return result
-            
+
         return False
 
     def trigger_event(self, event, when):
         """Triggers event and runs registered callbacks."""
         status = False
         bindings = self.get_event_bindings()
-        if not when in bindings.keys():
+        if when not in bindings.keys():
             return False
         if event in bindings[when].keys():
             callbacks = bindings[when][event]

@@ -196,7 +196,7 @@ class Editor(Viewer):
         """Move cursors right."""
         for cursor in self.cursors:
             line = self.lines[cursor.y]
-            if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0 ):
+            if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0):
                 cursor.move_down()
                 cursor.set_x(0)
             elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:

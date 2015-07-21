@@ -150,7 +150,7 @@ class File:
                 return False
             self.logger.info("Trying to decode with encoding '{}'".format(charenc))
             return data.decode(charenc)
-        except Exception as inst:
+        except:
             self.logger.warning("Failed reading binary file!", exc_info=True)
         return False
 

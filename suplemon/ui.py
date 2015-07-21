@@ -8,6 +8,10 @@ import logging
 
 import key_mappings
 
+# Curses can't be imported yet but we'll
+# predefine it to avoid confusing flake8
+curses = None
+
 
 class InputEvent:
     """Represents a keyboard or mouse event."""
@@ -90,7 +94,7 @@ class UI:
         os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
-        import curses.textpad
+        import curses.textpad  # noqa
 
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
@@ -393,7 +397,7 @@ class UI:
             127: 263,
             8: 263,
         }
-        #self.logger.debug("Query key input: {}".format(str(key)))
+        # self.logger.debug("Query key input: {}".format(str(key)))
         if key in rewrite.keys():
             key = rewrite[key]
         return key
