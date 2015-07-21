@@ -1,0 +1,19 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+
+# command to install dependencies
+
+install:
+  - "pip install flake8 --use-mirrors"
+before_script: "flake8 suplemon --max-line-length=120"
+
+# Not Implemented
+# ignore=E501,W291,W293"
+# command to run tests
+script: "exit 0"
+#script: "python setup.py nosetests"
