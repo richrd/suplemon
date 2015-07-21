@@ -15,4 +15,5 @@ before_script: "flake8 suplemon --max-line-length=120"
 # Not Implemented
 # ignore=E501,W291,W293"
 # command to run tests
+script: "exit 0"
 #script: "python setup.py nosetests"
