@@ -1,4 +1,7 @@
 language: python
+notifications:
+  irc:
+    - "irc.freenode.net#suplemon"
 python:
   - "2.6"
   - "2.7"
