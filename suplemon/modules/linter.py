@@ -12,6 +12,10 @@ class Linter(Module):
             self.logger.warning("Flake8 not available. Can't show linting.")
             return False
 
+        # Error codes to ignore e.g. 'E501' (line too long)
+        self.ignore = []
+        self.max_line_length = 79
+
         # Lint all files after app is loaded
         self.bind_event_after("app_loaded", self.lint_all_files)
         # Show linting messages in status bar
@@ -42,7 +46,8 @@ class Linter(Module):
             self.app.set_status("Line " + str(line_no) + ": " + msg)
 
     def has_flake8_support(self):
-        return self.get_output(["flake8"])
+        output = self.get_output(["flake8", "--version"])
+        return output
 
     def lint_current_file(self, event):
         self.lint_file(self.app.get_file())
@@ -100,7 +105,8 @@ class Linter(Module):
 
     def get_file_linting(self, path):
         """Do linting check for given file path."""
-        output = self.get_output(["flake8", path])
+        output = self.get_output(["flake8", "--max-line-length", str(self.max_line_length), path])
+
         if output is False:
             self.logger.warning("Failed to get linting for file '{}'.".format(path))
             return False
@@ -115,10 +121,13 @@ class Linter(Module):
             parts = line.split(":")
             line_no = int(parts[0])
             char_no = int(parts[1])
-            message = ":".join(parts[2:]).strip()
+            data = ":".join(parts[2:]).strip()
+            err_code = data.split(" ")[0]
+            if err_code in self.ignore:
+                continue
             if line_no not in linting.keys():
                 linting[line_no] = []
-            linting[line_no].append((char_no, message))
+            linting[line_no].append((char_no, data, err_code))
         return linting
 
 module = {
