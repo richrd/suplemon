@@ -17,6 +17,9 @@ class Linter(Module):
         # Max length of line
         self.max_line_length = 120  # Default is 79
 
+        # TODO: Run linting in a seperate thread to avoid
+        # blocking the UI when the app is loading
+
         # Lint all files after app is loaded
         self.bind_event_after("app_loaded", self.lint_all_files)
         # Show linting messages in status bar
