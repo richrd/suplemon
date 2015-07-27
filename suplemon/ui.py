@@ -44,11 +44,11 @@ class InputEvent:
         """Return a normalized key name for key_code."""
         if key_code in key_mappings.key_map.keys():
             return key_mappings.key_map[key_code]
-
         curs_key_name = self._curses_key_name(key_code)
         if curs_key_name:
             if curs_key_name in key_mappings.key_map.keys():
                 return key_mappings.key_map[curs_key_name]
+            return curs_key_name
         else:
             try:
                 return chr(key_code)
