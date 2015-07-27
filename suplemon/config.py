@@ -41,6 +41,7 @@ class Config:
                     "ctrl+pagedown": "prev_file",  # Ctrl + Page Down
                     "f1": "save_file_as",          # F1
                     "f2": "reload_file",           # F2
+                    "f7": "toggle_whitespace",     # F7
                     "f8": "toggle_mouse",          # F8
                     "f11": "toggle_fullscreen",    # F11
                 }
