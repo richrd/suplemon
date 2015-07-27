@@ -35,7 +35,7 @@ class Config:
                     "ctrl+o": "open",              # Ctrl + O
                     "ctrl+w": "close_file",        # Ctrl + W
                     "ctrl+n": "new_file",          # Ctrl + N
-                    "ctrl+x": "ask_exit",          # Ctrl + X
+                    "ctrl+q": "ask_exit",          # Ctrl + Q
                     "ctrl+p": "comment",           # Ctrl + P
                     "ctrl+pageup": "next_file",    # Ctrl + Page Up
                     "ctrl+pagedown": "prev_file",  # Ctrl + Page Down
