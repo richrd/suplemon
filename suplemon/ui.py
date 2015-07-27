@@ -366,7 +366,7 @@ class UI:
             ("^G", "Go to"),
             ("^E", "Run command"),
             ("F8", "Mouse mode"),
-            ("^X", "Exit"),
+            ("^Q", "Exit"),
         ]
         x = 0
         y = 0
@@ -391,7 +391,8 @@ class UI:
 
     def _process_query_key(self, key):
         """Process keystrokes from the Textbox window."""
-        # TODO: implement this to improve interacting in the input box
+        if key == 27:  # Support canceling query with ESC
+            raise KeyboardInterrupt
         # Standardize some keycodes
         rewrite = {
             127: 263,
