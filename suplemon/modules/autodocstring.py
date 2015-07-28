@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
-import helpers
-from suplemon_module import Module
+from suplemon import helpers
+from suplemon.suplemon_module import Module
 
 
 class AutoDocstring(Module):

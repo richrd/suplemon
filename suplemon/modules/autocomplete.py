@@ -2,8 +2,8 @@
 
 import re
 
-import helpers
-from suplemon_module import Module
+from suplemon import helpers
+from suplemon.suplemon_module import Module
 
 
 class AutoComplete(Module):

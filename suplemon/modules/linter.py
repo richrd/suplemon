@@ -2,7 +2,7 @@
 
 import subprocess
 
-from suplemon_module import Module
+from suplemon.suplemon_module import Module
 
 
 class Linter(Module):
