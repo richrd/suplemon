@@ -9,13 +9,17 @@ version = re.search(
     re.M
     ).group(1)
 
+files = ["suplemon/themes/*"]
+
 setup(name='Suplemon',
       version=version,
       description='Console text editor with multi cursor support.',
       author='Richard Lewis',
       author_email='richrd.lewis@gmail.com',
       url='https://github.com/richrd/suplemon/',
-      packages=['suplemon'],
+      packages=['suplemon', 'suplemon.modules', 'suplemon.linelight', 'suplemon.themes'],
+      package_data={'package': files},
+      include_package_data=True,
       entry_points={
           'console_scripts': ['suplemon=suplemon.cli:main']
       }
