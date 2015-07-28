@@ -360,24 +360,33 @@ class Viewer:
         #    completely highlighted (partial words). Syntax highlighting
         #    should be done first and then only render visible words.
         # 2) Additionaly highlighing should be done for all lines at once
-        #    tokens should be cached in line instances. That way we can
-        #    support multi line comment syntax etc.
+        #    and tokens should be cached in line instances. That way we can
+        #    support multi line comment syntax etc. It should also perform
+        #    better, since we only need to re-highlight lines when they change.
         tokens = self.lexer.lex(line_data, self.pygments_syntax)
         for token in tokens:
             if token[1] == '\n':
                 break
             scope = token[0]
             text = self.replace_whitespace(token[1])
-            settings = self.app.themes.get_scope(scope)
-            pair = scope_to_pair.get(scope)
-            if settings is not None and pair is not None:
-                fg = int(settings.get("foreground") or -1)
-                bg = int(settings.get("background") or -1)
-                curses.init_pair(pair, fg, bg)
+            if token[1].isspace():
+                # Color visible whitespace with gray
+                # TODO: get whitespace color from theme
+                pair = 9  # Gray text on normal background
                 curs_color = curses.color_pair(pair)
                 self.window.addstr(y, x_offset, text, curs_color)
             else:
-                self.window.addstr(y, x_offset, text)
+                # Color with pygments
+                settings = self.app.themes.get_scope(scope)
+                pair = scope_to_pair.get(scope)
+                if settings is not None and pair is not None:
+                    fg = int(settings.get("foreground") or -1)
+                    bg = int(settings.get("background") or -1)
+                    curses.init_pair(pair, fg, bg)
+                    curs_color = curses.color_pair(pair)
+                    self.window.addstr(y, x_offset, text, curs_color)
+                else:
+                    self.window.addstr(y, x_offset, text)
             x_offset += len(text)
 
     def render_line_linelight(self, line, pos, x_offset, max_len):
