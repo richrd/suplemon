@@ -110,6 +110,10 @@ class UI:
         self.setup_colors()
 
         curses.cbreak()
+        # TODO: Raw mode seems to work ok. Should probably
+        # switch to it from cbreak to get Ctrl+Z to work etc.
+        # curses.raw()
+
         curses.noecho()
         try:
             # Might fail on vt100 terminal emulators
@@ -161,7 +165,8 @@ class UI:
         curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
         curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
         curses.init_pair(7, fg, bg)                      # White on Black
-        curses.init_pair(8, fg, curses.COLOR_BLACK)  # White on Black (Line number color)
+        curses.init_pair(8, fg, curses.COLOR_BLACK)      # White on Black (Line number color)
+        curses.init_pair(9, 8, bg)                       # Gray (Whitespace color)
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
@@ -177,8 +182,8 @@ class UI:
                 curses.init_pair(5, 171, bg)  # 5 Magenta
                 curses.init_pair(6, 81, bg)   # 6 Cyan
                 curses.init_pair(7, 15, bg)   # 7 White
-                # curses.init_pair(8, 8, bg)   # 8 Gray (Line number color)
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
+                curses.init_pair(9, 8, bg)   # 8 Gray (Whitespace color)
             except:
                 self.logger.warning("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
                 self.app.config["editor"]["theme"] = "8colors"
