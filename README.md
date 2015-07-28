@@ -87,7 +87,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
 ## Keyboard shortcuts
 
- * Ctrl + X
+ * Ctrl + Q
    > Exit
 
  * Ctrl + C
@@ -96,7 +96,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
  * Ctrl + V
    > Insert buffer
 
- * Ctrl + W
+ * Ctrl + K
    > Duplicate line
 
  * Ctrl + G
@@ -135,6 +135,9 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
  * Ctrl + O
    > Open file
+
+ * Ctrl + W
+   > Close file
 
  * Ctrl + Page Up
    > Switch to next file
