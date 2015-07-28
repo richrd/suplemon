@@ -5,11 +5,11 @@ Editor class for extending viewer with text editing features.
 
 import re
 
-import helpers
+from . import helpers
 
-from line import Line
-from cursor import Cursor
-from viewer import Viewer
+from .line import Line
+from .cursor import Cursor
+from .viewer import Viewer
 
 
 class State:

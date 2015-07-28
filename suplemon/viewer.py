@@ -10,13 +10,13 @@ import curses
 import logging
 
 
-from line import Line
-from cursor import Cursor
-from themes import scope_to_pair
+from .line import Line
+from .cursor import Cursor
+from .themes import scope_to_pair
 
 try:
     import pygments.lexers
-    from lexer import Lexer
+    from .lexer import Lexer
 except ImportError:
     pygments = False
 

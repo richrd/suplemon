@@ -10,15 +10,15 @@ import os
 import sys
 import logging
 
-import ui
-import modules
-import themes
-import helpers
+from . import ui
+from . import modules
+from . import themes
+from . import helpers
 
-from file import File
-from logger import LoggingHandler
-from config import Config
-from editor import Editor
+from .file import File
+from .logger import LoggingHandler
+from .config import Config
+from .editor import Editor
 
 
 class App:
