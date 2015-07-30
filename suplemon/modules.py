@@ -49,7 +49,7 @@ class ModuleLoader:
             inst.options = module[1]
             return inst
         except:
-            self.logger.error("Initializing module failed: {}".format(module[0]), exc_info=True)
+            self.logger.error("Initializing module failed: {0}".format(module[0]), exc_info=True)
         return False
 
     def load_single(self, name):
@@ -58,7 +58,7 @@ class ModuleLoader:
         try:
             mod = imp.load_source(name, path)
         except:
-            self.logger.error("Failed loading module: {}".format(name), exc_info=True)
+            self.logger.error("Failed loading module: {0}".format(name), exc_info=True)
             return False
         if "module" not in dir(mod):
             return False

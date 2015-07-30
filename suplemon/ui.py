@@ -21,7 +21,7 @@ class InputEvent:
         self.key_code = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
-        self.logger = logging.getLogger("{}.InputEvent".format(__name__))
+        self.logger = logging.getLogger("{0}.InputEvent".format(__name__))
 
     def parse_key_code(self, key_code):
         """Parse a key code (or character) from curses."""
@@ -104,7 +104,7 @@ class UI:
         """Setup curses."""
         # Log the terminal type
         termname = curses.termname().decode("utf-8")
-        self.logger.info("Loading UI for terminal: {}".format(termname))
+        self.logger.info("Loading UI for terminal: {0}".format(termname))
 
         self.screen = curses.initscr()
         self.setup_colors()
@@ -166,6 +166,7 @@ class UI:
         curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
         curses.init_pair(7, fg, bg)                      # White on Black
         curses.init_pair(8, fg, curses.COLOR_BLACK)      # White on Black (Line number color)
+        # FIXME: fails on ubuntu terminal with $TERM=xterm
         curses.init_pair(9, 8, bg)                       # Gray (Whitespace color)
 
         # Nicer shades of same colors (if supported)
@@ -403,7 +404,7 @@ class UI:
             127: 263,
             8: 263,
         }
-        # self.logger.debug("Query key input: {}".format(str(key)))
+        # self.logger.debug("Query key input: {0}".format(str(key)))
         if key in rewrite.keys():
             key = rewrite[key]
         return key

@@ -13,7 +13,7 @@ class Eval(Module):
         except:
             app.set_status("Eval failed.")
             return False
-        app.set_status("Result:{}".format(value))
+        app.set_status("Result:{0}".format(value))
         return True
 
 module = {

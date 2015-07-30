@@ -394,9 +394,9 @@ class App:
         parts = data.split(" ")
         cmd = parts[0].lower()
         args = " ".join(parts[1:])
-        self.logger.debug("Looking for command '{}'".format(cmd))
+        self.logger.debug("Looking for command '{0}'".format(cmd))
         if cmd in self.modules.modules.keys():
-            self.logger.debug("Trying to run command '{}'".format(cmd))
+            self.logger.debug("Trying to run command '{0}'".format(cmd))
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor(), args)
         else:
@@ -437,7 +437,7 @@ class App:
                 try:
                     val = cb(event)
                 except:
-                    self.logger.error("Failed running callback: {}".format(cb), exc_info=True)
+                    self.logger.error("Failed running callback: {0}".format(cb), exc_info=True)
                     continue
                 if val:
                     status = True

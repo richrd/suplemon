@@ -77,7 +77,7 @@ class Viewer:
             try:
                 module = imp.load_source(ext, path)
             except:
-                self.logger.error("Failed to load syntax file '{}'!".format(path), exc_info=True)
+                self.logger.error("Failed to load syntax file '{0}'!".format(path), exc_info=True)
         else:
             return False
 
@@ -102,9 +102,9 @@ class Viewer:
             ext = self.extension_map[ext]  # Use it
         try:
             self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
-            self.logger.info("Loaded Pygments lexer '{}'.".format(ext))
+            self.logger.info("Loaded Pygments lexer '{0}'.".format(ext))
         except:
-            self.logger.warning("Failed to load Pygments lexer '{}'.".format(ext))
+            self.logger.warning("Failed to load Pygments lexer '{0}'.".format(ext))
             return False
         if ext == "php":
             # Hack to highlight PHP even without <?php ?> tags
@@ -323,7 +323,8 @@ class Viewer:
             try:
                 self.render_line_contents(line, pos, x_offset, max_len)
             except:
-                self.logger.error("Failed rendering line #{} @{} DATA:'{}'!".format(lnum+1, pos, line), exc_info=True)
+                self.logger.error("Failed rendering line #{0} @{1} DATA:'{2}'!".format(lnum+1, pos, line),
+                                  exc_info=True)
             i += 1
         self.render_cursors()
 

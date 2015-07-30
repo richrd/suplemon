@@ -28,7 +28,7 @@ class Module:
         Args:
         :param name: should be specified as __name__
         """
-        self.logger = logging.getLogger("module.{}".format(name))
+        self.logger = logging.getLogger("module.{0}".format(name))
 
     def run(self, app, editor, args):
         """This is called each time the module is run.

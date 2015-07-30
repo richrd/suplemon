@@ -112,7 +112,7 @@ class Linter(Module):
         output = self.get_output(["flake8", "--max-line-length", str(self.max_line_length), path])
 
         if output is False:
-            self.logger.warning("Failed to get linting for file '{}'.".format(path))
+            self.logger.warning("Failed to get linting for file '{0}'.".format(path))
             return False
         output = output.decode("utf-8")
         # Remove file paths from output

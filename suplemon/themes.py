@@ -69,7 +69,7 @@ class ThemeLoader:
     def load(self, name):
         fullpath = ''.join([self.theme_path, name, '.tmTheme'])
         if not os.path.exists(fullpath):
-            self.logger.warning("fullpath '{}' doesn't exist!".format(fullpath))
+            self.logger.warning("fullpath '{0}' doesn't exist!".format(fullpath))
             return None
 
         self.logger.info("Loading theme " + name)
