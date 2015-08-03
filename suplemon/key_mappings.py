@@ -40,7 +40,6 @@ key_map = {
     "\t": "tab",
     "^I": "tab",
     "^[": "escape",
-    " ": "space",
 
     # Control
     "^A": "ctrl+a",
