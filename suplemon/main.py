@@ -52,6 +52,7 @@ class App:
             "open": self.open,
             "close_file": self.close_file,
             "new_file": self.new_file,
+            "exit": self.ask_exit,
             "ask_exit": self.ask_exit,
             "prev_file": self.prev_file,
             "next_file": self.next_file,
