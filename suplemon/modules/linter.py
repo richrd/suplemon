@@ -86,9 +86,7 @@ class Linter(Module):
     def get_output(self, cmd):
         try:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        except EnvironmentError:
-            # cant use FileNotFoundError in Python 2
-            self.logger.exception("Getting command output failed.")
+        except EnvironmentError:  # cant use FileNotFoundError in Python 2
             return False
         out, err = process.communicate()
         return out
