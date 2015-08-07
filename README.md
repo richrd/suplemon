@@ -18,16 +18,27 @@ http://github.com/richrd/suplemon
 ## Suplemon multi cursor editing
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
-## Installation
-Try it out! Installation is as easy as pulling the repo.
+
+## Get it!
+You can just clone the repo, and try Suplemon, or also install it system wide. 
 
     git clone https://github.com/richrd/suplemon.git
+    cd suplemon
+    python3 suplemon.py
 
-**The master branch is considered stable.**
+### Installation
+To install Suplemon run the setup script:
 
-No dependencies outside the Python Standard Library required.
+    sudo python3 setup.py install
+
+### Notes
+ - **Must use Python 3.3 or higher for proper character encoding support.**
+ - **The master branch is considered stable.**
+ - *Python2.7 (and maybe lower) versions work, but aren't officially supported (special characters won't work etc).*
+ - *Tested on Unix.*
 
 Dev Branch Status: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=dev)](https://travis-ci.org/richrd/suplemon)
+No dependencies outside the Python Standard Library required.
 
 ### Optional dependencies
 
@@ -36,17 +47,11 @@ Dev Branch Status: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?br
  
  * Flake8
  > For showing linting for Python files.
- 
 
 ## Usage
 
-    python3 cli.py [filename]...
-
-**Must use Python 3.3 for proper character encoding support.**
-
-*Lower Python versions might work, but aren't officially supported.*
-
-*Tested on Unix.*
+    suplemon # New file in the current directory
+    suplemon [filename]... # Open one or more files
 
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
