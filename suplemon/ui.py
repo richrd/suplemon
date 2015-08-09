@@ -372,7 +372,7 @@ class UI:
             ("^G", "Go to"),
             ("^E", "Run command"),
             ("F8", "Mouse mode"),
-            ("^Q", "Exit"),
+            ("^Q, ^X", "Exit"),
         ]
         x = 0
         y = 0
