@@ -370,7 +370,7 @@ class Viewer:
                 break
             scope = token[0]
             text = self.replace_whitespace(token[1])
-            if token[1].isspace():
+            if token[1].isspace() and not self.app.ui.limited_colors:
                 # Color visible whitespace with gray
                 # TODO: get whitespace color from theme
                 pair = 9  # Gray text on normal background

@@ -86,7 +86,8 @@ class UI:
         self.app = app
         self.logger = logging.getLogger(__name__)
         self.warned_old_curses = 0
-
+        self.limited_colors = True
+        
     def init(self):
         """Set ESC delay and then import curses."""
         global curses
@@ -167,7 +168,10 @@ class UI:
         curses.init_pair(7, fg, bg)                      # White on Black
         curses.init_pair(8, fg, curses.COLOR_BLACK)      # White on Black (Line number color)
         # FIXME: fails on ubuntu terminal with $TERM=xterm
-        curses.init_pair(9, 8, bg)                       # Gray (Whitespace color)
+        try:
+            curses.init_pair(9, 8, bg)                       # Gray (Whitespace color)
+        except:
+            self.limited_colors = False
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
