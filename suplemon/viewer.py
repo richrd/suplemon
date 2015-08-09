@@ -559,7 +559,7 @@ class Viewer:
 
     def move_y_cursors(self, line, delta, exclude=None):
         """Move all cursors starting at line and col with delta on the y axis.
-        Exlude a cursor by passing it via the exclude argument."""
+        Exclude a cursor by passing it via the exclude argument."""
         for cursor in self.cursors:
             if cursor == exclude:
                 continue
