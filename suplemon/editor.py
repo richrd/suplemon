@@ -390,11 +390,19 @@ class Editor(Viewer):
                 # If we've run out of lines
                 break
             line = self.lines[cursor.y]
+            # if we have more than 1 line
+            # and we're at the end of the current line
+            # and we're not on the last line
             if len(self.lines) > 1 and cursor.x == len(line) and cursor.y != len(self.lines) - 1:
-                data = self.lines[cursor.y]
+                data = self.lines[cursor.y].get_data()
                 self.lines.pop(cursor.y)
                 self.lines[cursor.y].set_data(data+self.lines[cursor.y])
-                self.move_x_cursors(cursor.y, cursor.x, -1)
+                # Reposition cursors from line below into correct positions on current line
+                line_cursors = self.get_cursors_on_line(cursor.y+1)
+                for c in line_cursors:
+                    c.move_right(len(data))
+                    c.move_up()
+                self.move_y_cursors(cursor.y, -1)
             else:
                 start = line[:cursor.x]
                 end = line[cursor.x+1:]
