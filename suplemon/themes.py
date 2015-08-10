@@ -107,7 +107,9 @@ class ThemeLoader:
         self.current_theme = theme
 
     def get_scope(self, name):
-        return self.current_theme.scopes.get(name)
+        if self.current_theme:
+            return self.current_theme.scopes.get(name)
+        return False
 
     def set_theme(self, theme, settings):
         for entry in settings:
