@@ -339,7 +339,7 @@ class Viewer:
         :param x_offset: Offset from left edge of screen. Currently same as x position.
         :param max_len: Maximum amount of chars that will fit on screen.
         """
-        if pygments and self.app.config["editor"]["show_highlighting"] and self.pygments_syntax:
+        if pygments and self.app.config["editor"]["show_highlighting"] and self.pygments_syntax and self.app.themes.current_theme:
             self.render_line_pygments(line, pos, x_offset, max_len)
         elif self.app.config["editor"]["show_line_colors"]:
             self.render_line_linelight(line, pos, x_offset, max_len)
@@ -380,7 +380,7 @@ class Viewer:
                 # Color with pygments
                 settings = self.app.themes.get_scope(scope)
                 pair = scope_to_pair.get(scope)
-                if settings is not None and pair is not None:
+                if settings and pair is not None:
                     fg = int(settings.get("foreground") or -1)
                     bg = int(settings.get("background") or -1)
                     curses.init_pair(pair, fg, bg)
