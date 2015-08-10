@@ -165,13 +165,22 @@ class UI:
         curses.init_pair(4, curses.COLOR_BLUE, bg)       # 4 Blue
         curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
         curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
-        curses.init_pair(7, fg, bg)                      # White on Black
-        curses.init_pair(8, fg, curses.COLOR_BLACK)      # White on Black (Line number color)
-        # FIXME: fails on ubuntu terminal with $TERM=xterm
+        curses.init_pair(7, fg, bg)                      # 7 White on Black
+        curses.init_pair(8, fg, curses.COLOR_BLACK)      # 8 White on Black (Line number color)
+
+        # Set color for whitespace
+        # Fails on default Ubuntu terminal with $TERM=xterm (max 8 colors)
+        # TODO: Smarter implementation for custom colors
         try:
-            curses.init_pair(9, 8, bg)                       # Gray (Whitespace color)
+            curses.init_pair(9, 8, bg)                   # Gray (Whitespace color)
         except:
-            self.limited_colors = False
+            # Try to revert the color
+            self.limited_colors = True
+            try:
+                curses.init_pair(9, fg, bg)              # Try to revert color if possible
+            except:
+                # Reverting failed
+                self.logger.error("Failed to set and revert extra colors.")
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
