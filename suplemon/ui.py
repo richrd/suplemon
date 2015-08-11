@@ -87,7 +87,7 @@ class UI:
         self.logger = logging.getLogger(__name__)
         self.warned_old_curses = 0
         self.limited_colors = True
-        
+
     def init(self):
         """Set ESC delay and then import curses."""
         global curses
@@ -173,6 +173,7 @@ class UI:
         # TODO: Smarter implementation for custom colors
         try:
             curses.init_pair(9, 8, bg)                   # Gray (Whitespace color)
+            self.limited_colors = False
         except:
             # Try to revert the color
             self.limited_colors = True
