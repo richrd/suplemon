@@ -30,7 +30,7 @@ Most shortcuts are also shown at the bottom in the legend area. Here's
 the complete reference.
 
 
- * Ctrl + Q
+ * Ctrl + Q / Ctrl + X
    > Exit
 
  * Ctrl + C
@@ -56,10 +56,10 @@ the complete reference.
    > Add new curor in arrow direction
 
  * Ctrl + Left / Right
-   > Jump to previous or next word
+   > Jump to previous or next word or line
 
  * ESC
-   > Revert to a single cursor
+   > Revert to a single cursor / Cancel input prompt
 
  * Alt + Page Up
    > Move line(s) up

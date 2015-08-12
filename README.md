@@ -66,6 +66,7 @@ Suplemon is licensed under the MIT license.
  * Syntax highlighting
  * Autocomplete
  * Easy Undo/Redo
+ * Native clipboard support (on X Windows / linux)
  * Multiple files in tabs
  * Powerful Go To feature for jumping to files and lines
  * Find and Find next
@@ -80,7 +81,7 @@ Suplemon is licensed under the MIT license.
  2. [X] Usability should be even better and easier than nano. It's on par with desktop editors.
  3. [X] Multi cursor should be comparable to Sublime Text.
  4. [X] Develop Suplemon with Suplemon!!! I've used Suplemon for a long time as my main
-        editor (replacing ST and nano) for all developement, Git commits etc.
+        editor (replacing ST and nano) for all developement, Git commits and everything else.
 
 ## Configuration
 
@@ -93,7 +94,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
 ## Keyboard shortcuts
 
- * Ctrl + Q
+ * Ctrl + Q / Ctrl + X
    > Exit
 
  * Ctrl + C
@@ -119,10 +120,10 @@ You can find all the configuration options and descriptions in the suplemon/conf
    > Add new curor in arrow direction
 
  * Ctrl + Left / Right
-   > Jump to previous or next word
+   > Jump to previous or next word or line
 
  * ESC
-   > Revert to a single cursor
+   > Revert to a single cursor / Cancel input prompt
 
  * Alt + Page Up
    > Move line(s) up
