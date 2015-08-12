@@ -18,16 +18,28 @@ http://github.com/richrd/suplemon
 ## Suplemon multi cursor editing
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
-## Installation
-Try it out! Installation is as easy as pulling the repo.
+
+## Get it!
+You can just clone the repo, and try Suplemon, or also install it system wide. 
 
     git clone https://github.com/richrd/suplemon.git
+    cd suplemon
+    python3 suplemon.py
 
-**The master branch is considered stable.**
+### Installation
+To install Suplemon run the setup script:
 
-No dependencies outside the Python Standard Library required.
+    sudo python3 setup.py install
+
+### Notes
+ - **Must use Python 3.3 or higher for proper character encoding support.**
+ - **Python2.7 (and maybe lower) versions work, but aren't officially supported (some special characters won't work etc).**
+ - *The master branch is considered stable.*
+ - *Tested on Unix.*
 
 Dev Branch Status: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=dev)](https://travis-ci.org/richrd/suplemon)
+
+No dependencies outside the Python Standard Library required.
 
 ### Optional dependencies
 
@@ -36,17 +48,11 @@ Dev Branch Status: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?br
  
  * Flake8
  > For showing linting for Python files.
- 
 
 ## Usage
 
-    python3 cli.py [filename]...
-
-**Must use Python 3.3 for proper character encoding support.**
-
-*Lower Python versions might work, but aren't officially supported.*
-
-*Tested on Unix.*
+    suplemon # New file in the current directory
+    suplemon [filename]... # Open one or more files
 
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
@@ -60,6 +66,7 @@ Suplemon is licensed under the MIT license.
  * Syntax highlighting
  * Autocomplete
  * Easy Undo/Redo
+ * Native clipboard support (on X Windows / linux)
  * Multiple files in tabs
  * Powerful Go To feature for jumping to files and lines
  * Find and Find next
@@ -71,10 +78,10 @@ Suplemon is licensed under the MIT license.
 
 ## Goals
  1. [X] Create a command line text editor with built in multi cursor support. It's awesome!
- 2. [X] Usability should be as good and easy as nano.
+ 2. [X] Usability should be even better and easier than nano. It's on par with desktop editors.
  3. [X] Multi cursor should be comparable to Sublime Text.
  4. [X] Develop Suplemon with Suplemon!!! I've used Suplemon for a long time as my main
-        editor (replacing ST and nano) for all developement, Git commits etc.
+        editor (replacing ST and nano) for all developement, Git commits and everything else.
 
 ## Configuration
 
@@ -87,7 +94,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
 ## Keyboard shortcuts
 
- * Ctrl + X
+ * Ctrl + Q / Ctrl + X
    > Exit
 
  * Ctrl + C
@@ -96,7 +103,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
  * Ctrl + V
    > Insert buffer
 
- * Ctrl + W
+ * Ctrl + K
    > Duplicate line
 
  * Ctrl + G
@@ -113,10 +120,10 @@ You can find all the configuration options and descriptions in the suplemon/conf
    > Add new curor in arrow direction
 
  * Ctrl + Left / Right
-   > Jump to previous or next word
+   > Jump to previous or next word or line
 
  * ESC
-   > Revert to a single cursor
+   > Revert to a single cursor / Cancel input prompt
 
  * Alt + Page Up
    > Move line(s) up
@@ -135,6 +142,9 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
  * Ctrl + O
    > Open file
+
+ * Ctrl + W
+   > Close file
 
  * Ctrl + Page Up
    > Switch to next file

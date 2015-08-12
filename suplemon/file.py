@@ -148,7 +148,7 @@ class File:
             if charenc is None:
                 self.logger.warning("Failed to detect file encoding.")
                 return False
-            self.logger.info("Trying to decode with encoding '{}'".format(charenc))
+            self.logger.info("Trying to decode with encoding '{0}'".format(charenc))
             return data.decode(charenc)
         except:
             self.logger.warning("Failed reading binary file!", exc_info=True)

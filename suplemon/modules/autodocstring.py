@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
-import helpers
-from suplemon_module import Module
+from suplemon import helpers
+from suplemon.suplemon_module import Module
 
 
 class AutoDocstring(Module):
@@ -57,7 +57,7 @@ class AutoDocstring(Module):
         :param str indent: How much the docstring
         :param str docstring: The actual docstring
         """
-        docstring = '"""{}"""'.format(docstring)
+        docstring = '"""{0}"""'.format(docstring)
         raw_lines = docstring.split("\n")
         lines = []
         for line in raw_lines:
@@ -87,7 +87,7 @@ class AutoDocstring(Module):
 
         args = ""
         for arg in values["func_args"]:
-            args += ":param {}:\n".format(arg)
+            args += ":param {0}:\n".format(arg)
         values["args"] = args
 
         if values["func_returns"]:

@@ -4,21 +4,21 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.31"
+__version__ = "0.1.32"
 
 import os
 import sys
 import logging
 
-import ui
-import modules
-import themes
-import helpers
+from . import ui
+from . import modules
+from . import themes
+from . import helpers
 
-from file import File
-from logger import LoggingHandler
-from config import Config
-from editor import Editor
+from .file import File
+from .logger import LoggingHandler
+from .config import Config
+from .editor import Editor
 
 
 class App:
@@ -52,6 +52,7 @@ class App:
             "open": self.open,
             "close_file": self.close_file,
             "new_file": self.new_file,
+            "exit": self.ask_exit,
             "ask_exit": self.ask_exit,
             "prev_file": self.prev_file,
             "next_file": self.next_file,
@@ -394,9 +395,9 @@ class App:
         parts = data.split(" ")
         cmd = parts[0].lower()
         args = " ".join(parts[1:])
-        self.logger.debug("Looking for command '{}'".format(cmd))
+        self.logger.debug("Looking for command '{0}'".format(cmd))
         if cmd in self.modules.modules.keys():
-            self.logger.debug("Trying to run command '{}'".format(cmd))
+            self.logger.debug("Trying to run command '{0}'".format(cmd))
             self.get_editor().store_action_state(cmd)
             self.modules.modules[cmd].run(self, self.get_editor(), args)
         else:
@@ -406,7 +407,7 @@ class App:
 
     def run_operation(self, operation):
         """Run an app core operation."""
-        # Support arbitrary callables
+        # Support arbitrary callables. TODO: deprecate
         if hasattr(operation, '__call__'):
             return operation()
 
@@ -437,7 +438,7 @@ class App:
                 try:
                     val = cb(event)
                 except:
-                    self.logger.error("Failed running callback: {}".format(cb), exc_info=True)
+                    self.logger.error("Failed running callback: {0}".format(cb), exc_info=True)
                     continue
                 if val:
                     status = True

@@ -12,7 +12,7 @@ except:
     # Python < 2.7
     argparse = False
 
-from main import App, __version__
+from .main import App, __version__
 
 
 def main():

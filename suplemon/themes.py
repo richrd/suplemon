@@ -68,8 +68,8 @@ class ThemeLoader:
 
     def load(self, name):
         fullpath = ''.join([self.theme_path, name, '.tmTheme'])
-
         if not os.path.exists(fullpath):
+            self.logger.warning("fullpath '{0}' doesn't exist!".format(fullpath))
             return None
 
         self.logger.info("Loading theme " + name)
@@ -107,7 +107,9 @@ class ThemeLoader:
         self.current_theme = theme
 
     def get_scope(self, name):
-        return self.current_theme.scopes.get(name)
+        if self.current_theme:
+            return self.current_theme.scopes.get(name)
+        return False
 
     def set_theme(self, theme, settings):
         for entry in settings:

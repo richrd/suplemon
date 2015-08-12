@@ -10,13 +10,13 @@ import curses
 import logging
 
 
-from line import Line
-from cursor import Cursor
-from themes import scope_to_pair
+from .line import Line
+from .cursor import Cursor
+from .themes import scope_to_pair
 
 try:
     import pygments.lexers
-    from lexer import Lexer
+    from .lexer import Lexer
 except ImportError:
     pygments = False
 
@@ -77,7 +77,7 @@ class Viewer:
             try:
                 module = imp.load_source(ext, path)
             except:
-                self.logger.error("Failed to load syntax file '{}'!".format(path), exc_info=True)
+                self.logger.error("Failed to load syntax file '{0}'!".format(path), exc_info=True)
         else:
             return False
 
@@ -102,9 +102,9 @@ class Viewer:
             ext = self.extension_map[ext]  # Use it
         try:
             self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
-            self.logger.info("Loaded Pygments lexer '{}'.".format(ext))
+            self.logger.info("Loaded Pygments lexer '{0}'.".format(ext))
         except:
-            self.logger.warning("Failed to load Pygments lexer '{}'.".format(ext))
+            self.logger.warning("Failed to load Pygments lexer '{0}'.".format(ext))
             return False
         if ext == "php":
             # Hack to highlight PHP even without <?php ?> tags
@@ -323,7 +323,8 @@ class Viewer:
             try:
                 self.render_line_contents(line, pos, x_offset, max_len)
             except:
-                self.logger.error("Failed rendering line #{} @{} DATA:'{}'!".format(lnum+1, pos, line), exc_info=True)
+                self.logger.error("Failed rendering line #{0} @{1} DATA:'{2}'!".format(lnum+1, pos, line),
+                                  exc_info=True)
             i += 1
         self.render_cursors()
 
@@ -338,7 +339,8 @@ class Viewer:
         :param x_offset: Offset from left edge of screen. Currently same as x position.
         :param max_len: Maximum amount of chars that will fit on screen.
         """
-        if pygments and self.app.config["editor"]["show_highlighting"] and self.pygments_syntax:
+        show_highlighting = self.app.config["editor"]["show_highlighting"]
+        if pygments and show_highlighting and self.pygments_syntax and self.app.themes.current_theme:
             self.render_line_pygments(line, pos, x_offset, max_len)
         elif self.app.config["editor"]["show_line_colors"]:
             self.render_line_linelight(line, pos, x_offset, max_len)
@@ -360,24 +362,33 @@ class Viewer:
         #    completely highlighted (partial words). Syntax highlighting
         #    should be done first and then only render visible words.
         # 2) Additionaly highlighing should be done for all lines at once
-        #    tokens should be cached in line instances. That way we can
-        #    support multi line comment syntax etc.
+        #    and tokens should be cached in line instances. That way we can
+        #    support multi line comment syntax etc. It should also perform
+        #    better, since we only need to re-highlight lines when they change.
         tokens = self.lexer.lex(line_data, self.pygments_syntax)
         for token in tokens:
             if token[1] == '\n':
                 break
             scope = token[0]
             text = self.replace_whitespace(token[1])
-            settings = self.app.themes.get_scope(scope)
-            pair = scope_to_pair.get(scope)
-            if settings is not None and pair is not None:
-                fg = int(settings.get("foreground") or -1)
-                bg = int(settings.get("background") or -1)
-                curses.init_pair(pair, fg, bg)
+            if token[1].isspace() and not self.app.ui.limited_colors:
+                # Color visible whitespace with gray
+                # TODO: get whitespace color from theme
+                pair = 9  # Gray text on normal background
                 curs_color = curses.color_pair(pair)
                 self.window.addstr(y, x_offset, text, curs_color)
             else:
-                self.window.addstr(y, x_offset, text)
+                # Color with pygments
+                settings = self.app.themes.get_scope(scope)
+                pair = scope_to_pair.get(scope)
+                if settings and pair is not None:
+                    fg = int(settings.get("foreground") or -1)
+                    bg = int(settings.get("background") or -1)
+                    curses.init_pair(pair, fg, bg)
+                    curs_color = curses.color_pair(pair)
+                    self.window.addstr(y, x_offset, text, curs_color)
+                else:
+                    self.window.addstr(y, x_offset, text)
             x_offset += len(text)
 
     def render_line_linelight(self, line, pos, x_offset, max_len):
@@ -549,7 +560,7 @@ class Viewer:
 
     def move_y_cursors(self, line, delta, exclude=None):
         """Move all cursors starting at line and col with delta on the y axis.
-        Exlude a cursor by passing it via the exclude argument."""
+        Exclude a cursor by passing it via the exclude argument."""
         for cursor in self.cursors:
             if cursor == exclude:
                 continue

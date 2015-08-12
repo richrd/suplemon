@@ -29,7 +29,8 @@ The default keyboard shortcuts imitate those of common graphical editors.
 Most shortcuts are also shown at the bottom in the legend area. Here's
 the complete reference.
 
- * Ctrl + X
+
+ * Ctrl + Q / Ctrl + X
    > Exit
 
  * Ctrl + C
@@ -38,7 +39,7 @@ the complete reference.
  * Ctrl + V
    > Insert buffer
 
- * Ctrl + W
+ * Ctrl + K
    > Duplicate line
 
  * Ctrl + G
@@ -55,10 +56,10 @@ the complete reference.
    > Add new curor in arrow direction
 
  * Ctrl + Left / Right
-   > Jump to previous or next word
+   > Jump to previous or next word or line
 
  * ESC
-   > Revert to a single cursor
+   > Revert to a single cursor / Cancel input prompt
 
  * Alt + Page Up
    > Move line(s) up
@@ -66,14 +67,20 @@ the complete reference.
  * Alt + Page Down
    > Move line(s) down
 
- * F1, Ctrl + S
+ * Ctrl + S
    > Save current file
+
+ * F1
+   > Save file with new name
 
  * F2
    > Reload current file
 
  * Ctrl + O
    > Open file
+
+ * Ctrl + W
+   > Close file
 
  * Ctrl + Page Up
    > Switch to next file
@@ -90,6 +97,9 @@ the complete reference.
  * F6
    > Redo
 
+ * F7
+   > Toggle visible whitespace
+
  * F8
    > Toggle mouse mode
 
@@ -98,6 +108,18 @@ the complete reference.
 
  * F11
    > Toggle full screen
+
+### Mouse shortcuts
+
+ * Left Click
+   > Set cursor at mouse position. Reverts to a single cursor.
+
+ * Right Click
+   > Add a cursor at mouse position.
+
+ * Scroll Wheel Up / Down
+   > Scroll up & down.
+
 
 ## 4. Commands
 Commands are special operations that can be performed (e.g. remove whitespace

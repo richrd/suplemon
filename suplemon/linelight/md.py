@@ -1,4 +1,4 @@
-import helpers
+from suplemon import helpers
 
 
 class Syntax:

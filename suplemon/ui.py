@@ -6,7 +6,7 @@ Curses user interface.
 import os
 import logging
 
-import key_mappings
+from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
 # predefine it to avoid confusing flake8
@@ -21,7 +21,7 @@ class InputEvent:
         self.key_code = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
-        self.logger = logging.getLogger("{}.InputEvent".format(__name__))
+        self.logger = logging.getLogger("{0}.InputEvent".format(__name__))
 
     def parse_key_code(self, key_code):
         """Parse a key code (or character) from curses."""
@@ -42,12 +42,12 @@ class InputEvent:
 
     def _key_name(self, key_code):
         """Return a normalized key name for key_code."""
-        if key_code in key_mappings.key_map.keys():
-            return key_mappings.key_map[key_code]
+        if key_code in key_map.keys():
+            return key_map[key_code]
         curs_key_name = self._curses_key_name(key_code)
         if curs_key_name:
-            if curs_key_name in key_mappings.key_map.keys():
-                return key_mappings.key_map[curs_key_name]
+            if curs_key_name in key_map.keys():
+                return key_map[curs_key_name]
             return curs_key_name
         else:
             try:
@@ -86,6 +86,7 @@ class UI:
         self.app = app
         self.logger = logging.getLogger(__name__)
         self.warned_old_curses = 0
+        self.limited_colors = True
 
     def init(self):
         """Set ESC delay and then import curses."""
@@ -104,12 +105,16 @@ class UI:
         """Setup curses."""
         # Log the terminal type
         termname = curses.termname().decode("utf-8")
-        self.logger.info("Loading UI for terminal: {}".format(termname))
+        self.logger.info("Loading UI for terminal: {0}".format(termname))
 
         self.screen = curses.initscr()
         self.setup_colors()
 
         curses.cbreak()
+        # TODO: Raw mode seems to work ok. Should probably
+        # switch to it from cbreak to get Ctrl+Z to work etc.
+        # curses.raw()
+
         curses.noecho()
         try:
             # Might fail on vt100 terminal emulators
@@ -160,8 +165,23 @@ class UI:
         curses.init_pair(4, curses.COLOR_BLUE, bg)       # 4 Blue
         curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
         curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
-        curses.init_pair(7, fg, bg)                      # White on Black
-        curses.init_pair(8, fg, curses.COLOR_BLACK)  # White on Black (Line number color)
+        curses.init_pair(7, fg, bg)                      # 7 White on Black
+        curses.init_pair(8, fg, curses.COLOR_BLACK)      # 8 White on Black (Line number color)
+
+        # Set color for whitespace
+        # Fails on default Ubuntu terminal with $TERM=xterm (max 8 colors)
+        # TODO: Smarter implementation for custom colors
+        try:
+            curses.init_pair(9, 8, bg)                   # Gray (Whitespace color)
+            self.limited_colors = False
+        except:
+            # Try to revert the color
+            self.limited_colors = True
+            try:
+                curses.init_pair(9, fg, bg)              # Try to revert color if possible
+            except:
+                # Reverting failed
+                self.logger.error("Failed to set and revert extra colors.")
 
         # Nicer shades of same colors (if supported)
         if curses.can_change_color():
@@ -177,8 +197,8 @@ class UI:
                 curses.init_pair(5, 171, bg)  # 5 Magenta
                 curses.init_pair(6, 81, bg)   # 6 Cyan
                 curses.init_pair(7, 15, bg)   # 7 White
-                # curses.init_pair(8, 8, bg)   # 8 Gray (Line number color)
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
+                curses.init_pair(9, 8, bg)   # 8 Gray (Whitespace color)
             except:
                 self.logger.warning("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
                 self.app.config["editor"]["theme"] = "8colors"
@@ -366,7 +386,7 @@ class UI:
             ("^G", "Go to"),
             ("^E", "Run command"),
             ("F8", "Mouse mode"),
-            ("^X", "Exit"),
+            ("^Q, ^X", "Exit"),
         ]
         x = 0
         y = 0
@@ -391,13 +411,14 @@ class UI:
 
     def _process_query_key(self, key):
         """Process keystrokes from the Textbox window."""
-        # TODO: implement this to improve interacting in the input box
+        if key == 27:  # Support canceling query with ESC
+            raise KeyboardInterrupt
         # Standardize some keycodes
         rewrite = {
             127: 263,
             8: 263,
         }
-        # self.logger.debug("Query key input: {}".format(str(key)))
+        # self.logger.debug("Query key input: {0}".format(str(key)))
         if key in rewrite.keys():
             key = rewrite[key]
         return key

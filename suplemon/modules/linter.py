@@ -2,7 +2,7 @@
 
 import subprocess
 
-from suplemon_module import Module
+from suplemon.suplemon_module import Module
 
 
 class Linter(Module):
@@ -16,6 +16,9 @@ class Linter(Module):
         self.ignore = []
         # Max length of line
         self.max_line_length = 120  # Default is 79
+
+        # TODO: Run linting in a seperate thread to avoid
+        # blocking the UI when the app is loading
 
         # Lint all files after app is loaded
         self.bind_event_after("app_loaded", self.lint_all_files)
@@ -83,9 +86,7 @@ class Linter(Module):
     def get_output(self, cmd):
         try:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        except EnvironmentError:
-            # cant use FileNotFoundError in Python 2
-            self.logger.exception("Getting command output failed.")
+        except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
             return False
         out, err = process.communicate()
         return out
@@ -109,7 +110,7 @@ class Linter(Module):
         output = self.get_output(["flake8", "--max-line-length", str(self.max_line_length), path])
 
         if output is False:
-            self.logger.warning("Failed to get linting for file '{}'.".format(path))
+            self.logger.warning("Failed to get linting for file '{0}'.".format(path))
             return False
         output = output.decode("utf-8")
         # Remove file paths from output

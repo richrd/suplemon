@@ -35,6 +35,8 @@ class Config:
                     "ctrl+o": "open",              # Ctrl + O
                     "ctrl+w": "close_file",        # Ctrl + W
                     "ctrl+n": "new_file",          # Ctrl + N
+                    # FIXME: Ctrl+Q is used for unsuspend. Needs raw mode (not cbreak) to support this shortcut.
+                    "ctrl+q": "ask_exit",          # Ctrl + Q
                     "ctrl+x": "ask_exit",          # Ctrl + X
                     "ctrl+p": "comment",           # Ctrl + P
                     "ctrl+pageup": "next_file",    # Ctrl + Page Up
@@ -153,12 +155,12 @@ class Config:
                 f.close()
                 self.config = json.loads(data)
                 self.merge_defaults(self.config)
-                self.logger.info("Loaded configuration file '{}'".format(path))
+                self.logger.info("Loaded configuration file '{0}'".format(path))
                 return True
             except:
                 self.logger.warning("Failed to load config file!", exc_info=True)
                 return False
-        self.logger.info("Configuration file '{}' doesn't exist.".format(path))
+        self.logger.info("Configuration file '{0}' doesn't exist.".format(path))
         return False
 
     def reload(self):
