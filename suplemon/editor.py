@@ -789,7 +789,9 @@ class Editor(Viewer):
         """Run an editor core operation."""
         if operation in self.operations.keys():
             cancel = self.app.trigger_event_before(operation)
-            if not cancel:
-                result = self.operations[operation]()
-                return result
+            if cancel:
+                return False
+            result = self.operations[operation]()
+            self.app.trigger_event_after(operation)
+            return result
         return False
