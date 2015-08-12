@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.31"
+__version__ = "0.1.32"
 
 import os
 import sys
@@ -407,7 +407,7 @@ class App:
 
     def run_operation(self, operation):
         """Run an app core operation."""
-        # Support arbitrary callables
+        # Support arbitrary callables. TODO: deprecate
         if hasattr(operation, '__call__'):
             return operation()
 
