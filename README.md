@@ -33,11 +33,12 @@ To install Suplemon run the setup script:
 
 ### Notes
  - **Must use Python 3.3 or higher for proper character encoding support.**
- - **The master branch is considered stable.**
- - *Python2.7 (and maybe lower) versions work, but aren't officially supported (special characters won't work etc).*
+ - **Python2.7 (and maybe lower) versions work, but aren't officially supported (some special characters won't work etc).**
+ - *The master branch is considered stable.*
  - *Tested on Unix.*
 
 Dev Branch Status: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=dev)](https://travis-ci.org/richrd/suplemon)
+
 No dependencies outside the Python Standard Library required.
 
 ### Optional dependencies
@@ -76,7 +77,7 @@ Suplemon is licensed under the MIT license.
 
 ## Goals
  1. [X] Create a command line text editor with built in multi cursor support. It's awesome!
- 2. [X] Usability should be as good and easy as nano.
+ 2. [X] Usability should be even better and easier than nano. It's on par with desktop editors.
  3. [X] Multi cursor should be comparable to Sublime Text.
  4. [X] Develop Suplemon with Suplemon!!! I've used Suplemon for a long time as my main
         editor (replacing ST and nano) for all developement, Git commits etc.
