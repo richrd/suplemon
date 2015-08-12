@@ -27,7 +27,8 @@ class SystemClipboard(Module):
 
     def get_clipboard(self):
         try:
-            return subprocess.check_output("xsel", universal_newlines=True)
+            data = subprocess.check_output(["xsel", "-b"], universal_newlines=True)
+            return data
         except:
             return False
 
