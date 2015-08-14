@@ -9,7 +9,7 @@ version = re.search(
     re.M
     ).group(1)
 
-files = ["themes/*"]
+files = ["themes/*", "modules/*.py", "linelight/*.py"]
 
 setup(name='Suplemon',
       version=version,
@@ -17,7 +17,7 @@ setup(name='Suplemon',
       author='Richard Lewis',
       author_email='richrd.lewis@gmail.com',
       url='https://github.com/richrd/suplemon/',
-      packages=['suplemon', 'suplemon.modules', 'suplemon.linelight'],
+      packages=['suplemon'],
       package_data={'': files},
       include_package_data=True,
       entry_points={
