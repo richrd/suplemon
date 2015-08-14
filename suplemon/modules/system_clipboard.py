@@ -36,7 +36,6 @@ class SystemClipboard(Module):
         try:
             p = subprocess.Popen(['xsel', '-i', '-b'], stdin=subprocess.PIPE)
             out, err = p.communicate(input=bytes(data, "utf-8"))
-            self.logger.debug("Set clipboard to {0}".format(data))
             return out
         except:
             return False
