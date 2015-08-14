@@ -45,9 +45,12 @@ No dependencies outside the Python Standard Library required.
 
  * Pygments
  > For support for syntax highlighting over 300 languages.
- 
+
  * Flake8
  > For showing linting for Python files.
+
+ * xsel
+ > For system clipboard support on X Window (linux).
 
 ## Usage
 
@@ -66,11 +69,10 @@ Suplemon is licensed under the MIT license.
  * Syntax highlighting
  * Autocomplete
  * Easy Undo/Redo
- * Native clipboard support (on X Windows / linux)
+ * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix)
  * Multiple files in tabs
  * Powerful Go To feature for jumping to files and lines
  * Find and Find next
- * Copy & Paste, with multi line support
  * Custom keyboard shortcuts
  * Mouse support
  * Extensions (easy to write your own)
