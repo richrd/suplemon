@@ -17,7 +17,7 @@ class SystemClipboard(Module):
 
     def copy(self, event):
         lines = self.app.get_editor().get_buffer()
-        data = "\n".join([line.get_data() for line in lines])
+        data = "\n".join([str(line) for line in lines])
         self.set_clipboard(data)
 
     def insert(self, event):
