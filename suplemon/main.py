@@ -32,6 +32,7 @@ class App:
         self.version = __version__
         self.inited = 0
         self.running = 0
+        self.debug = 1
 
         # Set default variables
         self.path = os.path.dirname(os.path.realpath(__file__))
@@ -41,6 +42,9 @@ class App:
         self.last_input = None
         self.global_buffer = []
         self.event_bindings = {}
+
+        # Save filenames for later
+        self.filenames = filenames
 
         # Define core operations
         self.operations = {
@@ -73,10 +77,17 @@ class App:
         self.logger.addHandler(self.logger_handler)
         self.logger.info("Starting Suplemon...")
 
+    def init(self):
+        """Initialize the app."""
         # Load core components
         self.config = Config(self)
+        if not self.config.init():
+            return False
         self.config.load()
-        self.ui = ui.UI(self)  # Load user interface
+        self.debug = self.config["app"]["debug"]
+
+        # Load user interface
+        self.ui = ui.UI(self)
         self.ui.init()
 
         # Load extension modules
@@ -86,21 +97,20 @@ class App:
         # Load themes
         self.themes = themes.ThemeLoader(self)
 
-        # Save filenames for later
-        self.filenames = filenames
-
-        # Indicate that windows etc. have been created.
+        # Indicate that initialization is complete
         self.inited = 1
 
-    def init(self):
-        """Run the app via the ui wrapper."""
-        self.ui.run(self.run)
+        return True
 
     def exit(self):
         """Stop the main loop and exit."""
         self.running = 0
 
-    def run(self, *args):
+    def run(self):
+        """Run the app via the ui wrapper."""
+        self.ui.run(self.run_wrapped)
+
+    def run_wrapped(self, *args):
         """Actually run the app and start mainloop.
 
         This shouldn't be called directly. Instead it's passed to the UI wich

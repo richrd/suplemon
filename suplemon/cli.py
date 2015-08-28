@@ -30,10 +30,11 @@ def main():
 
     # Generate and start our application
     app = App(filenames=filenames)
-    app.init()
+    if app.init():
+        app.run()
 
     # Output log info
-    if app.config["app"]["debug"]:
+    if app.debug:
         app.logger_handler.output()
 
 if __name__ == "__main__":
