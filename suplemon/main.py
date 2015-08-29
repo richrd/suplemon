@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.32"
+__version__ = "0.1.33"
 
 import os
 import sys
@@ -82,6 +82,7 @@ class App:
         # Load core components
         self.config = Config(self)
         if not self.config.init():
+            # Can't run without config
             return False
         self.config.load()
         self.debug = self.config["app"]["debug"]
