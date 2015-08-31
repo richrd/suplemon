@@ -9,7 +9,7 @@ version = re.search(
     re.M
     ).group(1)
 
-files = ["themes/*", "modules/*.py", "linelight/*.py"]
+files = ["config/*.json", "themes/*", "modules/*.py", "linelight/*.py"]
 
 setup(name='Suplemon',
       version=version,
