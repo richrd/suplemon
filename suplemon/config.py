@@ -30,18 +30,19 @@ class Config:
 
     def load(self):
         path = self.path()
+        config = False
         if not os.path.exists(path):
             self.logger.info("Configuration file '{0}' doesn't exist.".format(path))
-            return False
-        config = self.load_config_file(path)
+        else:
+            config = self.load_config_file(path)
         if config:
             self.logger.info("Loaded configuration file '{0}'".format(path))
+            self.config = self.merge_defaults(config)
         else:
-            self.logger.warning("Failed to load config file!", exc_info=True)
+            self.logger.warning("Failed to load config file!")
+            self.config = dict(self.defaults)
             return False
-        self.config = config
-        self.merge_defaults(self.config)
-        return True
+        return config
 
     def load_defaults(self):
         path = os.path.join(self.app.path, "config", self.default_filename)
