@@ -110,10 +110,10 @@ class UI:
         self.screen = curses.initscr()
         self.setup_colors()
 
-        curses.cbreak()
+        # curses.cbreak()
         # TODO: Raw mode seems to work ok. Should probably
         # switch to it from cbreak to get Ctrl+Z to work etc.
-        # curses.raw()
+        curses.raw()
 
         curses.noecho()
         try:
