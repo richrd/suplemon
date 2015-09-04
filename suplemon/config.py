@@ -23,6 +23,7 @@ class Config:
         self.config = {}
 
     def init(self):
+        self.create_config_dir()
         return self.load_defaults()
 
     def path(self):
@@ -117,6 +118,14 @@ class Config:
                 continue
             cleaned.append(line)
         return "\n".join(cleaned)
+
+    def create_config_dir(self):
+        if not os.path.exists(self.fpath):
+            try:
+                os.makedirs(self.fpath)
+            except:
+                self.app.logger.warning("Config folder '{0}' doesn't exist and couldn't be created.".format(
+                                        self.fpath))
 
     def __getitem__(self, i):
         """Get a config variable."""
