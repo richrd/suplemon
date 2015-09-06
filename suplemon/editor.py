@@ -606,7 +606,7 @@ class Editor(Viewer):
     def copy(self):
         """Copy lines to buffer."""
         # Store cut lines in buffer
-        buffer = []
+        copy_buffer = []
         # Get all lines with cursors on them
         line_nums = self.get_lines_with_cursors()
         i = 0
@@ -614,9 +614,9 @@ class Editor(Viewer):
             # Get the line
             line = self.lines[line_nums[i]]
             # Put it in our temporary buffer
-            buffer.append(line)
+            copy_buffer.append(line)
             i += 1
-        self.set_buffer(buffer)
+        self.set_buffer(copy_buffer)
         self.store_action_state("copy")
 
     def cut(self):
