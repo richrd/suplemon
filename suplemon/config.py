@@ -29,6 +29,11 @@ class Config:
     def path(self):
         return os.path.join(self.fpath, self.config_filename)
 
+    def set_path(self, path):
+        parts = os.path.split(path)
+        self.fpath = parts[0]
+        self.config_filename = parts[1]
+
     def load(self):
         path = self.path()
         config = False
