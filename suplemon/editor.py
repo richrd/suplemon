@@ -89,7 +89,8 @@ class Editor(Viewer):
             "toggle_line_nums": self.toggle_line_nums,    # F9
             "toggle_line_ends": self.toggle_line_ends,    # F10
             "toggle_highlight": self.toggle_highlight,    # F11
-            "cut": self.cut,                              # Ctrl + C
+            "copy": self.copy,                            # Ctrl + C
+            "cut": self.cut,                              # Ctrl + X
             "duplicate_line": self.duplicate_line,        # Ctrl + W
             "find_next": self.find_next,                  # Ctrl + D
             "find_all": self.find_all,                    # Ctrl + A
@@ -601,6 +602,22 @@ class Editor(Viewer):
                 linenums.append(cursor.y)
         # Add a restore point if previous action != untab
         self.store_action_state("untab")
+
+    def copy(self):
+        """Copy lines to buffer."""
+        # Store cut lines in buffer
+        buffer = []
+        # Get all lines with cursors on them
+        line_nums = self.get_lines_with_cursors()
+        i = 0
+        while i < len(line_nums):
+            # Get the line
+            line = self.lines[line_nums[i]]
+            # Put it in our temporary buffer
+            buffer.append(line)
+            i += 1
+        self.set_buffer(buffer)
+        self.store_action_state("copy")
 
     def cut(self):
         """Cut lines to buffer."""
