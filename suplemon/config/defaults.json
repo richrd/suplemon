@@ -25,7 +25,6 @@
             "ctrl+n": "new_file",
             // FIXME: Ctrl+Q is used for unsuspend. Needs raw mode (not cbreak) to support this shortcut.
             "ctrl+q": "ask_exit",
-            "ctrl+x": "ask_exit",
             "ctrl+p": "comment",
             "ctrl+pageup": "next_file",
             "ctrl+pagedown": "prev_file",
@@ -113,7 +112,8 @@
             "alt+right": "new_cursor_right",
             "alt+pageup": "push_up",
             "alt+pagedown": "push_down",
-            "ctrl+c": "cut",
+            "ctrl+c": "copy",
+            "ctrl+x": "cut",
             "ctrl+k": "duplicate_line",
             "ctrl+v": "insert",
             "ctrl+d": "find_next",
