@@ -22,7 +22,7 @@ from .editor import Editor
 
 
 class App:
-    def __init__(self, filenames=None):
+    def __init__(self, filenames=None, config_file=None):
         """
         Handle App initialization
 
@@ -45,6 +45,9 @@ class App:
 
         # Save filenames for later
         self.filenames = filenames
+
+        # Save config file path for later
+        self.config_file = config_file
 
         # Define core operations
         self.operations = {
@@ -81,6 +84,8 @@ class App:
         """Initialize the app."""
         # Load core components
         self.config = Config(self)
+        if self.config_file:
+            self.config.set_path(self.config_file)
         if not self.config.init():
             # Can't run without config
             return False
