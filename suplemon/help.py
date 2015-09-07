@@ -30,10 +30,13 @@ Most shortcuts are also shown at the bottom in the legend area. Here's
 the complete reference.
 
 
- * Ctrl + Q / Ctrl + X
+ * Ctrl + Q
    > Exit
 
  * Ctrl + C
+   > Copy line(s) to buffer
+
+ * Ctrl + X
    > Cut line(s) to buffer
 
  * Ctrl + V
