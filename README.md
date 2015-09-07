@@ -96,10 +96,13 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
 ## Keyboard shortcuts
 
- * Ctrl + Q / Ctrl + X
+ * Ctrl + Q
    > Exit
 
  * Ctrl + C
+   > Copy line(s) to buffer
+
+ * Ctrl + X
    > Cut line(s) to buffer
 
  * Ctrl + V
@@ -109,7 +112,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
    > Duplicate line
 
  * Ctrl + G
-   > Go to line number or file (type the beginning of a filename to switch to it). 
+   > Go to line number or file (type the beginning of a filename to switch to it).
    > You can also use 'filena:42' to go to line 42 in filename.py etc.
 
  * Ctrl + F

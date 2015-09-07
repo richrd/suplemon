@@ -411,7 +411,7 @@ class UI:
 
     def _process_query_key(self, key):
         """Process keystrokes from the Textbox window."""
-        if key == 27:  # Support canceling query with ESC
+        if key in [3, 27]:  # Support canceling query with Ctrl+C or ESC
             raise KeyboardInterrupt
         # Standardize some keycodes
         rewrite = {
