@@ -303,7 +303,7 @@ class Viewer:
 
     def render(self):
         """Render the editor curses window."""
-        self.window.clear()
+        self.window.erase()
         i = 0
         max_y = self.get_size()[1]
         max_len = self.max_line_length()
