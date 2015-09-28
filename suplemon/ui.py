@@ -322,7 +322,9 @@ class UI:
         is_changed_symbol = ["*", "\u2732"][self.app.config["app"]["use_unicode_symbols"]]
         for f in file_list:
             prepend = [no_write_symbol, ""][f.is_writable()]
-            append = ["", is_changed_symbol][f.is_changed()]
+            append = ""
+            if self.app.config["display"]["show_file_modified_indicator"]:
+                append += ["", is_changed_symbol][f.is_changed()]
             fname = prepend + f.name + append
             if not str_list:
                 str_list.append("[" + fname + "]")

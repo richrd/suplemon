@@ -23,7 +23,6 @@
             "ctrl+o": "open",
             "ctrl+w": "close_file",
             "ctrl+n": "new_file",
-            // FIXME: Ctrl+Q is used for unsuspend. Needs raw mode (not cbreak) to support this shortcut.
             "ctrl+q": "ask_exit",
             "ctrl+p": "comment",
             "ctrl+pageup": "next_file",
@@ -126,11 +125,20 @@
     },
     // UI Display Settings
     "display": {
+        // Show top status bar
         "show_top_bar": true,
+        // Show app name and version in top bar
         "show_app_name": true,
+        // Show list of open files in top bar
         "show_file_list": true,
+        // Show indicator in the file list for files that are modified
+        // NOTE: if you experience performance issues, set this to false
+        "show_file_modified_indicator": true,
+        // Show the keyboard legend
         "show_legend": true,
+        // Show the bottom status bar
         "show_bottom_bar": true,
+        // Invert status bar colors (switch text and background colors)
         "invert_status_bars": true
     }
 }
