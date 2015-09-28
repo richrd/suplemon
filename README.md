@@ -239,3 +239,7 @@ have a too steep learning curve. For them (like for me) nano was the weapon of
 choice. But nano feels clunky and it has its limitations. That's why
 I wrote my own editor with built in multi cursor support to fix the situation.
 Another reason is that developing Suplemon is simply fun to do.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
