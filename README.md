@@ -1,4 +1,4 @@
-suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon)
+suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 ========
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
