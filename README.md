@@ -1,4 +1,4 @@
-suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon)
+suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 ========
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
@@ -119,10 +119,10 @@ You can find all the configuration options and descriptions in the suplemon/conf
    > Search for a string or regular expression (configurable)
 
  * Ctrl + D
-   > Search for next occurance or find the word the cursor is on. Adds a new cursor at each new occurance.
+   > Search for next occurrence or find the word the cursor is on. Adds a new cursor at each new occurrence.
 
  * Alt + Arrow Key
-   > Add new curor in arrow direction
+   > Add new cursor in arrow direction
 
  * Ctrl + Left / Right
    > Jump to previous or next word or line
@@ -235,7 +235,7 @@ I'll be happy to chat with you, see you there!
 ## Rationale
 For many the command line is a different environment for text editing.
 Most coders are familiar with GUI text editors and for many vi and emacs
-have a too steep learing curve. For them (like for me) nano was the weapon of
+have a too steep learning curve. For them (like for me) nano was the weapon of
 choice. But nano feels clunky and it has its limitations. That's why
 I wrote my own editor with built in multi cursor support to fix the situation.
 Another reason is that developing Suplemon is simply fun to do.
