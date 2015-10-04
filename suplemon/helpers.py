@@ -41,7 +41,7 @@ def ends(s, what):
 
 
 def multisplit(data, delimiters):
-    pattern = '|'.join(map(re.escape, delimiters))
+    pattern = "|".join(map(re.escape, delimiters))
     return re.split(pattern, data)
 
 

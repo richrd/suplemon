@@ -367,7 +367,7 @@ class Viewer:
         #    better, since we only need to re-highlight lines when they change.
         tokens = self.lexer.lex(line_data, self.pygments_syntax)
         for token in tokens:
-            if token[1] == '\n':
+            if token[1] == "\n":
                 break
             scope = token[0]
             text = self.replace_whitespace(token[1])

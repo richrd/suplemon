@@ -74,7 +74,7 @@ class App:
         self.logger = logging.getLogger()
         self.logger.handlers = []
         self.logger_handler = LoggingHandler()
-        fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         self.logger_formatter = logging.Formatter(fmt)
         self.logger_handler.setFormatter(self.logger_formatter)
         self.logger.addHandler(self.logger_handler)
@@ -424,7 +424,7 @@ class App:
     def run_operation(self, operation):
         """Run an app core operation."""
         # Support arbitrary callables. TODO: deprecate
-        if hasattr(operation, '__call__'):
+        if hasattr(operation, "__call__"):
             return operation()
 
         if operation in self.operations.keys():

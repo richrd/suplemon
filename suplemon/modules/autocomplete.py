@@ -90,7 +90,7 @@ class AutoComplete(Module):
         :return: True if a match is found.
         """
         editor = self.app.get_editor()
-        pattern = '|'.join(map(re.escape, self.get_separators()))
+        pattern = "|".join(map(re.escape, self.get_separators()))
         matched = False
         for cursor in editor.cursors:
             line = editor.lines[cursor.y][:cursor.x]
