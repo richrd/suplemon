@@ -96,86 +96,86 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
 ## Keyboard shortcuts
 
- * Ctrl + Q
+ * <kbd>Ctrl</kbd> + <kbd>Q</kbd>
    > Exit
 
- * Ctrl + C
+ * <kbd>Ctrl</kbd> + <kbd>C</kbd>
    > Copy line(s) to buffer
 
- * Ctrl + X
+ * <kbd>Ctrl</kbd> + <kbd>X</kbd>
    > Cut line(s) to buffer
 
- * Ctrl + V
+ * <kbd>Ctrl</kbd> + <kbd>V</kbd>
    > Insert buffer
 
- * Ctrl + K
+ * <kbd>Ctrl</kbd> + <kbd>K</kbd>
    > Duplicate line
 
- * Ctrl + G
+ * <kbd>Ctrl</kbd> + <kbd>G</kbd>
    > Go to line number or file (type the beginning of a filename to switch to it).
    > You can also use 'filena:42' to go to line 42 in filename.py etc.
 
- * Ctrl + F
+ * <kbd>Ctrl</kbd> + <kbd>F</kbd>
    > Search for a string or regular expression (configurable)
 
- * Ctrl + D
+ * <kbd>Ctrl</kbd> + <kbd>D</kbd>
    > Search for next occurrence or find the word the cursor is on. Adds a new cursor at each new occurrence.
 
- * Alt + Arrow Key
+ * <kbd>Alt</kbd> + <kbd>Arrow Key</kbd>
    > Add new cursor in arrow direction
 
- * Ctrl + Left / Right
+ * <kbd>Ctrl</kbd> + <kbd>Left / Right</kbd>
    > Jump to previous or next word or line
 
- * ESC
+ * <kbd>ESC</kbd>
    > Revert to a single cursor / Cancel input prompt
 
- * Alt + Page Up
+ * <kbd>Alt</kbd> + <kbd>Page Up</kbd>
    > Move line(s) up
 
- * Alt + Page Down
+ * <kbd>Alt</kbd> + <kbd>Page Down</kbd>
    > Move line(s) down
 
- * Ctrl + S
+ * <kbd>Ctrl</kbd> + <kbd>S</kbd>
    > Save current file
  
- * F1
+ * <kbd>F1</kbd>
    > Save file with new name
 
- * F2
+ * <kbd>F2</kbd>
    > Reload current file
 
- * Ctrl + O
+ * <kbd>Ctrl</kbd> + <kbd>O</kbd>
    > Open file
 
- * Ctrl + W
+ * <kbd>Ctrl</kbd> + <kbd>W</kbd>
    > Close file
 
- * Ctrl + Page Up
+ * <kbd>Ctrl</kbd> + <kbd>Page Up</kbd>
    > Switch to next file
 
- * Ctrl + Page Down
+ * <kbd>Ctrl</kbd> + <kbd>Page Down</kbd>
    > Switch to previous file
 
- * Ctrl + E
+ * <kbd>Ctrl</kbd> + <kbd>E</kbd>
    > Run a command.
 
- * F5
+ * <kbd>F5</kbd>
    > Undo
 
- * F6
+ * <kbd>F6</kbd>
    > Redo
 
- * F7
+ * <kbd>F7</kbd>
    > Toggle visible whitespace
 
- * F8
+ * <kbd>F8</kbd>
    > Toggle mouse mode
 
- * F9
+ * <kbd>F9</kbd>
    > Toggle line numbers
 
- * F11
+ * <kbd>F11</kbd>
    > Toggle full screen
 
 ## Mouse shortcuts
