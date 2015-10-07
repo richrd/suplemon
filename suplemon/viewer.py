@@ -219,7 +219,11 @@ class Viewer:
         """
         self.data = data
         self.lines = []
-        lines = self.data.split(self.config["end_of_line"])
+        lines = self.data.splitlines()
+        # splitlines doesn't return the last line if it's empty so we add a line
+        # if there we're no lines at all or if the data ends with a new line
+        if not len(lines) or self.data.endswith(("\n", "\r\n", "\r")):
+            lines.append(Line())
         for line in lines:
             self.lines.append(Line(line))
 
