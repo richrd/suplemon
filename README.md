@@ -1,4 +1,4 @@
-suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+Suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 ========
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
@@ -7,7 +7,7 @@ suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?bran
       _____/  /  /__/  /  /\___/  /____/  /_____/  /  /  /  /__/  /  / |   / /
      /_______/\_______/__/ /  /_______/________/__/__/__/________/__/ /|__/ /
      \_______\ \______\__\/   \_______\________\__\__\__\________\__\/ \__\/
-     
+
               Remedying the pain of command line editing since 2014
 
 
@@ -20,7 +20,7 @@ http://github.com/richrd/suplemon
 
 
 ## Get it!
-You can just clone the repo, and try Suplemon, or also install it system wide. 
+You can just clone the repo, and try Suplemon, or also install it system wide.
 
     git clone https://github.com/richrd/suplemon.git
     cd suplemon
@@ -50,7 +50,11 @@ No dependencies outside the Python Standard Library required.
  > For showing linting for Python files.
 
  * xsel
- > For system clipboard support on X Window (linux).
+ > For system clipboard support on X Window (Linux).
+
+ See [docs/optional-dependencies.md][] for installation instructions.
+
+ [docs/optional-dependencies.md]: docs/optional-dependencies.md
 
 ## Usage
 
@@ -138,7 +142,7 @@ You can find all the configuration options and descriptions in the suplemon/conf
 
  * <kbd>Ctrl</kbd> + <kbd>S</kbd>
    > Save current file
- 
+
  * <kbd>F1</kbd>
    > Save file with new name
 
@@ -196,6 +200,18 @@ If you experience problems, please submit a new issue.
 If you have a question, need help, or just want to chat head over to the IRC channel #suplemon @ Freenode.
 I'll be happy to chat with you, see you there!
 
+
+## Development
+
+If you are interested in contributing to Suplemon, development dependencies can be installed via:
+
+    # For OS cleanliness, we recommend using `virtualenv` to prevent global contamination
+    pip install -r requirements-dev.txt
+
+After those are installed, tests can be run via:
+
+    ./test.sh
+
 ## Todo
  * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Design proper API for plugins/extensions/macros
@@ -214,7 +230,7 @@ I'll be happy to chat with you, see you there!
       * ~~And disable editing~~ Don't disable editing. Instead enable save as.
    * [ ] Only refresh cursors when moving around
    * [ ] Only refresh modified lines when editing
- * [ ] Extensions: 
+ * [ ] Extensions:
    * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
    * [ ] Auto backup. Activate on n changes or every n seconds
    * [ ] File selector, kind of like what nano has

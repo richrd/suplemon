@@ -144,7 +144,7 @@ class File:
             f.close()
             import chardet
             detection = chardet.detect(data)
-            charenc = detection['encoding']
+            charenc = detection["encoding"]
             if charenc is None:
                 self.logger.warning("Failed to detect file encoding.")
                 return False

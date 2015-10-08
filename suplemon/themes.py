@@ -67,7 +67,7 @@ class ThemeLoader:
         self.current_theme = None
 
     def load(self, name):
-        fullpath = ''.join([self.theme_path, name, '.tmTheme'])
+        fullpath = "".join([self.theme_path, name, ".tmTheme"])
         if not os.path.exists(fullpath):
             self.logger.warning("fullpath '{0}' doesn't exist!".format(fullpath))
             return None
@@ -116,7 +116,7 @@ class ThemeLoader:
             if not isinstance(entry, dict):
                 continue
             scope_str = entry.get("scope") or "global"
-            scopes = scope_str.split(',')
+            scopes = scope_str.split(",")
             settings = entry.get("settings")
             if settings is not None:
                 for scope in scopes:
