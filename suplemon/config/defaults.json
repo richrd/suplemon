@@ -60,8 +60,8 @@
             " ": "\u00B7",
             // Tab as tab symbol
             "\t": "\u21B9",
-            // Show nonbreaking space as interpunct
-            "\u00A0": "\u00B7",
+            // Show nonbreaking space as bullet
+            "\u00A0": "\u2022",
             // Soft hyphen as letter shelf
             "\u00AD": "\u2423",
             // Zero width space as interpunct
