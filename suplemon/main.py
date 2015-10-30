@@ -8,7 +8,6 @@ __version__ = "0.1.41"
 
 import os
 import sys
-import logging
 
 from . import ui
 from . import modules
@@ -16,7 +15,7 @@ from . import themes
 from . import helpers
 
 from .file import File
-from .logger import LoggingHandler
+from .logger import logger
 from .config import Config
 from .editor import Editor
 
@@ -69,15 +68,8 @@ class App:
             "toggle_fullscreen": self.toggle_fullscreen,
         }
 
-        # Initialize logging
-        logging.basicConfig(level=logging.NOTSET)
-        self.logger = logging.getLogger()
-        self.logger.handlers = []
-        self.logger_handler = LoggingHandler()
-        fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        self.logger_formatter = logging.Formatter(fmt)
-        self.logger_handler.setFormatter(self.logger_formatter)
-        self.logger.addHandler(self.logger_handler)
+        # Bind our logger
+        self.logger = logger
         self.logger.info("Starting Suplemon...")
 
     def init(self):
