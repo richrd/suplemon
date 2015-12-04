@@ -38,7 +38,8 @@ def main():
 
     # Output log info
     if app.debug:
-        app.logger_handler.output()
+        for logger_handler in app.logger.handlers:
+            logger_handler.close()
 
 if __name__ == "__main__":
     main()
