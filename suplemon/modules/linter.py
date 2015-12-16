@@ -57,10 +57,14 @@ class Linter(Module):
             return False
 
         ext = file.get_extension().lower()
+        linter = False
         if ext == "py":
             linter = PyLint(self.logger)
         elif ext == "js":
             linter = JsLint(self.logger)
+
+        if not linter:
+            return False
 
         linting = linter.lint(path)
         if linting is False:
