@@ -138,7 +138,6 @@ class PyLint(BaseLint):
             self.logger.warning("Failed to get linting for file '{0}'.".format(path))
             return False
         output = output.decode("utf-8")
-        self.logger.debug(output)
         # Remove file paths from output
         output = output.replace(path+":", "")
         lines = output.split("\n")
@@ -178,19 +177,15 @@ class JsLint(BaseLint):
         output = output.decode("utf-8")
         # Remove file paths from output
         output = output.replace(path+": ", "")
-        self.logger.debug(output)
         lines = output.split("\n")
         linting = {}
         for line in lines:
-            self.logger.debug(line)
             if not line:
-               continue
+                continue
             try:
                 parts = line.split(", ")
                 if len(parts) < 3:
                     continue
-                self.logger.debug("PARTS")
-                self.logger.debug(parts)
                 line_no = int(re.sub("\D", "", parts[0]))
                 char_no = int(re.sub("\D", "", parts[1]))
                 data = parts[2]
@@ -202,7 +197,7 @@ class JsLint(BaseLint):
                 self.logger.debug("Failed to parse line:{}".format(line))
         return linting
 
- # asd
+
 module = {
     "class": Linter,
     "name": "linter",
