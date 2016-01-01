@@ -384,7 +384,7 @@ class UI:
             ("^F", "Find"),
             ("^D", "Find next"),
             ("^A", "Find all"),
-            ("^W", "Duplicate line"),
+            ("^K", "Duplicate line"),
             ("ESC", "Single cursor"),
             ("^G", "Go to"),
             ("^E", "Run command"),
