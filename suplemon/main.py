@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.41"
+__version__ = "0.1.42"
 
 import os
 import sys
@@ -300,7 +300,7 @@ class App:
     def help(self):
         """Open a new file with help text."""
         f = self.default_file()
-        import help
+        from . import help
         f.set_data(help.help_text)
         self.files.append(f)
         self.switch_to_file(self.last_file_index())
