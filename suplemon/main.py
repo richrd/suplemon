@@ -4,7 +4,7 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.42"
+__version__ = "0.1.43"
 
 import os
 import sys
