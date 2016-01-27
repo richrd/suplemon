@@ -4,7 +4,6 @@
 The main class that starts and runs Suplemon.
 """
 
-__version__ = "0.1.43"
 
 import os
 import sys
@@ -18,6 +17,8 @@ from .file import File
 from .logger import logger
 from .config import Config
 from .editor import Editor
+
+__version__ = "0.1.44"
 
 
 class App:

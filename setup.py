@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import re
-# from distutils.core import setup
 from setuptools import setup
 
 version = re.search(

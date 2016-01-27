@@ -1,5 +1,6 @@
 # -*- encoding: utf-8
 
+import os
 import time
 import subprocess
 
@@ -71,7 +72,8 @@ class Battery(Module):
     def battery_status_acpi(self):
         """Get the battery status via acpi."""
         try:
-            raw_str = subprocess.check_output(["acpi"])
+            FNULL = open(os.devnull, "w")
+            raw_str = subprocess.check_output(["acpi"], stdout=FNULL, stderr=FNULL)
         except:
             return None
         raw_str = raw_str.decode("utf-8")
@@ -91,6 +93,7 @@ class Battery(Module):
         except:
             return None
         raw_str = raw_str.decode("utf-8")
+        raw_str = raw_str.splitlines()[0]
         part = helpers.get_string_between("percentage:", "%", raw_str)
         if part:
             try:
