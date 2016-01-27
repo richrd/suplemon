@@ -72,7 +72,7 @@ class Battery(Module):
     def battery_status_acpi(self):
         """Get the battery status via acpi."""
         try:
-            FNULL = open(os.devnull, 'w')
+            FNULL = open(os.devnull, "w")
             raw_str = subprocess.check_output(["acpi"], stdout=FNULL, stderr=FNULL)
         except:
             return None
