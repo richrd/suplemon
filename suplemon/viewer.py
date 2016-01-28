@@ -90,7 +90,7 @@ class Viewer:
         """Setup Pygments based highlighting."""
         if not pygments:
             # If Pygments lib not available
-            self.logger.info("Pygments not available, please install it for proper syntax highlighting.")
+            self.logger.info("Pygments not available, please install it (python3-pygments) for proper syntax highlighting.")
             return False
         self.lexer = Lexer(self.app)
         ext = self.file_extension.lower()
