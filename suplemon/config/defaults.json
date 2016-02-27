@@ -15,7 +15,7 @@
         // Print debug logging
         "debug": true,
         // Debug log level (0: Notset, 10: Debug, 20: Info, 30: Warning, 40: Error, 50: Critical)
-        "debug_level": 10,
+        "debug_level": 20,
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Wether to use special unicode symbols for decoration

@@ -38,14 +38,14 @@ class Config:
         path = self.path()
         config = False
         if not os.path.exists(path):
-            self.logger.info("Configuration file '{0}' doesn't exist.".format(path))
+            self.logger.debug("Configuration file '{0}' doesn't exist.".format(path))
         else:
             config = self.load_config_file(path)
         if config:
-            self.logger.info("Loaded configuration file '{0}'".format(path))
+            self.logger.debug("Loaded configuration file '{0}'".format(path))
             self.config = self.merge_defaults(config)
         else:
-            self.logger.warning("Failed to load config file!")
+            self.logger.info("Failed to load config file '{0}'.".format(path))
             self.config = dict(self.defaults)
             return False
         return config
