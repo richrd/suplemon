@@ -18,7 +18,7 @@ from .logger import logger
 from .config import Config
 from .editor import Editor
 
-__version__ = "0.1.44"
+__version__ = "0.1.45"
 
 
 class App:
@@ -71,7 +71,7 @@ class App:
 
         # Bind our logger
         self.logger = logger
-        self.logger.info("Starting Suplemon...")
+        self.logger.debug("Starting Suplemon...")
 
     def init(self):
         """Initialize the app."""
@@ -84,6 +84,10 @@ class App:
             return False
         self.config.load()
         self.debug = self.config["app"]["debug"]
+        debug_level = self.config["app"]["debug_level"]
+        self.logger.debug("Setting debug_level to {0}.".format(debug_level))
+        self.logger.setLevel(debug_level)
+        [handler.setLevel(debug_level) for handler in self.logger.handlers]
 
         # Load user interface
         self.ui = ui.UI(self)
@@ -318,6 +322,7 @@ class App:
             new_file.set_path(path)
         self.files.append(new_file)
         self.current_file = self.last_file_index()
+        return new_file
 
     def ask_exit(self):
         """Exit if no unsaved changes, else make sure the user really wants to exit."""

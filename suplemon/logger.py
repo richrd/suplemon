@@ -33,6 +33,8 @@ class BufferingTargetHandler(BufferingHandler):
         self.acquire()
         try:
             for record in self.buffer:
+                if record.levelno < self.level:
+                    continue
                 msg = self.format(record)
                 print(msg, file=self._fd_target)
         finally:

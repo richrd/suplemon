@@ -105,7 +105,7 @@ class UI:
         """Setup curses."""
         # Log the terminal type
         termname = curses.termname().decode("utf-8")
-        self.logger.info("Loading UI for terminal: {0}".format(termname))
+        self.logger.debug("Loading UI for terminal: {0}".format(termname))
 
         self.screen = curses.initscr()
         self.setup_colors()

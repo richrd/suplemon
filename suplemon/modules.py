@@ -20,7 +20,7 @@ class ModuleLoader:
 
     def load(self):
         """Find and load available modules."""
-        self.logger.info("Loading modules...")
+        self.logger.debug("Loading modules...")
         dirlist = os.listdir(self.module_path)
         for item in dirlist:
             # Skip 'hidden' dot files
