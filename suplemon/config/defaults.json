@@ -4,15 +4,22 @@
 // If the file doesn't exist, or if it has errors Suplemon can't run.
 // Suplemon supports single line comments in JSON as seen here.
 
+// There are three main groups for settings:
+// - app: Global settings
+// - editor: Editor behaviour
+// - display: How the UI looks
+
 {
     // Global settings
     "app": {
         // Print debug logging
-        "debug": 1,
+        "debug": true,
+        // Debug log level (0: Notset, 10: Debug, 20: Info, 30: Warning, 40: Error, 50: Critical)
+        "debug_level": 10,
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Wether to use special unicode symbols for decoration
-        "use_unicode_symbols": 0,
+        "use_unicode_symbols": true,
         // Key bindings for app functions
         "keys": {
             "ctrl+h": "help",

@@ -95,7 +95,8 @@ The suplemon config file is stored at ```~/.config/suplemon/suplemon-config.json
 
 The best way to edit it is to run the ```config``` command (Run commands via ```Ctrl+E```).
 That way Suplemon will automatically reload the configuration when you save the file.
-You can find all the configuration options and descriptions in the suplemon/config.py file.
+To view the default configuration and see what options are available run ```config defaults``` via ```Ctrl+E```.
+
 
 
 ## Keyboard shortcuts

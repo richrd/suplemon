@@ -102,9 +102,9 @@ class Viewer:
             ext = self.extension_map[ext]  # Use it
         try:
             self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
-            self.logger.info("Loaded Pygments lexer '{0}'.".format(ext))
+            self.logger.debug("Loaded Pygments lexer '{0}'.".format(ext))
         except:
-            self.logger.warning("Failed to load Pygments lexer '{0}'.".format(ext))
+            self.logger.debug("Failed to load Pygments lexer '{0}'.".format(ext))
             return False
         if ext == "php":
             # Hack to highlight PHP even without <?php ?> tags

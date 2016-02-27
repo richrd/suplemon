@@ -84,6 +84,10 @@ class App:
             return False
         self.config.load()
         self.debug = self.config["app"]["debug"]
+        debug_level = self.config["app"]["debug_level"]
+        self.logger.info("Setting debug_level to {}".format(debug_level))
+        self.logger.setLevel(debug_level)
+        [handler.setLevel(debug_level) for handler in self.logger.handlers]
 
         # Load user interface
         self.ui = ui.UI(self)
@@ -318,6 +322,7 @@ class App:
             new_file.set_path(path)
         self.files.append(new_file)
         self.current_file = self.last_file_index()
+        return new_file
 
     def ask_exit(self):
         """Exit if no unsaved changes, else make sure the user really wants to exit."""
