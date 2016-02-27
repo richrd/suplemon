@@ -85,7 +85,7 @@ class App:
         self.config.load()
         self.debug = self.config["app"]["debug"]
         debug_level = self.config["app"]["debug_level"]
-        self.logger.debug("Setting debug_level to {}.".format(debug_level))
+        self.logger.debug("Setting debug_level to {0}.".format(debug_level))
         self.logger.setLevel(debug_level)
         [handler.setLevel(debug_level) for handler in self.logger.handlers]
 

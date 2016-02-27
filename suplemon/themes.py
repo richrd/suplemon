@@ -72,7 +72,7 @@ class ThemeLoader:
             self.logger.warning("fullpath '{0}' doesn't exist!".format(fullpath))
             return None
 
-        self.logger.debug("Loading theme " + name)
+        self.logger.debug("Loading theme '{0}'.".format(name))
 
         tree = ET.parse(fullpath)
         root = tree.getroot()
