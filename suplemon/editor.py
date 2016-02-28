@@ -726,7 +726,7 @@ class Editor(Viewer):
             y += 1
 
         if not new_cursors:
-            self.app.set_status("Can't find '" + what + "'")
+            self.app.set_status("Can't find '{0}'".format(what))
             # self.last_find = ""
             return
         else:
@@ -819,6 +819,7 @@ class PromptEditor(Editor):
     def __init__(self, app, window):
         Editor.__init__(self, app, window)
         self.ready = 0
+        self.canceled = 0
         self.input_func = lambda: False
         self.caption = ""
 
@@ -841,6 +842,7 @@ class PromptEditor(Editor):
         """Cancels the input prompt."""
         self.set_data("")
         self.ready = 1
+        self.canceled = 1
         return
 
     def line_offset(self):
@@ -884,4 +886,6 @@ class PromptEditor(Editor):
                 self.handle_input(event)
             self.resize()
             self.render()
+        if self.canceled:
+            return False
         return self.get_data()
