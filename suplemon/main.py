@@ -149,7 +149,7 @@ class App:
         self.load_files()
         self.running = 1
         self.trigger_event_after("app_loaded")
-        
+
     def on_input(self, event):
         # Handle the input or give it to the editor
         if not self.handle_input(event):
@@ -163,25 +163,25 @@ class App:
             self.ui.update()
             self.block_rendering = True
             got_input = False
-            
+
             # Run through as much input as we can
             while True:
                 event = self.ui.get_input(False)
-                
+
                 if not event:
-                    break # no more inputs to process at this time
-                                        
+                    break  # no more inputs to process at this time
+
                 got_input = True
                 self.on_input(event)
-                
+
             if not got_input:
                 # wait for input, since there were none already available
                 event = self.ui.get_input(True)
-                
+
                 if event:
                     got_input = True
                     self.on_input(event)
-             
+
             self.block_rendering = False
 
             # TODO: why do I need resize here?
