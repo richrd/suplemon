@@ -149,6 +149,12 @@ class App:
         self.load_files()
         self.running = 1
         self.trigger_event_after("app_loaded")
+        
+    def on_input(self, event):
+        # Handle the input or give it to the editor
+        if not self.handle_input(event):
+            # Pass the input to the editor component
+            self.get_editor().handle_input(event)
 
     def on_input(self, event):
         # Handle the input or give it to the editor
