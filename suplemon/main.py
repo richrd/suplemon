@@ -33,6 +33,7 @@ class App:
         self.inited = 0
         self.running = 0
         self.debug = 1
+        self.block_rendering = False
 
         # Set default variables
         self.path = os.path.dirname(os.path.realpath(__file__))
@@ -148,24 +149,52 @@ class App:
         self.load_files()
         self.running = 1
         self.trigger_event_after("app_loaded")
+        
+    def on_input(self, event):
+        # Handle the input or give it to the editor
+        if not self.handle_input(event):
+            # Pass the input to the editor component
+            self.get_editor().handle_input(event)
+
+    def on_input(self, event):
+        # Handle the input or give it to the editor
+        if not self.handle_input(event):
+            # Pass the input to the editor component
+            self.get_editor().handle_input(event)
 
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
         while self.running:
             # Update ui before refreshing it
             self.ui.update()
-            # See if we have input to process
-            event = self.ui.get_input()
-            if event:
-                # Handle the input or give it to the editor
-                if not self.handle_input(event):
-                    # Pass the input to the editor component
-                    self.get_editor().handle_input(event)
-                # TODO: why do I need resize here?
-                # (View won't update after switching files, WTF)
-                self.trigger_event_after("mainloop")
-                self.get_editor().resize()
-                self.ui.refresh()
+            self.block_rendering = True
+            got_input = False
+
+            # Run through as much input as we can
+            while True:
+                event = self.ui.get_input(False)
+
+                if not event:
+                    break  # no more inputs to process at this time
+
+                got_input = True
+                self.on_input(event)
+
+            if not got_input:
+                # wait for input, since there were none already available
+                event = self.ui.get_input(True)
+
+                if event:
+                    got_input = True
+                    self.on_input(event)
+
+            self.block_rendering = False
+
+            # TODO: why do I need resize here?
+            # (View won't update after switching files, WTF)
+            self.trigger_event_after("mainloop")
+            self.get_editor().resize()
+            self.ui.refresh()
 
     def get_status(self):
         """Get the current status message.
