@@ -871,9 +871,13 @@ class PromptEditor(Editor):
         """Get text input from the user via the prompt."""
         self.caption = caption
         self.set_data(initial)
-        self.end()
+        self.end()  # Move to the end of the initial text
+
+        # TODO: Still can't figure out why resize is needed for succesful render()
         self.resize()
         self.render()
+
+        # Run the input loop until ready
         while not self.ready:
             event = self.input_func(True)  # blocking
             if event:
