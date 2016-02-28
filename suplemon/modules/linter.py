@@ -41,7 +41,7 @@ class Linter(Module):
         line_no = cursor.y + 1
         msg = self.get_msgs_on_line(editor, cursor.y)
         if msg:
-            self.app.set_status("Line {0}: {1}".format(str(line_no),msg))
+            self.app.set_status("Line {0}: {1}".format(str(line_no), msg))
 
     def lint_current_file(self, event):
         self.lint_file(self.app.get_file())

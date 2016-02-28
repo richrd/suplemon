@@ -237,7 +237,7 @@ class BaseViewer:
         """Render the editor curses window."""
         if self.app.block_rendering:
             return
-        
+
         self.window.erase()
         i = 0
         max_y = self.get_size()[1]
@@ -390,7 +390,7 @@ class BaseViewer:
         """Render editor window cursors."""
         if self.app.block_rendering:
             return
-            
+
         max_x, max_y = self.get_size()
         for cursor in self.cursors:
             x = cursor.x - self.x_scroll + self.line_offset()
@@ -458,7 +458,7 @@ class BaseViewer:
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
         if self.app.block_rendering:
             noupdate = True
-            
+
         for cursor in self.cursors:
             if delta:
                 if delta[0] != 0 and cursor.x >= 0:

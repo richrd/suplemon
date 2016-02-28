@@ -6,7 +6,7 @@ Curses user interface.
 import os
 import logging
 
-from .editor import Editor, PromptEditor
+from .editor import PromptEditor
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
