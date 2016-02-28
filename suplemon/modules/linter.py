@@ -1,6 +1,7 @@
 # -*- encoding: utf-8
 
 import re
+import os
 import subprocess
 
 from suplemon.suplemon_module import Module
@@ -110,8 +111,11 @@ class BaseLint:
 
     def get_output(self, cmd):
         try:
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            fnull = open(os.devnull, "w")
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
+            fnull.close()
         except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
+            self.logger.exception("Subprocess failed.")
             return False
         out, err = process.communicate()
         return out
