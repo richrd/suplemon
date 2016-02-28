@@ -112,7 +112,7 @@ class Editor(Viewer):
 
     def get_key_bindings(self):
         """Get list of editor key bindings."""
-        return self.config["keys"]
+        return self.app.get_key_bindings()
 
     def set_buffer(self, buffer):
         """Sets local or global buffer depending on config."""

@@ -211,7 +211,10 @@ class App:
 
     def get_key_bindings(self):
         """Return the list of key bindings."""
-        return self.config["app"]["keys"]
+        bindings = {}
+        for binding in self.config.keymap:
+            bindings[binding["keys"]] = binding["command"]
+        return bindings
 
     def get_event_bindings(self):
         """Return the dict of event bindings."""
@@ -225,12 +228,12 @@ class App:
         :param key: What key or key combination to bind.
         :param str operation: Which operation to run.
         """
-        self.get_key_bindings()[key] = operation
+        self.config.keymap.prepend({"keys": key, "command": operation})
 
     def set_event_binding(self, event, when, callback):
         """Bind a callback to be run before or after an event.
 
-        Bind callback to run before or after event occurs. Th when parameter
+        Bind callback to run before or after event occurs. The when parameter
         should be 'before' or 'after'. If using 'before' the callback can
         inhibit running the event if it returns True
 
@@ -294,14 +297,18 @@ class App:
         :rtype: boolean
         """
         key_bindings = self.get_key_bindings()
+
+        operation = None
         if event.key_name in key_bindings.keys():
             operation = key_bindings[event.key_name]
         elif event.key_code in key_bindings.keys():
             operation = key_bindings[event.key_code]
-        else:
-            return False
-        self.run_operation(operation)
-        return True
+
+        if operation in self.operations.keys():
+            self.run_operation(operation)
+            return True
+
+        return False
 
     def handle_mouse(self, event):
         """Handle a mouse input event.
@@ -433,6 +440,8 @@ class App:
         """Run editor commands."""
         parts = data.split(" ")
         cmd = parts[0].lower()
+        if cmd in self.operations.keys():
+            return self.run_operation(cmd)
         args = " ".join(parts[1:])
         self.logger.debug("Looking for command '{0}'".format(cmd))
         if cmd in self.modules.modules.keys():
