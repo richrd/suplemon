@@ -213,7 +213,8 @@ class App:
         """Return the list of key bindings."""
         bindings = {}
         for binding in self.config.keymap:
-            bindings[binding["keys"]] = binding["command"]
+            for key in binding["keys"]:
+                bindings[key] = binding["command"]
         return bindings
 
     def get_event_bindings(self):
@@ -228,7 +229,7 @@ class App:
         :param key: What key or key combination to bind.
         :param str operation: Which operation to run.
         """
-        self.config.keymap.prepend({"keys": key, "command": operation})
+        self.config.keymap.prepend({"keys": [key], "command": operation})
 
     def set_event_binding(self, event, when, callback):
         """Bind a callback to be run before or after an event.
