@@ -308,6 +308,8 @@ class App:
         if operation in self.operations.keys():
             self.run_operation(operation)
             return True
+        elif operation in self.modules.modules.keys():
+            self.run_module(operation)
 
         return False
 
@@ -443,21 +445,27 @@ class App:
         cmd = parts[0].lower()
         if cmd in self.operations.keys():
             return self.run_operation(cmd)
+
         args = " ".join(parts[1:])
         self.logger.debug("Looking for command '{0}'".format(cmd))
         if cmd in self.modules.modules.keys():
             self.logger.debug("Trying to run command '{0}'".format(cmd))
             self.get_editor().store_action_state(cmd)
-            try:
-                self.modules.modules[cmd].run(self, self.get_editor(), args)
-            except:
-                self.set_status("Running command failed!")
-                self.logger.exception("Running command failed!")
+            if not self.run_module(cmd, args):
                 return False
         else:
             self.set_status("Command '{0}' not found.".format(cmd))
             return False
         return True
+
+    def run_module(self, module_name, args=""):
+        try:
+            self.modules.modules[module_name].run(self, self.get_editor(), args)
+            return True
+        except:
+            self.set_status("Running command failed!")
+            self.logger.exception("Running command failed!")
+            return False
 
     def run_operation(self, operation):
         """Run an app core operation."""
@@ -606,6 +614,13 @@ class App:
         name = self.ui.query("Save as:", f.name)
         if not name:
             return False
+        dir = os.path.dirname(name)
+        if not os.path.exists(dir):
+            if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
+                self.logger.debug("Creating missing folders in save path.")
+                os.makedirs(dir)
+            else:
+                return False
         f.set_name(name)
         return self.save_file(f)
 

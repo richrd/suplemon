@@ -19,7 +19,7 @@ http://github.com/richrd/suplemon
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
 
-## Get it!
+## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
 

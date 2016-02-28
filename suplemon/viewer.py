@@ -301,6 +301,7 @@ class BaseViewer:
         #    support multi line comment syntax etc. It should also perform
         #    better, since we only need to re-highlight lines when they change.
         tokens = self.lexer.lex(line_data, self.pygments_syntax)
+        first_token = True
         for token in tokens:
             if token[1] == "\n":
                 break
@@ -311,6 +312,9 @@ class BaseViewer:
                 # TODO: get whitespace color from theme
                 pair = 9  # Gray text on normal background
                 curs_color = curses.color_pair(pair)
+                # Only add tab indicators to the inital whitespace
+                if first_token and self.config["show_tab_indicators"]:
+                    text = self.add_tab_indicators(text)
                 self.window.addstr(y, x_offset, text, curs_color)
             else:
                 # Color with pygments
@@ -324,6 +328,8 @@ class BaseViewer:
                     self.window.addstr(y, x_offset, text, curs_color)
                 else:
                     self.window.addstr(y, x_offset, text)
+            if first_token:
+                first_token = False
             x_offset += len(text)
 
     def render_line_linelight(self, line, pos, x_offset, max_len):
@@ -340,6 +346,19 @@ class BaseViewer:
         line_data = line.get_data()
         line_data = self._prepare_line_for_rendering(line_data, max_len)
         self.window.addstr(y, x_offset, line_data)
+
+    def add_tab_indicators(self, data):
+        new_data = ""
+        i = 0
+        for char in data:
+            if i == 0:
+                new_data += self.config["tab_indicator_character"]
+            else:
+                new_data += char
+            i += 1
+            if i > self.config["tab_width"]-1:
+                i = 0
+        return new_data
 
     def replace_whitespace(self, data):
         """Replace unsafe whitespace with alternative safe characters
