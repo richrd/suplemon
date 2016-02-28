@@ -32,9 +32,9 @@ class Battery(Module):
         val = self.value()
         if val:
             if self.app.config["app"]["use_unicode_symbols"]:
-                return "\u26A1" + str(val) + "%"
+                return "\u26A1{0}%".format(str(val))
             else:
-                return "BAT " + str(val) + "%"
+                return "BAT {0}%".format(str(val))
         return ""
 
     def get_status(self):

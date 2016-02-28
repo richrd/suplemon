@@ -286,10 +286,10 @@ class UI:
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
-            name_str = "Suplemon Editor v" + self.app.version + " -"
+            name_str = "Suplemon Editor v{0} -".format(self.app.version)
             if self.app.config["app"]["use_unicode_symbols"]:
                 logo = "\u2688"      # Simple lemon (filled)
-                name_str = " " + logo + " " + name_str
+                name_str = " {0} {1}".format(logo, name_str)
             head_parts.append(name_str)
 
         # Add module statuses to the status bar
@@ -328,7 +328,7 @@ class UI:
                 append += ["", is_changed_symbol][f.is_changed()]
             fname = prepend + f.name + append
             if not str_list:
-                str_list.append("[" + fname + "]")
+                str_list.append("[{0}]".format(fname))
             else:
                 str_list.append(fname)
         return " ".join(str_list)
@@ -338,15 +338,15 @@ class UI:
         editor = self.app.get_editor()
         size = self.get_size()
         cur = editor.get_cursor()
-        data = "@ " + str(cur[0]) + "," + str(cur[1]) + " " + \
-            "cur:" + str(len(editor.cursors)) + " " + \
-            "buf:" + str(len(editor.get_buffer()))
+        data = "@ {0},{1} cur:{2} buf:{3}".format(
+            str(cur[0]),
+            str(cur[1]),
+            str(len(editor.cursors)),
+            str(len(editor.get_buffer()))
+        )
+
         if self.app.config["app"]["debug"]:
             data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
-        # if editor.last_find:
-        #     find = editor.last_find
-        #     if len(find) > 10:find = find[:10]+"..."
-        #     data = "find:'"+find+"' " + data
 
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():

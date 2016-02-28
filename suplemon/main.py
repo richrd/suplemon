@@ -445,7 +445,7 @@ class App:
                 self.logger.exception("Running command failed!")
                 return False
         else:
-            self.set_status("Command '" + cmd + "' not found.")
+            self.set_status("Command '{0}' not found.".format(cmd))
             return False
         return True
 
@@ -560,7 +560,7 @@ class App:
             return True
 
         if not self.open_file(name):
-            self.set_status("Failed to load '" + name + "'")
+            self.set_status("Failed to load '{0}'".format(name))
             return False
         self.switch_to_file(self.last_file_index())
         return True
@@ -583,11 +583,11 @@ class App:
         if not f.get_name():
             return self.save_file_as(f)
         if f.save():
-            self.set_status("Saved [" + helpers.curr_time_sec() + "] '" + f.name + "'")
+            self.set_status("Saved [{0}] '{1}'".format(helpers.curr_time_sec(), f.name))
             if f.path() == self.config.path():
                 self.reload_config()
             return True
-        self.set_status("Couldn't write to '" + f.name + "'")
+        self.set_status("Couldn't write to '{0}'".format(f.name))
         return False
 
     def save_file_as(self, file=False):
@@ -601,7 +601,7 @@ class App:
 
     def reload_file(self):
         """Reload the current file."""
-        if self.ui.query_bool("Reload '" + self.get_file().name + "'?"):
+        if self.ui.query_bool("Reload '{0}'?".format(self.get_file().name)):
             if self.get_file().reload():
                 return True
         return False
