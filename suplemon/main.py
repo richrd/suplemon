@@ -438,7 +438,12 @@ class App:
         if cmd in self.modules.modules.keys():
             self.logger.debug("Trying to run command '{0}'".format(cmd))
             self.get_editor().store_action_state(cmd)
-            self.modules.modules[cmd].run(self, self.get_editor(), args)
+            try:
+                self.modules.modules[cmd].run(self, self.get_editor(), args)
+            except:
+                self.set_status("Running command failed!")
+                self.logger.exception("Running command failed!")
+                return False
         else:
             self.set_status("Command '" + cmd + "' not found.")
             return False

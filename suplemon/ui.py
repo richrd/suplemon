@@ -486,7 +486,7 @@ class UI:
             event.set_key_name("ctrl+c")
             return event
         except:
-            self.logger.exception("Failed to get input!")
+            self.logger.debug("Failed to get input!")
             # No input available
             return False
         finally:
