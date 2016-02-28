@@ -486,12 +486,13 @@ class UI:
             event.set_key_name("ctrl+c")
             return event
         except:
+            self.logger.debug("Failed to get input!")
             # No input available
             return False
         finally:
             self.screen.nodelay(0)
 
-        if char:
+        if char and char != -1:
             if self.is_mouse(char):
                 state = self.get_mouse_state()
                 if state:
