@@ -464,7 +464,7 @@ class UI:
             return default
         return False
 
-    def get_input(self):
+    def get_input(self, blocking=True):
         """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""
         event = InputEvent()  # Initialize new empty event
         char = False
@@ -476,16 +476,23 @@ class UI:
             # Old Python fallback. No multibyte characters.
             input_func = self.screen.getch
         try:
+            if blocking:
+                self.screen.nodelay(0)
+            else:
+                self.screen.nodelay(1)
             char = input_func()
         except KeyboardInterrupt:
             # Handle KeyboardInterrupt as Ctrl+C
             event.set_key_name("ctrl+c")
             return event
         except:
+            self.logger.debug("Failed to get input!")
             # No input available
             return False
+        finally:
+            self.screen.nodelay(0)
 
-        if char:
+        if char and char != -1:
             if self.is_mouse(char):
                 state = self.get_mouse_state()
                 if state:

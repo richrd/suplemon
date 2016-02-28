@@ -1,5 +1,7 @@
 # -*- encoding: utf-8
 
+import os
+
 from suplemon.suplemon_module import Module
 
 
@@ -9,7 +11,7 @@ class Config(Module):
     def run(self, app, editor, args):
         if args == "defaults":
             # Open the default config in a new file only for viewing
-            path = app.path + "/config/defaults.json"
+            path = os.path.join(app.path, "config/defaults.json")
             f = open(path)
             data = f.read()
             f.close()
