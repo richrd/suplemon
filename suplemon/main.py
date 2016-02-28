@@ -156,12 +156,6 @@ class App:
             # Pass the input to the editor component
             self.get_editor().handle_input(event)
 
-    def on_input(self, event):
-        # Handle the input or give it to the editor
-        if not self.handle_input(event):
-            # Pass the input to the editor component
-            self.get_editor().handle_input(event)
-
     def main_loop(self):
         """Run the terminal IO loop until exit() is called."""
         while self.running:
@@ -170,19 +164,21 @@ class App:
             self.block_rendering = True
             got_input = False
 
-            # Run through as much input as we can
-            while True:
-                event = self.ui.get_input(False)
+            # Run through max 100 inputs (so the view is updated at least every 100 characters)
+            i = 0
+            while i < 100:
+                event = self.ui.get_input(False)  # non-blocking
 
                 if not event:
                     break  # no more inputs to process at this time
 
+                i += 1
                 got_input = True
                 self.on_input(event)
 
             if not got_input:
-                # wait for input, since there were none already available
-                event = self.ui.get_input(True)
+                # Wait for input, since there were none already available
+                event = self.ui.get_input(True)  # blocking
 
                 if event:
                     got_input = True
