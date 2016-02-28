@@ -21,5 +21,6 @@ setup(name="Suplemon",
       include_package_data=True,
       entry_points={
           "console_scripts": ["suplemon=suplemon.cli:main"]
-      }
+      },
+      classifiers=[]
       )

@@ -20,6 +20,7 @@ http://github.com/richrd/suplemon
 
 
 ## Get it!
+
 You can just clone the repo, and try Suplemon, or also install it system wide.
 
     git clone https://github.com/richrd/suplemon.git
@@ -27,7 +28,12 @@ You can just clone the repo, and try Suplemon, or also install it system wide.
     python3 suplemon.py
 
 ### Installation
-To install Suplemon run the setup script:
+
+Install the latest version from PIP:
+
+    sudo pip3 install suplemon
+
+To install Suplemon from the repo run the setup script:
 
     sudo python3 setup.py install
 
