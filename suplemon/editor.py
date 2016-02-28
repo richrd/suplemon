@@ -812,3 +812,72 @@ class Editor(Viewer):
             self.app.trigger_event_after(operation)
             return result
         return False
+
+
+class PromptEditor(Editor):
+    """An input prompt based on the Editor."""
+    def __init__(self, app, window):
+        Editor.__init__(self, app, window)
+        self.ready = 0
+        self.input_func = lambda: False
+        self.caption = ""
+
+    def set_config(self, config):
+        """Set the configuration for the editor."""
+        # Override showing line numbers
+        config["show_line_nums"] = False
+        Editor.set_config(self, config)
+
+    def set_input_source(self, input_func):
+        # Set the input function to use while looping for input
+        self.input_func = input_func
+
+    def on_ready(self):
+        """Accepts the current input."""
+        self.ready = 1
+        return
+
+    def on_cancel(self):
+        """Cancels the input prompt."""
+        self.set_data("")
+        self.ready = 1
+        return
+
+    def line_offset(self):
+        """Get the x coordinate of beginning of line."""
+        return len(self.caption)+1
+
+    def render_line_contents(self, line, pos, x_offset, max_len):
+        """Render the prompt line."""
+        x_offset = self.line_offset()
+        # Render the caption
+        self.window.addstr(pos[1], 0, self.caption)
+        # Render input
+        self.render_line_normal(line, pos, x_offset, max_len)
+
+    def handle_input(self, event):
+        """Handle special bindings for the prompt."""
+        name = event.key_name
+        if name in ["ctrl+c", "escape"]:
+            self.on_cancel()
+            return False
+        if name == "enter":
+            self.on_ready()
+            return False
+
+        return Editor.handle_input(self, event)
+
+    def get_input(self, caption="", initial=""):
+        """Get text input from the user via the prompt."""
+        self.caption = caption
+        self.set_data(initial)
+        self.end()
+        self.resize()
+        self.render()
+        while not self.ready:
+            event = self.input_func(True)  # blocking
+            if event:
+                self.handle_input(event)
+            self.resize()
+            self.render()
+        return self.get_data()

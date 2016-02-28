@@ -543,6 +543,7 @@ class App:
         """Setup an editor instance with configuration."""
         config = self.config["editor"]
         editor.set_config(config)
+        editor.init()
 
     ###########################################################################
     # File operations

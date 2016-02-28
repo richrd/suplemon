@@ -21,7 +21,7 @@ except ImportError:
     pygments = False
 
 
-class Viewer:
+class BaseViewer:
     def __init__(self, app, window):
         """
         Handle Viewer initialization
@@ -50,66 +50,8 @@ class Viewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
-        # Lexer for translating tokens to strings
-        self.lexer = None
-        # Built in syntax definition (for commenting etc.)
-        self.syntax = None
-        # Normal Pygments lexer
-        self.pygments_syntax = None
-
-        self.setup_linelight()
-        if self.app.config["editor"]["show_highlighting"]:
-            self.setup_highlight()
-
-    def setup_linelight(self):
-        """Setup line based highlighting."""
-        ext = self.file_extension
-        # Check if a file extension is redefined
-        # Maps e.g. 'scss' to 'css'
-        if ext in self.extension_map.keys():
-            ext = self.extension_map[ext]  # Use it
-        curr_path = os.path.dirname(os.path.realpath(__file__))
-
-        filename = ext + ".py"
-        path = os.path.join(curr_path, "linelight", filename)
-        module = False
-        if os.path.isfile(path):
-            try:
-                module = imp.load_source(ext, path)
-            except:
-                self.logger.error("Failed to load syntax file '{0}'!".format(path), exc_info=True)
-        else:
-            return False
-
-        if not module or "Syntax" not in dir(module):
-            self.logger.error("File doesn't match API!")
-            return False
-        self.syntax = module.Syntax()
-
-    def setup_highlight(self):
-        """Setup Pygments based highlighting."""
-        if not pygments:
-            # If Pygments lib not available
-            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
-            return False
-        self.lexer = Lexer(self.app)
-        ext = self.file_extension.lower()
-        if not ext:
-            return False
-        # Check if a file extension is redefined
-        # Maps e.g. 'scss' to 'css'
-        if ext in self.extension_map.keys():
-            ext = self.extension_map[ext]  # Use it
-        try:
-            self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
-            self.logger.debug("Loaded Pygments lexer '{0}'.".format(ext))
-        except:
-            self.logger.debug("Failed to load Pygments lexer '{0}'.".format(ext))
-            return False
-        if ext == "php":
-            # Hack to highlight PHP even without <?php ?> tags
-            self.pygments_syntax.options.update({"startinline": 1})
-            self.pygments_syntax.startinline = 1
+    def init(self):
+        pass
 
     def size(self):
         """Get editor size (x,y). (Deprecated, use get_size)."""
@@ -183,20 +125,6 @@ class Viewer:
         line_nums.sort()
         return line_nums
 
-    def get_line_color(self, raw_line):
-        """Return a color based on line contents.
-
-        :param str raw_line: The line from which to get a color value.
-        :return: A color value for given raw_data.
-        :rtype: int
-        """
-        if self.syntax:
-            try:
-                return self.syntax.get_color(raw_line)
-            except:
-                return 0
-        return 0
-
     def get_data(self):
         """Get editor contents.
 
@@ -266,7 +194,7 @@ class Viewer:
         if ext and ext != self.file_extension:
             self.file_extension = ext
             self.setup_linelight()
-            if self.app.config["editor"]["show_highlighting"]:
+            if self.config["show_highlighting"]:
                 self.setup_highlight()
 
     def add_cursor(self, cursor):
@@ -346,10 +274,10 @@ class Viewer:
         :param x_offset: Offset from left edge of screen. Currently same as x position.
         :param max_len: Maximum amount of chars that will fit on screen.
         """
-        show_highlighting = self.app.config["editor"]["show_highlighting"]
+        show_highlighting = self.config["show_highlighting"]
         if pygments and show_highlighting and self.pygments_syntax and self.app.themes.current_theme:
             self.render_line_pygments(line, pos, x_offset, max_len)
-        elif self.app.config["editor"]["show_line_colors"]:
+        elif self.config["show_line_colors"]:
             self.render_line_linelight(line, pos, x_offset, max_len)
         else:
             self.render_line_normal(line, pos, x_offset, max_len)
@@ -621,3 +549,85 @@ class Viewer:
         for line_cursors in cursor:
             self.remove_cursor(cursor)
         return True
+
+
+class Viewer(BaseViewer):
+    def __init__(self, app, window):
+        BaseViewer.__init__(self, app, window)
+
+        # Lexer for translating tokens to strings
+        self.lexer = None
+        # Built in syntax definition (for commenting etc.)
+        self.syntax = None
+        # Normal Pygments lexer
+        self.pygments_syntax = None
+
+        self.setup_linelight()
+
+    def init(self):
+        if self.config["show_highlighting"]:
+            self.setup_highlight()
+
+    def setup_linelight(self):
+        """Setup line based highlighting."""
+        ext = self.file_extension
+        # Check if a file extension is redefined
+        # Maps e.g. 'scss' to 'css'
+        if ext in self.extension_map.keys():
+            ext = self.extension_map[ext]  # Use it
+        curr_path = os.path.dirname(os.path.realpath(__file__))
+
+        filename = ext + ".py"
+        path = os.path.join(curr_path, "linelight", filename)
+        module = False
+        if os.path.isfile(path):
+            try:
+                module = imp.load_source(ext, path)
+            except:
+                self.logger.error("Failed to load syntax file '{0}'!".format(path), exc_info=True)
+        else:
+            return False
+
+        if not module or "Syntax" not in dir(module):
+            self.logger.error("File doesn't match API!")
+            return False
+        self.syntax = module.Syntax()
+
+    def setup_highlight(self):
+        """Setup Pygments based highlighting."""
+        if not pygments:
+            # If Pygments lib not available
+            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
+            return False
+        self.lexer = Lexer(self.app)
+        ext = self.file_extension.lower()
+        if not ext:
+            return False
+        # Check if a file extension is redefined
+        # Maps e.g. 'scss' to 'css'
+        if ext in self.extension_map.keys():
+            ext = self.extension_map[ext]  # Use it
+        try:
+            self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
+            self.logger.debug("Loaded Pygments lexer '{0}'.".format(ext))
+        except:
+            self.logger.debug("Failed to load Pygments lexer '{0}'.".format(ext))
+            return False
+        if ext == "php":
+            # Hack to highlight PHP even without <?php ?> tags
+            self.pygments_syntax.options.update({"startinline": 1})
+            self.pygments_syntax.startinline = 1
+
+    def get_line_color(self, raw_line):
+        """Return a color based on line contents.
+
+        :param str raw_line: The line from which to get a color value.
+        :return: A color value for given raw_data.
+        :rtype: int
+        """
+        if self.syntax:
+            try:
+                return self.syntax.get_color(raw_line)
+            except:
+                return 0
+        return 0

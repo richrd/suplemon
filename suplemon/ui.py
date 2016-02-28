@@ -6,6 +6,7 @@ Curses user interface.
 import os
 import logging
 
+from .editor import Editor, PromptEditor
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -406,42 +407,24 @@ class UI:
             x += len(key[1])+2
         self.legend_win.refresh()
 
-    def show_capture_status(self, s="", value=""):
-        """Show status when capturing input."""
-        self.status_win.erase()
-        self.status_win.addstr(0, 0, s, curses.A_REVERSE)
-        self.status_win.addstr(0, len(s), value)
-
-    def _process_query_key(self, key):
-        """Process keystrokes from the Textbox window."""
-        if key in [3, 27]:  # Support canceling query with Ctrl+C or ESC
-            raise KeyboardInterrupt
-        # Standardize some keycodes
-        rewrite = {
-            127: 263,
-            8: 263,
-        }
-        # self.logger.debug("Query key input: {0}".format(str(key)))
-        if key in rewrite.keys():
-            key = rewrite[key]
-        return key
-
     def _query(self, text, initial=""):
         """Ask for text input via the status bar."""
-        self.show_capture_status(text, initial)
-        self.text_input = curses.textpad.Textbox(self.status_win)
-        try:
-            out = self.text_input.edit(self._process_query_key)
-        except:
-            return False
 
-        # If input begins with prompt, remove the prompt text
-        if len(out) >= len(text):
-            if out[:len(text)] == text:
-                out = out[len(text):]
-        if len(out) > 0 and out[-1] == " ":
-            out = out[:-1]
-        out = out.rstrip("\r\n")
+        # Disable render blocking
+        blocking = self.app.block_rendering
+        self.app.block_rendering = 0
+
+        # Create our text input
+        self.text_input = PromptEditor(self.app, self.status_win)
+        self.text_input.set_config(self.app.config["editor"].copy())
+        self.text_input.set_input_source(self.get_input)
+
+        # Get input from the user
+        out = self.text_input.get_input(text, initial)
+
+        # Restore render blocking
+        self.app.block_rendering = blocking
+
         return out
 
     def query(self, text, initial=""):
