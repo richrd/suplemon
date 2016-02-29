@@ -44,6 +44,9 @@ class App:
         self.global_buffer = []
         self.event_bindings = {}
 
+        # Maximum amount of inputs to process at once
+        self.max_input = 100
+
         # Save filenames for later
         self.filenames = filenames
 
@@ -84,6 +87,12 @@ class App:
             # Can't run without config
             return False
         self.config.load()
+
+        # Unicode symbols don't play nice with Python 2 so disable them
+        if sys.version_info[0] < 3:
+            self.config["app"]["use_unicode_symbols"] = False
+
+        # Configure logger
         self.debug = self.config["app"]["debug"]
         debug_level = self.config["app"]["debug_level"]
         self.logger.debug("Setting debug_level to {0}.".format(debug_level))
@@ -166,7 +175,7 @@ class App:
 
             # Run through max 100 inputs (so the view is updated at least every 100 characters)
             i = 0
-            while i < 100:
+            while i < self.max_input:
                 event = self.ui.get_input(False)  # non-blocking
 
                 if not event:

@@ -20,7 +20,10 @@ class BufferingTargetHandler(BufferingHandler):
         :param object fd_target: File descriptor to write output to (e.g. `sys.stdout`)
         """
         # Call our BufferingHandler init
-        super(BufferingTargetHandler, self).__init__(capacity)
+        if issubclass(BufferingTargetHandler, object):
+            super(BufferingTargetHandler, self).__init__(capacity)
+        else:
+            BufferingHandler.__init__(self, capacity)
 
         # Save target for later
         self._fd_target = fd_target
@@ -41,7 +44,10 @@ class BufferingTargetHandler(BufferingHandler):
             self.release()
 
         # Then, run our normal close actions
-        super(BufferingTargetHandler, self).close()
+        if issubclass(BufferingTargetHandler, object):
+            super(BufferingTargetHandler, self).close()
+        else:
+            BufferingHandler.close(self)
 
 
 # Initialize logging
