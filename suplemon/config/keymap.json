@@ -40,7 +40,7 @@
     {"keys": ["pageup"],           "command": "page_up"},
     {"keys": ["pagedown"],         "command": "page_down"},
     {"keys": ["ctrl+z", "f5"],     "command": "undo"},
-    {"keys": ["f6"],               "command": "redo"},
+    {"keys": ["ctrl+y", "f6"],     "command": "redo"},
     {"keys": ["f9"],               "command": "toggle_line_nums"},
     {"keys": ["f10"],              "command": "toggle_line_ends"},
     {"keys": ["f11"],              "command": "toggle_highlight"},
