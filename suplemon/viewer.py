@@ -9,6 +9,7 @@ import imp
 import curses
 import logging
 
+from . import helpers
 
 from .line import Line
 from .cursor import Cursor
@@ -50,18 +51,38 @@ class BaseViewer:
         self.x_scroll = 0
         self.cursors = [Cursor()]
 
+        # Copy/paste buffer
+        self.buffer = []
+
+        # Runnable methods
+        self.operations = {
+            "arrow_right": self.arrow_right,              # Arrow Right
+            "arrow_left": self.arrow_left,                # Arrow Left
+            "arrow_up": self.arrow_up,                    # Arrow Up
+            "arrow_down": self.arrow_down,                # Arrow Down
+            "jump_left": self.jump_left,                  # Ctrl + Left
+            "jump_right": self.jump_right,                # Ctrl + Right
+            "jump_up": self.jump_up,                      # Ctrl + Up
+            "jump_down": self.jump_down,                  # Ctrl + Down
+            "page_up": self.page_up,                      # Page Up
+            "page_down": self.page_down,                  # Page Down
+            "home": self.home,                            # Home
+            "end": self.end,                              # End
+            "find": self.find_query                       # Ctrl + F
+        }
+
     def init(self):
         pass
 
-    def size(self):
-        """Get editor size (x,y). (Deprecated, use get_size)."""
-        self.logger.warning("size() is deprecated, please use get_size()")
-        return self.get_size()
+    def get_buffer(self):
+        """Returns the current buffer.
 
-    def cursor(self):
-        """Return the main cursor. (Deprecated, use get_cursor)"""
-        self.logger.warning("cursor() is deprecated, please use get_cursor()")
-        return self.get_cursor()
+        Returns the local buffer or the global buffer depending on config.
+        """
+        if self.config["use_global_buffer"]:
+            return self.app.global_buffer
+        else:
+            return self.buffer
 
     def get_size(self):
         """Get editor size (x,y)."""
@@ -232,6 +253,31 @@ class BaseViewer:
     def toggle_highlight(self):
         """Toggle syntax highlighting."""
         return False
+
+    ###########################################################################
+    # Curses
+    ###########################################################################
+
+    def move_win(self, yx):
+        """Move the editor window to position yx."""
+        # Must try & catch since mvwin might
+        # crash with incorrect coordinates
+        try:
+            self.window.mvwin(yx[0], yx[1])
+        except:
+            self.logger.warning("Moving window failed!", exc_info=True)
+
+    def refresh(self):
+        """Refresh the editor curses window."""
+        self.window.refresh()
+
+    def resize(self, yx=None):
+        """Resize the UI."""
+        if not yx:
+            yx = self.window.getmaxyx()
+        self.window.resize(yx[0], yx[1])
+        self.move_cursors()
+        self.refresh()
 
     def render(self):
         """Render the editor curses window."""
@@ -424,17 +470,9 @@ class BaseViewer:
                 continue
             self.window.chgat(y, cursor.x+self.line_offset()-self.x_scroll, 1, self.cursor_style)
 
-    def refresh(self):
-        """Refresh the editor curses window."""
-        self.window.refresh()
-
-    def resize(self, yx=None):
-        """Resize the UI."""
-        if not yx:
-            yx = self.window.getmaxyx()
-        self.window.resize(yx[0], yx[1])
-        self.move_cursors()
-        self.refresh()
+    ###########################################################################
+    # Scrolling
+    ###########################################################################
 
     def scroll_up(self):
         """Scroll view up if neccesary."""
@@ -460,18 +498,13 @@ class BaseViewer:
             new_y = 0
         self.y_scroll = new_y
 
-    def move_win(self, yx):
-        """Move the editor window to position yx."""
-        # Must try & catch since mvwin might
-        # crash with incorrect coordinates
-        try:
-            self.window.mvwin(yx[0], yx[1])
-        except:
-            self.logger.warning("Moving window failed!", exc_info=True)
-
     def move_y_scroll(self, delta):
         """Add delta the y scroll axis scroll"""
         self.y_scroll += delta
+
+    ###########################################################################
+    # Cursors
+    ###########################################################################
 
     def move_cursors(self, delta=None, noupdate=False):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
@@ -568,6 +601,172 @@ class BaseViewer:
         for line_cursors in cursor:
             self.remove_cursor(cursor)
         return True
+
+    ###########################################################################
+    # Input Handling
+    ###########################################################################
+
+    def get_key_bindings(self):
+        """Get list of editor key bindings."""
+        return self.app.get_key_bindings()
+
+    def handle_input(self, event):
+        """Handle input."""
+        if event.type == "mouse":
+            return False
+        key = event.key_code
+        name = event.key_name
+        # Try match a key to a method and call it
+
+        key_bindings = self.get_key_bindings()
+        operation = None
+        if key in key_bindings.keys():
+            operation = key_bindings[key]
+        elif name in key_bindings.keys():
+            operation = key_bindings[name]
+        if operation:
+            self.run_operation(operation)
+            return True
+        return False
+
+    def run_operation(self, operation):
+        """Run an editor core operation."""
+        if operation in self.operations.keys():
+            cancel = self.app.trigger_event_before(operation)
+            if cancel:
+                return False
+            result = self.operations[operation]()
+            self.app.trigger_event_after(operation)
+            return result
+        return False
+
+    ###########################################################################
+    # Operations
+    ###########################################################################
+
+    def arrow_right(self):
+        """Move cursors right."""
+        for cursor in self.cursors:
+            line = self.lines[cursor.y]
+            if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0):
+                cursor.move_down()
+                cursor.set_x(0)
+            elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:
+                cursor.move_right()
+        self.move_cursors()
+        self.scroll_down()
+
+    def arrow_left(self):
+        """Move cursors left."""
+        for cursor in self.cursors:
+            if cursor.y != 0 and cursor.x == 0:
+                cursor.move_up()
+                cursor.set_x(len(self.lines[cursor.y])+1)
+        self.move_cursors((-1, 0))
+        self.scroll_up()
+
+    def arrow_up(self):
+        """Move cursors up."""
+        self.move_cursors((0, -1))
+        self.scroll_up()
+
+    def arrow_down(self):
+        """Move cursors down."""
+        self.move_cursors((0, 1))
+        self.scroll_down()
+
+    def home(self):
+        """Move to start of line or text on that line."""
+        for cursor in self.cursors:
+            wspace = helpers.whitespace(self.lines[cursor.y])
+            if cursor.x == wspace:
+                cursor.set_x(0)
+            else:
+                cursor.set_x(wspace)
+        self.move_cursors()
+
+    def end(self):
+        """Move to end of line."""
+        for cursor in self.cursors:
+            cursor.set_x(len(self.lines[cursor.y]))
+        self.move_cursors()
+
+    def page_up(self):
+        """Move half a page up."""
+        amount = int(self.get_size()[1]/2) * -1
+        self.move_cursors((0, amount))
+        self.scroll_up()
+
+    def page_down(self):
+        """Move half a page down."""
+        amount = int(self.get_size()[1]/2)
+        self.move_cursors((0, amount))
+        self.scroll_down()
+
+    def jump_left(self):
+        """Jump one 'word' to the left."""
+        chars = self.config["punctuation"]
+        for cursor in self.cursors:
+            line = self.lines[cursor.y]
+            if cursor.x == 0:
+                if cursor.y > 0:
+                    # Jump to end of previous line
+                    cursor.set_x(len(self.lines[cursor.y-1]))
+                    cursor.move_up()
+                continue
+            if cursor.x <= len(line):
+                cur_chr = line[cursor.x-1]
+            else:
+                cur_chr = line[cursor.x]
+            while cursor.x > 0:
+                next = cursor.x-2
+                if next < 0:
+                    next = 0
+                if cur_chr == " ":
+                    cursor.move_left()
+                    if line[next] != " ":
+                        break
+                else:
+                    cursor.move_left()
+                    if line[next] in chars:
+                        break
+        self.move_cursors()
+
+    def jump_right(self):
+        """Jump one 'word' to the right."""
+        chars = self.config["punctuation"]
+        for cursor in self.cursors:
+            line = self.lines[cursor.y]
+            if cursor.x == len(line):
+                if cursor.y < len(self.lines):
+                    # Jump to start of next line
+                    cursor.set_x(0)
+                    cursor.move_down()
+                continue
+            cur_chr = line[cursor.x]
+            while cursor.x < len(line):
+                next = cursor.x+1
+                if next == len(line):
+                    next -= 1
+                if cur_chr == " ":
+                    cursor.move_right()
+                    if line[next] != " ":
+                        break
+                else:
+                    cursor.move_right()
+                    if line[next] in chars:
+                        break
+        self.move_cursors()
+
+    def jump_up(self):
+        """Jump up 3 lines."""
+        self.move_cursors((0, -3))
+        self.scroll_up()
+
+    def jump_down(self):
+        """Jump down 3 lines."""
+        self.move_cursors((0, 3))
+        self.scroll_down()
 
 
 class Viewer(BaseViewer):

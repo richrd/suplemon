@@ -58,7 +58,6 @@ class App:
             "help": self.help,
             "save_file": self.save_file,
             "run_command": self.query_command,
-            "find": self.find,
             "go_to": self.go_to,
             "open": self.open,
             "close_file": self.close_file,
@@ -431,13 +430,6 @@ class App:
                 file_index = self.find_file(input_str)
                 if file_index != -1:
                     self.switch_to_file(file_index)
-
-    def find(self):
-        """Find in file."""
-        editor = self.get_editor()
-        what = self.ui.query("Find:", editor.last_find)
-        if what:
-            editor.find(what)
 
     def find_file(self, s):
         """Return index of file matching string."""

@@ -345,8 +345,9 @@ class UI:
             str(len(editor.get_buffer()))
         )
 
-        if self.app.config["app"]["debug"]:
-            data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
+        # Deprecate?
+        # if self.app.config["app"]["debug"]:
+        #     data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
 
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
