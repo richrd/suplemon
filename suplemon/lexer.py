@@ -35,20 +35,28 @@ class Lexer:
                 scope = "keyword"
             elif token == pygments.token.Comment:
                 scope = "comment"
-            elif token in pygments.token.Literal.String:
-                scope = "string"
-            elif token in pygments.token.Literal.Number:
-                scope = "constant.numeric"
+            elif token == pygments.token.Comment.Single:
+                scope = "comment"
             elif token == pygments.token.Name.Function:
                 scope = "entity.name.function"
             elif token == pygments.token.Name.Class:
                 scope = "entity.name.class"
             elif token == pygments.token.Name.Tag:
                 scope = "entity.name.tag"
+            elif token == pygments.token.Name.Attribute:
+                scope = "entity.other.attribute-name"
+            elif token == pygments.token.Name.Variable:
+                scope = "variable"
             elif token == pygments.token.Operator:
                 scope = "keyword"
             elif token == pygments.token.Name.Builtin.Pseudo:
                 scope = "constant.language"
+            elif token in pygments.token.Literal.String:
+                scope = "string"
+            elif token in pygments.token.Literal.Number:
+                scope = "constant.numeric"
+            elif token in pygments.token.Name:
+                scope = "entity.name"
 
             scopes.append((scope, word[1]))
         return scopes
