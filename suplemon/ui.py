@@ -419,6 +419,7 @@ class UI:
         self.text_input = PromptEditor(self.app, self.status_win)
         self.text_input.set_config(self.app.config["editor"].copy())
         self.text_input.set_input_source(self.get_input)
+        self.text_input.init()
 
         # Get input from the user
         out = self.text_input.get_input(text, initial)
