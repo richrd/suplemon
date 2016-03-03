@@ -152,7 +152,6 @@ class Editor(Viewer):
         state = self.history[index]
         state.restore(self)
         self.current_state = index
-        self.refresh()
 
     def handle_input(self, event):
         done = Viewer.handle_input(self, event)
@@ -718,8 +717,6 @@ class PromptEditor(Editor):
         self.set_data(initial)
         self.end()  # Move to the end of the initial text
 
-        # TODO: Still can't figure out why resize is needed for succesful render()
-        self.resize()
         self.render()
 
         # Run the input loop until ready
