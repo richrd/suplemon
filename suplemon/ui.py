@@ -97,7 +97,7 @@ class UI:
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
         import curses.textpad  # noqa
-        self.logger.debug("Loaded curses {}".format(curses.version.decode()))
+        self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
 
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
