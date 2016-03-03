@@ -661,6 +661,11 @@ class PromptEditor(Editor):
         self.input_func = lambda: False
         self.caption = ""
 
+    def init(self):
+        Editor.init(self)
+        # Remove the find feature, otherwise it can be invoked recursively
+        del self.operations["find"]
+
     def set_config(self, config):
         """Set the configuration for the editor."""
         # Override showing line numbers
