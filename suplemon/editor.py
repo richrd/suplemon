@@ -51,8 +51,6 @@ class Editor(Viewer):
         """
         Viewer.__init__(self, app, window)
 
-        # Last search used in 'find'
-        self.last_find = ""
         # History of editor states for undo/redo
         self.history = [State()]
         # Current state index of the editor
@@ -86,8 +84,6 @@ class Editor(Viewer):
             "copy": self.copy,                            # Ctrl + C
             "cut": self.cut,                              # Ctrl + X
             "duplicate_line": self.duplicate_line,        # Ctrl + W
-            "find_next": self.find_next,                  # Ctrl + D
-            "find_all": self.find_all,                    # Ctrl + A
         }
         for key in operations.keys():
             self.operations[key] = operations[key]
@@ -547,98 +543,6 @@ class Editor(Viewer):
             cur.y = len(self.lines)-1
         self.scroll_to_line(cur.y)
         self.move_cursors()
-
-    def find_query(self):
-        """Find in file via user input."""
-        what = self.app.ui.query("Find:", self.last_find)
-        if what:
-            self.find(what)
-
-    def find(self, what, findall=False):
-        """Find what in data (from top to bottom). Adds a cursor when found."""
-        # Sorry for this colossal function
-        if not what:
-            return
-        last_cursor = self.get_last_cursor()
-        y = last_cursor.y
-
-        found = False
-        new_cursors = []
-        # Loop through all lines starting from the last cursor
-        while y < len(self.lines):
-            line = self.lines[y]
-            x_offset = 0  # Which character to begin searching from
-            if y == last_cursor.y:
-                # On the current line begin from the last cursor x pos
-                x_offset = last_cursor.x
-
-            # Find all occurances of search string
-            s = str(line[x_offset:])  # Data to search in
-            pattern = re.escape(what)  # Default to non regex pattern
-            if self.config["regex_find"]:
-                try:  # Try to search with the actual regex
-                    indices = [match.start() for match in re.finditer(what, s)]
-                except:  # Revert to normal search
-                    indices = [match.start() for match in re.finditer(pattern, s)]
-            else:
-                indices = [match.start() for match in re.finditer(pattern, s)]
-
-            # Loop through the indices and add cursors if they don't exist yet
-            for i in indices:
-                new = Cursor(i+x_offset, y)
-                if not self.cursor_exists(new):
-                    found = True
-                    new_cursors.append(new)
-                    if not findall:
-                        break
-                if new not in new_cursors:
-                    new_cursors.append(new)
-            if found and not findall:
-                break
-            y += 1
-
-        if not new_cursors:
-            self.app.set_status("Can't find '{0}'".format(what))
-            # self.last_find = ""
-            return
-        else:
-            # If we only have one cursor, and it's not
-            # where the first occurance is, just remove it
-            if len(self.cursors) == 1 and self.cursors[0].tuple() != new_cursors[0].tuple():
-                self.cursors = []
-        self.last_find = what   # Only store string if it's really found
-
-        # Add the new cursors
-        for cursor in new_cursors:
-            self.cursors.append(cursor)
-
-        destination = self.get_last_cursor().y
-        self.scroll_to_line(destination)
-        self.store_action_state("find")  # Store undo point
-
-    def find_next(self):
-        """Find next occurance."""
-        what = self.last_find
-        if what == "":
-            cursor = self.get_cursor()
-            search = "^([\w\-]+)"
-            line = self.lines[cursor.y][cursor.x:]
-            matches = re.match(search, line)
-            if matches:
-                what = matches.group(0)
-            else:
-                if line:
-                    what = line[0]
-            # Escape the data if regex is enabled
-            if self.config["regex_find"]:
-                what = re.escape(what)
-
-            self.last_find = what
-        self.find(what)
-
-    def find_all(self):
-        """Find all occurances."""
-        self.find(self.last_find, True)
 
     def duplicate_line(self):
         """Copy current line and add it below as a new line."""

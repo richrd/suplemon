@@ -4,6 +4,7 @@ Text viewer component subclassed by Editor.
 """
 
 import os
+import re
 import sys
 import imp
 import curses
@@ -54,6 +55,9 @@ class BaseViewer:
         # Copy/paste buffer
         self.buffer = []
 
+        # Last search used in 'find'
+        self.last_find = ""
+
         # Runnable methods
         self.operations = {
             "arrow_right": self.arrow_right,              # Arrow Right
@@ -68,7 +72,9 @@ class BaseViewer:
             "page_down": self.page_down,                  # Page Down
             "home": self.home,                            # Home
             "end": self.end,                              # End
-            "find": self.find_query                       # Ctrl + F
+            "find": self.find_query,                      # Ctrl + F
+            "find_next": self.find_next,                  # Ctrl + D
+            "find_all": self.find_all,                    # Ctrl + A
         }
 
     def init(self):
@@ -576,7 +582,7 @@ class BaseViewer:
         self.cursors.pop(index)
         return True
 
-    def purge_cursors(self):
+    def purge_cursors(self, render=True):
         """Remove duplicate cursors that have the same position."""
         new = []
         # This sucks: can't use "if .. in .." for different instances (?)
@@ -587,7 +593,8 @@ class BaseViewer:
                 ref.append(cursor.tuple())
                 new.append(cursor)
         self.cursors = new
-        self.render()  # TODO: is this needed?
+        if render:
+            self.render()  # TODO: is this needed?
 
     def purge_line_cursors(self, line_no):
         """Remove all but first cursor on given line."""
@@ -770,6 +777,99 @@ class BaseViewer:
         """Jump down 3 lines."""
         self.move_cursors((0, 3))
         self.scroll_down()
+
+    def find_query(self):
+        """Find in file via user input."""
+        what = self.app.ui.query("Find:", self.last_find)
+        if what:
+            self.find(what)
+
+    def find(self, what, findall=False):
+        """Find what in data (from top to bottom). Adds a cursor when found."""
+        # Sorry for this colossal function
+        if not what:
+            return
+        last_cursor = self.get_last_cursor()
+        y = last_cursor.y
+
+        found = False
+        new_cursors = []
+        # Loop through all lines starting from the last cursor
+        while y < len(self.lines):
+            line = self.lines[y]
+            x_offset = 0  # Which character to begin searching from
+            if y == last_cursor.y:
+                # On the current line begin from the last cursor x pos
+                x_offset = last_cursor.x
+
+            # Find all occurances of search string
+            s = str(line[x_offset:])  # Data to search in
+            pattern = re.escape(what)  # Default to non regex pattern
+            if self.config["regex_find"]:
+                try:  # Try to search with the actual regex
+                    indices = [match.start() for match in re.finditer(what, s)]
+                except:  # Revert to normal search
+                    indices = [match.start() for match in re.finditer(pattern, s)]
+            else:
+                # Use normal search
+                indices = [match.start() for match in re.finditer(pattern, s)]
+
+            # Loop through the indices and add cursors if they don't exist yet
+            for i in indices:
+                new = Cursor(i+x_offset, y)
+                if not self.cursor_exists(new):
+                    found = True
+                    if new not in new_cursors:  # Make sure we don't get duplicates
+                        new_cursors.append(new)
+                    if not findall:
+                        break
+                if new not in new_cursors:
+                    new_cursors.append(new)
+            if found and not findall:
+                break
+            y += 1
+
+        if not new_cursors:
+            self.app.set_status("Can't find '{0}'".format(what))
+            return False
+        else:
+            # If we only have one cursor, and it's not
+            # where the first occurance is, just remove it
+            if len(self.cursors) == 1 and self.cursors[0].tuple() != new_cursors[0].tuple():
+                self.cursors = []
+        self.last_find = what   # Only store string if it's really found
+
+        # Add the new cursors
+        for cursor in new_cursors:
+            if not self.cursor_exists(cursor):
+                self.cursors.append(cursor)
+
+        destination = self.get_last_cursor().y
+        self.scroll_to_line(destination)
+        self.store_action_state("find")  # Store undo point
+
+    def find_next(self):
+        """Find next occurance."""
+        what = self.last_find
+        if what == "":
+            cursor = self.get_cursor()
+            search = "^([\w\-]+)"
+            line = self.lines[cursor.y][cursor.x:]
+            matches = re.match(search, line)
+            if matches:
+                what = matches.group(0)
+            else:
+                if line:
+                    what = line[0]
+            # Escape the data if regex is enabled
+            if self.config["regex_find"]:
+                what = re.escape(what)
+            self.last_find = what
+        self.find(what)
+
+    def find_all(self):
+        """Find all occurances."""
+        self.find(self.last_find, True)
 
 
 class Viewer(BaseViewer):
