@@ -269,6 +269,7 @@ class BaseViewer:
 
     def refresh(self):
         """Refresh the editor curses window."""
+        self.render()
         self.window.refresh()
 
     def resize(self, yx=None):
@@ -586,7 +587,7 @@ class BaseViewer:
                 ref.append(cursor.tuple())
                 new.append(cursor)
         self.cursors = new
-        self.render()
+        self.render()  # TODO: is this needed?
 
     def purge_line_cursors(self, line_no):
         """Remove all but first cursor on given line."""

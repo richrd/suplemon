@@ -264,7 +264,7 @@ class UI:
         self.screen.refresh()
 
     def check_resize(self):
-        """Check if terminal has resized."""
+        """Check if terminal has resized and resize if needed."""
         yx = self.screen.getmaxyx()
         if self.current_yx != yx:
             self.current_yx = yx

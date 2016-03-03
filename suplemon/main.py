@@ -194,10 +194,10 @@ class App:
 
             self.block_rendering = False
 
-            # TODO: why do I need resize here?
-            # (View won't update after switching files, WTF)
             self.trigger_event_after("mainloop")
-            self.get_editor().resize()  # TODO: Optimize performance. Can make up 45% of processing time in the loop.
+            # Rendering happens here
+            # TODO: Optimize performance. Can make up 45% of processing time in the loop.
+            self.get_editor().refresh()
             self.ui.refresh()
 
     def get_status(self):
