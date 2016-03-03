@@ -18,6 +18,7 @@ class Lexer:
             pygments.token.Name.Variable: "variable",
             pygments.token.Operator: "keyword",
             pygments.token.Name.Builtin.Pseudo: "constant.language",
+            pygments.token.Literal.String: "string",
         }
 
     def lex(self, code, lex):
