@@ -93,6 +93,6 @@
         // Show the bottom status bar
         "show_bottom_bar": true,
         // Invert status bar colors (switch text and background colors)
-        "invert_status_bars": true
+        "invert_status_bars": false
     }
 }
