@@ -346,6 +346,7 @@ class BaseViewer:
         #    and tokens should be cached in line instances. That way we can
         #    support multi line comment syntax etc. It should also perform
         #    better, since we only need to re-highlight lines when they change.
+        # TODO 2: Optimize lexer performance
         tokens = self.lexer.lex(line_data, self.pygments_syntax)
         first_token = True
         for token in tokens:
@@ -407,6 +408,7 @@ class BaseViewer:
         return new_data
 
     def replace_whitespace(self, data):
+        # TODO: Optimize performance
         """Replace unsafe whitespace with alternative safe characters
 
         Replace unsafe whitespace with normal space or visible replacement.
