@@ -717,15 +717,14 @@ class PromptEditor(Editor):
         self.set_data(initial)
         self.end()  # Move to the end of the initial text
 
-        self.render()
+        self.refresh()
 
         # Run the input loop until ready
         while not self.ready:
             event = self.input_func(True)  # blocking
             if event:
                 self.handle_input(event)
-            self.resize()
-            self.render()
+            self.refresh()
         if self.canceled:
             return False
         return self.get_data()

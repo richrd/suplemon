@@ -133,7 +133,7 @@ class App:
         # Load ui and files etc
         self.load()
         # Initial render
-        self.get_editor().resize()
+        self.get_editor().refresh()
         self.ui.refresh()
         # Start mainloop
         self.main_loop()
@@ -190,7 +190,7 @@ class App:
 
                 if event:
                     got_input = True
-                    self.on_input(event)  # Up to 30% processing time
+                    self.on_input(event)  # PERF: Up to 30% processing time
 
             self.block_rendering = False
 

@@ -97,6 +97,7 @@ class UI:
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
         import curses.textpad  # noqa
+        self.logger.debug("Loaded curses {}".format(curses.version.decode()))
 
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
@@ -261,7 +262,6 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows(resize=True)
-        self.screen.refresh()
 
     def check_resize(self):
         """Check if terminal has resized and resize if needed."""
