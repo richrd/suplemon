@@ -388,7 +388,7 @@ class BaseViewer:
 
     def render_line_linelight(self, line, pos, x_offset, max_len):
         """Render line with naive line based highlighting."""
-        x, y = pos
+        y = pos[1]
         line_data = line.get_data()
         line_data = self._prepare_line_for_rendering(line_data, max_len)
         curs_color = curses.color_pair(self.get_line_color(line))
@@ -396,7 +396,7 @@ class BaseViewer:
 
     def render_line_normal(self, line, pos, x_offset, max_len):
         """Render line without any highlighting."""
-        x, y = pos
+        y = pos[1]
         line_data = line.get_data()
         line_data = self._prepare_line_for_rendering(line_data, max_len)
         self.window.addstr(y, x_offset, line_data)

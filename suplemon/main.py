@@ -615,11 +615,11 @@ class App:
         name = self.ui.query("Save as:", f.name)
         if not name:
             return False
-        dir = os.path.dirname(name)
-        if dir and not os.path.exists(dir):
+        target_dir = os.path.dirname(name)
+        if target_dir and not os.path.exists(target_dir):
             if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
                 self.logger.debug("Creating missing folders in save path.")
-                os.makedirs(dir)
+                os.makedirs(target_dir)
             else:
                 return False
         f.set_name(name)

@@ -3,8 +3,6 @@
 Editor class for extending viewer with text editing features.
 """
 
-import re
-
 from . import helpers
 
 from .line import Line
