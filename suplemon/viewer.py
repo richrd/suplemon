@@ -275,6 +275,7 @@ class BaseViewer:
 
     def refresh(self):
         """Refresh the editor curses window."""
+        self.move_cursors()
         self.render()
         self.window.refresh()
 
@@ -515,7 +516,7 @@ class BaseViewer:
     # Cursors
     ###########################################################################
 
-    def move_cursors(self, delta=None, noupdate=False):
+    def move_cursors(self, delta=None):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
         if self.app.block_rendering:
             noupdate = True
@@ -550,8 +551,7 @@ class BaseViewer:
             self.x_scroll -= abs(cur.x - self.x_scroll)  # FIXME
         if cur.x - self.x_scroll+offset < offset:
             self.x_scroll -= 1
-        if not noupdate:
-            self.purge_cursors()
+        self.purge_cursors()
 
     def move_x_cursors(self, line, col, delta):
         """Move all cursors starting at line and col with delta on the x axis."""
