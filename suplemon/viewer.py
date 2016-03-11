@@ -947,8 +947,7 @@ class Viewer(BaseViewer):
         :rtype: int
         """
         if self.syntax:
-            try:
-                return self.syntax.get_color(raw_line)
-            except:
-                return 0
+            color = self.syntax.get_color(raw_line)
+            if color is not None:
+                return color
         return 0
