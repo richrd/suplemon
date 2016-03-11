@@ -423,7 +423,7 @@ class BaseViewer:
         For example tab characters make cursors go out of sync with line
         contents.
         """
-        for key in self.config["white_space_map"].keys():
+        for key in self.config["white_space_map"]:
             char = " "
             if self.config["show_white_space"]:
                 char = self.config["white_space_map"][key]
@@ -630,9 +630,9 @@ class BaseViewer:
 
         key_bindings = self.get_key_bindings()
         operation = None
-        if key in key_bindings.keys():
+        if key in key_bindings:
             operation = key_bindings[key]
-        elif name in key_bindings.keys():
+        elif name in key_bindings:
             operation = key_bindings[name]
         if operation:
             self.run_operation(operation)
@@ -641,7 +641,7 @@ class BaseViewer:
 
     def run_operation(self, operation):
         """Run an editor core operation."""
-        if operation in self.operations.keys():
+        if operation in self.operations:
             cancel = self.app.trigger_event_before(operation)
             if cancel:
                 return False
@@ -894,7 +894,7 @@ class Viewer(BaseViewer):
         ext = self.file_extension
         # Check if a file extension is redefined
         # Maps e.g. 'scss' to 'css'
-        if ext in self.extension_map.keys():
+        if ext in self.extension_map:
             ext = self.extension_map[ext]  # Use it
         curr_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -926,7 +926,7 @@ class Viewer(BaseViewer):
             return False
         # Check if a file extension is redefined
         # Maps e.g. 'scss' to 'css'
-        if ext in self.extension_map.keys():
+        if ext in self.extension_map:
             ext = self.extension_map[ext]  # Use it
         try:
             self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
