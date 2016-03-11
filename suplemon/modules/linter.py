@@ -115,7 +115,7 @@ class BaseLint:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
             fnull.close()
         except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
-            self.logger.exception("Subprocess failed.")
+            self.logger.debug("Subprocess failed.")
             return False
         out, err = process.communicate()
         return out
