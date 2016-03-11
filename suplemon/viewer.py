@@ -518,9 +518,6 @@ class BaseViewer:
 
     def move_cursors(self, delta=None):
         """Move all cursors with delta. To avoid refreshing the screen set noupdate to True."""
-        if self.app.block_rendering:
-            noupdate = True
-
         for cursor in self.cursors:
             if delta:
                 if delta[0] != 0 and cursor.x >= 0:
@@ -582,7 +579,7 @@ class BaseViewer:
         self.cursors.pop(index)
         return True
 
-    def purge_cursors(self, render=True):
+    def purge_cursors(self):
         """Remove duplicate cursors that have the same position."""
         new = []
         # This sucks: can't use "if .. in .." for different instances (?)
@@ -593,8 +590,6 @@ class BaseViewer:
                 ref.append(cursor.tuple())
                 new.append(cursor)
         self.cursors = new
-        if render:
-            self.render()  # TODO: is this needed?
 
     def purge_line_cursors(self, line_no):
         """Remove all but first cursor on given line."""
