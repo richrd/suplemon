@@ -653,10 +653,14 @@ class BaseViewer:
         """Move cursors right."""
         for cursor in self.cursors:
             line = self.lines[cursor.y]
-            if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0):
-                cursor.move_down()
-                cursor.set_x(0)
-            elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:
+            # If we are at the end of the line
+            if cursor.x >= len(line) or len(line) == 0:
+                # If there is another line, then move down
+                if cursor.y != len(self.lines)-1:
+                    cursor.move_down()
+                    cursor.set_x(0)
+            # Otherwise, move the cursor right
+            else:
                 cursor.move_right()
         self.move_cursors()
         self.scroll_down()
