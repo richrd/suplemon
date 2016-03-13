@@ -9,7 +9,7 @@ class SystemClipboard(Module):
     def init(self):
         self.init_logging(__name__)
         if not self.has_xsel_support():
-            self.logger.warning("xsel not available. Can't use system clipboard.")
+            self.logger.warning("Can't use system clipboard. Install 'xsel' for system clipboard support.")
             return False
         self.bind_event_before("insert", self.insert)
         self.bind_event_after("copy", self.copy)

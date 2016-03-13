@@ -67,7 +67,7 @@ key_map = {
     "^W": "ctrl+w",
     "^X": "ctrl+x",
     "^Y": "ctrl+y",
-    # "^Z": "ctrl+z",  # Conflicts with suspend
+    "^Z": "ctrl+z",  # Conflicts with suspend
 
     544: "ctrl+left",
     559: "ctrl+right",

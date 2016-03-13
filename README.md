@@ -19,7 +19,7 @@ http://github.com/richrd/suplemon
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
 
-## Get it!
+## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
 
@@ -97,6 +97,7 @@ Suplemon is licensed under the MIT license.
 
 ## Configuration
 
+### Main Config
 The suplemon config file is stored at ```~/.config/suplemon/suplemon-config.json```.
 
 The best way to edit it is to run the ```config``` command (Run commands via ```Ctrl+E```).
@@ -104,8 +105,10 @@ That way Suplemon will automatically reload the configuration when you save the 
 To view the default configuration and see what options are available run ```config defaults``` via ```Ctrl+E```.
 
 
+### Keymap Config
 
-## Keyboard shortcuts
+Below are the default key mappings used in suplemon. They can be edited by running the ```keymap``` command.
+To view the default keymap file run ```keymap default```
 
  * <kbd>Ctrl</kbd> + <kbd>Q</kbd>
    > Exit
@@ -171,10 +174,10 @@ To view the default configuration and see what options are available run ```conf
  * <kbd>Ctrl</kbd> + <kbd>E</kbd>
    > Run a command.
 
- * <kbd>F5</kbd>
+ * <kbd>Ctrl</kbd> + <kbd>Z</kbd> and <kbd>F5</kbd>
    > Undo
 
- * <kbd>F6</kbd>
+ * <kbd>Ctrl</kbd> + <kbd>Y</kbd> and <kbd>F6</kbd>
    > Redo
 
  * <kbd>F7</kbd>
@@ -219,33 +222,36 @@ After those are installed, tests can be run via:
 
     ./test.sh
 
+PRs are very welcome and appreciated.
+When making PRs make sure to set the target branch to `dev`. I only push to master when releasing new versions.
+
+
 ## Todo
  * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Design proper API for plugins/extensions/macros
- * [ ] Documentation for v 1.0.0
- * [ ] Package Suplemon and upload to PIP
+ * [ ] Documentation for v 1.0.0
 
 ## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
  * [X] Display tab characters with a replacement char (tab messes up lines)
  * [X] Global clipboard (copy from one file to another)
- * [ ] Core
+ * [ ] Core
    * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Setting for enabling/disabling undo for cursor changes
    * [ ] Selections
    * [ ] List of recent files
    * [ ] Read only viewer
       * ~~And disable editing~~ Don't disable editing. Instead enable save as.
-   * [ ] Only refresh cursors when moving around
-   * [ ] Only refresh modified lines when editing
- * [ ] Extensions:
+   * [X] Only refresh cursors when moving around
+   * [X] Only refresh modified lines when editing
+ * [ ] Extensions:
    * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
    * [ ] Auto backup. Activate on n changes or every n seconds
    * [ ] File selector, kind of like what nano has
      * [ ] This should be implemented as an extension
-     * [ ] Could be triggered with a key binding (and/or override open file)
+     * [ ] Could be triggered with a key binding (and/or override open file)
      * [ ] Need to refactor App class to support views instead of just files
-     * [ ] A view could be an editor or an extension ui
-     * [ ] Extensions should be able to control both status bars and key legend
+     * [ ] A view could be an editor or an extension ui
+     * [ ] Extensions should be able to control both status bars and key legend
    * [ ] Automatically add ; to end of lines
       * [ ] Generalized: add line prepend and append commands
       * [ ] Will need multiline comment and string detection etc.
