@@ -620,13 +620,56 @@ class PromptEditor(Editor):
         self.end()  # Move to the end of the initial text
 
         self.refresh()
+        success = self.input_loop()
+        if success:
+            return self.get_data()
+        return False
 
+    def input_loop(self):
         # Run the input loop until ready
         while not self.ready:
             event = self.input_func(True)  # blocking
             if event:
                 self.handle_input(event)
             self.refresh()
-        if self.canceled:
+        if not self.canceled:
+            return True
+
+
+class PromptEditorBool(PromptEditor):
+    """An input prompt for booleans based on PromptEditor."""
+
+    def set_value(self, val):
+        self.value = val
+
+    def handle_input(self, event):
+        """Handle special bindings for the prompt."""
+        name = event.key_name
+        if name.lower() == "y":
+            self.set_value(True)
+            self.on_ready()
             return False
-        return self.get_data()
+        if name.lower() == "n":
+            self.set_value(False)
+            self.on_ready()
+            return False
+        PromptEditor.handle_input(self, event)
+
+    def get_input(self, caption="", initial=False):
+        """Get a boolean value from the user via the prompt."""
+
+        indicator = "[y/N]"
+        if initial:
+            indicator = "[Y/n]"
+
+        self.caption = caption + " " + indicator
+        self.set_value(initial)
+        self.end()  # Move to the end of the initial text
+
+        self.refresh()
+
+        # Run the input loop until ready
+        success = self.input_loop()
+        if success:
+            return self.value
+        return False
