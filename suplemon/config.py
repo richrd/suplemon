@@ -171,18 +171,18 @@ class Config:
 
 
 class ConfigModule(suplemon_module.Module):
-    """Helper for shortcut for openning config files."""
+    """Helper for shortcut for opening config files."""
     def init(self):
-        self.conf_name = "defaults.json"
-        self.conf_default_path = os.path.join(self.app.path, "config", self.conf_name)
-        self.conf_user_path = self.app.config.path()
+        self.config_name = "defaults.json"
+        self.config_default_path = os.path.join(self.app.path, "config", self.config_name)
+        self.config_user_path = self.app.config.path()
 
     def run(self, app, editor, args):
         if args == "defaults":
             # Open the default config in a new file only for viewing
-            self.open(app, self.conf_default_path, read_only=True)
+            self.open(app, self.config_default_path, read_only=True)
         else:
-            self.open(app, self.conf_user_path)
+            self.open(app, self.config_user_path)
 
     def open(self, app, path, read_only=False):
         if read_only:
@@ -190,7 +190,7 @@ class ConfigModule(suplemon_module.Module):
             data = f.read()
             f.close()
             file = app.new_file()
-            file.set_name(self.conf_name)
+            file.set_name(self.config_name)
             file.set_data(data)
             app.switch_to_file(app.last_file_index())
         else:
