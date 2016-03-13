@@ -9,7 +9,7 @@ import os
 import sys
 
 from . import ui
-from . import modules
+from . import module_loader
 from . import themes
 from . import helpers
 
@@ -103,7 +103,7 @@ class App:
         self.ui.init()
 
         # Load extension modules
-        self.modules = modules.ModuleLoader(self)
+        self.modules = module_loader.ModuleLoader(self)
         self.modules.load()
 
         # Load themes
