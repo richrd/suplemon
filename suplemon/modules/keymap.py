@@ -5,17 +5,17 @@ import os
 from suplemon import config
 
 
-class SuplemonConfig(config.ConfigModule):
+class KeymapConfig(config.ConfigModule):
     """Shortcut to openning the keymap config file."""
     def __init__(self, app):
         config.ConfigModule.__init__(self, app)
 
     def init(self):
-        self.conf_name = "defaults.json"
+        self.conf_name = "keymap.json"
         self.conf_default_path = os.path.join(self.app.path, "config", self.conf_name)
-        self.conf_user_path = self.app.config.path()
+        self.conf_user_path = self.app.config.keymap_path()
 
 module = {
-    "class": SuplemonConfig,
-    "name": "config",
+    "class": KeymapConfig,
+    "name": "keymap",
 }

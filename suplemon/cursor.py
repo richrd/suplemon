@@ -123,6 +123,9 @@ class Cursor:
     def __str__(self):
         return "Cursor({x},{y})".format(x=self.x, y=self.y)
 
+    def __repr__(self):
+        return self.__str__()
+
     def tuple(self):
         """Return the cursor as a tuple.
 

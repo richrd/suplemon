@@ -6,6 +6,7 @@ Curses user interface.
 import os
 import logging
 
+from .editor import PromptEditor
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -96,6 +97,7 @@ class UI:
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
         import curses.textpad  # noqa
+        self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
 
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
@@ -260,10 +262,9 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows(resize=True)
-        self.screen.refresh()
 
     def check_resize(self):
-        """Check if terminal has resized."""
+        """Check if terminal has resized and resize if needed."""
         yx = self.screen.getmaxyx()
         if self.current_yx != yx:
             self.current_yx = yx
@@ -285,10 +286,10 @@ class UI:
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
-            name_str = "Suplemon Editor v" + self.app.version + " -"
+            name_str = "Suplemon Editor v{0} -".format(self.app.version)
             if self.app.config["app"]["use_unicode_symbols"]:
                 logo = "\u2688"      # Simple lemon (filled)
-                name_str = " " + logo + " " + name_str
+                name_str = " {0} {1}".format(logo, name_str)
             head_parts.append(name_str)
 
         # Add module statuses to the status bar
@@ -327,7 +328,7 @@ class UI:
                 append += ["", is_changed_symbol][f.is_changed()]
             fname = prepend + f.name + append
             if not str_list:
-                str_list.append("[" + fname + "]")
+                str_list.append("[{0}]".format(fname))
             else:
                 str_list.append(fname)
         return " ".join(str_list)
@@ -337,15 +338,16 @@ class UI:
         editor = self.app.get_editor()
         size = self.get_size()
         cur = editor.get_cursor()
-        data = "@ " + str(cur[0]) + "," + str(cur[1]) + " " + \
-            "cur:" + str(len(editor.cursors)) + " " + \
-            "buf:" + str(len(editor.get_buffer()))
-        if self.app.config["app"]["debug"]:
-            data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
-        # if editor.last_find:
-        #     find = editor.last_find
-        #     if len(find) > 10:find = find[:10]+"..."
-        #     data = "find:'"+find+"' " + data
+        data = "@ {0},{1} cur:{2} buf:{3}".format(
+            str(cur[0]),
+            str(cur[1]),
+            str(len(editor.cursors)),
+            str(len(editor.get_buffer()))
+        )
+
+        # Deprecate?
+        # if self.app.config["app"]["debug"]:
+        #     data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
 
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
@@ -406,42 +408,25 @@ class UI:
             x += len(key[1])+2
         self.legend_win.refresh()
 
-    def show_capture_status(self, s="", value=""):
-        """Show status when capturing input."""
-        self.status_win.erase()
-        self.status_win.addstr(0, 0, s, curses.A_REVERSE)
-        self.status_win.addstr(0, len(s), value)
-
-    def _process_query_key(self, key):
-        """Process keystrokes from the Textbox window."""
-        if key in [3, 27]:  # Support canceling query with Ctrl+C or ESC
-            raise KeyboardInterrupt
-        # Standardize some keycodes
-        rewrite = {
-            127: 263,
-            8: 263,
-        }
-        # self.logger.debug("Query key input: {0}".format(str(key)))
-        if key in rewrite.keys():
-            key = rewrite[key]
-        return key
-
     def _query(self, text, initial=""):
         """Ask for text input via the status bar."""
-        self.show_capture_status(text, initial)
-        self.text_input = curses.textpad.Textbox(self.status_win)
-        try:
-            out = self.text_input.edit(self._process_query_key)
-        except:
-            return False
 
-        # If input begins with prompt, remove the prompt text
-        if len(out) >= len(text):
-            if out[:len(text)] == text:
-                out = out[len(text):]
-        if len(out) > 0 and out[-1] == " ":
-            out = out[:-1]
-        out = out.rstrip("\r\n")
+        # Disable render blocking
+        blocking = self.app.block_rendering
+        self.app.block_rendering = 0
+
+        # Create our text input
+        self.text_input = PromptEditor(self.app, self.status_win)
+        self.text_input.set_config(self.app.config["editor"].copy())
+        self.text_input.set_input_source(self.get_input)
+        self.text_input.init()
+
+        # Get input from the user
+        out = self.text_input.get_input(text, initial)
+
+        # Restore render blocking
+        self.app.block_rendering = blocking
+
         return out
 
     def query(self, text, initial=""):
@@ -486,7 +471,6 @@ class UI:
             event.set_key_name("ctrl+c")
             return event
         except:
-            self.logger.debug("Failed to get input!")
             # No input available
             return False
         finally:

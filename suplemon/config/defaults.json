@@ -19,27 +19,7 @@
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Wether to use special unicode symbols for decoration
-        "use_unicode_symbols": true,
-        // Key bindings for app functions
-        "keys": {
-            "ctrl+h": "help",
-            "ctrl+s": "save_file",
-            "ctrl+e": "run_command",
-            "ctrl+f": "find",
-            "ctrl+g": "go_to",
-            "ctrl+o": "open",
-            "ctrl+w": "close_file",
-            "ctrl+n": "new_file",
-            "ctrl+q": "ask_exit",
-            "ctrl+p": "comment",
-            "ctrl+pageup": "next_file",
-            "ctrl+pagedown": "prev_file",
-            "f1": "save_file_as",
-            "f2": "reload_file",
-            "f7": "toggle_whitespace",
-            "f8": "toggle_mouse",
-            "f11": "toggle_fullscreen"
-        }
+        "use_unicode_symbols": true
     },
     // Editor settings
     "editor": {
@@ -78,6 +58,10 @@
         },
         // Wether to visually show white space chars
         "show_white_space": false,
+        // Show tab indicators in whitespace
+        "show_tab_indicators": true,
+        // Tab indicator charatrer
+        "tab_indicator_character": "\u203A",
         // Line numbering
         "show_line_nums": true,
         // Naive line highlighting
@@ -91,46 +75,7 @@
         // Wether to use copy/paste across multiple files
         "use_global_buffer": true,
         // Find with regex by default
-        "regex_find": false,
-        // Key bindings for editor functions
-        "keys": {
-            "up": "arrow_up",
-            "down": "arrow_down",
-            "left": "arrow_left",
-            "right": "arrow_right",
-            "enter": "enter",
-            "backspace": "backspace",
-            "delete": "delete",
-            "insert": "insert",
-            "tab": "tab",
-            "shift+tab": "untab",
-            "home": "home",
-            "end": "end",
-            "escape": "escape",
-            "pageup": "page_up",
-            "pagedown": "page_down",
-            "f5": "undo",
-            "f6": "redo",
-            "f9": "toggle_line_nums",
-            "f10": "toggle_line_ends",
-            "f11": "toggle_highlight",
-            "alt+up": "new_cursor_up",
-            "alt+down": "new_cursor_down",
-            "alt+left": "new_cursor_left",
-            "alt+right": "new_cursor_right",
-            "alt+pageup": "push_up",
-            "alt+pagedown": "push_down",
-            "ctrl+c": "copy",
-            "ctrl+x": "cut",
-            "ctrl+k": "duplicate_line",
-            "ctrl+v": "insert",
-            "ctrl+d": "find_next",
-            "ctrl+a": "find_all",
-            "ctrl+left": "jump_left",
-            "ctrl+right": "jump_right",
-            "ctrl+up": "jump_up",
-            "ctrl+down": "jump_down"
-        }
+        "regex_find": false
     },
     // UI Display Settings
     "display": {
@@ -148,6 +93,6 @@
         // Show the bottom status bar
         "show_bottom_bar": true,
         // Invert status bar colors (switch text and background colors)
-        "invert_status_bars": true
+        "invert_status_bars": false
     }
 }

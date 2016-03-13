@@ -19,7 +19,7 @@ http://github.com/richrd/suplemon
 ![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
 
 
-## Get it!
+## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
 
@@ -97,6 +97,7 @@ Suplemon is licensed under the MIT license.
 
 ## Configuration
 
+### Main Config
 The suplemon config file is stored at ```~/.config/suplemon/suplemon-config.json```.
 
 The best way to edit it is to run the ```config``` command (Run commands via ```Ctrl+E```).
@@ -104,8 +105,10 @@ That way Suplemon will automatically reload the configuration when you save the 
 To view the default configuration and see what options are available run ```config defaults``` via ```Ctrl+E```.
 
 
+### Keymap Config
 
-## Keyboard shortcuts
+Below are the default key mappings used in suplemon. They can be edited by running the ```keymap``` command.
+To view the default keymap file run ```keymap default```
 
  * <kbd>Ctrl</kbd> + <kbd>Q</kbd>
    > Exit
