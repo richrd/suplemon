@@ -2,38 +2,20 @@
 
 import os
 
-from suplemon.suplemon_module import Module
+from suplemon import config
 
 
-class Config(Module):
-    """Shortcut to openning the current config file."""
+class SuplemonConfig(config.ConfigModule):
+    """Shortcut to openning the keymap config file."""
+    def __init__(self, app):
+        config.ConfigModule.__init__(self, app)
 
-    def run(self, app, editor, args):
-        if args == "defaults":
-            # Open the default config in a new file only for viewing
-            path = os.path.join(app.path, "config", "defaults.json")
-            self.open_read_only(app, path)
-        else:
-            # Open the user config file for editing
-            path = app.config.path()
-            f = app.file_is_open(path)
-            if f:
-                app.switch_to_file(app.get_file_index(f))
-            else:
-                if not app.open_file(path):
-                    app.new_file(path)
-                app.switch_to_file(app.last_file_index())
-
-    def open_read_only(self, app, path):
-        f = open(path)
-        data = f.read()
-        f.close()
-        file = app.new_file()
-        file.set_name("defaults.json")
-        file.set_data(data)
-        app.switch_to_file(app.last_file_index())
+    def init(self):
+        self.conf_name = "defaults.json"
+        self.conf_default_path = os.path.join(self.app.path, "config", self.conf_name)
+        self.conf_user_path = self.app.config.path()
 
 module = {
-    "class": Config,
+    "class": SuplemonConfig,
     "name": "config",
 }

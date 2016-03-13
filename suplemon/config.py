@@ -8,6 +8,7 @@ import json
 import logging
 
 from . import helpers
+from . import suplemon_module
 
 
 class Config:
@@ -167,3 +168,37 @@ class Config:
     def __len__(self):
         """Return length of top level config variables."""
         return len(self.config)
+
+
+class ConfigModule(suplemon_module.Module):
+    """Helper for shortcut for openning config files."""
+    def init(self):
+        self.conf_name = "defaults.json"
+        self.conf_default_path = os.path.join(self.app.path, "config", self.conf_name)
+        self.conf_user_path = self.app.config.path()
+
+    def run(self, app, editor, args):
+        if args == "defaults":
+            # Open the default config in a new file only for viewing
+            self.open(app, self.conf_default_path, read_only=True)
+        else:
+            self.open(app, self.conf_user_path)
+
+    def open(self, app, path, read_only=False):
+        if read_only:
+            f = open(path)
+            data = f.read()
+            f.close()
+            file = app.new_file()
+            file.set_name(self.conf_name)
+            file.set_data(data)
+            app.switch_to_file(app.last_file_index())
+        else:
+            # Open the user config file for editing
+            f = app.file_is_open(path)
+            if f:
+                app.switch_to_file(app.get_file_index(f))
+            else:
+                if not app.open_file(path):
+                    app.new_file(path)
+                app.switch_to_file(app.last_file_index())
