@@ -6,15 +6,16 @@ Text viewer component subclassed by Editor.
 import os
 import re
 import sys
-import imp
 import curses
 import logging
+import importlib
 
 from . import helpers
 
 from .line import Line
 from .cursor import Cursor
 from .themes import scope_to_pair
+import suplemon.linelight  # NOQA
 
 try:
     import pygments.lexers
@@ -900,9 +901,10 @@ class Viewer(BaseViewer):
         filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
         module = False
+        syntax_module_name = ".{}".format(ext)
         if os.path.isfile(path):
             try:
-                module = imp.load_source(ext, path)
+                module = importlib.import_module(syntax_module_name, "suplemon.linelight")
             except:
                 self.logger.error("Failed to load syntax file '{0}'!".format(path), exc_info=True)
         else:

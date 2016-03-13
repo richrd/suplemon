@@ -1,4 +1,5 @@
 from suplemon import helpers
+from suplemon.linelight.color_map import color_map
 
 
 class Syntax:
@@ -6,10 +7,10 @@ class Syntax:
         return ("", "")
 
     def get_color(self, raw_line):
-        color = 7
+        color = color_map["white"]
         line = raw_line.strip()
         if helpers.starts(line, ["{", "}"]):
-            color = 3    # Blue
+            color = color_map["yellow"]
         elif helpers.starts(line, "\""):
-            color = 2    # Green
+            color = color_map["green"]
         return color
