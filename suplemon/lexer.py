@@ -11,14 +11,16 @@ class Lexer:
         self.token_map = {
             pygments.token.Comment: "comment",
             pygments.token.Comment.Single: "comment",
+            pygments.token.Operator: "keyword",
             pygments.token.Name.Function: "entity.name.function",
             pygments.token.Name.Class: "entity.name.class",
             pygments.token.Name.Tag: "entity.name.tag",
             pygments.token.Name.Attribute: "entity.other.attribute-name",
             pygments.token.Name.Variable: "variable",
-            pygments.token.Operator: "keyword",
             pygments.token.Name.Builtin.Pseudo: "constant.language",
             pygments.token.Literal.String: "string",
+            pygments.token.Literal.String.Doc: "string",
+            pygments.token.Punctuation: "punctuation",
         }
 
     def lex(self, code, lex):
