@@ -174,10 +174,10 @@ To view the default keymap file run ```keymap default```
  * <kbd>Ctrl</kbd> + <kbd>E</kbd>
    > Run a command.
 
- * <kbd>F5</kbd>
+ * <kbd>Ctrl</kbd> + <kbd>Z</kbd> and <kbd>F5</kbd>
    > Undo
 
- * <kbd>F6</kbd>
+ * <kbd>Ctrl</kbd> + <kbd>Y</kbd> and <kbd>F6</kbd>
    > Redo
 
  * <kbd>F7</kbd>
@@ -221,6 +221,10 @@ If you are interested in contributing to Suplemon, development dependencies can 
 After those are installed, tests can be run via:
 
     ./test.sh
+
+PRs are very welcome and appreciated.
+When making PRs make sure to set the target branch to `dev`. I only push to master when releasing new versions.
+
 
 ## Todo
  * [ ] Remember cursor positions in files (and restore when opened again)
