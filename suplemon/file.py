@@ -114,6 +114,15 @@ class File:
         if not os.path.isfile(path):
             self.logger.info("Given path isn't a file.")
             return False
+        data = self._read(path)
+        if not data:
+            return False
+        self.data = data
+        self.editor.set_data(data)
+        self.on_load()
+        return True
+
+    def _read(self, path):
         data = self._read_text(path)
         if data is False:
             self.logger.warning("Normal file read failed.")
@@ -121,10 +130,7 @@ class File:
         if data is False:
             self.logger.warning("Fallback file read failed.")
             return False
-        self.data = data
-        self.editor.set_data(data)
-        self.on_load()
-        return True
+        return data
 
     def _read_text(self, file):
         # Read text file
@@ -161,6 +167,13 @@ class File:
     def is_changed(self):
         """Check if the editor data is different from the file."""
         return self.editor.get_data() != self.data
+
+    def is_changed_on_disk(self):
+        path = self._path()
+        data = self._read(path)
+        if data != self.data:
+            return True
+        return False
 
     def is_writable(self):
         """Check if the file is writable."""

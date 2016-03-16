@@ -375,9 +375,8 @@ class App:
                 self.exit()
                 return True
             return False
-        else:
-            self.exit()
-            return True
+        self.exit()
+        return True
 
     def switch_to_file(self, index):
         """Load a default file if no files specified."""
@@ -599,8 +598,14 @@ class App:
     def save_file(self, file=False):
         """Save current file."""
         f = file or self.get_file()
+        # Make sure the file has a name
         if not f.get_name():
             return self.save_file_as(f)
+        # Warn if the file has changed on disk
+        if f.is_changed_on_disk():
+            if not self.ui.query_bool("The file was modified since you opened it, save anyway?"):
+                return False
+        # Save the file
         if f.save():
             self.set_status("Saved [{0}] '{1}'".format(helpers.curr_time_sec(), f.name))
             if f.path() == self.config.path():
