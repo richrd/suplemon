@@ -170,9 +170,10 @@ class File:
 
     def is_changed_on_disk(self):
         path = self._path()
-        data = self._read(path)
-        if data != self.data:
-            return True
+        if os.path.isfile(path):
+            data = self._read(path)
+            if data != self.data:
+                return True
         return False
 
     def is_writable(self):

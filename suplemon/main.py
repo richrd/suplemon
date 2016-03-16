@@ -620,6 +620,9 @@ class App:
         name = self.ui.query("Save as:", f.name)
         if not name:
             return False
+        if os.path.exists(name):
+            if not self.ui.query_bool("A file or directory with that name already exists. Overwrite it?"):
+                return False
         target_dir = os.path.dirname(name)
         if target_dir and not os.path.exists(target_dir):
             if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
