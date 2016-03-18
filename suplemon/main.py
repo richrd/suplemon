@@ -595,14 +595,14 @@ class App:
         if self.current_file == len(self.files):
             self.current_file -= 1
 
-    def save_file(self, file=False):
+    def save_file(self, file=False, overwrite=False):
         """Save current file."""
         f = file or self.get_file()
         # Make sure the file has a name
         if not f.get_name():
             return self.save_file_as(f)
         # Warn if the file has changed on disk
-        if f.is_changed_on_disk():
+        if not overwrite and f.is_changed_on_disk():
             if not self.ui.query_bool("The file was modified since you opened it, save anyway?"):
                 return False
         # Save the file
@@ -631,7 +631,8 @@ class App:
             else:
                 return False
         f.set_name(name)
-        return self.save_file(f)
+        # We can just overwrite the file since the user already confirmed
+        return self.save_file(f, overwrite=True)
 
     def reload_file(self):
         """Reload the current file."""
