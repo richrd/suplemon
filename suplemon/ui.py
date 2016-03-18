@@ -6,7 +6,7 @@ Curses user interface.
 import os
 import logging
 
-from .editor import PromptEditor
+from .editor import PromptEditor, PromptEditorBool
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -345,7 +345,7 @@ class UI:
             str(len(editor.get_buffer()))
         )
 
-        # Deprecate?
+        # TODO: Deprecate?
         # if self.app.config["app"]["debug"]:
         #     data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
 
@@ -408,7 +408,7 @@ class UI:
             x += len(key[1])+2
         self.legend_win.refresh()
 
-    def _query(self, text, initial=""):
+    def _query(self, text, initial="", cls=PromptEditor):
         """Ask for text input via the status bar."""
 
         # Disable render blocking
@@ -416,7 +416,7 @@ class UI:
         self.app.block_rendering = 0
 
         # Create our text input
-        self.text_input = PromptEditor(self.app, self.status_win)
+        self.text_input = cls(self.app, self.status_win)
         self.text_input.set_config(self.app.config["editor"].copy())
         self.text_input.set_input_source(self.get_input)
         self.text_input.init()
@@ -436,18 +436,8 @@ class UI:
 
     def query_bool(self, text, default=False):
         """Get a boolean from the user."""
-        indicator = "[y/N]"
-        initial = ""
-        if default:
-            indicator = "[Y/n]"
-            initial = "y"
-
-        result = self._query(text + " " + indicator, initial)
-        if result in ["Y", "y"]:
-            return True
-        if result == "":
-            return default
-        return False
+        result = self._query(text, default, PromptEditorBool)
+        return result
 
     def get_input(self, blocking=True):
         """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""

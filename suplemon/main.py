@@ -375,9 +375,8 @@ class App:
                 self.exit()
                 return True
             return False
-        else:
-            self.exit()
-            return True
+        self.exit()
+        return True
 
     def switch_to_file(self, index):
         """Load a default file if no files specified."""
@@ -596,11 +595,17 @@ class App:
         if self.current_file == len(self.files):
             self.current_file -= 1
 
-    def save_file(self, file=False):
+    def save_file(self, file=False, overwrite=False):
         """Save current file."""
         f = file or self.get_file()
+        # Make sure the file has a name
         if not f.get_name():
             return self.save_file_as(f)
+        # Warn if the file has changed on disk
+        if not overwrite and f.is_changed_on_disk():
+            if not self.ui.query_bool("The file was modified since you opened it, save anyway?"):
+                return False
+        # Save the file
         if f.save():
             self.set_status("Saved [{0}] '{1}'".format(helpers.curr_time_sec(), f.name))
             if f.path() == self.config.path():
@@ -615,6 +620,9 @@ class App:
         name = self.ui.query("Save as:", f.name)
         if not name:
             return False
+        if os.path.exists(name):
+            if not self.ui.query_bool("A file or directory with that name already exists. Overwrite it?"):
+                return False
         target_dir = os.path.dirname(name)
         if target_dir and not os.path.exists(target_dir):
             if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
@@ -623,7 +631,8 @@ class App:
             else:
                 return False
         f.set_name(name)
-        return self.save_file(f)
+        # We can just overwrite the file since the user already confirmed
+        return self.save_file(f, overwrite=True)
 
     def reload_file(self):
         """Reload the current file."""
