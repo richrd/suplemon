@@ -42,20 +42,15 @@ key_map = {
     "KEY_LEFT": "left",
     "KEY_RIGHT": "right",
 
-    curses.KEY_SLEFT: "shift+left",
-    curses.KEY_SRIGHT: "shift+right",
-    "KEY_SLEFT": "shift+left",
-    "KEY_SRIGHT": "shift+right",
-
     curses.KEY_ENTER: "enter",
     "KEY_ENTER": "enter",
     "\n": "enter",
     "^J": "enter",
-    
+
     curses.KEY_BACKSPACE: "backspace",
     "KEY_BACKSPACE": "backspace",
     "^?": "backspace",
-    
+
     curses.KEY_DC: "delete",
     curses.KEY_HOME: "home",
     curses.KEY_END: "end",
@@ -66,13 +61,14 @@ key_map = {
     "KEY_END": "end",
     "KEY_PPAGE": "pageup",
     "KEY_NPAGE": "pagedown",
-    
+
     curses.KEY_IC: "insert",
     "KEY_IC": "insert",
     331: "insert",
     "\t": "tab",
     "^I": "tab",
     "^[": "escape",
+
 
     # Control
     "^A": "ctrl+a",
@@ -110,10 +106,16 @@ key_map = {
     "kRIT5": "ctrl+right",
     "kUP5": "ctrl+up",
     "kDN5": "ctrl+down",
+
+    "kDC5": "ctrl+delete",
+    "kHOM5": "ctrl+home",
+    "kEND5": "ctrl+end",
+
     554: "ctrl+pageup",
     549: "ctrl+pagedown",
     "kNXT5": "ctrl+pageup",
     "kPRV5": "ctrl+pagedown",
+
 
     # Alt
     563: "alt+up",
@@ -124,12 +126,60 @@ key_map = {
     "kDN3": "alt+down",
     "kLFT3": "alt+left",
     "kRIT3": "alt+right",
+
+    "kDC3": "alt+delete",
+    "kHOM3": "alt+home",
+    "kEND3": "alt+end",
+
     552: "alt+pageup",
     547: "alt+pagedown",
     "kPRV3": "alt+pageup",
     "kNXT3": "alt+pagedown",
 
+
     # Shift
+    curses.KEY_SLEFT: "shift+left",
+    curses.KEY_SRIGHT: "shift+right",
+    "KEY_SLEFT": "shift+left",
+    "KEY_SRIGHT": "shift+right",
+
     353: "shift+tab",
     "KEY_BTAB": "shift+tab",
+
+
+    # Shift + Alt
+    "kUP4": "shift+alt+up",
+    "kDN4": "shift+alt+down",
+    "kLFT4": "shift+alt+left",
+    "kRIT4": "shift+alt+right",
+
+    "kDC4": "shift+alt+delete",
+    "kHOM4": "shift+alt+home",
+    "kEND4": "shift+alt+end",
+
+
+    # Control + Shift
+    "kUP6": "ctrl+shift+up",
+    "kDN6": "ctrl+shift+down",
+    "kLFT6": "ctrl+shift+left",
+    "kRIT6": "ctrl+shift+right",
+
+    "kDC6": "ctrl+alt+delete",
+    "kHOM6": "ctrl+alt+home",
+    "kEND6": "ctrl+alt+end",
+
+
+    # Control + Alt
+    "kUP7": "ctrl+alt+up",
+    "kDN7": "ctrl+alt+down",
+    "kLFT7": "ctrl+alt+left",
+    "kRIT7": "ctrl+alt+right",
+
+    "kPRV7": "ctrl+alt+pageup",
+    "kNXT7": "ctrl+alt+pagedown",
+
+    "kDC7": "ctrl+alt+delete",
+    "kHOM7": "ctrl+alt+home",
+    "kEND7": "ctrl+alt+end",
+
 }
