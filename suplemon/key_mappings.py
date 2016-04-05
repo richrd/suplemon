@@ -8,7 +8,6 @@ import curses
 
 key_map = {
     # Single keys
-    # F1
     curses.KEY_F1: "f1",    # 265
     curses.KEY_F2: "f2",    # 266
     curses.KEY_F3: "f3",    # 267
@@ -21,25 +20,55 @@ key_map = {
     curses.KEY_F10: "f10",  # 274
     curses.KEY_F11: "f11",  # 275
     curses.KEY_F12: "f12",  # 276
+    "KEY_F(1)": "f1",
+    "KEY_F(2)": "f2",
+    "KEY_F(3)": "f3",
+    "KEY_F(4)": "f4",
+    "KEY_F(5)": "f5",
+    "KEY_F(6)": "f6",
+    "KEY_F(7)": "f7",
+    "KEY_F(8)": "f8",
+    "KEY_F(9)": "f9",
+    "KEY_F(10)": "f10",
+    "KEY_F(11)": "f11",
+    "KEY_F(12)": "f12",
 
     curses.KEY_UP: "up",
     curses.KEY_DOWN: "down",
     curses.KEY_LEFT: "left",
     curses.KEY_RIGHT: "right",
+    "KEY_UP": "up",
+    "KEY_DOWN": "down",
+    "KEY_LEFT": "left",
+    "KEY_RIGHT": "right",
+
     curses.KEY_SLEFT: "shift+left",
     curses.KEY_SRIGHT: "shift+right",
+    "KEY_SLEFT": "shift+left",
+    "KEY_SRIGHT": "shift+right",
 
     curses.KEY_ENTER: "enter",
+    "KEY_ENTER": "enter",
     "\n": "enter",
     "^J": "enter",
+    
     curses.KEY_BACKSPACE: "backspace",
+    "KEY_BACKSPACE": "backspace",
     "^?": "backspace",
+    
     curses.KEY_DC: "delete",
     curses.KEY_HOME: "home",
     curses.KEY_END: "end",
     curses.KEY_PPAGE: "pageup",
     curses.KEY_NPAGE: "pagedown",
+    "KEY_DC": "delete",
+    "KEY_HOME": "home",
+    "KEY_END": "end",
+    "KEY_PPAGE": "pageup",
+    "KEY_NPAGE": "pagedown",
+    
     curses.KEY_IC: "insert",
+    "KEY_IC": "insert",
     331: "insert",
     "\t": "tab",
     "^I": "tab",
@@ -102,4 +131,5 @@ key_map = {
 
     # Shift
     353: "shift+tab",
+    "KEY_BTAB": "shift+tab",
 }
