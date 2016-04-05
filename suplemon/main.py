@@ -159,7 +159,7 @@ class App:
         self.trigger_event_after("app_loaded")
 
     def on_input(self, event):
-        self.logger.debug("on_input: key_name={} key_code={}".format(event.key_name, event.key_code))
+        self.logger.debug("on_input: key_name={} key_code={} curses_name={}".format(event.key_name, event.key_code, event.curses_key_name))
         # Handle the input or give it to the editor
         if not self.handle_input(event):
             # Pass the input to the editor component

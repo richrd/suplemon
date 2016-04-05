@@ -20,6 +20,7 @@ class InputEvent:
         self.type = None  # 'key' or 'mouse'
         self.key_name = None
         self.key_code = None
+        self.curses_key_name = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
         self.logger = logging.getLogger("{0}.InputEvent".format(__name__))
@@ -29,6 +30,7 @@ class InputEvent:
         self.type = "key"
         self.key_code = key_code
         self.key_name = self._key_name(key_code)
+        self.curses_key_name = self._curses_key_name(key_code)
 
     def set_key_name(self, name):
         """Manually set the event key name."""
