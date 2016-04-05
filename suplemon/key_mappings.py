@@ -26,6 +26,9 @@ key_map = {
     curses.KEY_DOWN: "down",
     curses.KEY_LEFT: "left",
     curses.KEY_RIGHT: "right",
+    curses.KEY_SLEFT: "shift+left",
+    curses.KEY_SRIGHT: "shift+right",
+
     curses.KEY_ENTER: "enter",
     "\n": "enter",
     "^J": "enter",
@@ -36,6 +39,7 @@ key_map = {
     curses.KEY_END: "end",
     curses.KEY_PPAGE: "pageup",
     curses.KEY_NPAGE: "pagedown",
+    curses.KEY_IC: "insert",
     331: "insert",
     "\t": "tab",
     "^I": "tab",
