@@ -1,5 +1,8 @@
-Suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+Suplemon :lemon:
 ========
+
+[![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://gitter.im/richrd/suplemon](https://badges.gitter.im/richrd/suplemon.svg)](https://gitter.im/richrd/suplemon?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
         /  /____/  /  /  /  /_/  /  / /  /  /_____/  /  /  /  /  /  /    |/  / /
@@ -15,8 +18,7 @@ Suplemon is a modern, powerful and intuitive console text editor with multi curs
 Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 http://github.com/richrd/suplemon
 
-## Suplemon multi cursor editing
-![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
+![Suplemon in action](http://www.suplemon.com/assets/suplemon-v0.1.51-multi-cursor-editing.gif)
 
 
 ## Try it!
@@ -227,22 +229,17 @@ When making PRs make sure to set the target branch to `dev`. I only push to mast
 
 
 ## Todo
- * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Design proper API for plugins/extensions/macros
  * [ ] Documentation for v 1.0.0
 
 ## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
- * [X] Display tab characters with a replacement char (tab messes up lines)
- * [X] Global clipboard (copy from one file to another)
  * [ ] Core
-   * [ ] Optimize rendering for ssh (minimal screen update)
    * [ ] Setting for enabling/disabling undo for cursor changes
    * [ ] Selections
    * [ ] List of recent files
+   * [ ] Optionally Remember cursor positions in files (and restore when opened again)
    * [ ] Read only viewer
       * ~~And disable editing~~ Don't disable editing. Instead enable save as.
-   * [X] Only refresh cursors when moving around
-   * [X] Only refresh modified lines when editing
  * [ ] Extensions:
    * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
    * [ ] Auto backup. Activate on n changes or every n seconds
@@ -252,13 +249,6 @@ When making PRs make sure to set the target branch to `dev`. I only push to mast
      * [ ] Need to refactor App class to support views instead of just files
      * [ ] A view could be an editor or an extension ui
      * [ ] Extensions should be able to control both status bars and key legend
-   * [ ] Automatically add ; to end of lines
-      * [ ] Generalized: add line prepend and append commands
-      * [ ] Will need multiline comment and string detection etc.
-
-## Fix / Defects
- * [ ] Input queries can't detect trailing whitespace
- * [ ] Remember find query if occurance not found (jump to top of file)
 
 
 ## Rationale
