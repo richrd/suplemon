@@ -12,7 +12,7 @@ class Cursor:
         :param y: Cursor y coordinate. Defaults to 0.
         """
         # Handle coords as a tuple
-        if isinstance(x, tuple):
+        if isinstance(x, tuple) or isinstance(x, list):
             x, y = x
             self.x = x
             self.y = y
