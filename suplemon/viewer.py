@@ -817,6 +817,8 @@ class BaseViewer:
 
             # Find all occurances of search string
             s = str(line[x_offset:])  # Data to search in
+            if y < len(self.lines)-1:  # Make line breaks findable (add them to all except last line)
+                s = s + "\n"
             pattern = re.escape(what)  # Default to non regex pattern
             if self.config["regex_find"]:
                 try:  # Try to search with the actual regex
