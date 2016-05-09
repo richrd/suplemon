@@ -16,6 +16,15 @@ class Storage:
         self.data = {}
         self.automatic = False
         self.module = module
+        self.data_subdir = "modules"
+        self.extension = "json"
+        self.storage_dir = os.path.join(self.module.app.config.get_config_dir(), self.data_subdir)
+        if not os.path.exists(self.storage_dir):
+            try:
+                os.makedirs(self.storage_dir)
+            except:
+                self.app.logger.warning("Module storage folder '{0}' doesn't exist and couldn't be created.".format(
+                                        self.storage_dir))
 
     def __getitem__(self, i):
         """Get a storage key value."""
@@ -44,7 +53,7 @@ class Storage:
     def get_path(self):
         """Get the storage file path."""
         if self.module.get_name():
-            return os.path.join(self.module.app.config.get_config_dir(), self.module.get_name())
+            return os.path.join(self.storage_dir, self.module.get_name() + "." + self.extension)
         return False
 
     def get_data(self):
@@ -67,23 +76,26 @@ class Storage:
             f.write(data)
             f.close()
         except:
-            self.module.logger.exception("storing module storage failed")
+            self.module.logger.exception("Storing module storage failed.")
 
     def load(self):
         """Load the storage data from disk."""
-        try:
-            f = open(self.get_path())
-            data = f.read()
-            f.close()
-        except:
-            self.module.logger.debug("loading module storage failed")
+        if os.path.exists(self.get_path()):
+            try:
+                f = open(self.get_path())
+                data = f.read()
+                f.close()
+            except:
+                self.module.logger.debug("Loading module storage failed.")
+                return False
+        else:
             return False
 
         try:
             self.data = json.loads(data)
             return True
         except:
-            self.module.logger.exception("parsing module storage failed")
+            self.module.logger.exception("Parsing module storage failed.")
         return False
 
 
