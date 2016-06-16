@@ -44,6 +44,7 @@ class BaseViewer:
         self.extension_map = {
             "scss": "css",
             "less": "css",
+            "tmtheme": "xml",
         }
         self.show_line_ends = True
 

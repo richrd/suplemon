@@ -10,6 +10,8 @@ try:
 except:
     import xml.etree.ElementTree as ET
 
+from . import hex2xterm
+
 # Map scope name to its color pair index
 scope_to_pair = {
     "global": 21,
@@ -128,7 +130,7 @@ class ThemeLoader:
         elif node.tag == "array":
             return self.parse_array(node)
         elif node.tag == "string":
-            return node.text
+            return self.parse_text(node)
 
         return None
 
@@ -160,3 +162,34 @@ class ThemeLoader:
                 l.append(value)
 
         return l
+
+    def parse_text(self, node):
+        # If the node text is a hex color convert it to an xterm equivalent
+        if node.text:
+            color = self.convert_color(node.text)
+            if color is not False:
+                return color
+
+        return node.text
+
+    def convert_color(self, text):
+        if text[0] != "#":
+            return False
+        # Validate length e.g. #F90, #FF9900, #FF990055
+        if len(text) not in [4, 7, 9]:
+            return False
+        # Strip alpha channel
+        hex_color = text
+        if len(hex_color) == 9:
+            hex_color = hex_color[:7]
+        # If the color only has one character per channel convert them to two
+        if len(hex_color) == 4:
+            hex_color = "#{}{}{}".format(hex_color[1:2]*2, hex_color[2:3]*2, hex_color[3:4]*2)
+        # Convert the color
+        try:
+            xterm_color = int(hex2xterm.hex_to_xterm(hex_color))
+            return xterm_color
+        except:
+            self.logger.exception("Failed to convert color: {}".format(text))
+
+        return False
