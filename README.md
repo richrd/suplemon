@@ -36,6 +36,10 @@ http://github.com/richrd/suplemon
  * Extensions (easy to write your own)
  * Lots more...
 
+
+## Caveats
+ * Currently no built in selections (regions). To copy part of a line select it with your mouse and use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>
+
 ## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
