@@ -78,7 +78,7 @@ class ThemeLoader:
         try:
             tree = ET.parse(fullpath)
         except:
-            self.logger.error("Couldn't parse theme '{}'. Falling back to line based highlighting.")
+            self.logger.error("Couldn't parse theme '{}'. Falling back to line based highlighting.".format(name))
             return None
         root = tree.getroot()
 
