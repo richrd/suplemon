@@ -75,8 +75,11 @@ class ThemeLoader:
             return None
 
         self.logger.debug("Loading theme '{0}'.".format(name))
-
-        tree = ET.parse(fullpath)
+        try:
+            tree = ET.parse(fullpath)
+        except:
+            self.logger.error("Couldn't parse theme '{}'. Falling back to line based highlighting.")
+            return None
         root = tree.getroot()
 
         for child in root:
