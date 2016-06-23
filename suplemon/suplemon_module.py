@@ -148,7 +148,7 @@ class Module:
     def run(self, app, editor, args):
         """This is called each time the module is run.
 
-        Called when command is issued via promtt or key binding.
+        Called when command is issued via prompt or key binding.
 
         Args:
         :param app: the app instance
