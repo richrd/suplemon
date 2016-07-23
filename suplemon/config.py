@@ -57,7 +57,6 @@ class Config:
         else:
             self.logger.info("Failed to load config file '{0}'.".format(path))
             self.config = dict(self.defaults)
-            return False
         self.load_keys()
         return config
 
