@@ -3,7 +3,7 @@
 from suplemon.suplemon_module import Module
 
 
-class RememberState(Module):
+class ApplicationState(Module):
     def init(self):
         self.init_logging(__name__)
         self.bind_event_after("app_loaded", self.on_load)
@@ -53,6 +53,6 @@ class RememberState(Module):
                 self.set_file_state(file, self.storage[path])
 
 module = {
-    "class": RememberState,
-    "name": "remember_state",
+    "class": ApplicationState,
+    "name": "application_state",
 }
