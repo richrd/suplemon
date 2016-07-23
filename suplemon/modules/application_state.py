@@ -38,7 +38,7 @@ class RememberState(Module):
         file.editor.set_cursors(state["cursors"])
         file.editor.set_scroll_pos(state["scroll_pos"])
 
-    def store_states(self, event=None):
+    def store_states(self):
         """Store the states of opened files."""
         states = self.get_file_states()
         for path in states.keys():

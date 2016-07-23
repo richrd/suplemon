@@ -18,7 +18,7 @@ class Storage:
         self.module = module
         self.data_subdir = "modules"
         self.extension = "json"
-        self.storage_dir = os.path.join(self.module.app.config.get_config_dir(), self.data_subdir)
+        self.storage_dir = os.path.join(self.module.app.config.config_dir, self.data_subdir)
         if not os.path.exists(self.storage_dir):
             try:
                 os.makedirs(self.storage_dir)

@@ -26,9 +26,6 @@ class Config:
         self.keymap = {}
         self.config = {}
 
-    def get_config_dir(self):
-        return self.config_dir
-
     def init(self):
         self.create_config_dir()
         return self.load_defaults()
