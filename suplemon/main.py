@@ -116,6 +116,7 @@ class App:
 
     def exit(self):
         """Stop the main loop and exit."""
+        self.trigger_event_before("app_exit")
         self.running = 0
 
     def run(self):
@@ -137,6 +138,7 @@ class App:
         self.ui.refresh()
         # Start mainloop
         self.main_loop()
+        self.trigger_event_after("app_exit")
         # Unload ui
         self.ui.unload()
 

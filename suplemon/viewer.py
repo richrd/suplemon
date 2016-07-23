@@ -44,6 +44,7 @@ class BaseViewer:
         self.extension_map = {
             "scss": "css",
             "less": "css",
+            "tmtheme": "xml",
         }
         self.show_line_ends = True
 
@@ -96,13 +97,22 @@ class BaseViewer:
         y, x = self.window.getmaxyx()
         return (x, y)
 
+    def get_scroll_pos(self):
+        return (self.y_scroll, self.x_scroll)
+
+    def get_y_scroll(self):
+        return self.y_scroll
+
+    def get_x_scroll(self):
+        return self.x_scroll
+
     def get_cursor(self):
         """Return the main cursor."""
         return self.cursors[0]
 
     def get_cursors(self):
         """Return list of all cursors."""
-        return self.cursors[0]
+        return self.cursors
 
     def get_first_cursor(self):
         """Get the first (primary) cursor."""
@@ -191,6 +201,10 @@ class BaseViewer:
         self.config = config
         self.set_cursor_style(self.config["cursor_style"])
 
+    def set_scroll_pos(self, pos):
+        self.y_scroll = pos[0]
+        self.x_scroll = pos[1]
+
     def set_cursor_style(self, cursor_style):
         """Set cursor style.
 
@@ -208,13 +222,13 @@ class BaseViewer:
         self.logger.warning("set_cursor is deprecated, use set_cursor_style instead.")
         return self.set_cursor_style(cursor)
 
+    def set_cursors(self, cursors):
+        """Return list of all cursors."""
+        self.cursors = [Cursor(c) for c in cursors]
+
     def set_single_cursor(self, cursor):
         """Discard all cursors and place a new one."""
         self.cursors = [Cursor(cursor)]
-
-    def set_cursors(self, cursors):
-        """Replace cursors with new cursor list."""
-        self.cursors = cursors
 
     def set_file_extension(self, ext):
         """Set the file extension."""
@@ -804,6 +818,8 @@ class BaseViewer:
 
             # Find all occurances of search string
             s = str(line[x_offset:])  # Data to search in
+            if y < len(self.lines)-1:  # Make line breaks findable (add them to all except last line)
+                s = s + "\n"
             pattern = re.escape(what)  # Default to non regex pattern
             if self.config["regex_find"]:
                 try:  # Try to search with the actual regex

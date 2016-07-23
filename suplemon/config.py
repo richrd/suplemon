@@ -20,7 +20,7 @@ class Config:
         self.config_filename = "suplemon-config.json"
         self.keymap_filename = "suplemon-keymap.json"
         self.home_dir = os.path.expanduser("~")
-        self.fpath = os.path.join(self.home_dir, ".config", "suplemon")
+        self.config_dir = os.path.join(self.home_dir, ".config", "suplemon")
 
         self.defaults = {}
         self.keymap = {}
@@ -31,14 +31,14 @@ class Config:
         return self.load_defaults()
 
     def path(self):
-        return os.path.join(self.fpath, self.config_filename)
+        return os.path.join(self.config_dir, self.config_filename)
 
     def keymap_path(self):
-        return os.path.join(self.fpath, self.keymap_filename)
+        return os.path.join(self.config_dir, self.keymap_filename)
 
     def set_path(self, path):
         parts = os.path.split(path)
-        self.fpath = parts[0]
+        self.config_dir = parts[0]
         self.config_filename = parts[1]
 
     def load(self):
@@ -54,7 +54,6 @@ class Config:
         else:
             self.logger.info("Failed to load config file '{0}'.".format(path))
             self.config = dict(self.defaults)
-            return False
         self.load_keys()
         return config
 
@@ -146,12 +145,12 @@ class Config:
         return "\n".join(cleaned)
 
     def create_config_dir(self):
-        if not os.path.exists(self.fpath):
+        if not os.path.exists(self.config_dir):
             try:
-                os.makedirs(self.fpath)
+                os.makedirs(self.config_dir)
             except:
                 self.app.logger.warning("Config folder '{0}' doesn't exist and couldn't be created.".format(
-                                        self.fpath))
+                                        self.config_dir))
 
     def __getitem__(self, i):
         """Get a config variable."""

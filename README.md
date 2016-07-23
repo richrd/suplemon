@@ -20,6 +20,25 @@ http://github.com/richrd/suplemon
 
 ![Suplemon in action](http://www.suplemon.com/assets/suplemon-v0.1.51-multi-cursor-editing.gif)
 
+## Features
+ * Terminal text editing with style
+ * Proper multi cursor editing, Sublime Text style.
+ * Syntax highlighting
+ * Autocomplete (based on words in the files that are open)
+ * Easy Undo/Redo (Ctrl + Z, Ctrl + Y)
+ * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix)
+ * Multiple files in tabs
+ * Powerful Go To feature for jumping to files and lines
+ * Find, Find next and Find all (Ctrl + F, Ctrl + D, Ctrl + A)
+ * Custom keyboard shortcuts (and easy-to-use defaults)
+ * Mouse support
+ * Restores cursor positions in when reopenning files.
+ * Extensions (easy to write your own)
+ * Lots more...
+
+
+## Caveats
+ * Currently no built in selections (regions). To copy part of a line select it with your mouse and use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>
 
 ## Try it!
 
@@ -74,21 +93,6 @@ Suplemon is an intuitive command line text editor. It supports multiple cursors 
 It is as easy as nano, and has much of the power of Sublime Text. It also supports extensions
 to allow all kinds of customizations. To get more help hit ```Ctrl + H``` in the editor.
 Suplemon is licensed under the MIT license.
-
-## Features
- * Terminal text editing with style
- * Proper multi cursor editing, Sublime Text style.
- * Syntax highlighting
- * Autocomplete
- * Easy Undo/Redo
- * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix)
- * Multiple files in tabs
- * Powerful Go To feature for jumping to files and lines
- * Find and Find next
- * Custom keyboard shortcuts
- * Mouse support
- * Extensions (easy to write your own)
- * Lots more...
 
 ## Goals
  1. [X] Create a command line text editor with built in multi cursor support. It's awesome!
