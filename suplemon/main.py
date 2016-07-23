@@ -18,7 +18,7 @@ from .logger import logger
 from .config import Config
 from .editor import Editor
 
-__version__ = "0.1.52"
+__version__ = "0.1.53"
 
 
 class App:
