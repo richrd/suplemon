@@ -21,9 +21,8 @@ http://github.com/richrd/suplemon
 ![Suplemon in action](http://www.suplemon.com/assets/suplemon-v0.1.51-multi-cursor-editing.gif)
 
 ## Features
- * Terminal text editing with style
- * Proper multi cursor editing, Sublime Text style.
- * Syntax highlighting
+ * Proper multi cursor editing, as in Sublime Text
+ * Syntax highlighting with Text Mate themes
  * Autocomplete (based on words in the files that are open)
  * Easy Undo/Redo (Ctrl + Z, Ctrl + Y)
  * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix)
@@ -32,7 +31,7 @@ http://github.com/richrd/suplemon
  * Find, Find next and Find all (Ctrl + F, Ctrl + D, Ctrl + A)
  * Custom keyboard shortcuts (and easy-to-use defaults)
  * Mouse support
- * Restores cursor positions in when reopenning files.
+ * Restores cursor positions in when reopenning files
  * Extensions (easy to write your own)
  * Lots more...
 
@@ -58,6 +57,12 @@ To install Suplemon from the repo run the setup script:
 
     sudo python3 setup.py install
 
+### Usage
+
+    suplemon # New file in the current directory
+    suplemon [filename]... # Open one or more files
+
+
 ### Notes
  - **Must use Python 3.3 or higher for proper character encoding support.**
  - **Python2.7 (and maybe lower) versions work, but aren't officially supported (some special characters won't work etc).**
@@ -82,11 +87,6 @@ No dependencies outside the Python Standard Library required.
  See [docs/optional-dependencies.md][] for installation instructions.
 
  [docs/optional-dependencies.md]: docs/optional-dependencies.md
-
-## Usage
-
-    suplemon # New file in the current directory
-    suplemon [filename]... # Open one or more files
 
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
