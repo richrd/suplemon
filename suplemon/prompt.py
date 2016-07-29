@@ -145,6 +145,17 @@ class PromptFile(Prompt):
     def handle_input(self, event):
         """Handle special bindings for the prompt."""
         name = event.key_name
+        if self.complete_active:
+            # Allow accepting completed directories with enter
+            if name == "enter":
+                if os.path.isdir(self.get_data()):
+                    self.deactivate_autocomplete()
+                    return False
+            # Revert auto completion with esc
+            if name == "escape":
+                self.revert_autocomplete()
+                self.deactivate_autocomplete()
+                return False
         if name == "tab":
             # Run auto completion when tab is pressed
             self.autocomplete()
@@ -154,10 +165,6 @@ class PromptFile(Prompt):
             # If any key other than tab is pressed deactivate the auto completer
             self.logger.debug("AC autodeactivate! Name: {}".format(name))
             self.deactivate_autocomplete()
-        if name == "enter":
-            if self.complete_active:
-                self.deactivate_autocomplete()
-                return False
         Prompt.handle_input(self, event)
 
     def autocomplete(self):
@@ -218,10 +225,10 @@ class PromptFile(Prompt):
             self.set_data(self.complete_data)
 
     def filter_items(self, items, name):
+        """Remove items that don't begin with name. Not case sensitive."""
         if not name:
             return items
         name = name.lower()
-
         return [item for item in items if item.lower().startswith(name)]
 
     def get_path_contents(self, path):
