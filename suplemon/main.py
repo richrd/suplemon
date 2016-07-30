@@ -571,7 +571,7 @@ class App:
 
     def open(self):
         """Ask for file name and try to open it."""
-        name = self.ui.query("Open file:")
+        name = self.ui.query_file("Open file:")
         if not name:
             return False
         exists = self.file_is_open(name)
@@ -619,7 +619,7 @@ class App:
     def save_file_as(self, file=False):
         """Save current file."""
         f = file or self.get_file()
-        name = self.ui.query("Save as:", f.name)
+        name = self.ui.query_file("Save as:", f.name)
         if not name:
             return False
         if os.path.exists(name):

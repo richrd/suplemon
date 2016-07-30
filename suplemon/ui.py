@@ -6,7 +6,7 @@ Curses user interface.
 import os
 import logging
 
-from .editor import PromptEditor, PromptEditorBool
+from .prompt import Prompt, PromptBool, PromptFile
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -410,7 +410,7 @@ class UI:
             x += len(key[1])+2
         self.legend_win.refresh()
 
-    def _query(self, text, initial="", cls=PromptEditor):
+    def _query(self, text, initial="", cls=Prompt):
         """Ask for text input via the status bar."""
 
         # Disable render blocking
@@ -438,7 +438,12 @@ class UI:
 
     def query_bool(self, text, default=False):
         """Get a boolean from the user."""
-        result = self._query(text, default, PromptEditorBool)
+        result = self._query(text, default, PromptBool)
+        return result
+
+    def query_file(self, text, initial=""):
+        """Get a file path from the user."""
+        result = self._query(text, initial, PromptFile)
         return result
 
     def get_input(self, blocking=True):
