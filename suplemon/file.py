@@ -104,6 +104,7 @@ class File:
             return False
         self.data = data
         self.last_save = time.time()
+        self.writable = os.access(self._path(), os.W_OK)
         return True
 
     def load(self, read=True):
