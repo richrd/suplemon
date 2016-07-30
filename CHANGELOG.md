@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+## [v0.1.54](https://github.com/richrd/suplemon/tree/v0.1.32) (2015-08-12) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.53...v0.1.54)
+
+**Implemented enhancements:**
+
+- Autocomplete in open/save dialogs
+
+**Fixed bugs:**
+
+- Fixed showing unwritable marker when saving file in a writable location
+
+
 ## [v0.1.32](https://github.com/richrd/suplemon/tree/v0.1.32) (2015-08-12) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.31...v0.1.32)
 
