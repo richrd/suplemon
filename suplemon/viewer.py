@@ -378,9 +378,12 @@ class BaseViewer:
             scope = token[0]
             text = self.replace_whitespace(token[1])
             if token[1].isspace() and not self.app.ui.limited_colors:
-                # Color visible whitespace with gray
-                # TODO: get whitespace color from theme
-                pair = 9  # Gray text on normal background
+                pair = 9  # Default to gray text on normal background
+                settings = self.app.themes.get_scope("global")
+                if settings and settings.get("invisibles"):
+                    fg = int(settings.get("invisibles") or -1)
+                    bg = int(settings.get("background") or -1)
+                    curses.init_pair(pair, fg, bg)
                 curs_color = curses.color_pair(pair)
                 # Only add tab indicators to the inital whitespace
                 if first_token and self.config["show_tab_indicators"]:
