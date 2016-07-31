@@ -347,10 +347,6 @@ class UI:
             str(len(editor.get_buffer()))
         )
 
-        # TODO: Deprecate?
-        # if self.app.config["app"]["debug"]:
-        #     data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
-
         # Add module statuses to the status bar
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
@@ -373,41 +369,61 @@ class UI:
 
     def show_legend(self):
         """Show keyboard legend."""
-        # TODO: get from key bindings
-        self.legend_win.erase()
-        keys = [
-            ("^S", "Save"),
-            ("F1", "Save as"),
-            ("F2", "Reload"),
-            ("F5", "Undo"),
-            ("F6", "Redo"),
-            ("^O", "Open"),
-            ("^C", "Copy"),
-            ("^X", "Cut"),
-            ("^V", "Paste"),
-            ("^F", "Find"),
-            ("^D", "Find next"),
-            ("^A", "Find all"),
-            ("^K", "Duplicate line"),
-            ("ESC", "Single cursor"),
-            ("^G", "Go to"),
-            ("^E", "Run command"),
-            ("F8", "Mouse mode"),
-            ("^Q", "Exit"),
+        # Only the most important commands are displayed in the legend
+        legend_commands = [
+            ("save_file", "Save"),
+            ("save_file_as", "Save as"),
+            ("reload_file", "Reload"),
+            ("undo", "Undo"),
+            ("redo", "Redo"),
+            ("open", "Open"),
+            ("copy", "Copy"),
+            ("cut", "Cut"),
+            ("insert", "Paste"),
+            ("find", "Find"),
+            ("find_next", "Find next"),
+            ("find_all", "Find all"),
+            ("duplicate_line", "Duplicate line"),
+            ("escape", "Single cursor"),
+            ("go_to", "Go to"),
+            ("run_command", "Run command"),
+            ("toggle_mouse", "Mouse mode"),
+            ("ask_exit", "Exit"),
         ]
+
+        # Get the key bindings for the commands
+        keys = []
+        for command in legend_commands:
+            for item in self.app.config.keymap:
+                if item["command"] == command[0]:
+                    key = item["keys"][0]
+                    keys.append((key, command[1]))
+                    break
+
+        # Render the keys
+        self.legend_win.erase()
         x = 0
         y = 0
         max_y = 1
-        for key in keys:
-            if x+len(" ".join(key)) >= self.get_size()[0]:
+        for item in keys:
+            key = item[0]
+            label = item[1]
+            key = key.upper()
+            # Format some key names to look better
+            if key.startswith("CTRL+"):
+                key = "^"+key[5:]
+            if key == "ESCAPE":
+                key = "ESC"
+
+            if x+len(" ".join((key, label))) >= self.get_size()[0]:
                 x = 0
                 y += 1
                 if y > max_y:
                     break
-            self.legend_win.addstr(y, x, key[0], curses.A_REVERSE)
-            x += len(key[0])
-            self.legend_win.addstr(y, x, " "+key[1])
-            x += len(key[1])+2
+            self.legend_win.addstr(y, x, key.upper(), curses.A_REVERSE)
+            x += len(key)
+            self.legend_win.addstr(y, x, " "+label)
+            x += len(label)+2
         self.legend_win.refresh()
 
     def _query(self, text, initial="", cls=Prompt):
