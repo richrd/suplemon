@@ -67,6 +67,8 @@ class Editor(Viewer):
             "tab": self.tab,                              # Tab
             "untab": self.untab,                          # Shift + Tab
             "escape": self.escape,                        # Escape
+            "single_selection": self.single_selection,    # Escape
+            "clear_last_find": self.clear_last_find,      # Escape
             "new_cursor_up": self.new_cursor_up,          # Alt + Up
             "new_cursor_down": self.new_cursor_down,      # Alt + Down
             "new_cursor_left": self.new_cursor_left,      # Alt + Left
@@ -227,11 +229,18 @@ class Editor(Viewer):
     def escape(self):
         """Handle escape key.
 
-        Removes last_find and all cursors except primary cursor."""
+        Wrapper for clear_last_find and single_selection."""
+        self.clear_last_find()
+        self.single_selection()
+
+    def clear_last_find(self):
+        """Removes last_find so a new auto-find can be initiated."""
         self.last_find = ""
+
+    def single_selection(self):
+        """Removes all cursors except primary cursor."""
         self.cursors = [self.cursors[0]]
         self.move_cursors()
-        self.render()
 
     #
     # Text editing operations
