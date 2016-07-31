@@ -2,6 +2,7 @@
 
 import re
 import os
+import threading
 import subprocess
 
 from suplemon.suplemon_module import Module
@@ -15,7 +16,7 @@ class Linter(Module):
         # blocking the UI when the app is loading
 
         # Lint all files after app is loaded
-        self.bind_event_after("app_loaded", self.lint_all_files)
+        self.bind_event_after("app_loaded", self.on_loaded)
         # Show linting messages in status bar
         self.bind_event_after("mainloop", self.mainloop)
         # Re-lint current file when appropriate
@@ -30,6 +31,11 @@ class Linter(Module):
         count = self.get_msg_count(editor)
         status = "{0} lines with linting errors in this file.".format(str(count))
         self.app.set_status(status)
+
+    def on_loaded(self, event):
+        # Lint all files in a thread since it might take a while
+        thread = threading.Thread(target=self.lint_all_files, args=(event,))
+        thread.start()
 
     def mainloop(self, event):
         """Run the linting command."""
