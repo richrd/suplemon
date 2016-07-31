@@ -22,7 +22,7 @@
     {"keys": ["f2"],               "command": "reload_file"},
     {"keys": ["f7"],               "command": "toggle_whitespace"},
     {"keys": ["f8"],               "command": "toggle_mouse"},
-    {"keys": ["f11"],              "command": "toggle_fullscreen"},
+    {"keys": ["f12"],              "command": "toggle_fullscreen"},
     // Editor
     {"keys": ["up"],               "command": "arrow_up"},
     {"keys": ["down"],             "command": "arrow_down"},
