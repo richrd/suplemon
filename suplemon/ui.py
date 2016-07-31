@@ -398,6 +398,7 @@ class UI:
                 if item["command"] == command[0]:
                     key = item["keys"][0]
                     keys.append((key, command[1]))
+                    break
 
         # Render the keys
         self.legend_win.erase()
