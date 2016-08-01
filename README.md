@@ -241,7 +241,7 @@ When making PRs make sure to set the target branch to `dev`. I only push to mast
    * [ ] Setting for enabling/disabling undo for cursor changes
    * [ ] Selections
    * [ ] List of recent files
-   * [ ] Optionally Remember cursor positions in files (and restore when opened again)
+   * [X] Optionally Remember cursor positions in files (and restore when opened again)
    * [ ] Read only viewer
       * ~~And disable editing~~ Don't disable editing. Instead enable save as.
  * [ ] Extensions:

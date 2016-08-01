@@ -1,7 +1,21 @@
 Change Log
 ==========
 
-## [v0.1.54](https://github.com/richrd/suplemon/tree/v0.1.32) (2015-08-12) compared to previous master branch.
+## [v0.1.55](https://github.com/richrd/suplemon/tree/v0.1.55) (2016-08-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.54...v0.1.55)
+
+**Implemented enhancements:**
+
+- Faster loading when linting lots of files
+
+- Use `invisibles` setting in TextMate themes [\#77](https://github.com/richrd/suplemon/issues/77)
+
+**Fixed bugs:**
+
+- Show key legend based on config instead of static defaults [\#157](https://github.com/richrd/suplemon/issues/157)
+
+
+## [v0.1.54](https://github.com/richrd/suplemon/tree/v0.1.54) (2016-07-30) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.53...v0.1.54)
 
 **Implemented enhancements:**
