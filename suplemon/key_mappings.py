@@ -33,6 +33,7 @@ key_map = {
     "KEY_F(11)": "f11",
     "KEY_F(12)": "f12",
 
+
     curses.KEY_UP: "up",
     curses.KEY_DOWN: "down",
     curses.KEY_LEFT: "left",
@@ -107,6 +108,7 @@ key_map = {
     "kUP5": "ctrl+up",
     "kDN5": "ctrl+down",
 
+    "kIC5": "ctrl+insert",
     "kDC5": "ctrl+delete",
     "kHOM5": "ctrl+home",
     "kEND5": "ctrl+end",
@@ -115,6 +117,11 @@ key_map = {
     549: "ctrl+pagedown",
     "kNXT5": "ctrl+pageup",
     "kPRV5": "ctrl+pagedown",
+
+    "O5P": "ctrl+f1",
+    "O5Q": "ctrl+f2",
+    "O5R": "ctrl+f3",
+    "O5S": "ctrl+f4",
 
 
     # Alt
@@ -146,6 +153,18 @@ key_map = {
     353: "shift+tab",
     "KEY_BTAB": "shift+tab",
 
+    "O2P": "shift+f1",
+    "O2Q": "shift+f2",
+    "O2R": "shift+f3",
+    "O2S": "shift+f4",
+
+
+    # Alt Gr
+    "O1P": "altgr+f1",
+    "O1Q": "altgr+f2",
+    "O1R": "altgr+f3",
+    "O1S": "altgr+f4",
+
 
     # Shift + Alt
     "kUP4": "shift+alt+up",
@@ -153,6 +172,7 @@ key_map = {
     "kLFT4": "shift+alt+left",
     "kRIT4": "shift+alt+right",
 
+    "kIC4": "shift+alt+inset",
     "kDC4": "shift+alt+delete",
     "kHOM4": "shift+alt+home",
     "kEND4": "shift+alt+end",
@@ -178,6 +198,7 @@ key_map = {
     "kPRV7": "ctrl+alt+pageup",
     "kNXT7": "ctrl+alt+pagedown",
 
+    "kIC7": "ctrl+alt+insert",
     "kDC7": "ctrl+alt+delete",
     "kHOM7": "ctrl+alt+home",
     "kEND7": "ctrl+alt+end",
