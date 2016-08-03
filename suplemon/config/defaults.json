@@ -33,6 +33,8 @@
         "cursor_style": "reverse",
         // Encoding for reading and writing files
         "default_encoding": "utf-8",
+        // Use hard tabs (insert actual tabulator character instead of spaces)
+        "hard_tabs": 0,
         // Number of spaces to insert when pressing tab
         "tab_width": 4,
         // Amount of undo states to store
