@@ -101,6 +101,12 @@ class UI:
         import curses.textpad  # noqa
         self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
 
+        # Notify user if Pygments syntax highlighting isn't available
+        try:
+            import pygments  # noqa
+        except:
+            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
+
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
         curses.wrapper(func)

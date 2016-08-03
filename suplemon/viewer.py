@@ -937,8 +937,6 @@ class Viewer(BaseViewer):
     def setup_highlight(self):
         """Setup Pygments based highlighting."""
         if not pygments:
-            # If Pygments lib not available
-            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
             return False
         self.lexer = Lexer(self.app)
         ext = self.file_extension.lower()
