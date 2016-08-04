@@ -98,7 +98,6 @@ class UI:
         os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
-        import curses.textpad  # noqa
         self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
 
         # Notify user if Pygments syntax highlighting isn't available
