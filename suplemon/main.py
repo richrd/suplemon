@@ -434,9 +434,18 @@ class App:
 
     def find_file(self, s):
         """Return index of file matching string."""
+        # Case insensitive matching
+        s = s.lower()
         i = 0
+        # First match files beginning with s
         for file in self.files:
-            if file.name[:len(s)].lower() == s.lower():
+            if file.name.lower().startswith(s):
+                return i
+            i += 1
+        i = 0
+        # Then match files that contain s
+        for file in self.files:
+            if s in file.name.lower():
                 return i
             i += 1
         return -1
