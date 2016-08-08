@@ -67,7 +67,9 @@ class Config:
         if not keymap:
             self.logger.info("Failed to load keymap file '{0}'.".format(path))
             return False
-        self.keymap += keymap  # Append the user key map
+        # Prepend the user keys to the defaults to give the user config a higher priority
+        keymap += self.keymap
+        self.keymap = keymap
         return True
 
     def load_defaults(self):
