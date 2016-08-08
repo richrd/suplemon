@@ -619,7 +619,7 @@ class App:
         # Save the file
         if f.save():
             self.set_status("Saved [{0}] '{1}'".format(helpers.curr_time_sec(), f.name))
-            if f.path() == self.config.path():
+            if f.path() == self.config.path() or f.path() == self.config.keymap_path():
                 self.reload_config()
             return True
         self.set_status("Couldn't write to '{0}'".format(f.name))
