@@ -8,7 +8,11 @@ import re
 import sys
 import curses
 import logging
-import importlib
+
+try:
+    import importlib
+except:
+    importlib = False
 
 from . import helpers
 
@@ -920,7 +924,7 @@ class Viewer(BaseViewer):
         filename = ext + ".py"
         path = os.path.join(curr_path, "linelight", filename)
         module = False
-        syntax_module_name = ".{}".format(ext)
+        syntax_module_name = ".{0}".format(ext)
         if os.path.isfile(path):
             try:
                 module = importlib.import_module(syntax_module_name, "suplemon.linelight")
