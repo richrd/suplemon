@@ -45,6 +45,9 @@ class InputEvent:
 
     def _key_name(self, key_code):
         """Return a normalized key name for key_code."""
+        if isinstance(key_code, int):
+            if key_code in key_map.keys():
+                return key_map[key_code]
         curs_key_name = self._curses_key_name(key_code)
         if curs_key_name:
             if curs_key_name in key_map.keys():
@@ -68,8 +71,12 @@ class InputEvent:
         # Special keys can also be ints on Python > 3.3
         if isinstance(key, int):  # getch fallback
             try:  # Try to convert to a curses key name
-                return str(curses.keyname(key).decode("utf-8"))
+                self.logger.debug("key:{}".format(key))
+                name = str(curses.keyname(key).decode("utf-8"))
+                self.logger.debug("name:{}".format(name))
+                return name
             except:  # Otherwise try to convert to a character
+                self.logger.debug("key not found!")
                 return False
         return False
 
@@ -393,6 +400,7 @@ class UI:
             ("go_to", "Go to"),
             ("run_command", "Run command"),
             ("toggle_mouse", "Mouse mode"),
+            ("help", "Help"),
             ("ask_exit", "Exit"),
         ]
 
@@ -484,6 +492,7 @@ class UI:
             else:
                 self.screen.nodelay(1)
             char = input_func()
+            self.logger.debug("got input char:'{0}'".format(char))
         except KeyboardInterrupt:
             # Handle KeyboardInterrupt as Ctrl+C
             event.set_key_name("ctrl+c")
