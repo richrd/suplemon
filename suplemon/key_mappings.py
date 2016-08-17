@@ -135,6 +135,7 @@ key_map = {
     "kLFT3": "alt+left",
     "kRIT3": "alt+right",
 
+    "kIC3": "alt+insert",
     "kDC3": "alt+delete",
     "kHOM3": "alt+home",
     "kEND3": "alt+end",
