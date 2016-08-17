@@ -71,12 +71,9 @@ class InputEvent:
         # Special keys can also be ints on Python > 3.3
         if isinstance(key, int):  # getch fallback
             try:  # Try to convert to a curses key name
-                self.logger.debug("key:{}".format(key))
                 name = str(curses.keyname(key).decode("utf-8"))
-                self.logger.debug("name:{}".format(name))
                 return name
             except:  # Otherwise try to convert to a character
-                self.logger.debug("key not found!")
                 return False
         return False
 
@@ -492,7 +489,6 @@ class UI:
             else:
                 self.screen.nodelay(1)
             char = input_func()
-            self.logger.debug("got input char:'{0}'".format(char))
         except KeyboardInterrupt:
             # Handle KeyboardInterrupt as Ctrl+C
             event.set_key_name("ctrl+c")

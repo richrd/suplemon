@@ -117,17 +117,15 @@ class BaseLint:
         """Do linting check for given file path."""
         return {}
 
-    def get_output(self, cmd, errors=False):
+    def get_output(self, cmd):
         try:
             fnull = open(os.devnull, "w")
-            # process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
             fnull.close()
         except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
             self.logger.debug("Subprocess failed.")
             return False
         out, err = process.communicate()
-        self.logger.debug(err)
         return out
 
 
