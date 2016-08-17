@@ -69,6 +69,8 @@ class Linter(Module):
             linter = PyLint(self.logger)
         elif ext == "js":
             linter = JsLint(self.logger)
+        elif ext == "php":
+            linter = PhpLint(self.logger)
 
         if not linter:
             return False
@@ -115,15 +117,17 @@ class BaseLint:
         """Do linting check for given file path."""
         return {}
 
-    def get_output(self, cmd):
+    def get_output(self, cmd, errors=False):
         try:
             fnull = open(os.devnull, "w")
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
+            # process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             fnull.close()
         except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
             self.logger.debug("Subprocess failed.")
             return False
         out, err = process.communicate()
+        self.logger.debug(err)
         return out
 
 
@@ -203,6 +207,55 @@ class JsLint(BaseLint):
                 line_no = int(re.sub("\D", "", parts[0]))
                 char_no = int(re.sub("\D", "", parts[1]))
                 data = parts[2]
+                err_code = None
+                if line_no not in linting.keys():
+                    linting[line_no] = []
+                linting[line_no].append((char_no, data, err_code))
+            except:
+                self.logger.debug("Failed to parse line:{0}".format(line))
+        return linting
+
+
+class PhpLint(BaseLint):
+    def __init__(self, logger):
+        BaseLint.__init__(self, logger)
+
+    def lint(self, path):
+        return self.get_file_linting(path)
+
+    def get_output(self, cmd, errors=False):
+        # Need to override this since php reports the errors to stderr
+        try:
+            fnull = open(os.devnull, "w")
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            fnull.close()
+        except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
+            self.logger.debug("Subprocess failed.")
+            return False
+        out, err = process.communicate()
+        return err
+
+    def get_file_linting(self, path):
+        """Do linting check for given file path."""
+        output = self.get_output(["php", "-l", path])
+        if output is False:
+            self.logger.warning("Failed to get linting for file '{0}'.".format(path))
+            return False
+        output = output.decode("utf-8")
+        lines = output.split("\n")
+        linting = {}
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                parts = line.split(" in {0} on line ".format(path))
+                self.logger.debug(parts)
+                if len(parts) != 2:
+                    continue
+                line_no = int(parts[1])
+                char_no = 0
+                data = parts[0]
                 err_code = None
                 if line_no not in linting.keys():
                     linting[line_no] = []
