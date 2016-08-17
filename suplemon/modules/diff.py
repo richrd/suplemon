@@ -23,7 +23,7 @@ class Diff(Module):
             self.app.set_status("The file in the editor and on disk are identical.")
             return False
         file = app.new_file()
-        file.set_name("diff")
+        file.set_name("diff.diff")
         file.set_data(diff)
         app.switch_to_file(app.last_file_index())
 

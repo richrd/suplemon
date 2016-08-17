@@ -942,6 +942,10 @@ class Viewer(BaseViewer):
         ext = self.file_extension.lower()
         if not ext:
             return False
+        # Don't use Pygments for diffs. The text mate themes that are used don't often support it properly.
+        # It's also such a basic format that it's justified to fall back on line based highlighting.
+        if ext == "diff":
+            return False
         # Check if a file extension is redefined
         # Maps e.g. 'scss' to 'css'
         if ext in self.extension_map:
