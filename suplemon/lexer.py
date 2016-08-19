@@ -21,6 +21,10 @@ class Lexer:
             pygments.token.Literal.String: "string",
             pygments.token.Literal.String.Doc: "string",
             pygments.token.Punctuation: "punctuation",
+            pygments.token.Literal.Number: "constant.numeric",
+            pygments.token.Name: "entity.name",
+            pygments.token.Keyword: "keyword",
+            pygments.token.Generic.Deleted: "invalid",
         }
 
     def lex(self, code, lex):
@@ -48,12 +52,6 @@ class Lexer:
 
             if token in self.token_map.keys():
                 scope = self.token_map[token]
-            elif token in pygments.token.Literal.Number:
-                scope = "constant.numeric"
-            elif token in pygments.token.Name:
-                scope = "entity.name"
-            elif token in pygments.token.Keyword:
-                scope = "keyword"
 
             scopes.append((scope, word[1]))
         return scopes
