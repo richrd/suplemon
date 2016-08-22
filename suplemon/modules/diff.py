@@ -8,7 +8,8 @@ from suplemon.suplemon_module import Module
 class Diff(Module):
     """View a diff of the current file compared to it's on disk version."""
     def run(self, app, editor, args):
-        curr_path = app.get_file().get_path()
+        curr_file = app.get_file()
+        curr_path = curr_file.get_path()
         if not curr_path:
             self.app.set_status("File hasn't been saved, can't show diff.")
             return False
@@ -23,7 +24,7 @@ class Diff(Module):
             self.app.set_status("The file in the editor and on disk are identical.")
             return False
         file = app.new_file()
-        file.set_name("diff.diff")
+        file.set_name(curr_file.get_name() + ".diff")
         file.set_data(diff)
         app.switch_to_file(app.last_file_index())
 
