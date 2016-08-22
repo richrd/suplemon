@@ -641,7 +641,7 @@ class App:
                 os.makedirs(target_dir)
             else:
                 return False
-        f.set_name(name)
+        f.set_path(name)
         # We can just overwrite the file since the user already confirmed
         return self.save_file(f, overwrite=True)
 
