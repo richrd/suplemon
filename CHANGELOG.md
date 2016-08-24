@@ -1,6 +1,29 @@
 Change Log
 ==========
 
+## [v0.1.56](https://github.com/richrd/suplemon/tree/v0.1.56) (2016-08-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.55...v0.1.56)
+
+**Implemented enhancements:**
+
+- New feature: Ability to use hard tabs instead of spaces via the boolean option 'hard_tabs'.
+- New feature: Save all files by running the ´save_all´ command.
+- New feature: Linter now shows PHP syntax errors (if PHP is installed).
+- New module: New `diff` command for comaring current edits to the file on disk.
+- New module: Show machine hostname in bottom status bar.
+- Enhanced Go To feature: If no file name begins with the search string, also match file names that contain the search string at any position.
+- More supported key bindings.
+- Other light code improvements.
+
+**Fixed bugs:**
+
+- Prevented multiple warnings about missing pygments.
+- Reload user keymap when it's changed in the editor.
+- Prioritize user key bindings over defaults. [\#163](https://github.com/richrd/suplemon/issues/163)
+- Reworked key handling to support more bindings (like `ctrl+enter` on some terminals).
+- Normalize modifier key order in keymaps so that they are matched correctly.
+- Properly set the internal file path when saving a file under a new name.
+
 ## [v0.1.55](https://github.com/richrd/suplemon/tree/v0.1.55) (2016-08-01) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.54...v0.1.55)
 
