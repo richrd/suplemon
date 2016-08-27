@@ -20,6 +20,7 @@ class InputEvent:
         self.type = None  # 'key' or 'mouse'
         self.key_name = None
         self.key_code = None
+        self.is_typeable = False
         self.curses_key_name = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
@@ -54,12 +55,16 @@ class InputEvent:
                 return key_map[curs_key_name]
             return curs_key_name
         else:
+            char = None
             if key_code in key_map.keys():
                 return key_map[key_code]
             try:
-                return chr(key_code)
+                char = chr(key_code)
             except:
                 return False
+            if char is not None:
+                self.is_typeable = True
+                return char
         return False
 
     def _curses_key_name(self, key):
