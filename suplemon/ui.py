@@ -53,6 +53,7 @@ class InputEvent:
         if curs_key_name:
             if curs_key_name in key_map.keys():
                 return key_map[curs_key_name]
+            self.is_typeable = True  # We'll assume the key is typeable if it's not found in the key map
             return curs_key_name
         else:
             char = None
@@ -61,7 +62,7 @@ class InputEvent:
             try:
                 char = chr(key_code)
             except:
-                return False
+                pass
             if char is not None:
                 self.is_typeable = True
                 return char
