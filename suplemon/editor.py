@@ -154,8 +154,12 @@ class Editor(Viewer):
         done = Viewer.handle_input(self, event)
         if not done:
             key = event.key_code
+            name = event.key_name
             if event.is_typeable:
-                self.type(key)
+                if isinstance(key, str):
+                    self.type(key)
+                elif name:
+                    self.type(name)
                 return True
         return False
 

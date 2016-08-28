@@ -155,6 +155,10 @@ key_map = {
     353: "shift+tab",
     "KEY_BTAB": "shift+tab",
 
+    "KEY_SDC": "shift+delete",
+    "KEY_SHOME": "shift+home",
+    "KEY_SEND": "shift+end",
+
     "O2P": "shift+f1",
     "O2Q": "shift+f2",
     "O2R": "shift+f3",
@@ -205,4 +209,6 @@ key_map = {
     "kHOM7": "ctrl+alt+home",
     "kEND7": "ctrl+alt+end",
 
+    # Special events
+    "KEY_RESIZE": "resize",
 }
