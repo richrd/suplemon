@@ -151,6 +151,8 @@ key_map = {
     curses.KEY_SRIGHT: "shift+right",
     "KEY_SLEFT": "shift+left",
     "KEY_SRIGHT": "shift+right",
+    "KEY_SR": "shift+up",
+    "KEY_SF": "shift+down",
 
     353: "shift+tab",
     "KEY_BTAB": "shift+tab",
