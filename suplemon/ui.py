@@ -355,7 +355,9 @@ class UI:
         editor = self.app.get_editor()
         size = self.get_size()
         cur = editor.get_cursor()
-        data = "@ {0},{1} cur:{2} buf:{3}".format(
+
+        # Core status info
+        status_str = "@{0},{1} cur:{2} buf:{3}".format(
             str(cur[0]),
             str(cur[1]),
             str(len(editor.cursors)),
@@ -363,15 +365,17 @@ class UI:
         )
 
         # Add module statuses to the status bar
+        module_str = ""
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "bottom":
-                data += " " + module.get_status()
+                module_str += " " + module.get_status()
+        status_str = module_str + " " + status_str
 
         self.status_win.erase()
         status = self.app.get_status()
-        extra = size[0] - len(status+data) - 1
-        line = status+(" "*extra)+data
+        extra = size[0] - len(status+status_str) - 1
+        line = status+(" "*extra)+status_str
 
         if len(line) >= size[0]:
             line = line[:size[0]-1]
