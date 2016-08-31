@@ -163,59 +163,45 @@ class PromptFile(Prompt):
             return False
         else:
             # If any key other than tab is pressed deactivate the auto completer
-            self.logger.debug("AC autodeactivate! Name: {}".format(name))
             self.deactivate_autocomplete()
         Prompt.handle_input(self, event)
 
     def autocomplete(self):
-        self.logger.debug("AC called...")
         data = self.get_data()  # Use the current input by default
         if self.complete_active:  # If the completer is active use the its initial input value
-            self.logger.debug("AC using existing data")
             data = self.complete_data
 
         name = os.path.basename(data)
-        self.logger.debug("AC data, name: {}, {}".format(data, name))
         items = self.get_path_contents(data)  # Get directory listing of input path
-        self.logger.debug("AC items: {}".format(items))
 
         # Filter the items by name if the input path contains a name
         if name:
             items = self.filter_items(items, name)
-        self.logger.debug("AC items (filtered): {}".format(items))
         if not items:
             # Deactivate completion if there's nothing to complete
-            self.logger.debug("AC no items! Deactivating!")
             self.deactivate_autocomplete()
             return False
 
         if not self.complete_active:
             # Initialize the auto completor
-            self.logger.debug("AC activating")
             self.complete_active = 1
             self.complete_data = data
             self.complete_index = 0
         else:
             # Increment the selected item countor
-            self.logger.debug("AC active, incrementing AC item")
             self.complete_index += 1
             if self.complete_index > len(items)-1:
-                self.logger.debug("AC resetting counter!")
                 self.complete_index = 0
 
-        self.logger.debug("AC complete_index {}".format(self.complete_index))
         item = items[self.complete_index]
         new_data = os.path.join(os.path.dirname(data), item)
         if len(items) == 1:
-            self.logger.debug("AC Only one item!")
             self.deactivate_autocomplete()
-        self.logger.debug("AC setting new data: {}".format(new_data))
         # Set the input data to the new path and move cursor to the end
         self.set_data(new_data)
         self.end()
 
     def deactivate_autocomplete(self):
-        self.logger.debug("Deactivated autocomplete.")
         self.complete_active = 0
         self.complete_index = 0
         self.complete_data = ""

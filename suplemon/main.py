@@ -434,9 +434,18 @@ class App:
 
     def find_file(self, s):
         """Return index of file matching string."""
+        # Case insensitive matching
+        s = s.lower()
         i = 0
+        # First match files beginning with s
         for file in self.files:
-            if file.name[:len(s)].lower() == s.lower():
+            if file.name.lower().startswith(s):
+                return i
+            i += 1
+        i = 0
+        # Then match files that contain s
+        for file in self.files:
+            if s in file.name.lower():
                 return i
             i += 1
         return -1
@@ -610,7 +619,7 @@ class App:
         # Save the file
         if f.save():
             self.set_status("Saved [{0}] '{1}'".format(helpers.curr_time_sec(), f.name))
-            if f.path() == self.config.path():
+            if f.path() == self.config.path() or f.path() == self.config.keymap_path():
                 self.reload_config()
             return True
         self.set_status("Couldn't write to '{0}'".format(f.name))
@@ -632,7 +641,7 @@ class App:
                 os.makedirs(target_dir)
             else:
                 return False
-        f.set_name(name)
+        f.set_path(name)
         # We can just overwrite the file since the user already confirmed
         return self.save_file(f, overwrite=True)
 

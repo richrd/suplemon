@@ -20,6 +20,7 @@ class InputEvent:
         self.type = None  # 'key' or 'mouse'
         self.key_name = None
         self.key_code = None
+        self.is_typeable = False
         self.curses_key_name = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
@@ -45,18 +46,26 @@ class InputEvent:
 
     def _key_name(self, key_code):
         """Return a normalized key name for key_code."""
+        if isinstance(key_code, int):
+            if key_code in key_map.keys():
+                return key_map[key_code]
         curs_key_name = self._curses_key_name(key_code)
         if curs_key_name:
             if curs_key_name in key_map.keys():
                 return key_map[curs_key_name]
+            self.is_typeable = True  # We'll assume the key is typeable if it's not found in the key map
             return curs_key_name
         else:
+            char = None
             if key_code in key_map.keys():
                 return key_map[key_code]
             try:
-                return chr(key_code)
+                char = chr(key_code)
             except:
-                return False
+                pass
+            if char is not None:
+                self.is_typeable = True
+                return char
         return False
 
     def _curses_key_name(self, key):
@@ -68,7 +77,8 @@ class InputEvent:
         # Special keys can also be ints on Python > 3.3
         if isinstance(key, int):  # getch fallback
             try:  # Try to convert to a curses key name
-                return str(curses.keyname(key).decode("utf-8"))
+                name = str(curses.keyname(key).decode("utf-8"))
+                return name
             except:  # Otherwise try to convert to a character
                 return False
         return False
@@ -98,8 +108,13 @@ class UI:
         os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
-        import curses.textpad  # noqa
         self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
+
+        # Notify user if Pygments syntax highlighting isn't available
+        try:
+            import pygments  # noqa
+        except:
+            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
 
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
@@ -340,7 +355,9 @@ class UI:
         editor = self.app.get_editor()
         size = self.get_size()
         cur = editor.get_cursor()
-        data = "@ {0},{1} cur:{2} buf:{3}".format(
+
+        # Core status info
+        status_str = "@{0},{1} cur:{2} buf:{3}".format(
             str(cur[0]),
             str(cur[1]),
             str(len(editor.cursors)),
@@ -348,15 +365,17 @@ class UI:
         )
 
         # Add module statuses to the status bar
+        module_str = ""
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "bottom":
-                data += " " + module.get_status()
+                module_str += " " + module.get_status()
+        status_str = module_str + " " + status_str
 
         self.status_win.erase()
         status = self.app.get_status()
-        extra = size[0] - len(status+data) - 1
-        line = status+(" "*extra)+data
+        extra = size[0] - len(status+status_str) - 1
+        line = status+(" "*extra)+status_str
 
         if len(line) >= size[0]:
             line = line[:size[0]-1]
@@ -388,6 +407,7 @@ class UI:
             ("go_to", "Go to"),
             ("run_command", "Run command"),
             ("toggle_mouse", "Mouse mode"),
+            ("help", "Help"),
             ("ask_exit", "Exit"),
         ]
 

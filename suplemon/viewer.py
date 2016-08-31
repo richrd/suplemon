@@ -8,10 +8,9 @@ import re
 import sys
 import curses
 import logging
-
 try:
     import importlib
-except:
+except ImportError:
     importlib = False
 
 from . import helpers
@@ -925,7 +924,7 @@ class Viewer(BaseViewer):
         path = os.path.join(curr_path, "linelight", filename)
         module = False
         syntax_module_name = ".{0}".format(ext)
-        if os.path.isfile(path):
+        if importlib and os.path.isfile(path):
             try:
                 module = importlib.import_module(syntax_module_name, "suplemon.linelight")
             except:
@@ -941,12 +940,14 @@ class Viewer(BaseViewer):
     def setup_highlight(self):
         """Setup Pygments based highlighting."""
         if not pygments:
-            # If Pygments lib not available
-            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
             return False
         self.lexer = Lexer(self.app)
         ext = self.file_extension.lower()
         if not ext:
+            return False
+        # Don't use Pygments for diffs. The text mate themes that are used don't often support it properly.
+        # It's also such a basic format that it's justified to fall back on line based highlighting.
+        if ext == "diff":
             return False
         # Check if a file extension is redefined
         # Maps e.g. 'scss' to 'css'

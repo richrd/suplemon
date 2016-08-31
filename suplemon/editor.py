@@ -153,13 +153,11 @@ class Editor(Viewer):
     def handle_input(self, event):
         done = Viewer.handle_input(self, event)
         if not done:
-            key = event.key_code
-            name = event.key_name
-            if isinstance(key, str):
-                self.type(key)
-                return True
-            elif name and not name.startswith("KEY_"):
-                self.type(name)
+            if event.is_typeable:
+                if isinstance(event.key_code, str):
+                    self.type(event.key_code)
+                elif event.key_name:
+                    self.type(event.key_name)
                 return True
         return False
 
@@ -320,13 +318,14 @@ class Editor(Viewer):
                 del_n_chars = 1
                 # Check if we should unindent
                 if self.config["backspace_unindent"]:
-                    # Check if we can unindent,
-                    # and that it's actually  whitespace
-                    indent = self.config["tab_width"]
-                    if cursor.x >= indent:
-                        if curr_line[cursor.x-indent:cursor.x] == indent*" ":
-                            # Remove an indents worth of whitespace
-                            del_n_chars = indent
+                    # Check if we can unindent, and that it's actually whitespace
+                    # We don't do this for hard tabs since they're just a single character
+                    if not self.config["hard_tabs"]:
+                        indent = self.config["tab_width"]
+                        if cursor.x >= indent:
+                            if curr_line[cursor.x-indent:cursor.x] == indent*" ":
+                                # Remove an indents worth of whitespace
+                                del_n_chars = indent
                 # Slice characters out of the line
                 start = curr_line[:cursor.x-del_n_chars]
                 end = curr_line[cursor.x:]
@@ -453,20 +452,26 @@ class Editor(Viewer):
         """Indent lines."""
         # Add a restore point if previous action != tab
         self.store_action_state("tab")
-        self.type(" "*self.config["tab_width"])
+        if not self.config["hard_tabs"]:
+            self.type(" "*self.config["tab_width"])
+        else:
+            self.type("\t")
 
     def untab(self):
         """Unindent lines."""
         linenums = []
         # String to compare tabs to
         tab = " "*self.config["tab_width"]
+        if self.config["hard_tabs"]:
+            tab = "\t"
+        width = len(tab)
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.y in linenums:
                 cursor.x = helpers.whitespace(line)
                 continue
-            elif line[:self.config["tab_width"]] == tab:
-                line = Line(line[self.config["tab_width"]:])
+            elif line[:width] == tab:
+                line = Line(line[width:])
                 self.lines[cursor.y] = line
                 cursor.x = helpers.whitespace(line)
                 linenums.append(cursor.y)

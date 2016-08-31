@@ -67,8 +67,30 @@ class Config:
         if not keymap:
             self.logger.info("Failed to load keymap file '{0}'.".format(path))
             return False
-        self.keymap += keymap  # Append the user key map
+        # Prepend the user keys to the defaults to give the user config a higher priority
+        keymap += self.keymap
+        self.keymap = self.normalize_keys(keymap)
         return True
+
+    def normalize_keys(self, keymap):
+        """Normalize the order of modifier keys in keymap."""
+        modifiers = ["shift", "ctrl", "alt", "meta"]  # The modifiers in correct order
+        for item in keymap:
+            new_keys = []
+            for key_item in item["keys"]:
+                parts = key_item.split("+")
+                key = parts[-1]
+                if len(parts) < 2:
+                    new_keys.append(key)
+                    continue
+                normalized = ""
+                for mod in modifiers:  # Add the used modifiers back in correct order
+                    if mod in parts:
+                        normalized += mod + "+"
+                normalized += key
+                new_keys.append(normalized)
+            item["keys"] = new_keys
+        return keymap
 
     def load_defaults(self):
         if not self.load_default_config() or not self.load_default_keys():
