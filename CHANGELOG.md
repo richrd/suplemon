@@ -12,6 +12,7 @@ Change Log
 - New module: New `diff` command for comaring current edits to the file on disk.
 - New module: Show machine hostname in bottom status bar.
 - Enhanced Go To feature: If no file name begins with the search string, also match file names that contain the search string at any position.
+- Module status info is now shown on the left of core info in the bottom status bar.
 - More supported key bindings.
 - Other light code improvements.
 
