@@ -379,10 +379,21 @@ class UI:
 
         if len(line) >= size[0]:
             line = line[:size[0]-1]
+
         if self.app.config["display"]["invert_status_bars"]:
-            self.status_win.addstr(0, 0, line, curses.color_pair(0) | curses.A_REVERSE)
+            attrs = curses.color_pair(0) | curses.A_REVERSE
         else:
-            self.status_win.addstr(0, 0, line, curses.color_pair(0))
+            attrs = curses.color_pair(0)
+
+        # This thwarts a weird crash that happens when pasting a lot
+        # of data that contains line breaks into the find dialog.
+        # Should probably figure out why it happens, but it's not
+        # due to line breaks in the data nor is the data too long.
+        # Thanks curses!
+        try:
+            self.status_win.addstr(0, 0, line, attrs)
+        except:
+            self.logger.exception("Failed to show bottom status bar. Status line was: {0}".format(line))
 
         self.status_win.refresh()
 
