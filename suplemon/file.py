@@ -116,7 +116,7 @@ class File:
             self.logger.info("Given path isn't a file.")
             return False
         data = self._read(path)
-        if not data:
+        if data is False:
             return False
         self.data = data
         self.editor.set_data(data)
@@ -141,6 +141,7 @@ class File:
             f.close()
             return data
         except:
+            self.logger.exception("Reading file failed.")
             return False
 
     def _read_binary(self, file):
