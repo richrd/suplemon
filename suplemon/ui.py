@@ -129,13 +129,11 @@ class UI:
         self.screen = curses.initscr()
         self.setup_colors()
 
-        # curses.cbreak()
-        # TODO: Raw mode seems to work ok. Should probably
-        # switch to it from cbreak to get Ctrl+Z to work etc.
         curses.raw()
-
         curses.noecho()
+
         try:
+            # Hide the default cursor
             # Might fail on vt100 terminal emulators
             curses.curs_set(0)
         except:
@@ -552,6 +550,8 @@ class UI:
         x, y = (state[1], state[2])
         if self.app.config["display"]["show_top_bar"]:
             y -= 1
-        x -= editor.line_offset()
+        x -= editor.line_offset() - editor.x_scroll
+        if x < 0:
+            x = 0
         y += editor.y_scroll
         return (state[0], x, y, state[3], state[4])
