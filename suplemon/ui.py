@@ -4,6 +4,7 @@ Curses user interface.
 """
 
 import os
+import sys
 import logging
 
 from .prompt import Prompt, PromptBool, PromptFile
@@ -59,6 +60,12 @@ class InputEvent:
             char = None
             if key_code in key_map.keys():
                 return key_map[key_code]
+
+            if sys.version_info[0] >= 3:
+                if isinstance(key_code, str):
+                    self.is_typeable = True
+                    return key_code
+
             try:
                 char = chr(key_code)
             except:
