@@ -1,6 +1,22 @@
 Change Log
 ==========
 
+## [v0.1.57](https://github.com/richrd/suplemon/tree/v0.1.57) (2016-11-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.56...v0.1.57)
+
+**Implemented enhancements:**
+- Show all special unicode whitespace characters when "show_white_space" is set to true. This helps detecting unwanted characters in files.
+- Now the mouse wheel works the same way in normal mode and mouse mode.
+
+**Fixed bugs:**
+
+- Fixed weird crash when pasting lots of text into prompts (like the find prompt etc)
+- Fixed false matches in diff highlighting.
+- Fixed inability to open empty files.
+- Fixed adding cursors via mouse click when the view is horizontally scrolled.
+- Fixed inputting various special characters that were ignored in some cases on Python3.
+
+
 ## [v0.1.56](https://github.com/richrd/suplemon/tree/v0.1.56) (2016-08-01) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.55...v0.1.56)
 
