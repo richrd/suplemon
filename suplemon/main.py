@@ -18,7 +18,7 @@ from .logger import logger
 from .config import Config
 from .editor import Editor
 
-__version__ = "0.1.56"
+__version__ = "0.1.57"
 
 
 class App:
@@ -336,9 +336,9 @@ class App:
         elif event.mouse_code == 4096:               # Right mouse button release
             editor.add_cursor(event.mouse_pos)
         elif event.mouse_code == 524288:             # Wheel up
-            editor.page_up()
+            editor.jump_up()
         elif event.mouse_code == 134217728:          # Wheel down(and unfortunately left button drag)
-            editor.page_down()
+            editor.jump_down()
         else:
             return False
         return True

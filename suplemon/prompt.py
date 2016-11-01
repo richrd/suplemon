@@ -58,11 +58,10 @@ class Prompt(Editor):
 
     def handle_input(self, event):
         """Handle special bindings for the prompt."""
-        name = event.key_name
-        if name in ["ctrl+c", "escape"]:
+        if event.key_name in ["ctrl+c", "escape"]:
             self.on_cancel()
             return False
-        if name == "enter":
+        if event.key_name == "enter":
             self.on_ready()
             return False
 

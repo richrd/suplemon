@@ -4,6 +4,7 @@ Curses user interface.
 """
 
 import os
+import sys
 import logging
 
 from .prompt import Prompt, PromptBool, PromptFile
@@ -59,6 +60,12 @@ class InputEvent:
             char = None
             if key_code in key_map.keys():
                 return key_map[key_code]
+
+            if sys.version_info[0] >= 3:
+                if isinstance(key_code, str):
+                    self.is_typeable = True
+                    return key_code
+
             try:
                 char = chr(key_code)
             except:
@@ -129,13 +136,11 @@ class UI:
         self.screen = curses.initscr()
         self.setup_colors()
 
-        # curses.cbreak()
-        # TODO: Raw mode seems to work ok. Should probably
-        # switch to it from cbreak to get Ctrl+Z to work etc.
         curses.raw()
-
         curses.noecho()
+
         try:
+            # Hide the default cursor
             # Might fail on vt100 terminal emulators
             curses.curs_set(0)
         except:
@@ -379,10 +384,21 @@ class UI:
 
         if len(line) >= size[0]:
             line = line[:size[0]-1]
+
         if self.app.config["display"]["invert_status_bars"]:
-            self.status_win.addstr(0, 0, line, curses.color_pair(0) | curses.A_REVERSE)
+            attrs = curses.color_pair(0) | curses.A_REVERSE
         else:
-            self.status_win.addstr(0, 0, line, curses.color_pair(0))
+            attrs = curses.color_pair(0)
+
+        # This thwarts a weird crash that happens when pasting a lot
+        # of data that contains line breaks into the find dialog.
+        # Should probably figure out why it happens, but it's not
+        # due to line breaks in the data nor is the data too long.
+        # Thanks curses!
+        try:
+            self.status_win.addstr(0, 0, line, attrs)
+        except:
+            self.logger.exception("Failed to show bottom status bar. Status line was: {0}".format(line))
 
         self.status_win.refresh()
 
@@ -541,6 +557,8 @@ class UI:
         x, y = (state[1], state[2])
         if self.app.config["display"]["show_top_bar"]:
             y -= 1
-        x -= editor.line_offset()
+        x -= editor.line_offset() - editor.x_scroll
+        if x < 0:
+            x = 0
         y += editor.y_scroll
         return (state[0], x, y, state[3], state[4])

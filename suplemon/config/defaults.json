@@ -55,8 +55,46 @@
             "\u00A0": "\u237D",
             // Soft hyphen as letter shelf
             "\u00AD": "\u2423",
-            // Zero width space as interpunct
-            "\u200B": "\u00B7"
+
+            // Other special unicode spaces shown as a space symbol (s/p)
+            // See here for details: http://www.cs.tut.fi/~jkorpela/chars/spaces.html
+
+            // no-break space
+            "\u00A0": "\u2420",
+            // mongolian vowel separator
+            "\u180E": "\u2420",
+            // en quad
+            "\u2000": "\u2420",
+            // em quad
+            "\u2001": "\u2420",
+            // en space
+            "\u2002": "\u2420",
+            // em space
+            "\u2003": "\u2420",
+            // three-per-em space
+            "\u2004": "\u2420",
+            // four-per-em space
+            "\u2005": "\u2420",
+            // six-per-em space
+            "\u2006": "\u2420",
+            // figure space
+            "\u2007": "\u2420",
+            // punctuation space
+            "\u2008": "\u2420",
+            // thin space
+            "\u2009": "\u2420",
+            // hair space
+            "\u200A": "\u2420",
+            // zero width space
+            "\u200B": "\u2420",
+            // narrow no-break space
+            "\u202F": "\u2420",
+            // medium mathematical space
+            "\u205F": "\u2420",
+            // ideographic space
+            "\u3000": "\u2420",
+            // zero width no-break space
+            "\uFEFF": "\u2420"
         },
         // Wether to visually show white space chars
         "show_white_space": false,
