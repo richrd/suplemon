@@ -11,6 +11,7 @@ class LStrip(Module):
             line = editor.lines[n]
             line.data = line.data.lstrip()
 
+
 module = {
     "class": LStrip,
     "name": "lstrip",

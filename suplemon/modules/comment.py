@@ -51,6 +51,7 @@ class Comment(Module):
         editor.move_cursors()
         editor.store_action_state("comment")
 
+
 module = {
     "class": Comment,
     "name": "comment",

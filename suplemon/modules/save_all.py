@@ -10,6 +10,7 @@ class SaveAll(Module):
         for file in app.get_files():
             file.save()
 
+
 module = {
     "class": SaveAll,
     "name": "save_all",

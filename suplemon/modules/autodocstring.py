@@ -137,6 +137,7 @@ class AutoDocstring(Module):
             i += 1
         return False
 
+
 module = {
     "class": AutoDocstring,
     "name": "autodocstring",

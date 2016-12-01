@@ -110,6 +110,7 @@ class Battery(Module):
         f.close()
         return data
 
+
 module = {
     "class": Battery,
     "name": "battery",

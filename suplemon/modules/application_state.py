@@ -52,6 +52,7 @@ class ApplicationState(Module):
             if path in self.storage.get_data().keys():
                 self.set_file_state(file, self.storage[path])
 
+
 module = {
     "class": ApplicationState,
     "name": "application_state",

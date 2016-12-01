@@ -41,5 +41,6 @@ def main():
         for logger_handler in app.logger.handlers:
             logger_handler.close()
 
+
 if __name__ == "__main__":
     main()

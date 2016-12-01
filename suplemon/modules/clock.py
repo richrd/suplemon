@@ -13,6 +13,7 @@ class Clock(Module):
             return "\u231A" + s
         return s
 
+
 module = {
     "class": Clock,
     "name": "clock",

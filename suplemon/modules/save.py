@@ -7,6 +7,7 @@ class Save(Module):
     def run(self, app, editor, args):
         return app.save_file()
 
+
 module = {
     "class": Save,
     "name": "save",
