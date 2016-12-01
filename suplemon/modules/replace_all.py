@@ -14,6 +14,7 @@ class ReplaceAll(Module):
         for file in app.get_files():
             file.editor.replace_all(r_from, r_to)
 
+
 module = {
     "class": ReplaceAll,
     "name": "replace_all",

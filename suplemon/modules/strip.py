@@ -11,6 +11,7 @@ class Strip(Module):
             line = editor.lines[n]
             line.set_data(line.data.strip())
 
+
 module = {
     "class": Strip,
     "name": "strip",

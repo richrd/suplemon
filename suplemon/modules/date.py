@@ -12,6 +12,7 @@ class Date(Module):
             return "" + s
         return s
 
+
 module = {
     "class": Date,
     "name": "date",

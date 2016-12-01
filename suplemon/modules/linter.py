@@ -141,6 +141,7 @@ class PyLint(BaseLint):
         if not self.has_flake8_support():
             self.logger.warning("Flake8 not available. Can't show linting.")
             return False
+        self.logger.debug(self.has_flake8_support())
         return self.get_file_linting(path)
 
     def has_flake8_support(self):

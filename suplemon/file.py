@@ -141,7 +141,7 @@ class File:
             f.close()
             return data
         except:
-            self.logger.exception("Reading file failed.")
+            self.logger.exception("Failed reading file \"{file}\"".format(file=file))
             return False
 
     def _read_binary(self, file):

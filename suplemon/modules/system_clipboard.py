@@ -52,6 +52,7 @@ class SystemClipboard(Module):
         out, err = process.communicate()
         return out
 
+
 module = {
     "class": SystemClipboard,
     "name": "system_clipboard",

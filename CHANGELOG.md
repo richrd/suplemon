@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+## [v0.1.58](https://github.com/richrd/suplemon/tree/v0.1.58) (2016-12-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.57...v0.1.58)
+
+**Fixed bugs:**
+
+- Fixed tests by using newer flake8.
+- Treat .ts files the same as .js so (un)commenting .ts files works.
+
+
 ## [v0.1.57](https://github.com/richrd/suplemon/tree/v0.1.57) (2016-11-01) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.56...v0.1.57)
 

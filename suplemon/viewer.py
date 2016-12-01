@@ -48,6 +48,7 @@ class BaseViewer:
             "scss": "css",
             "less": "css",
             "tmtheme": "xml",
+            "ts": "js",
         }
         self.show_line_ends = True
 

@@ -102,6 +102,7 @@ class AutoComplete(Module):
                 editor.type_at_cursor(cursor, match)
         return matched
 
+
 module = {
     "class": AutoComplete,
     "name": "autocomplete",

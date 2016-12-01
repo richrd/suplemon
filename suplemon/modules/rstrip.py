@@ -11,6 +11,7 @@ class RStrip(Module):
             line = editor.lines[n]
             line.set_data(line.data.rstrip())
 
+
 module = {
     "class": RStrip,
     "name": "rstrip",

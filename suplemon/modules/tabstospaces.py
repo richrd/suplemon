@@ -11,6 +11,7 @@ class TabsToSpaces(Module):
             editor.lines[i].set_data(new)
             i += 1
 
+
 module = {
     "class": TabsToSpaces,
     "name": "tabstospaces",

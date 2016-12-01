@@ -12,6 +12,7 @@ class SuplemonConfig(config.ConfigModule):
         self.config_default_path = os.path.join(self.app.path, "config", self.config_name)
         self.config_user_path = self.app.config.path()
 
+
 module = {
     "class": SuplemonConfig,
     "name": "config",

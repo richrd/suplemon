@@ -64,6 +64,7 @@ class ModuleLoader:
             mod.module["status"] = False
         return name, mod.module
 
+
 if __name__ == "__main__":
     ml = ModuleLoader()
     ml.load()
