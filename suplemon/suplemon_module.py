@@ -23,8 +23,9 @@ class Storage:
             try:
                 os.makedirs(self.storage_dir)
             except:
-                self.module.app.logger.warning("Module storage folder '{0}' doesn't exist and couldn't be created.".format(
-                                        self.storage_dir))
+                self.module.app.logger.warning(
+                  "Module storage folder '{0}' doesn't exist and couldn't be created.".format(
+                                               self.storage_dir))
 
     def __getitem__(self, i):
         """Get a storage key value."""
