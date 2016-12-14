@@ -19,6 +19,9 @@ setup(name="Suplemon",
       packages=["suplemon"],
       package_data={"": files},
       include_package_data=True,
+      install_requires=[
+          "pygments"
+      ],
       entry_points={
           "console_scripts": ["suplemon=suplemon.cli:main"]
       },
