@@ -67,8 +67,12 @@ class Linter(Module):
         linter = False
         if ext == "py":
             linter = PyLint(self.logger)
+        # elif ext == "js":
+            # linter = JsLint(self.logger)
         elif ext == "js":
-            linter = JsLint(self.logger)
+            linter = EsLint(self.logger)
+        elif ext == "es":
+            linter = EsLint(self.logger)
         elif ext == "php":
             linter = PhpLint(self.logger)
 
@@ -212,6 +216,40 @@ class JsLint(BaseLint):
                 linting[line_no].append((char_no, data, err_code))
             except:
                 self.logger.debug("Failed to parse line:{0}".format(line))
+        return linting
+
+
+class EsLint(BaseLint):
+    def __init__(self, logger):
+        BaseLint.__init__(self, logger)
+
+    def lint(self, path):
+        return self.get_file_linting(path)
+
+    def get_file_linting(self, path):
+        """Do linting check for given file path."""
+        # TODO: get output as JSON via '-f json' and parse that instead.
+        output = self.get_output(["eslint", path])
+        if output is False:
+            self.logger.warning("Failed to get linting for file '{0}'.".format(path))
+            return False
+        output = output.decode("utf-8")
+        self.logger.debug(str(output))
+        lines = output.split("\n")
+
+        linting = {}
+        for line in lines:
+            if not line:
+                continue
+            if line.find("  error  ") == -1:
+                continue
+            parts = line.split("  error  ")
+            line_no, char_no = map(int, parts[0].strip().split(":"))
+            data = " ".join(parts[1:])
+            if line_no not in linting.keys():
+                linting[line_no] = []
+            err_code = None
+            linting[line_no].append((char_no, data, err_code))
         return linting
 
 
