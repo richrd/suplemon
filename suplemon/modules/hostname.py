@@ -9,14 +9,22 @@ class Hostname(Module):
     """Shows the machine hostname in the bottom status bar."""
 
     def init(self):
-        hostinfo = socket.gethostbyaddr(socket.gethostname())
-        self.hostname = hostinfo[0]
-        # Use shorter hostname if available
-        if hostinfo[1]:
-            self.hostname = hostinfo[1][0]
+        self.hostname = ""
+        hostinfo = None
+        try:
+            hostinfo = socket.gethostbyaddr(socket.gethostname())
+        except socket.gaierror:
+            self.logger.debug("Failed to get hostname.")
+        if hostinfo:
+            self.hostname = hostinfo[0]
+            # Use shorter hostname if available
+            if hostinfo[1]:
+                self.hostname = hostinfo[1][0]
 
     def get_status(self):
-        return "host:{0}".format(self.hostname)
+        if self.hostname:
+            return "host:{0}".format(self.hostname)
+        return ""
 
 
 module = {
