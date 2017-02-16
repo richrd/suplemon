@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+## [v0.1.59](https://github.com/richrd/suplemon/tree/v0.1.59) (2017-02-16) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.58...v0.1.59)
+
+**Implemented enhancements:**
+
+- Added pygments as a dependency. 
+
+
+**Fixed bugs:**
+
+- Added error handling to hostname module should it fail.
+
+
 ## [v0.1.58](https://github.com/richrd/suplemon/tree/v0.1.58) (2016-12-01) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.57...v0.1.58)
 
