@@ -124,6 +124,14 @@ key_map = {
     "O5R": "ctrl+f3",
     "O5S": "ctrl+f4",
 
+    "KEY_F(29)": "ctrl+f5",
+    "KEY_F(30)": "ctrl+f6",
+    "KEY_F(31)": "ctrl+f7",
+    "KEY_F(32)": "ctrl+f8",
+    "KEY_F(33)": "ctrl+f9",
+    "KEY_F(34)": "ctrl+f10",
+    "KEY_F(35)": "ctrl+f11",
+    "KEY_F(36)": "ctrl+f12",
 
     # Alt
     563: "alt+up",
@@ -145,6 +153,14 @@ key_map = {
     "kPRV3": "alt+pageup",
     "kNXT3": "alt+pagedown",
 
+    "KEY_F(53)": "alt+f5",
+    "KEY_F(54)": "alt+f6",
+    "KEY_F(55)": "alt+f7",
+    "KEY_F(56)": "alt+f8",
+    "KEY_F(57)": "alt+f9",
+    "KEY_F(58)": "alt+f10",
+    "KEY_F(59)": "alt+f11",
+    "KEY_F(60)": "alt+f12",
 
     # Shift
     curses.KEY_SLEFT: "shift+left",
@@ -165,6 +181,15 @@ key_map = {
     "O2Q": "shift+f2",
     "O2R": "shift+f3",
     "O2S": "shift+f4",
+
+    "KEY_F(17)": "shift+f5",
+    "KEY_F(18)": "shift+f6",
+    "KEY_F(19)": "shift+f7",
+    "KEY_F(20)": "shift+f8",
+    "KEY_F(21)": "shift+f9",
+    "KEY_F(22)": "shift+f10",
+    "KEY_F(23)": "shift+f11",
+    "KEY_F(24)": "shift+f12",
 
 
     # Alt Gr
@@ -192,9 +217,9 @@ key_map = {
     "kLFT6": "ctrl+shift+left",
     "kRIT6": "ctrl+shift+right",
 
-    "kDC6": "ctrl+alt+delete",
-    "kHOM6": "ctrl+alt+home",
-    "kEND6": "ctrl+alt+end",
+    "kDC6": "ctrl+shift+delete",
+    "kHOM6": "ctrl+shift+home",
+    "kEND6": "ctrl+shift+end",
 
 
     # Control + Alt
