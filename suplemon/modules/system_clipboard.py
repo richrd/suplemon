@@ -8,8 +8,12 @@ from suplemon.suplemon_module import Module
 class SystemClipboard(Module):
     def init(self):
         self.init_logging(__name__)
-        if not self.has_xsel_support():
-            self.logger.warning("Can't use system clipboard. Install 'xsel' for system clipboard support.")
+        if self.has_xsel_support():
+            self.clipboard_type = "xsel"
+        elif self.has_pb_support():
+            self.clipboard_type = "pb"
+        else:
+            self.logger.warning("Can't use system clipboard. Install 'xsel' or 'pbcopy' for system clipboard support.")
             return False
         self.bind_event_before("insert", self.insert)
         self.bind_event_after("copy", self.copy)
@@ -27,18 +31,34 @@ class SystemClipboard(Module):
 
     def get_clipboard(self):
         try:
-            data = subprocess.check_output(["xsel", "-b"], universal_newlines=True)
+            if self.clipboard_type == "xsel":
+                command = ["xsel", "-b"]
+            elif self.clipboard_type == "pb":
+                command = ["pbpaste", "-Prefer", "txt"]
+            else:
+                return False
+            data = subprocess.check_output(command, universal_newlines=True)
             return data
         except:
             return False
 
     def set_clipboard(self, data):
         try:
-            p = subprocess.Popen(["xsel", "-i", "-b"], stdin=subprocess.PIPE)
+            if self.clipboard_type == "xsel":
+                command = ["xsel", "-i", "-b"]
+            elif self.clipboard_type == "pb":
+                command = ["pbcopy"]
+            else:
+                return False
+            p = subprocess.Popen(command, stdin=subprocess.PIPE)
             out, err = p.communicate(input=bytes(data, "utf-8"))
             return out
         except:
             return False
+
+    def has_pb_support(self):
+        output = self.get_output(["which", "pbcopy"])
+        return output
 
     def has_xsel_support(self):
         output = self.get_output(["xsel", "--version"])
