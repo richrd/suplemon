@@ -1,6 +1,21 @@
 Change Log
 ==========
 
+## [v0.1.60](https://github.com/richrd/suplemon/tree/v0.1.60) (2017-03-23) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.59...v0.1.60)
+
+**Implemented enhancements:**
+
+- Add support for the MacOS native pasteboard via pbcopy/pbpaste. Credit @abl
+- Added shift+tab for going backwards when autocompleting files.
+- Added F keys with modifiers and fixed some ctrl+shift keybindings.
+
+**Fixed bugs:**
+
+- Broader error handling in hostname module.
+- Don't print log message when opening file that doesn't exist.
+
+
 ## [v0.1.59](https://github.com/richrd/suplemon/tree/v0.1.59) (2017-02-16) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.58...v0.1.59)
 
