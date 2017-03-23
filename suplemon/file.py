@@ -113,7 +113,7 @@ class File:
             return True
         path = self._path()
         if not os.path.isfile(path):
-            self.logger.info("Given path isn't a file.")
+            self.logger.debug("Given path isn't a file.")
             return False
         data = self._read(path)
         if data is False:

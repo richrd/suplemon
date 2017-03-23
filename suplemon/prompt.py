@@ -160,12 +160,17 @@ class PromptFile(Prompt):
             self.autocomplete()
             # Don't pass the event to the parent class
             return False
+        elif name == "shift+tab":
+            # Go to previous item when shift+tab is pressed
+            self.autocomplete(previous=True)
+            # Don't pass the event to the parent class
+            return False
         else:
             # If any key other than tab is pressed deactivate the auto completer
             self.deactivate_autocomplete()
         Prompt.handle_input(self, event)
 
-    def autocomplete(self):
+    def autocomplete(self, previous=False):
         data = self.get_data()  # Use the current input by default
         if self.complete_active:  # If the completer is active use the its initial input value
             data = self.complete_data
@@ -188,9 +193,16 @@ class PromptFile(Prompt):
             self.complete_index = 0
         else:
             # Increment the selected item countor
-            self.complete_index += 1
-            if self.complete_index > len(items)-1:
-                self.complete_index = 0
+            if previous:
+                # Go back
+                self.complete_index -= 1
+                if self.complete_index < 0:
+                    self.complete_index = len(items)-1
+            else:
+                # Go forward
+                self.complete_index += 1
+                if self.complete_index > len(items)-1:
+                    self.complete_index = 0
 
         item = items[self.complete_index]
         new_data = os.path.join(os.path.dirname(data), item)
