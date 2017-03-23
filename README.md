@@ -25,7 +25,7 @@ http://github.com/richrd/suplemon
  * Syntax highlighting with Text Mate themes
  * Autocomplete (based on words in the files that are open)
  * Easy Undo/Redo (Ctrl + Z, Ctrl + Y)
- * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix)
+ * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix and Mac OS)
  * Multiple files in tabs
  * Powerful Go To feature for jumping to files and lines
  * Find, Find next and Find all (Ctrl + F, Ctrl + D, Ctrl + A)
@@ -83,6 +83,9 @@ No dependencies outside the Python Standard Library required.
 
  * xsel
  > For system clipboard support on X Window (Linux).
+
+ * pbcopy / pbpaste
+ > For system clipboard support on Mac OS.
 
  See [docs/optional-dependencies.md][] for installation instructions.
 
