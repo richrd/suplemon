@@ -30,9 +30,7 @@ class InputEvent(object):
         return "MOUSE[{},{}] {} {}".format(self._x, self._y, self._mouse_type, self._mouse_btn)
 
     def __repr__(self):
-        if self.is_keyboard:
-            return "KEY[{} / {}, printable: {}]".format(self.to_string(), self.key_value, str(self.is_printable))
-        return "MOUSE[{},{}] {} {}".format(self._x, self._y, self._mouse_type, self._mouse_btn)
+        return str(self)
 
     #
     # Mouse Events

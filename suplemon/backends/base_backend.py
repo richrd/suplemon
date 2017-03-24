@@ -3,9 +3,10 @@ import logging
 
 
 class AbstractBackend(object):
-    def __init__(self):
-        self.logger = logging.getLogger("{}.{}".format(__name__, self.__class__.__name__))
+    def __init__(self, backend=None):
+        self._backend = backend
         self._running = 0
+        self.logger = logging.getLogger("{}.{}".format(__name__, self.__class__.__name__))
 
     def start(self):
         if not self._running:

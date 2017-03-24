@@ -5,16 +5,18 @@ from .base_backend import AbstractBackend
 
 
 class InputBackend(AbstractBackend):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, backend=None):
+        super().__init__(backend=backend)
         self.logger = logging.getLogger("{}.{}".format(__name__, self.__class__.__name__))
+        if not backend:
+            self.logger.debug("no backend in __init__")
 
     def init(self):
         """Initialize the backend. This should be called before any other calls to the backend."""
         raise NotImplementedError
 
     def use_mouse(self, yes=True):
-        """Enable mouse input for the backend."""
+        """Enable or disable mouse input for the backend."""
         self._use_mouse(yes)
 
     def get_events(self):
