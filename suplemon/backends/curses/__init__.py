@@ -71,15 +71,14 @@ class CursesBackend(Backend):
         self.output.start()
         self.input.start()
 
-        self.run_event_loop()
+        # Testing
+        # self.run_event_loop()
 
     def run_event_loop(self):
         """
         Currently this is just a mockup for testing the screen.
         """
         size = self.output.get_size()
-        # self.output._
-        # self.screen.lines[0][0] = ScreenString(str(time.ctime()) + " – " + str(size))
         self.output.render(self.screen)
         while self._running:
             input = self.input.get_input()
@@ -91,13 +90,15 @@ class CursesBackend(Backend):
             size = self.output.get_size()
             fg = Color()
             self.screen.lines = []
-            y = 0
-            while y < size[1]:
-                s = ScreenString(str(y) + "." * (size[0]-len(str(y))-1) )
-                self.screen.lines.append([s])
-                y += 1
+            #y = 0
+            #while y < size[1]:
+            #    s = ScreenString(str(y) + "." * (size[0]-len(str(y))-1) )
+            #    self.screen.lines.append([s])
+            #    y += 1
+
             #if input is not None:
             #    self.screen.lines.append([ScreenString(input.to_string()*5, fg=fg)])
+
             #if self.screen.get_size()[1] > self.output.get_size()[1]-1:
             #    self.screen.lines.pop(0)
             #self.screen.lines[0][0] = ScreenString(str(time.ctime()) + " – " + str(size) + " - " + str(fg._xterm256), fg=fg)

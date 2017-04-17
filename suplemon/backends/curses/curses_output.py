@@ -86,6 +86,8 @@ class CursesOutput(OutputBackend):
         # self._root.clear()
 
     def _render(self, screen):
+        if not screen.lines:
+            return False
         self._erase()
         self._root.move(0, 0)
         x = 0
@@ -94,8 +96,6 @@ class CursesOutput(OutputBackend):
         curses.init_pair(10, -1, screen.lines[0][0].attributes._color_fg._xterm256)
         for line in screen.lines:
             for part in line:
-                #if len(part) > self.size[0]:
-                #    continue
                 attrs = self._convert_scr_attr(part.attributes)
                 attrs = attrs | curses.color_pair(10)
                 self.__addstr(y, x, str(part), attrs)

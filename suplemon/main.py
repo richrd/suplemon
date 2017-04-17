@@ -31,6 +31,7 @@ class App:
         self.backend.start()
 
     def shutdown(self):
+        self.logger.debug("shutdown")
         self.backend.stop()
         self.logger.debug("shutdown")
 
