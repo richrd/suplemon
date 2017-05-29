@@ -19,7 +19,7 @@
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Wether to use special unicode symbols for decoration
-        "use_unicode_symbols": true
+        "use_unicode_symbols": false
     },
     // Editor settings
     "editor": {
