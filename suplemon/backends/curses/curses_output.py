@@ -60,9 +60,6 @@ class CursesOutput(OutputBackend):
     def _stop(self):
         pass
 
-    def _set_root(self, root):
-        self._backend._root = root
-
     def _convert_scr_attr(self, attr):
         attrs = self.curses.A_NORMAL
         if attr.is_bold():
@@ -78,6 +75,7 @@ class CursesOutput(OutputBackend):
         # self._backend._root.clear()
 
     def _render(self, screen):
+        # TODO: Warn if screen is bigger than terminal
         if not screen.lines:
             return False
         self._erase()  # TODO: clear or erase?
@@ -96,8 +94,14 @@ class CursesOutput(OutputBackend):
         self._backend._root.refresh()
 
     def __addstr(self, y, x, s, attrs):
+        # Curses addstr needs to be wrapped since it stupidly
+        # freaks out whenever writing to bottom right corner.
+        # Verified on Python 3.5.2
+        # Ref: https://stackoverflow.com/questions/7063128/last-character-of-a-window-in-python-curses
         try:
             self._backend._root.addstr(y, x, str(s), attrs)
         except self.curses.error:
-            self.logger.exception("__addstr failed!")
-            self.logger.warning("size:{}, x,y = {}, len:{}".format(self.size, (x, y), len(s)))
+            pass # Just meh
+            #self.logger.exception("__addstr failed!")
+            #self.logger.error("string:{}".format(s))
+            #self.logger.error("size:{}, x,y = {}, len:{}".format(self.size, (x, y), len(s)))

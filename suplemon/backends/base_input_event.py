@@ -18,6 +18,7 @@ class InputEvent(object):
 
         self.is_keyboard = False
         self.is_mouse = False
+        self.is_resize = False
         self.is_printable = False
 
         self.key_value = ""

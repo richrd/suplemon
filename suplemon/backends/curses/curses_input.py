@@ -152,7 +152,9 @@ class CursesInput(InputBackend):
         if char == self.curses.KEY_RESIZE:
             if self._backend:
                 self._backend.output.update_size()
-            return None
+            event = InputEvent()
+            event.is_resize = True
+            return event
 
         # Create an empty event
         event = InputEvent()
