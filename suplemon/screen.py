@@ -23,9 +23,6 @@ Attributes are:
         - italics
         - ? inverse
 
-
-
-
 """
 
 
@@ -96,8 +93,8 @@ class ScreenString(object):
 
 
 class Screen(object):
-    def __init__(self):
-        self.lines = []
+    def __init__(self, lines=[]):
+        self.lines = lines
 
     def get_size(self):
         # TODO: Get max x width

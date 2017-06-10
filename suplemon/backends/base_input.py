@@ -11,10 +11,6 @@ class InputBackend(AbstractBackend):
         if not backend:
             self.logger.debug("no backend in __init__")
 
-    def init(self):
-        """Initialize the backend. This should be called before any other calls to the backend."""
-        raise NotImplementedError
-
     def use_mouse(self, yes=True):
         """Enable or disable mouse input for the backend."""
         self._use_mouse(yes)

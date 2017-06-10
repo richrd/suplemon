@@ -11,8 +11,8 @@ class OutputBackend(AbstractBackend):
         self.logger = logging.getLogger("{}.{}".format(__name__, self.__class__.__name__))
         self.size = (0, 0)
 
-    def init(self):
-        """Initialize the backend. This should be called before any other calls to the backend."""
+    def _render(self, screen):
+        """Render a screen."""
         raise NotImplementedError
 
     def has_colors(self):

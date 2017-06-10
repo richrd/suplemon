@@ -40,7 +40,7 @@ better and more advanced features.
 
 ## Architecture
 
-This is still pretty abstract and incomplete.
+This is just a guideline and it's still very abstract and incomplete.
 
      __________________________
     |                          |
@@ -57,10 +57,10 @@ This is still pretty abstract and incomplete.
     | APP                      |
     |                          |
     |__________________________|
-            
-            
-            
-            
+        |
+        |
+        |
+        |
      __\|/_____________________
     |                          |
     | LAYOUT                   |
@@ -91,7 +91,7 @@ This is still pretty abstract and incomplete.
                  |                                   |             
      ____________|___________________                |             
     |                                |               |             
-    |            SCREEN              |               |             
+    |             SCREEN             |               |             
     |     (Character Cell Grid)      |        [Buffered Input]     
     |________________________________|               |             
                  |                                   |             
@@ -112,7 +112,7 @@ This is still pretty abstract and incomplete.
     |    |             |    |              |    |            |    |
     |    |   Curses    |    |    Urwid?    |    |    PTPY?   |    |
     |    |_____________|    |______________|    |____________|    |
-    |    _____________________________________________________    |
+    |    _________|___________________________________________    |
     |                            /|\                              |
     |                             |                               |
     |                             |                               |

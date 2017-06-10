@@ -8,15 +8,23 @@ class AbstractBackend(object):
         self._running = 0
         self.logger = logging.getLogger("{}.{}".format(__name__, self.__class__.__name__))
 
-    def start(self):
-        if not self._running:
-            self._running = 1
-            self._start()
+    def init(self, *args):
+        """Initialize the backend. This should be called before any other calls to the backend."""
+        assert not self._running
+        self._init(*args)
+
+    def start(self, *args):
+        assert not self._running
+        self._running = 1
+        self._start(*args)
 
     def stop(self):
-        if self._running:
-            self._running = 0
-            self._stop()
+        assert self._running
+        self._running = 0
+        self._stop()
+
+    def _init(self):
+        raise NotImplementedError
 
     def _start(self):
         raise NotImplementedError

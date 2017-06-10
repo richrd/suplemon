@@ -26,7 +26,6 @@ def main():
         app.run()
     else:
         app.logger.debug("app.init() returned False, not proceeding to run.")
-    app.shutdown()
 
 
 if __name__ == "__main__":
