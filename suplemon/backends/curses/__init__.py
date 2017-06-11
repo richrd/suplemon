@@ -1,9 +1,6 @@
 import os
-import time
 
 from ..base_backend import Backend
-from ...screen import Color, ScreenAttributes, ScreenString, Screen
-
 
 from .curses_input import CursesInput
 from .curses_output import CursesOutput

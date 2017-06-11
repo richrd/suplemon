@@ -1,6 +1,7 @@
 
 from ..base_output import OutputBackend
 
+
 class CursesOutput(OutputBackend):
     def _init(self, curses):
         self.curses = curses
@@ -98,10 +99,13 @@ class CursesOutput(OutputBackend):
         # freaks out whenever writing to bottom right corner.
         # Verified on Python 3.5.2
         # Ref: https://stackoverflow.com/questions/7063128/last-character-of-a-window-in-python-curses
+        # TODO: check answer comments:
+        # https://stackoverflow.com/questions/22456527/why-cant-i-addstr-to-last-row-col-in-python-curses-window
+
         try:
             self._backend._root.addstr(y, x, str(s), attrs)
         except self.curses.error:
-            pass # Just meh
-            #self.logger.exception("__addstr failed!")
-            #self.logger.error("string:{}".format(s))
-            #self.logger.error("size:{}, x,y = {}, len:{}".format(self.size, (x, y), len(s)))
+            pass  # Just meh
+            # self.logger.exception("__addstr failed!")
+            # self.logger.error("string:{}".format(s))
+            # self.logger.error("size:{}, x,y = {}, len:{}".format(self.size, (x, y), len(s)))
