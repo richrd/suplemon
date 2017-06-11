@@ -9,19 +9,19 @@ scratch to be more flexible to work with. This will make it easier to implement
 better and more advanced features.
 
 ## Major Architectural Changes
-- Base all UI components on a shared base class with a good interface (widget)
-- Allow arbitrary ordering of UI layout/widgets
+- [X] Base all UI components on a shared base class with a good interface (widget)
+- [X] Allow arbitrary ordering of UI layout/widgets
 
 
 ## Features that should be added (or at least made possible)
-- Render tab character as n spaces
-- Support selecting text (regions)
-- Per file settings (e.g. different tab width for different file types, support editorconfig)
-- Split screen view (multiple files visible at the same time)
-- Sidebar with directory tree (or anything else that's useful in a sidebar)
-- Add a dropdown for autocomplete matches
-- Proper plugin architecture (there's a lot that plugins can't do at the moment). Ultimately sublime plugins should be supported.
-- Proper event system
+- [ ] Render tab character as n spaces
+- [ ] Support selecting text (regions)
+- [ ] Per file settings (e.g. different tab width for different file types, support editorconfig)
+- [X] Split screen view (multiple files visible at the same time)
+- [ ] Sidebar with directory tree (or anything else that's useful in a sidebar)
+- [ ] Add a dropdown for autocomplete matches
+- [ ] Proper plugin architecture (there's a lot that plugins can't do at the moment). Ultimately sublime plugins should be supported.
+- [ ] Proper event system
 
 
 ## Whishlist
