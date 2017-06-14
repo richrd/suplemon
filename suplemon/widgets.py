@@ -1,20 +1,23 @@
 import logging
 
+from .logger import logger as logger  # TODO: fixme
 from .screen import Screen, ScreenString
 
 
 class BaseWidget(object):
     """Base class for all widgets"""
     def __init__(self):
-        self.logger = logging.getLogger("{0}.UI".format(__name__))
+        self.logger = logging.getLogger("{}.{}".format(__name__, self.__class__))
         self.size = [0, 0]
         self.min_size = [1, 1]
 
+    # TODO: move to utlis
     @staticmethod
     def halve(n):
         """Divide n by two and return as tuple. Remainder is added to the second int."""
         return (int(n/2), int(n/2) + n % 2)
 
+    # TODO: move to utlis
     @staticmethod
     def divide(n, percentages):
         """
@@ -23,13 +26,19 @@ class BaseWidget(object):
         Percentages should add up to 100 and the remainder
         is added to the last item.
         """
+        # TODO: distribute remainder between last items instead of just adding it all to the last one
         i = 0
         sizes = []
+        last_index = 0  # Last index that had a percentage (where we add the remainder)
         while i < len(percentages):
-            sizes.append(int(n * (percentages[i] / 100)))
+            if percentages[i]:
+                sizes.append(int(n * (percentages[i] / 100)))
+                last_index = i
+            else:
+                sizes.append(0)
             i += 1
         if sum(sizes) < n:
-            sizes[-1] += n - sum(sizes)
+            sizes[last_index] += n - sum(sizes)
         return sizes
 
     def set_size(self, size):
