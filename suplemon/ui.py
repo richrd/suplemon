@@ -327,11 +327,17 @@ class UI:
             head_parts.append(self.file_list_str())
 
         head = " ".join(head_parts)
-        head = head + (" " * (self.screen.getmaxyx()[1]-wcswidth(head)-1))
-        if self.app.config["display"]["invert_status_bars"]:
-            self.header_win.addstr(0, 0, head, curses.color_pair(0) | curses.A_REVERSE)
-        else:
-            self.header_win.addstr(0, 0, head, curses.color_pair(0))
+        head = head + (" " * (size[0]-wcswidth(head)-1))
+        head_width = wcswidth(head)
+        if head_width > size[0]:
+            head = head[:size[0]-head_width]
+        try:
+            if self.app.config["display"]["invert_status_bars"]:
+                self.header_win.addstr(0, 0, head, curses.color_pair(0) | curses.A_REVERSE)
+            else:
+                self.header_win.addstr(0, 0, head, curses.color_pair(0))
+        except:
+            pass
         self.header_win.refresh()
 
     def file_list_str(self):
