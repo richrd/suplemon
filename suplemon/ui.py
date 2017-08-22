@@ -6,6 +6,7 @@ Curses user interface.
 import os
 import sys
 import logging
+from wcwidth import wcswidth
 
 from .prompt import Prompt, PromptBool, PromptFile
 from .key_mappings import key_map
@@ -326,9 +327,7 @@ class UI:
             head_parts.append(self.file_list_str())
 
         head = " ".join(head_parts)
-        head = head + (" " * (self.screen.getmaxyx()[1]-len(head)-1))
-        if len(head) >= size[0]:
-            head = head[:size[0]-1]
+        head = head + (" " * (self.screen.getmaxyx()[1]-wcswidth(head)-1))
         if self.app.config["display"]["invert_status_bars"]:
             self.header_win.addstr(0, 0, head, curses.color_pair(0) | curses.A_REVERSE)
         else:
