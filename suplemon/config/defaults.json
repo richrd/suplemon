@@ -96,7 +96,7 @@
             // zero width no-break space
             "\uFEFF": "\u2420"
         },
-        // Wether to visually show white space chars
+        // Whether to visually show white space chars
         "show_white_space": false,
         // Show tab indicators in whitespace
         "show_tab_indicators": true,
