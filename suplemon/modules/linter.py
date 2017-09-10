@@ -2,6 +2,7 @@
 
 import re
 import os
+import threading
 import subprocess
 
 from suplemon.suplemon_module import Module
@@ -15,7 +16,7 @@ class Linter(Module):
         # blocking the UI when the app is loading
 
         # Lint all files after app is loaded
-        self.bind_event_after("app_loaded", self.lint_all_files)
+        self.bind_event_after("app_loaded", self.on_loaded)
         # Show linting messages in status bar
         self.bind_event_after("mainloop", self.mainloop)
         # Re-lint current file when appropriate
@@ -28,8 +29,13 @@ class Linter(Module):
         """Run the linting command."""
         editor = self.app.get_file().get_editor()
         count = self.get_msg_count(editor)
-        status = str(count) + " lines with linting errors in this file."
+        status = "{0} lines with linting errors in this file.".format(str(count))
         self.app.set_status(status)
+
+    def on_loaded(self, event):
+        # Lint all files in a thread since it might take a while
+        thread = threading.Thread(target=self.lint_all_files, args=(event,))
+        thread.start()
 
     def mainloop(self, event):
         """Run the linting command."""
@@ -41,7 +47,7 @@ class Linter(Module):
         line_no = cursor.y + 1
         msg = self.get_msgs_on_line(editor, cursor.y)
         if msg:
-            self.app.set_status("Line " + str(line_no) + ": " + msg)
+            self.app.set_status("Line {0}: {1}".format(str(line_no), msg))
 
     def lint_current_file(self, event):
         self.lint_file(self.app.get_file())
@@ -63,6 +69,8 @@ class Linter(Module):
             linter = PyLint(self.logger)
         elif ext == "js":
             linter = JsLint(self.logger)
+        elif ext == "php":
+            linter = PhpLint(self.logger)
 
         if not linter:
             return False
@@ -115,7 +123,7 @@ class BaseLint:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=fnull)
             fnull.close()
         except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
-            self.logger.exception("Subprocess failed.")
+            self.logger.debug("Subprocess failed.")
             return False
         out, err = process.communicate()
         return out
@@ -133,6 +141,7 @@ class PyLint(BaseLint):
         if not self.has_flake8_support():
             self.logger.warning("Flake8 not available. Can't show linting.")
             return False
+        self.logger.debug(self.has_flake8_support())
         return self.get_file_linting(path)
 
     def has_flake8_support(self):
@@ -197,6 +206,55 @@ class JsLint(BaseLint):
                 line_no = int(re.sub("\D", "", parts[0]))
                 char_no = int(re.sub("\D", "", parts[1]))
                 data = parts[2]
+                err_code = None
+                if line_no not in linting.keys():
+                    linting[line_no] = []
+                linting[line_no].append((char_no, data, err_code))
+            except:
+                self.logger.debug("Failed to parse line:{0}".format(line))
+        return linting
+
+
+class PhpLint(BaseLint):
+    def __init__(self, logger):
+        BaseLint.__init__(self, logger)
+
+    def lint(self, path):
+        return self.get_file_linting(path)
+
+    def get_output(self, cmd, errors=False):
+        # Need to override this since php reports the errors to stderr
+        try:
+            fnull = open(os.devnull, "w")
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            fnull.close()
+        except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
+            self.logger.debug("Subprocess failed.")
+            return False
+        out, err = process.communicate()
+        return err
+
+    def get_file_linting(self, path):
+        """Do linting check for given file path."""
+        output = self.get_output(["php", "-l", path])
+        if output is False:
+            self.logger.warning("Failed to get linting for file '{0}'.".format(path))
+            return False
+        output = output.decode("utf-8")
+        lines = output.split("\n")
+        linting = {}
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                parts = line.split(" in {0} on line ".format(path))
+                self.logger.debug(parts)
+                if len(parts) != 2:
+                    continue
+                line_no = int(parts[1])
+                char_no = 0
+                data = parts[0]
                 err_code = None
                 if line_no not in linting.keys():
                     linting[line_no] = []

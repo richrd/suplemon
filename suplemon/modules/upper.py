@@ -12,6 +12,7 @@ class Upper(Module):
                 data = editor.lines[cursor.y].get_data().upper()
                 editor.lines[cursor.y].set_data(data)
 
+
 module = {
     "class": Upper,
     "name": "upper",

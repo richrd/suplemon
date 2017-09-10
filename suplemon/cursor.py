@@ -12,7 +12,7 @@ class Cursor:
         :param y: Cursor y coordinate. Defaults to 0.
         """
         # Handle coords as a tuple
-        if isinstance(x, tuple):
+        if isinstance(x, tuple) or isinstance(x, list):
             x, y = x
             self.x = x
             self.y = y
@@ -122,6 +122,9 @@ class Cursor:
 
     def __str__(self):
         return "Cursor({x},{y})".format(x=self.x, y=self.y)
+
+    def __repr__(self):
+        return self.__str__()
 
     def tuple(self):
         """Return the cursor as a tuple.

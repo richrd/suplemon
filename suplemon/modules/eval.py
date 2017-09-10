@@ -29,6 +29,7 @@ class Eval(Module):
                 continue
             line.set_data(str(value))
 
+
 module = {
     "class": Eval,
     "name": "eval",

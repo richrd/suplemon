@@ -13,6 +13,7 @@ class Reverse(Module):
                 data = editor.lines[cursor.y].data[::-1]
                 editor.lines[cursor.y].set_data(data)
 
+
 module = {
     "class": Reverse,
     "name": "upper",

@@ -1,0 +1,4 @@
+include suplemon/themes/*
+include suplemon/config/*.json
+include suplemon/modules/*.py
+include suplemon/linelight/*.py

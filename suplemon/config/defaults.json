@@ -19,27 +19,7 @@
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Wether to use special unicode symbols for decoration
-        "use_unicode_symbols": true,
-        // Key bindings for app functions
-        "keys": {
-            "ctrl+h": "help",
-            "ctrl+s": "save_file",
-            "ctrl+e": "run_command",
-            "ctrl+f": "find",
-            "ctrl+g": "go_to",
-            "ctrl+o": "open",
-            "ctrl+w": "close_file",
-            "ctrl+n": "new_file",
-            "ctrl+q": "ask_exit",
-            "ctrl+p": "comment",
-            "ctrl+pageup": "next_file",
-            "ctrl+pagedown": "prev_file",
-            "f1": "save_file_as",
-            "f2": "reload_file",
-            "f7": "toggle_whitespace",
-            "f8": "toggle_mouse",
-            "f11": "toggle_fullscreen"
-        }
+        "use_unicode_symbols": false
     },
     // Editor settings
     "editor": {
@@ -53,6 +33,8 @@
         "cursor_style": "reverse",
         // Encoding for reading and writing files
         "default_encoding": "utf-8",
+        // Use hard tabs (insert actual tabulator character instead of spaces)
+        "hard_tabs": 0,
         // Number of spaces to insert when pressing tab
         "tab_width": 4,
         // Amount of undo states to store
@@ -73,11 +55,53 @@
             "\u00A0": "\u237D",
             // Soft hyphen as letter shelf
             "\u00AD": "\u2423",
-            // Zero width space as interpunct
-            "\u200B": "\u00B7"
+
+            // Other special unicode spaces shown as a space symbol (s/p)
+            // See here for details: http://www.cs.tut.fi/~jkorpela/chars/spaces.html
+
+            // no-break space
+            "\u00A0": "\u2420",
+            // mongolian vowel separator
+            "\u180E": "\u2420",
+            // en quad
+            "\u2000": "\u2420",
+            // em quad
+            "\u2001": "\u2420",
+            // en space
+            "\u2002": "\u2420",
+            // em space
+            "\u2003": "\u2420",
+            // three-per-em space
+            "\u2004": "\u2420",
+            // four-per-em space
+            "\u2005": "\u2420",
+            // six-per-em space
+            "\u2006": "\u2420",
+            // figure space
+            "\u2007": "\u2420",
+            // punctuation space
+            "\u2008": "\u2420",
+            // thin space
+            "\u2009": "\u2420",
+            // hair space
+            "\u200A": "\u2420",
+            // zero width space
+            "\u200B": "\u2420",
+            // narrow no-break space
+            "\u202F": "\u2420",
+            // medium mathematical space
+            "\u205F": "\u2420",
+            // ideographic space
+            "\u3000": "\u2420",
+            // zero width no-break space
+            "\uFEFF": "\u2420"
         },
         // Wether to visually show white space chars
         "show_white_space": false,
+        // Show tab indicators in whitespace
+        "show_tab_indicators": true,
+        // Tab indicator charatrer
+        "tab_indicator_character": "\u203A",
         // Line numbering
         "show_line_nums": true,
         // Naive line highlighting
@@ -91,46 +115,7 @@
         // Wether to use copy/paste across multiple files
         "use_global_buffer": true,
         // Find with regex by default
-        "regex_find": false,
-        // Key bindings for editor functions
-        "keys": {
-            "up": "arrow_up",
-            "down": "arrow_down",
-            "left": "arrow_left",
-            "right": "arrow_right",
-            "enter": "enter",
-            "backspace": "backspace",
-            "delete": "delete",
-            "insert": "insert",
-            "tab": "tab",
-            "shift+tab": "untab",
-            "home": "home",
-            "end": "end",
-            "escape": "escape",
-            "pageup": "page_up",
-            "pagedown": "page_down",
-            "f5": "undo",
-            "f6": "redo",
-            "f9": "toggle_line_nums",
-            "f10": "toggle_line_ends",
-            "f11": "toggle_highlight",
-            "alt+up": "new_cursor_up",
-            "alt+down": "new_cursor_down",
-            "alt+left": "new_cursor_left",
-            "alt+right": "new_cursor_right",
-            "alt+pageup": "push_up",
-            "alt+pagedown": "push_down",
-            "ctrl+c": "copy",
-            "ctrl+x": "cut",
-            "ctrl+k": "duplicate_line",
-            "ctrl+v": "insert",
-            "ctrl+d": "find_next",
-            "ctrl+a": "find_all",
-            "ctrl+left": "jump_left",
-            "ctrl+right": "jump_right",
-            "ctrl+up": "jump_up",
-            "ctrl+down": "jump_down"
-        }
+        "regex_find": false
     },
     // UI Display Settings
     "display": {
@@ -148,6 +133,6 @@
         // Show the bottom status bar
         "show_bottom_bar": true,
         // Invert status bar colors (switch text and background colors)
-        "invert_status_bars": true
+        "invert_status_bars": false
     }
 }

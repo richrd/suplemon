@@ -104,6 +104,7 @@ class File:
             return False
         self.data = data
         self.last_save = time.time()
+        self.writable = os.access(self._path(), os.W_OK)
         return True
 
     def load(self, read=True):
@@ -112,8 +113,17 @@ class File:
             return True
         path = self._path()
         if not os.path.isfile(path):
-            self.logger.info("Given path isn't a file.")
+            self.logger.debug("Given path isn't a file.")
             return False
+        data = self._read(path)
+        if data is False:
+            return False
+        self.data = data
+        self.editor.set_data(data)
+        self.on_load()
+        return True
+
+    def _read(self, path):
         data = self._read_text(path)
         if data is False:
             self.logger.warning("Normal file read failed.")
@@ -121,10 +131,7 @@ class File:
         if data is False:
             self.logger.warning("Fallback file read failed.")
             return False
-        self.data = data
-        self.editor.set_data(data)
-        self.on_load()
-        return True
+        return data
 
     def _read_text(self, file):
         # Read text file
@@ -134,6 +141,7 @@ class File:
             f.close()
             return data
         except:
+            self.logger.exception("Failed reading file \"{file}\"".format(file=file))
             return False
 
     def _read_binary(self, file):
@@ -161,6 +169,14 @@ class File:
     def is_changed(self):
         """Check if the editor data is different from the file."""
         return self.editor.get_data() != self.data
+
+    def is_changed_on_disk(self):
+        path = self._path()
+        if os.path.isfile(path):
+            data = self._read(path)
+            if data != self.data:
+                return True
+        return False
 
     def is_writable(self):
         """Check if the file is writable."""

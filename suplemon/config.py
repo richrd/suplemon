@@ -8,18 +8,22 @@ import json
 import logging
 
 from . import helpers
+from . import suplemon_module
 
 
 class Config:
     def __init__(self, app):
         self.app = app
         self.logger = logging.getLogger(__name__)
-        self.default_filename = "defaults.json"
+        self.default_config_filename = "defaults.json"
+        self.default_keymap_filename = "keymap.json"
         self.config_filename = "suplemon-config.json"
+        self.keymap_filename = "suplemon-keymap.json"
         self.home_dir = os.path.expanduser("~")
-        self.fpath = os.path.join(self.home_dir, ".config", "suplemon")
+        self.config_dir = os.path.join(self.home_dir, ".config", "suplemon")
 
         self.defaults = {}
+        self.keymap = {}
         self.config = {}
 
     def init(self):
@@ -27,11 +31,14 @@ class Config:
         return self.load_defaults()
 
     def path(self):
-        return os.path.join(self.fpath, self.config_filename)
+        return os.path.join(self.config_dir, self.config_filename)
+
+    def keymap_path(self):
+        return os.path.join(self.config_dir, self.keymap_filename)
 
     def set_path(self, path):
         parts = os.path.split(path)
-        self.fpath = parts[0]
+        self.config_dir = parts[0]
         self.config_filename = parts[1]
 
     def load(self):
@@ -47,18 +54,65 @@ class Config:
         else:
             self.logger.info("Failed to load config file '{0}'.".format(path))
             self.config = dict(self.defaults)
-            return False
+        self.load_keys()
         return config
 
-    def load_defaults(self):
-        path = os.path.join(self.app.path, "config", self.default_filename)
+    def load_keys(self):
+        path = self.keymap_path()
+        keymap = False
         if not os.path.exists(path):
+            self.logger.debug("Keymap file '{0}' doesn't exist.".format(path))
             return False
-        defaults = self.load_config_file(path)
-        if not defaults:
-            self.logger.warning("Failed to load default config file! ('{0}')".format(path))
+        keymap = self.load_config_file(path)
+        if not keymap:
+            self.logger.info("Failed to load keymap file '{0}'.".format(path))
             return False
-        self.defaults = defaults
+        # Prepend the user keys to the defaults to give the user config a higher priority
+        keymap += self.keymap
+        self.keymap = self.normalize_keys(keymap)
+        return True
+
+    def normalize_keys(self, keymap):
+        """Normalize the order of modifier keys in keymap."""
+        modifiers = ["shift", "ctrl", "alt", "meta"]  # The modifiers in correct order
+        for item in keymap:
+            new_keys = []
+            for key_item in item["keys"]:
+                parts = key_item.split("+")
+                key = parts[-1]
+                if len(parts) < 2:
+                    new_keys.append(key)
+                    continue
+                normalized = ""
+                for mod in modifiers:  # Add the used modifiers back in correct order
+                    if mod in parts:
+                        normalized += mod + "+"
+                normalized += key
+                new_keys.append(normalized)
+            item["keys"] = new_keys
+        return keymap
+
+    def load_defaults(self):
+        if not self.load_default_config() or not self.load_default_keys():
+            return False
+        return True
+
+    def load_default_config(self):
+        path = os.path.join(self.app.path, "config", self.default_config_filename)
+        config = self.load_config_file(path)
+        if not config:
+            self.logger.error("Failed to load default config file '{0}'!".format(path))
+            return False
+        self.defaults = config
+        return True
+
+    def load_default_keys(self):
+        path = os.path.join(self.app.path, "config", self.default_keymap_filename)
+        config = self.load_config_file(path)
+        if not config:
+            self.logger.error("Failed to load default keymap file '{0}'!".format(path))
+            return False
+        self.keymap = config
         return True
 
     def reload(self):
@@ -82,19 +136,7 @@ class Config:
             for sec_key in curr_item.keys():
                 if sec_key not in config[prim_key].keys():
                     config[prim_key][sec_key] = curr_item[sec_key]
-        self.merge_keys(config)
         return config
-
-    def merge_keys(self, config):
-        """Fill in config with default keys."""
-        # Do merge for app and editor keys
-        for dest in ["app", "editor"]:
-            key_config = config[dest]["keys"]
-            key_defaults = self.defaults[dest]["keys"]
-            for key in key_defaults.keys():
-                # Fill in each key that's not defined yet
-                if key not in key_config.keys():
-                    key_config[key] = key_defaults[key]
 
     def load_config_file(self, path):
         try:
@@ -125,12 +167,12 @@ class Config:
         return "\n".join(cleaned)
 
     def create_config_dir(self):
-        if not os.path.exists(self.fpath):
+        if not os.path.exists(self.config_dir):
             try:
-                os.makedirs(self.fpath)
+                os.makedirs(self.config_dir)
             except:
                 self.app.logger.warning("Config folder '{0}' doesn't exist and couldn't be created.".format(
-                                        self.fpath))
+                                        self.config_dir))
 
     def __getitem__(self, i):
         """Get a config variable."""
@@ -147,3 +189,37 @@ class Config:
     def __len__(self):
         """Return length of top level config variables."""
         return len(self.config)
+
+
+class ConfigModule(suplemon_module.Module):
+    """Helper for shortcut for opening config files."""
+    def init(self):
+        self.config_name = "defaults.json"
+        self.config_default_path = os.path.join(self.app.path, "config", self.config_name)
+        self.config_user_path = self.app.config.path()
+
+    def run(self, app, editor, args):
+        if args == "defaults":
+            # Open the default config in a new file only for viewing
+            self.open(app, self.config_default_path, read_only=True)
+        else:
+            self.open(app, self.config_user_path)
+
+    def open(self, app, path, read_only=False):
+        if read_only:
+            f = open(path)
+            data = f.read()
+            f.close()
+            file = app.new_file()
+            file.set_name(self.config_name)
+            file.set_data(data)
+            app.switch_to_file(app.last_file_index())
+        else:
+            # Open the user config file for editing
+            f = app.file_is_open(path)
+            if f:
+                app.switch_to_file(app.get_file_index(f))
+            else:
+                if not app.open_file(path):
+                    app.new_file(path)
+                app.switch_to_file(app.last_file_index())

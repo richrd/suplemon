@@ -12,6 +12,7 @@ class Lower(Module):
                 new_data = editor.lines[cursor.y].get_data().lower()
                 editor.lines[cursor.y].data = new_data
 
+
 module = {
     "class": Lower,
     "name": "lower",

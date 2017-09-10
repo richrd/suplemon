@@ -4,8 +4,10 @@ Curses user interface.
 """
 
 import os
+import sys
 import logging
 
+from .prompt import Prompt, PromptBool, PromptFile
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -19,6 +21,8 @@ class InputEvent:
         self.type = None  # 'key' or 'mouse'
         self.key_name = None
         self.key_code = None
+        self.is_typeable = False
+        self.curses_key_name = None
         self.mouse_code = None
         self.mouse_pos = (0, 0)
         self.logger = logging.getLogger("{0}.InputEvent".format(__name__))
@@ -28,6 +32,7 @@ class InputEvent:
         self.type = "key"
         self.key_code = key_code
         self.key_name = self._key_name(key_code)
+        self.curses_key_name = self._curses_key_name(key_code)
 
     def set_key_name(self, name):
         """Manually set the event key name."""
@@ -42,18 +47,32 @@ class InputEvent:
 
     def _key_name(self, key_code):
         """Return a normalized key name for key_code."""
-        if key_code in key_map.keys():
-            return key_map[key_code]
+        if isinstance(key_code, int):
+            if key_code in key_map.keys():
+                return key_map[key_code]
         curs_key_name = self._curses_key_name(key_code)
         if curs_key_name:
             if curs_key_name in key_map.keys():
                 return key_map[curs_key_name]
+            self.is_typeable = True  # We'll assume the key is typeable if it's not found in the key map
             return curs_key_name
         else:
+            char = None
+            if key_code in key_map.keys():
+                return key_map[key_code]
+
+            if sys.version_info[0] >= 3:
+                if isinstance(key_code, str):
+                    self.is_typeable = True
+                    return key_code
+
             try:
-                return chr(key_code)
+                char = chr(key_code)
             except:
-                return False
+                pass
+            if char is not None:
+                self.is_typeable = True
+                return char
         return False
 
     def _curses_key_name(self, key):
@@ -65,7 +84,8 @@ class InputEvent:
         # Special keys can also be ints on Python > 3.3
         if isinstance(key, int):  # getch fallback
             try:  # Try to convert to a curses key name
-                return str(curses.keyname(key).decode("utf-8"))
+                name = str(curses.keyname(key).decode("utf-8"))
+                return name
             except:  # Otherwise try to convert to a character
                 return False
         return False
@@ -95,7 +115,13 @@ class UI:
         os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
-        import curses.textpad  # noqa
+        self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
+
+        # Notify user if Pygments syntax highlighting isn't available
+        try:
+            import pygments  # noqa
+        except:
+            self.logger.info("Pygments not available, please install python3-pygments for proper syntax highlighting.")
 
     def run(self, func):
         """Run the application main function via the curses wrapper for safety."""
@@ -110,13 +136,11 @@ class UI:
         self.screen = curses.initscr()
         self.setup_colors()
 
-        # curses.cbreak()
-        # TODO: Raw mode seems to work ok. Should probably
-        # switch to it from cbreak to get Ctrl+Z to work etc.
         curses.raw()
-
         curses.noecho()
+
         try:
+            # Hide the default cursor
             # Might fail on vt100 terminal emulators
             curses.curs_set(0)
         except:
@@ -260,10 +284,9 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows(resize=True)
-        self.screen.refresh()
 
     def check_resize(self):
-        """Check if terminal has resized."""
+        """Check if terminal has resized and resize if needed."""
         yx = self.screen.getmaxyx()
         if self.current_yx != yx:
             self.current_yx = yx
@@ -285,10 +308,10 @@ class UI:
         display = self.app.config["display"]
         head_parts = []
         if display["show_app_name"]:
-            name_str = "Suplemon Editor v" + self.app.version + " -"
+            name_str = "Suplemon Editor v{0} -".format(self.app.version)
             if self.app.config["app"]["use_unicode_symbols"]:
                 logo = "\u2688"      # Simple lemon (filled)
-                name_str = " " + logo + " " + name_str
+                name_str = " {0} {1}".format(logo, name_str)
             head_parts.append(name_str)
 
         # Add module statuses to the status bar
@@ -327,7 +350,7 @@ class UI:
                 append += ["", is_changed_symbol][f.is_changed()]
             fname = prepend + f.name + append
             if not str_list:
-                str_list.append("[" + fname + "]")
+                str_list.append("[{0}]".format(fname))
             else:
                 str_list.append(fname)
         return " ".join(str_list)
@@ -337,111 +360,127 @@ class UI:
         editor = self.app.get_editor()
         size = self.get_size()
         cur = editor.get_cursor()
-        data = "@ " + str(cur[0]) + "," + str(cur[1]) + " " + \
-            "cur:" + str(len(editor.cursors)) + " " + \
-            "buf:" + str(len(editor.get_buffer()))
-        if self.app.config["app"]["debug"]:
-            data += " cs:"+str(editor.current_state)+" hist:"+str(len(editor.history))  # Undo / Redo debug
-        # if editor.last_find:
-        #     find = editor.last_find
-        #     if len(find) > 10:find = find[:10]+"..."
-        #     data = "find:'"+find+"' " + data
+
+        # Core status info
+        status_str = "@{0},{1} cur:{2} buf:{3}".format(
+            str(cur[0]),
+            str(cur[1]),
+            str(len(editor.cursors)),
+            str(len(editor.get_buffer()))
+        )
 
         # Add module statuses to the status bar
+        module_str = ""
         for name in self.app.modules.modules.keys():
             module = self.app.modules.modules[name]
             if module.options["status"] == "bottom":
-                data += " " + module.get_status()
+                module_str += " " + module.get_status()
+        status_str = module_str + " " + status_str
 
         self.status_win.erase()
         status = self.app.get_status()
-        extra = size[0] - len(status+data) - 1
-        line = status+(" "*extra)+data
+        extra = size[0] - len(status+status_str) - 1
+        line = status+(" "*extra)+status_str
 
         if len(line) >= size[0]:
             line = line[:size[0]-1]
+
         if self.app.config["display"]["invert_status_bars"]:
-            self.status_win.addstr(0, 0, line, curses.color_pair(0) | curses.A_REVERSE)
+            attrs = curses.color_pair(0) | curses.A_REVERSE
         else:
-            self.status_win.addstr(0, 0, line, curses.color_pair(0))
+            attrs = curses.color_pair(0)
+
+        # This thwarts a weird crash that happens when pasting a lot
+        # of data that contains line breaks into the find dialog.
+        # Should probably figure out why it happens, but it's not
+        # due to line breaks in the data nor is the data too long.
+        # Thanks curses!
+        try:
+            self.status_win.addstr(0, 0, line, attrs)
+        except:
+            self.logger.exception("Failed to show bottom status bar. Status line was: {0}".format(line))
 
         self.status_win.refresh()
 
     def show_legend(self):
         """Show keyboard legend."""
-        # TODO: get from key bindings
-        self.legend_win.erase()
-        keys = [
-            ("^S", "Save"),
-            ("F1", "Save as"),
-            ("F2", "Reload"),
-            ("F5", "Undo"),
-            ("F6", "Redo"),
-            ("^O", "Open"),
-            ("^C", "Copy"),
-            ("^X", "Cut"),
-            ("^V", "Paste"),
-            ("^F", "Find"),
-            ("^D", "Find next"),
-            ("^A", "Find all"),
-            ("^K", "Duplicate line"),
-            ("ESC", "Single cursor"),
-            ("^G", "Go to"),
-            ("^E", "Run command"),
-            ("F8", "Mouse mode"),
-            ("^Q", "Exit"),
+        # Only the most important commands are displayed in the legend
+        legend_commands = [
+            ("save_file", "Save"),
+            ("save_file_as", "Save as"),
+            ("reload_file", "Reload"),
+            ("undo", "Undo"),
+            ("redo", "Redo"),
+            ("open", "Open"),
+            ("copy", "Copy"),
+            ("cut", "Cut"),
+            ("insert", "Paste"),
+            ("find", "Find"),
+            ("find_next", "Find next"),
+            ("find_all", "Find all"),
+            ("duplicate_line", "Duplicate line"),
+            ("escape", "Single cursor"),
+            ("go_to", "Go to"),
+            ("run_command", "Run command"),
+            ("toggle_mouse", "Mouse mode"),
+            ("help", "Help"),
+            ("ask_exit", "Exit"),
         ]
+
+        # Get the key bindings for the commands
+        keys = []
+        for command in legend_commands:
+            for item in self.app.config.keymap:
+                if item["command"] == command[0]:
+                    key = item["keys"][0]
+                    keys.append((key, command[1]))
+                    break
+
+        # Render the keys
+        self.legend_win.erase()
         x = 0
         y = 0
         max_y = 1
-        for key in keys:
-            if x+len(" ".join(key)) >= self.get_size()[0]:
+        for item in keys:
+            key = item[0]
+            label = item[1]
+            key = key.upper()
+            # Format some key names to look better
+            if key.startswith("CTRL+"):
+                key = "^"+key[5:]
+            if key == "ESCAPE":
+                key = "ESC"
+
+            if x+len(" ".join((key, label))) >= self.get_size()[0]:
                 x = 0
                 y += 1
                 if y > max_y:
                     break
-            self.legend_win.addstr(y, x, key[0], curses.A_REVERSE)
-            x += len(key[0])
-            self.legend_win.addstr(y, x, " "+key[1])
-            x += len(key[1])+2
+            self.legend_win.addstr(y, x, key.upper(), curses.A_REVERSE)
+            x += len(key)
+            self.legend_win.addstr(y, x, " "+label)
+            x += len(label)+2
         self.legend_win.refresh()
 
-    def show_capture_status(self, s="", value=""):
-        """Show status when capturing input."""
-        self.status_win.erase()
-        self.status_win.addstr(0, 0, s, curses.A_REVERSE)
-        self.status_win.addstr(0, len(s), value)
-
-    def _process_query_key(self, key):
-        """Process keystrokes from the Textbox window."""
-        if key in [3, 27]:  # Support canceling query with Ctrl+C or ESC
-            raise KeyboardInterrupt
-        # Standardize some keycodes
-        rewrite = {
-            127: 263,
-            8: 263,
-        }
-        # self.logger.debug("Query key input: {0}".format(str(key)))
-        if key in rewrite.keys():
-            key = rewrite[key]
-        return key
-
-    def _query(self, text, initial=""):
+    def _query(self, text, initial="", cls=Prompt):
         """Ask for text input via the status bar."""
-        self.show_capture_status(text, initial)
-        self.text_input = curses.textpad.Textbox(self.status_win)
-        try:
-            out = self.text_input.edit(self._process_query_key)
-        except:
-            return False
 
-        # If input begins with prompt, remove the prompt text
-        if len(out) >= len(text):
-            if out[:len(text)] == text:
-                out = out[len(text):]
-        if len(out) > 0 and out[-1] == " ":
-            out = out[:-1]
-        out = out.rstrip("\r\n")
+        # Disable render blocking
+        blocking = self.app.block_rendering
+        self.app.block_rendering = 0
+
+        # Create our text input
+        self.text_input = cls(self.app, self.status_win)
+        self.text_input.set_config(self.app.config["editor"].copy())
+        self.text_input.set_input_source(self.get_input)
+        self.text_input.init()
+
+        # Get input from the user
+        out = self.text_input.get_input(text, initial)
+
+        # Restore render blocking
+        self.app.block_rendering = blocking
+
         return out
 
     def query(self, text, initial=""):
@@ -451,18 +490,13 @@ class UI:
 
     def query_bool(self, text, default=False):
         """Get a boolean from the user."""
-        indicator = "[y/N]"
-        initial = ""
-        if default:
-            indicator = "[Y/n]"
-            initial = "y"
+        result = self._query(text, default, PromptBool)
+        return result
 
-        result = self._query(text + " " + indicator, initial)
-        if result in ["Y", "y"]:
-            return True
-        if result == "":
-            return default
-        return False
+    def query_file(self, text, initial=""):
+        """Get a file path from the user."""
+        result = self._query(text, initial, PromptFile)
+        return result
 
     def get_input(self, blocking=True):
         """Get an input event from keyboard or mouse. Returns an InputEvent instance or False."""
@@ -486,7 +520,6 @@ class UI:
             event.set_key_name("ctrl+c")
             return event
         except:
-            self.logger.debug("Failed to get input!")
             # No input available
             return False
         finally:
@@ -524,6 +557,8 @@ class UI:
         x, y = (state[1], state[2])
         if self.app.config["display"]["show_top_bar"]:
             y -= 1
-        x -= editor.line_offset()
+        x -= editor.line_offset() - editor.x_scroll
+        if x < 0:
+            x = 0
         y += editor.y_scroll
         return (state[0], x, y, state[3], state[4])

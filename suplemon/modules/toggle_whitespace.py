@@ -9,6 +9,7 @@ class ToggleWhitespace(Module):
         new_value = not self.app.config["editor"]["show_white_space"]
         self.app.config["editor"]["show_white_space"] = new_value
 
+
 module = {
     "class": ToggleWhitespace,
     "name": "toggle_whitespace",

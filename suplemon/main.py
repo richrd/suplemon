@@ -9,7 +9,7 @@ import os
 import sys
 
 from . import ui
-from . import modules
+from . import module_loader
 from . import themes
 from . import helpers
 
@@ -18,7 +18,7 @@ from .logger import logger
 from .config import Config
 from .editor import Editor
 
-__version__ = "0.1.46"
+__version__ = "0.1.61"
 
 
 class App:
@@ -44,6 +44,9 @@ class App:
         self.global_buffer = []
         self.event_bindings = {}
 
+        # Maximum amount of inputs to process at once
+        self.max_input = 100
+
         # Save filenames for later
         self.filenames = filenames
 
@@ -55,7 +58,6 @@ class App:
             "help": self.help,
             "save_file": self.save_file,
             "run_command": self.query_command,
-            "find": self.find,
             "go_to": self.go_to,
             "open": self.open,
             "close_file": self.close_file,
@@ -84,6 +86,12 @@ class App:
             # Can't run without config
             return False
         self.config.load()
+
+        # Unicode symbols don't play nice with Python 2 so disable them
+        if sys.version_info[0] < 3:
+            self.config["app"]["use_unicode_symbols"] = False
+
+        # Configure logger
         self.debug = self.config["app"]["debug"]
         debug_level = self.config["app"]["debug_level"]
         self.logger.debug("Setting debug_level to {0}.".format(debug_level))
@@ -95,7 +103,7 @@ class App:
         self.ui.init()
 
         # Load extension modules
-        self.modules = modules.ModuleLoader(self)
+        self.modules = module_loader.ModuleLoader(self)
         self.modules.load()
 
         # Load themes
@@ -108,6 +116,7 @@ class App:
 
     def exit(self):
         """Stop the main loop and exit."""
+        self.trigger_event_before("app_exit")
         self.running = 0
 
     def run(self):
@@ -125,10 +134,11 @@ class App:
         # Load ui and files etc
         self.load()
         # Initial render
-        self.get_editor().resize()
+        self.get_editor().refresh()
         self.ui.refresh()
         # Start mainloop
         self.main_loop()
+        self.trigger_event_after("app_exit")
         # Unload ui
         self.ui.unload()
 
@@ -166,7 +176,7 @@ class App:
 
             # Run through max 100 inputs (so the view is updated at least every 100 characters)
             i = 0
-            while i < 100:
+            while i < self.max_input:
                 event = self.ui.get_input(False)  # non-blocking
 
                 if not event:
@@ -182,14 +192,14 @@ class App:
 
                 if event:
                     got_input = True
-                    self.on_input(event)
+                    self.on_input(event)  # PERF: Up to 30% processing time
 
             self.block_rendering = False
 
-            # TODO: why do I need resize here?
-            # (View won't update after switching files, WTF)
             self.trigger_event_after("mainloop")
-            self.get_editor().resize()
+            # Rendering happens here
+            # TODO: Optimize performance. Can make up 45% of processing time in the loop.
+            self.get_editor().refresh()
             self.ui.refresh()
 
     def get_status(self):
@@ -211,7 +221,11 @@ class App:
 
     def get_key_bindings(self):
         """Return the list of key bindings."""
-        return self.config["app"]["keys"]
+        bindings = {}
+        for binding in self.config.keymap:
+            for key in binding["keys"]:
+                bindings[key] = binding["command"]
+        return bindings
 
     def get_event_bindings(self):
         """Return the dict of event bindings."""
@@ -225,12 +239,12 @@ class App:
         :param key: What key or key combination to bind.
         :param str operation: Which operation to run.
         """
-        self.get_key_bindings()[key] = operation
+        self.config.keymap.prepend({"keys": [key], "command": operation})
 
     def set_event_binding(self, event, when, callback):
         """Bind a callback to be run before or after an event.
 
-        Bind callback to run before or after event occurs. Th when parameter
+        Bind callback to run before or after event occurs. The when parameter
         should be 'before' or 'after'. If using 'before' the callback can
         inhibit running the event if it returns True
 
@@ -294,14 +308,20 @@ class App:
         :rtype: boolean
         """
         key_bindings = self.get_key_bindings()
+
+        operation = None
         if event.key_name in key_bindings.keys():
             operation = key_bindings[event.key_name]
         elif event.key_code in key_bindings.keys():
             operation = key_bindings[event.key_code]
-        else:
-            return False
-        self.run_operation(operation)
-        return True
+
+        if operation in self.operations.keys():
+            self.run_operation(operation)
+            return True
+        elif operation in self.modules.modules.keys():
+            self.run_module(operation)
+
+        return False
 
     def handle_mouse(self, event):
         """Handle a mouse input event.
@@ -316,9 +336,9 @@ class App:
         elif event.mouse_code == 4096:               # Right mouse button release
             editor.add_cursor(event.mouse_pos)
         elif event.mouse_code == 524288:             # Wheel up
-            editor.page_up()
+            editor.jump_up()
         elif event.mouse_code == 134217728:          # Wheel down(and unfortunately left button drag)
-            editor.page_down()
+            editor.jump_down()
         else:
             return False
         return True
@@ -357,9 +377,8 @@ class App:
                 self.exit()
                 return True
             return False
-        else:
-            self.exit()
-            return True
+        self.exit()
+        return True
 
     def switch_to_file(self, index):
         """Load a default file if no files specified."""
@@ -413,18 +432,20 @@ class App:
                 if file_index != -1:
                     self.switch_to_file(file_index)
 
-    def find(self):
-        """Find in file."""
-        editor = self.get_editor()
-        what = self.ui.query("Find:", editor.last_find)
-        if what:
-            editor.find(what)
-
     def find_file(self, s):
         """Return index of file matching string."""
+        # Case insensitive matching
+        s = s.lower()
         i = 0
+        # First match files beginning with s
         for file in self.files:
-            if file.name[:len(s)].lower() == s.lower():
+            if file.name.lower().startswith(s):
+                return i
+            i += 1
+        i = 0
+        # Then match files that contain s
+        for file in self.files:
+            if s in file.name.lower():
                 return i
             i += 1
         return -1
@@ -433,21 +454,29 @@ class App:
         """Run editor commands."""
         parts = data.split(" ")
         cmd = parts[0].lower()
+        if cmd in self.operations.keys():
+            return self.run_operation(cmd)
+
         args = " ".join(parts[1:])
         self.logger.debug("Looking for command '{0}'".format(cmd))
         if cmd in self.modules.modules.keys():
             self.logger.debug("Trying to run command '{0}'".format(cmd))
             self.get_editor().store_action_state(cmd)
-            try:
-                self.modules.modules[cmd].run(self, self.get_editor(), args)
-            except:
-                self.set_status("Running command failed!")
-                self.logger.exception("Running command failed!")
+            if not self.run_module(cmd, args):
                 return False
         else:
-            self.set_status("Command '" + cmd + "' not found.")
+            self.set_status("Command '{0}' not found.".format(cmd))
             return False
         return True
+
+    def run_module(self, module_name, args=""):
+        try:
+            self.modules.modules[module_name].run(self, self.get_editor(), args)
+            return True
+        except:
+            self.set_status("Running command failed!")
+            self.logger.exception("Running command failed!")
+            return False
 
     def run_operation(self, operation):
         """Run an app core operation."""
@@ -543,6 +572,7 @@ class App:
         """Setup an editor instance with configuration."""
         config = self.config["editor"]
         editor.set_config(config)
+        editor.init()
 
     ###########################################################################
     # File operations
@@ -550,7 +580,7 @@ class App:
 
     def open(self):
         """Ask for file name and try to open it."""
-        name = self.ui.query("Open file:")
+        name = self.ui.query_file("Open file:")
         if not name:
             return False
         exists = self.file_is_open(name)
@@ -559,7 +589,7 @@ class App:
             return True
 
         if not self.open_file(name):
-            self.set_status("Failed to load '" + name + "'")
+            self.set_status("Failed to load '{0}'".format(name))
             return False
         self.switch_to_file(self.last_file_index())
         return True
@@ -576,31 +606,48 @@ class App:
         if self.current_file == len(self.files):
             self.current_file -= 1
 
-    def save_file(self, file=False):
+    def save_file(self, file=False, overwrite=False):
         """Save current file."""
         f = file or self.get_file()
+        # Make sure the file has a name
         if not f.get_name():
             return self.save_file_as(f)
+        # Warn if the file has changed on disk
+        if not overwrite and f.is_changed_on_disk():
+            if not self.ui.query_bool("The file was modified since you opened it, save anyway?"):
+                return False
+        # Save the file
         if f.save():
-            self.set_status("Saved [" + helpers.curr_time_sec() + "] '" + f.name + "'")
-            if f.path() == self.config.path():
+            self.set_status("Saved [{0}] '{1}'".format(helpers.curr_time_sec(), f.name))
+            if f.path() == self.config.path() or f.path() == self.config.keymap_path():
                 self.reload_config()
             return True
-        self.set_status("Couldn't write to '" + f.name + "'")
+        self.set_status("Couldn't write to '{0}'".format(f.name))
         return False
 
     def save_file_as(self, file=False):
         """Save current file."""
         f = file or self.get_file()
-        name = self.ui.query("Save as:", f.name)
+        name = self.ui.query_file("Save as:", f.name)
         if not name:
             return False
-        f.set_name(name)
-        return self.save_file(f)
+        if os.path.exists(name):
+            if not self.ui.query_bool("A file or directory with that name already exists. Overwrite it?"):
+                return False
+        target_dir = os.path.dirname(name)
+        if target_dir and not os.path.exists(target_dir):
+            if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
+                self.logger.debug("Creating missing folders in save path.")
+                os.makedirs(target_dir)
+            else:
+                return False
+        f.set_path(name)
+        # We can just overwrite the file since the user already confirmed
+        return self.save_file(f, overwrite=True)
 
     def reload_file(self):
         """Reload the current file."""
-        if self.ui.query_bool("Reload '" + self.get_file().name + "'?"):
+        if self.ui.query_bool("Reload '{0}'?".format(self.get_file().name)):
             if self.get_file().reload():
                 return True
         return False

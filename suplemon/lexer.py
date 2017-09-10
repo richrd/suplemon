@@ -1,12 +1,31 @@
 # -*- encoding: utf-8
 
 import pygments
+import pygments.token
 import pygments.lexers
 
 
 class Lexer:
     def __init__(self, app):
         self.app = app
+        self.token_map = {
+            pygments.token.Comment: "comment",
+            pygments.token.Comment.Single: "comment",
+            pygments.token.Operator: "keyword",
+            pygments.token.Name.Function: "entity.name.function",
+            pygments.token.Name.Class: "entity.name.class",
+            pygments.token.Name.Tag: "entity.name.tag",
+            pygments.token.Name.Attribute: "entity.other.attribute-name",
+            pygments.token.Name.Variable: "variable",
+            pygments.token.Name.Builtin.Pseudo: "constant.language",
+            pygments.token.Literal.String: "string",
+            pygments.token.Literal.String.Doc: "string",
+            pygments.token.Punctuation: "punctuation",
+            pygments.token.Literal.Number: "constant.numeric",
+            pygments.token.Name: "entity.name",
+            pygments.token.Keyword: "keyword",
+            pygments.token.Generic.Deleted: "invalid",
+        }
 
     def lex(self, code, lex):
         """Return tokenified code.
@@ -31,24 +50,8 @@ class Lexer:
             token = word[0]
             scope = "global"
 
-            if token in pygments.token.Keyword:
-                scope = "keyword"
-            elif token == pygments.token.Comment:
-                scope = "comment"
-            elif token in pygments.token.Literal.String:
-                scope = "string"
-            elif token in pygments.token.Literal.Number:
-                scope = "constant.numeric"
-            elif token == pygments.token.Name.Function:
-                scope = "entity.name.function"
-            elif token == pygments.token.Name.Class:
-                scope = "entity.name.class"
-            elif token == pygments.token.Name.Tag:
-                scope = "entity.name.tag"
-            elif token == pygments.token.Operator:
-                scope = "keyword"
-            elif token == pygments.token.Name.Builtin.Pseudo:
-                scope = "constant.language"
+            if token in self.token_map.keys():
+                scope = self.token_map[token]
 
             scopes.append((scope, word[1]))
         return scopes

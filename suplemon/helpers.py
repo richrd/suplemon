@@ -47,7 +47,7 @@ def multisplit(data, delimiters):
 
 def get_error_info():
     """Return info about last error."""
-    msg = str(traceback.format_exc()) + "\n" + str(sys.exc_info())
+    msg = "{0}\n{1}".format(str(traceback.format_exc()), str(sys.exc_info()))
     return msg
 
 

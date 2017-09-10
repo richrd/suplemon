@@ -3,7 +3,6 @@
 Editor class for extending viewer with text editing features.
 """
 
-import re
 
 from . import helpers
 
@@ -51,10 +50,6 @@ class Editor(Viewer):
         """
         Viewer.__init__(self, app, window)
 
-        # Copy/paste buffer
-        self.buffer = []
-        # Last search used in 'find'
-        self.last_find = ""
         # History of editor states for undo/redo
         self.history = [State()]
         # Current state index of the editor
@@ -62,9 +57,9 @@ class Editor(Viewer):
         # Last editor action that was used (for undo/redo)
         self.last_action = None
 
-        self.operations = {
-            "home": self.home,                            # Home
-            "end": self.end,                              # End
+    def init(self):
+        Viewer.init(self)
+        operations = {
             "backspace": self.backspace,                  # Backspace
             "delete": self.delete,                        # Delete
             "insert": self.insert,                        # Insert
@@ -72,10 +67,8 @@ class Editor(Viewer):
             "tab": self.tab,                              # Tab
             "untab": self.untab,                          # Shift + Tab
             "escape": self.escape,                        # Escape
-            "arrow_right": self.arrow_right,              # Arrow Right
-            "arrow_left": self.arrow_left,                # Arrow Left
-            "arrow_up": self.arrow_up,                    # Arrow Up
-            "arrow_down": self.arrow_down,                # Arrow Down
+            "single_selection": self.single_selection,    # Escape
+            "clear_last_find": self.clear_last_find,      # Escape
             "new_cursor_up": self.new_cursor_up,          # Alt + Up
             "new_cursor_down": self.new_cursor_down,      # Alt + Down
             "new_cursor_left": self.new_cursor_left,      # Alt + Left
@@ -92,27 +85,9 @@ class Editor(Viewer):
             "copy": self.copy,                            # Ctrl + C
             "cut": self.cut,                              # Ctrl + X
             "duplicate_line": self.duplicate_line,        # Ctrl + W
-            "find_next": self.find_next,                  # Ctrl + D
-            "find_all": self.find_all,                    # Ctrl + A
-            "jump_left": self.jump_left,                  # Ctrl + Left
-            "jump_right": self.jump_right,                # Ctrl + Right
-            "jump_up": self.jump_up,                      # Ctrl + Up
-            "jump_down": self.jump_down,                  # Ctrl + Down
         }
-
-    def get_buffer(self):
-        """Returns the current buffer.
-
-        Returns the local buffer or the global buffer depending on config.
-        """
-        if self.app.config["editor"]["use_global_buffer"]:
-            return self.app.global_buffer
-        else:
-            return self.buffer
-
-    def get_key_bindings(self):
-        """Get list of editor key bindings."""
-        return self.config["keys"]
+        for key in operations.keys():
+            self.operations[key] = operations[key]
 
     def set_buffer(self, buffer):
         """Sets local or global buffer depending on config."""
@@ -174,7 +149,17 @@ class Editor(Viewer):
         state = self.history[index]
         state.restore(self)
         self.current_state = index
-        self.refresh()
+
+    def handle_input(self, event):
+        done = Viewer.handle_input(self, event)
+        if not done:
+            if event.is_typeable:
+                if isinstance(event.key_code, str):
+                    self.type(event.key_code)
+                elif event.key_name:
+                    self.type(event.key_name)
+                return True
+        return False
 
     def undo(self):
         """Undo the last command or change."""
@@ -192,102 +177,6 @@ class Editor(Viewer):
     #
     # Cursor operations
     #
-
-    def arrow_right(self):
-        """Move cursors right."""
-        for cursor in self.cursors:
-            line = self.lines[cursor.y]
-            if cursor.y != len(self.lines)-1 and (cursor.x >= len(line) or len(line) == 0):
-                cursor.move_down()
-                cursor.set_x(0)
-            elif cursor.x < len(self.lines[cursor.y]) and len(line) > 0:
-                cursor.move_right()
-        self.move_cursors()
-        self.scroll_down()
-
-    def arrow_left(self):
-        """Move cursors left."""
-        for cursor in self.cursors:
-            if cursor.y != 0 and cursor.x == 0:
-                cursor.move_up()
-                cursor.set_x(len(self.lines[cursor.y])+1)
-        self.move_cursors((-1, 0))
-        self.scroll_up()
-
-    def arrow_up(self):
-        """Move cursors up."""
-        self.move_cursors((0, -1))
-        self.scroll_up()
-
-    def arrow_down(self):
-        """Move cursors down."""
-        self.move_cursors((0, 1))
-        self.scroll_down()
-
-    def jump_left(self):
-        """Jump one 'word' to the left."""
-        chars = self.config["punctuation"]
-        for cursor in self.cursors:
-            line = self.lines[cursor.y]
-            if cursor.x == 0:
-                if cursor.y > 0:
-                    # Jump to end of previous line
-                    cursor.set_x(len(self.lines[cursor.y-1]))
-                    cursor.move_up()
-                continue
-            if cursor.x <= len(line):
-                cur_chr = line[cursor.x-1]
-            else:
-                cur_chr = line[cursor.x]
-            while cursor.x > 0:
-                next = cursor.x-2
-                if next < 0:
-                    next = 0
-                if cur_chr == " ":
-                    cursor.move_left()
-                    if line[next] != " ":
-                        break
-                else:
-                    cursor.move_left()
-                    if line[next] in chars:
-                        break
-        self.move_cursors()
-
-    def jump_right(self):
-        """Jump one 'word' to the right."""
-        chars = self.config["punctuation"]
-        for cursor in self.cursors:
-            line = self.lines[cursor.y]
-            if cursor.x == len(line):
-                if cursor.y < len(self.lines):
-                    # Jump to start of next line
-                    cursor.set_x(0)
-                    cursor.move_down()
-                continue
-            cur_chr = line[cursor.x]
-            while cursor.x < len(line):
-                next = cursor.x+1
-                if next == len(line):
-                    next -= 1
-                if cur_chr == " ":
-                    cursor.move_right()
-                    if line[next] != " ":
-                        break
-                else:
-                    cursor.move_right()
-                    if line[next] in chars:
-                        break
-        self.move_cursors()
-
-    def jump_up(self):
-        """Jump up 3 lines."""
-        self.move_cursors((0, -3))
-        self.scroll_up()
-
-    def jump_down(self):
-        """Jump down 3 lines."""
-        self.move_cursors((0, 3))
-        self.scroll_down()
 
     def new_cursor_up(self):
         """Add a new cursor one line up."""
@@ -338,38 +227,17 @@ class Editor(Viewer):
     def escape(self):
         """Handle escape key.
 
-        Removes last_find and all cursors except primary cursor."""
+        Wrapper for clear_last_find and single_selection."""
+        self.clear_last_find()
+        self.single_selection()
+
+    def clear_last_find(self):
+        """Removes last_find so a new auto-find can be initiated."""
         self.last_find = ""
+
+    def single_selection(self):
+        """Removes all cursors except primary cursor."""
         self.cursors = [self.cursors[0]]
-        self.move_cursors()
-        self.render()
-
-    def page_up(self):
-        """Move half a page up."""
-        amount = int(self.get_size()[1]/2) * -1
-        self.move_cursors((0, amount))
-        self.scroll_up()
-
-    def page_down(self):
-        """Move half a page down."""
-        amount = int(self.get_size()[1]/2)
-        self.move_cursors((0, amount))
-        self.scroll_down()
-
-    def home(self):
-        """Move to start of line or text on that line."""
-        for cursor in self.cursors:
-            wspace = helpers.whitespace(self.lines[cursor.y])
-            if cursor.x == wspace:
-                cursor.set_x(0)
-            else:
-                cursor.set_x(wspace)
-        self.move_cursors()
-
-    def end(self):
-        """Move to end of line."""
-        for cursor in self.cursors:
-            cursor.set_x(len(self.lines[cursor.y]))
         self.move_cursors()
 
     #
@@ -450,13 +318,14 @@ class Editor(Viewer):
                 del_n_chars = 1
                 # Check if we should unindent
                 if self.config["backspace_unindent"]:
-                    # Check if we can unindent,
-                    # and that it's actually  whitespace
-                    indent = self.config["tab_width"]
-                    if cursor.x >= indent:
-                        if curr_line[cursor.x-indent:cursor.x] == indent*" ":
-                            # Remove an indents worth of whitespace
-                            del_n_chars = indent
+                    # Check if we can unindent, and that it's actually whitespace
+                    # We don't do this for hard tabs since they're just a single character
+                    if not self.config["hard_tabs"]:
+                        indent = self.config["tab_width"]
+                        if cursor.x >= indent:
+                            if curr_line[cursor.x-indent:cursor.x] == indent*" ":
+                                # Remove an indents worth of whitespace
+                                del_n_chars = indent
                 # Slice characters out of the line
                 start = curr_line[:cursor.x-del_n_chars]
                 end = curr_line[cursor.x:]
@@ -583,20 +452,26 @@ class Editor(Viewer):
         """Indent lines."""
         # Add a restore point if previous action != tab
         self.store_action_state("tab")
-        self.type(" "*self.config["tab_width"])
+        if not self.config["hard_tabs"]:
+            self.type(" "*self.config["tab_width"])
+        else:
+            self.type("\t")
 
     def untab(self):
         """Unindent lines."""
         linenums = []
         # String to compare tabs to
         tab = " "*self.config["tab_width"]
+        if self.config["hard_tabs"]:
+            tab = "\t"
+        width = len(tab)
         for cursor in self.cursors:
             line = self.lines[cursor.y]
             if cursor.y in linenums:
                 cursor.x = helpers.whitespace(line)
                 continue
-            elif line[:self.config["tab_width"]] == tab:
-                line = Line(line[self.config["tab_width"]:])
+            elif line[:width] == tab:
+                line = Line(line[width:])
                 self.lines[cursor.y] = line
                 cursor.x = helpers.whitespace(line)
                 linenums.append(cursor.y)
@@ -682,92 +557,6 @@ class Editor(Viewer):
         self.scroll_to_line(cur.y)
         self.move_cursors()
 
-    def find(self, what, findall=False):
-        """Find what in data (from top to bottom). Adds a cursor when found."""
-        # Sorry for this colossal function
-        if not what:
-            return
-        last_cursor = self.get_last_cursor()
-        y = last_cursor.y
-
-        found = False
-        new_cursors = []
-        # Loop through all lines starting from the last cursor
-        while y < len(self.lines):
-            line = self.lines[y]
-            x_offset = 0  # Which character to begin searching from
-            if y == last_cursor.y:
-                # On the current line begin from the last cursor x pos
-                x_offset = last_cursor.x
-
-            # Find all occurances of search string
-            s = str(line[x_offset:])  # Data to search in
-            pattern = re.escape(what)  # Default to non regex pattern
-            if self.config["regex_find"]:
-                try:  # Try to search with the actual regex
-                    indices = [match.start() for match in re.finditer(what, s)]
-                except:  # Revert to normal search
-                    indices = [match.start() for match in re.finditer(pattern, s)]
-            else:
-                indices = [match.start() for match in re.finditer(pattern, s)]
-
-            # Loop through the indices and add cursors if they don't exist yet
-            for i in indices:
-                new = Cursor(i+x_offset, y)
-                if not self.cursor_exists(new):
-                    found = True
-                    new_cursors.append(new)
-                    if not findall:
-                        break
-                if new not in new_cursors:
-                    new_cursors.append(new)
-            if found and not findall:
-                break
-            y += 1
-
-        if not new_cursors:
-            self.app.set_status("Can't find '" + what + "'")
-            # self.last_find = ""
-            return
-        else:
-            # If we only have one cursor, and it's not
-            # where the first occurance is, just remove it
-            if len(self.cursors) == 1 and self.cursors[0].tuple() != new_cursors[0].tuple():
-                self.cursors = []
-        self.last_find = what   # Only store string if it's really found
-
-        # Add the new cursors
-        for cursor in new_cursors:
-            self.cursors.append(cursor)
-
-        destination = self.get_last_cursor().y
-        self.scroll_to_line(destination)
-        self.store_action_state("find")  # Store undo point
-
-    def find_next(self):
-        """Find next occurance."""
-        what = self.last_find
-        if what == "":
-            cursor = self.get_cursor()
-            search = "^([\w\-]+)"
-            line = self.lines[cursor.y][cursor.x:]
-            matches = re.match(search, line)
-            if matches:
-                what = matches.group(0)
-            else:
-                if line:
-                    what = line[0]
-            # Escape the data if regex is enabled
-            if self.config["regex_find"]:
-                what = re.escape(what)
-
-            self.last_find = what
-        self.find(what)
-
-    def find_all(self):
-        """Find all occurances."""
-        self.find(self.last_find, True)
-
     def duplicate_line(self):
         """Copy current line and add it below as a new line."""
         curs = sorted(self.cursors, key=lambda c: (c.y, c.x))
@@ -777,38 +566,3 @@ class Editor(Viewer):
             self.move_y_cursors(cursor.y, 1)
         self.move_cursors()
         self.store_action_state("duplicate_line")
-
-    def handle_input(self, event):
-        """Handle input."""
-        if event.type == "mouse":
-            return False
-        key = event.key_code
-        name = event.key_name
-        # Try match a key to a method and call it
-
-        key_bindings = self.get_key_bindings()
-        operation = None
-        if key in key_bindings.keys():
-            operation = key_bindings[key]
-        elif name in key_bindings.keys():
-            operation = key_bindings[name]
-        if operation:
-            self.run_operation(operation)
-        # Try to type the key into the editor
-        else:
-            if isinstance(key, str):
-                self.type(key)
-            elif name and not name.startswith("KEY_"):
-                self.type(name)
-        return False
-
-    def run_operation(self, operation):
-        """Run an editor core operation."""
-        if operation in self.operations.keys():
-            cancel = self.app.trigger_event_before(operation)
-            if cancel:
-                return False
-            result = self.operations[operation]()
-            self.app.trigger_event_after(operation)
-            return result
-        return False

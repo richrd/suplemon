@@ -1,5 +1,8 @@
-Suplemon :lemon: [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/richrd/suplemon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+Suplemon :lemon:
 ========
+
+[![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://gitter.im/richrd/suplemon](https://badges.gitter.im/richrd/suplemon.svg)](https://gitter.im/richrd/suplemon?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
         /  /____/  /  /  /  /_/  /  / /  /  /_____/  /  /  /  /  /  /    |/  / /
@@ -15,11 +18,28 @@ Suplemon is a modern, powerful and intuitive console text editor with multi curs
 Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 http://github.com/richrd/suplemon
 
-## Suplemon multi cursor editing
-![Suplemon in action](http://bittemple.org/misc/suplemon/suplemon-demo.gif)
+![Suplemon in action](http://www.suplemon.com/assets/suplemon-v0.1.51-multi-cursor-editing.gif)
+
+## Features
+ * Proper multi cursor editing, as in Sublime Text
+ * Syntax highlighting with Text Mate themes
+ * Autocomplete (based on words in the files that are open)
+ * Easy Undo/Redo (Ctrl + Z, Ctrl + Y)
+ * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix and Mac OS)
+ * Multiple files in tabs
+ * Powerful Go To feature for jumping to files and lines
+ * Find, Find next and Find all (Ctrl + F, Ctrl + D, Ctrl + A)
+ * Custom keyboard shortcuts (and easy-to-use defaults)
+ * Mouse support
+ * Restores cursor positions in when reopenning files
+ * Extensions (easy to write your own)
+ * Lots more...
 
 
-## Get it!
+## Caveats
+ * Currently no built in selections (regions). To copy part of a line select it with your mouse and use <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>
+
+## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
 
@@ -36,6 +56,12 @@ Install the latest version from PIP:
 To install Suplemon from the repo run the setup script:
 
     sudo python3 setup.py install
+
+### Usage
+
+    suplemon # New file in the current directory
+    suplemon [filename]... # Open one or more files
+
 
 ### Notes
  - **Must use Python 3.3 or higher for proper character encoding support.**
@@ -58,35 +84,18 @@ No dependencies outside the Python Standard Library required.
  * xsel
  > For system clipboard support on X Window (Linux).
 
+ * pbcopy / pbpaste
+ > For system clipboard support on Mac OS.
+
  See [docs/optional-dependencies.md][] for installation instructions.
 
  [docs/optional-dependencies.md]: docs/optional-dependencies.md
-
-## Usage
-
-    suplemon # New file in the current directory
-    suplemon [filename]... # Open one or more files
 
 ## Description
 Suplemon is an intuitive command line text editor. It supports multiple cursors out of the box.
 It is as easy as nano, and has much of the power of Sublime Text. It also supports extensions
 to allow all kinds of customizations. To get more help hit ```Ctrl + H``` in the editor.
 Suplemon is licensed under the MIT license.
-
-## Features
- * Terminal text editing with style
- * Proper multi cursor editing, Sublime Text style.
- * Syntax highlighting
- * Autocomplete
- * Easy Undo/Redo
- * Copy & Paste, with multi line support (and native clipboard support on X11 / Unix)
- * Multiple files in tabs
- * Powerful Go To feature for jumping to files and lines
- * Find and Find next
- * Custom keyboard shortcuts
- * Mouse support
- * Extensions (easy to write your own)
- * Lots more...
 
 ## Goals
  1. [X] Create a command line text editor with built in multi cursor support. It's awesome!
@@ -97,6 +106,7 @@ Suplemon is licensed under the MIT license.
 
 ## Configuration
 
+### Main Config
 The suplemon config file is stored at ```~/.config/suplemon/suplemon-config.json```.
 
 The best way to edit it is to run the ```config``` command (Run commands via ```Ctrl+E```).
@@ -104,8 +114,10 @@ That way Suplemon will automatically reload the configuration when you save the 
 To view the default configuration and see what options are available run ```config defaults``` via ```Ctrl+E```.
 
 
+### Keymap Config
 
-## Keyboard shortcuts
+Below are the default key mappings used in suplemon. They can be edited by running the ```keymap``` command.
+To view the default keymap file run ```keymap default```
 
  * <kbd>Ctrl</kbd> + <kbd>Q</kbd>
    > Exit
@@ -171,10 +183,10 @@ To view the default configuration and see what options are available run ```conf
  * <kbd>Ctrl</kbd> + <kbd>E</kbd>
    > Run a command.
 
- * <kbd>F5</kbd>
+ * <kbd>Ctrl</kbd> + <kbd>Z</kbd> and <kbd>F5</kbd>
    > Undo
 
- * <kbd>F6</kbd>
+ * <kbd>Ctrl</kbd> + <kbd>Y</kbd> and <kbd>F6</kbd>
    > Redo
 
  * <kbd>F7</kbd>
@@ -219,40 +231,31 @@ After those are installed, tests can be run via:
 
     ./test.sh
 
+PRs are very welcome and appreciated.
+When making PRs make sure to set the target branch to `dev`. I only push to master when releasing new versions.
+
+
 ## Todo
- * [ ] Remember cursor positions in files (and restore when opened again)
  * [ ] Design proper API for plugins/extensions/macros
- * [ ] Documentation for v 1.0.0
- * [ ] Package Suplemon and upload to PIP
+ * [ ] Documentation for v 1.0.0
 
 ## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
- * [X] Display tab characters with a replacement char (tab messes up lines)
- * [X] Global clipboard (copy from one file to another)
- * [ ] Core
-   * [ ] Optimize rendering for ssh (minimal screen update)
+ * [ ] Core
    * [ ] Setting for enabling/disabling undo for cursor changes
    * [ ] Selections
    * [ ] List of recent files
+   * [X] Optionally Remember cursor positions in files (and restore when opened again)
    * [ ] Read only viewer
       * ~~And disable editing~~ Don't disable editing. Instead enable save as.
-   * [ ] Only refresh cursors when moving around
-   * [ ] Only refresh modified lines when editing
- * [ ] Extensions:
+ * [ ] Extensions:
    * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
    * [ ] Auto backup. Activate on n changes or every n seconds
    * [ ] File selector, kind of like what nano has
      * [ ] This should be implemented as an extension
-     * [ ] Could be triggered with a key binding (and/or override open file)
+     * [ ] Could be triggered with a key binding (and/or override open file)
      * [ ] Need to refactor App class to support views instead of just files
-     * [ ] A view could be an editor or an extension ui
-     * [ ] Extensions should be able to control both status bars and key legend
-   * [ ] Automatically add ; to end of lines
-      * [ ] Generalized: add line prepend and append commands
-      * [ ] Will need multiline comment and string detection etc.
-
-## Fix / Defects
- * [ ] Input queries can't detect trailing whitespace
- * [ ] Remember find query if occurance not found (jump to top of file)
+     * [ ] A view could be an editor or an extension ui
+     * [ ] Extensions should be able to control both status bars and key legend
 
 
 ## Rationale

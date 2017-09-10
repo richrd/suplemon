@@ -9,9 +9,7 @@ class Syntax:
     def get_color(self, raw_line):
         color = color_map["white"]
         line = raw_line.strip()
-        if helpers.starts(line, ["import", "from"]):
-            color = color_map["blue"]
-        elif helpers.starts(line, "function"):
+        if helpers.starts(line, "function"):
             color = color_map["cyan"]
         elif helpers.starts(line, ["return"]):
             color = color_map["red"]

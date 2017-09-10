@@ -44,9 +44,7 @@ class ModuleLoader:
     def load_instance(self, module):
         """Initialize a module."""
         try:
-            inst = module[1]["class"](self.app)  # Store the module instance
-            inst.name = module[0]
-            inst.options = module[1]
+            inst = module[1]["class"](self.app, module[0], module[1])  # Store the module instance
             return inst
         except:
             self.logger.error("Initializing module failed: {0}".format(module[0]), exc_info=True)
@@ -65,6 +63,7 @@ class ModuleLoader:
         if "status" not in mod.module.keys():
             mod.module["status"] = False
         return name, mod.module
+
 
 if __name__ == "__main__":
     ml = ModuleLoader()
