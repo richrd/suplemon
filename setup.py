@@ -20,7 +20,8 @@ setup(name="Suplemon",
       package_data={"": files},
       include_package_data=True,
       install_requires=[
-          "pygments"
+          "pygments",
+          "wcwidth"
       ],
       entry_points={
           "console_scripts": ["suplemon=suplemon.cli:main"]
