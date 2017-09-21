@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+## [v0.1.62](https://github.com/richrd/suplemon/tree/v0.1.62) (2017-08-22) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.61...v0.1.62)
+
+**Fixed bugs:**
+
+- Fixed and re-enabled fancy unicode symbols.
+
+
 ## [v0.1.61](https://github.com/richrd/suplemon/tree/v0.1.61) (2017-05-29) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.60...v0.1.61)
 
