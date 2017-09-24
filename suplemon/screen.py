@@ -95,8 +95,13 @@ class ScreenString(object):
 class Screen(object):
     # TODO: size attribute and clamp method for triming to set size
     def __init__(self, lines=[]):
-        self.lines = lines
+        self.lines = self.normalize_lines(lines)
 
     def get_size(self):
         # TODO: Get max x width
         return (1, len(self.lines))
+
+    def normalize_lines(self, lines):
+        # TODO: implement this
+        # > It should replace all raw strings as a ScreenString instance
+        return lines

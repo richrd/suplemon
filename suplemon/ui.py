@@ -10,14 +10,19 @@ class UI(object):
         self.app = app
         self.backend = backend
 
+        self.setup_layout()
+
+        # Layout test can be used instead of setup_layout to test a more complex layout
         # self.layout_test()
+
+    def setup_layout(self):
         self.root_widget = widgets.VSplitWidget()
         self.root_widget.add_child(HeaderWidget(app=self.app), 0)
         self.root_widget.add_child(widgets.TestWidget(), 100)
-        self.root_widget.add_child(FooterWidget(app=self.app), 0)
+        self.footer_widget = FooterWidget(app=self.app)
+        self.root_widget.add_child(self.footer_widget, 0)
 
     def update(self):
-        self.logger.debug("update()")
         input = self.backend.input.get_input()
         key = ""
         if input is None:
@@ -36,6 +41,7 @@ class UI(object):
         size = self.backend.output.get_size()
         self.root_widget.set_size(size)
 
+        self.footer_widget._set_text(text)
         screen = self.root_widget.render()
         self.backend.output.render(screen)
 
@@ -65,13 +71,16 @@ class UI(object):
         hs4.add_child(widgets.TestWidget(), 40)
 
         vs1 = widgets.VSplitWidget()
-        vs1.add_child(widgets.HeaderWidget(), 0)
+        vs1.add_child(HeaderWidget(app=self.app), 0)
         vs1.add_child(hs1, 20)
         vs1.add_child(hs2, 30)
         vs1.add_child(widgets.SpacerWidget(), 0)
         vs1.add_child(hs3, 30)
         vs1.add_child(hs4, 20)
-        # self.root_widget.set_children([hs1, hs2, hs3, hs4])  # Automatic
+        self.footer_widget = FooterWidget(app=self.app)
+        vs1.add_child(self.footer_widget, 0)
+        # TODO: Verify automatic layout works with static sized widgets (e.g. footer widget)
+        # self.root_widget.set_children([hs1, hs2, widgets.SpacerWidget(), hs3, hs4, self.footer_widget])  # Automatic
 
         self.root_widget = vs1
 
@@ -90,6 +99,11 @@ class FooterWidget(widgets.BaseWidget):
     def __init__(self, app):
         super().__init__()
         self.app = app
+        self._text = ""
+
+    # DEBUG: used for showing last keypress
+    def _set_text(self, text):
+        self._text = text
 
     def render(self):
-        return Screen([[ScreenString("---")]])
+        return Screen([[ScreenString("LAST KEY:" + self._text)]])

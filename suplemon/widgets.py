@@ -1,5 +1,6 @@
 import logging
 
+from .utils import halve, divide
 from .logger import logger as logger  # TODO: fixme
 from .screen import Screen, ScreenString
 
@@ -11,36 +12,6 @@ class BaseWidget(object):
         self.size = [0, 0]
         self.min_size = [1, 1]
 
-    # TODO: move to utlis
-    @staticmethod
-    def halve(n):
-        """Divide n by two and return as tuple. Remainder is added to the second int."""
-        return (int(n/2), int(n/2) + n % 2)
-
-    # TODO: move to utlis
-    @staticmethod
-    def divide(n, percentages):
-        """
-        Devide n with each percentage and return as list of integers.
-
-        Percentages should add up to 100 and the remainder
-        is added to the last item.
-        """
-        # TODO: distribute remainder between last items instead of just adding it all to the last one
-        i = 0
-        sizes = []
-        last_index = 0  # Last index that had a percentage (where we add the remainder)
-        while i < len(percentages):
-            if percentages[i]:
-                sizes.append(int(n * (percentages[i] / 100)))
-                last_index = i
-            else:
-                sizes.append(0)
-            i += 1
-        if sum(sizes) < n:
-            sizes[last_index] += n - sum(sizes)
-        return sizes
-
     def set_size(self, size):
         self.size = size
 
@@ -49,21 +20,22 @@ class BaseWidget(object):
 
 
 class TestWidget(BaseWidget):
-    """Widget that creates a border around its edges (useful for debugging)."""
+    """
+    Widget with a border around its edges and displays it's size in the center (useful for debugging).
+    """
     def render(self):
         w, h = self.size
-        lines = []
         top = [ScreenString("+NW" + ("-" * (w-6)) + "NE+")]
         bottom = [ScreenString("+SW" + ("-" * (w-6)) + "SE+")]
-        lines.append(top)
+        lines = [top]
+
+        halfwayY = int((h-2) / 2)
         i = 0
         while i < h-2:
-            halfwayY = int((h-2) / 2)
             if i == halfwayY:
-                size_str = str(self.size)[1:-1]
-                max_w = w - 2 - len(size_str)
-                pad_sizes = BaseWidget.halve(max_w)
-                line = [ScreenString("|" + ((" " * pad_sizes[0])) + size_str + (" " * pad_sizes[1]) + "|")]
+                size_str = "{0[0]} x {0[1]}".format(self.size)
+                max_w = w - 2
+                line = [ScreenString("|" + size_str.center(max_w, " ") + "|")]
             else:
                 line = [ScreenString("|" + (" " * (w-2)) + "|")]
             lines.append(line)
@@ -120,7 +92,7 @@ class BaseSplitWidget(BaseContainerWidget):
                 remaining_size -= self.children[i].min_size[self.axis]
             i += 1
 
-        sizes = BaseWidget.divide(remaining_size, self.percentages)
+        sizes = divide(remaining_size, self.percentages)
         i = 0
         for item in sizes:
             s = [None, None]
