@@ -5,7 +5,7 @@ The main class that starts and runs Suplemon.
 """
 
 
-__version__ = "0.1.90"
+__version__ = "0.2.0"
 
 from .ui import UI
 
@@ -19,7 +19,6 @@ class App:
         self.version = __version__
         self.running = 0
         self.logger = logger
-        self.logger.debug("============================================================")
         self.logger.debug("App.__init__()")
         self.logger.debug("Filenames: {}".format(filenames))
 
@@ -36,7 +35,7 @@ class App:
 
         self.backend.init()
         self.backend.start(self.mainloop)
-        self.logger.debug("Backend ended.")
+        self.logger.debug("Backend stopped.")
 
     def mainloop(self):
         self.logger.debug("App.mainloop()")

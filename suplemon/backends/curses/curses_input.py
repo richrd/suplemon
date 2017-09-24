@@ -117,9 +117,6 @@ class CursesInput(InputBackend):
         except:
             return None
 
-    def get_events(self):
-        raise NotImplementedError
-
     def get_input(self):
         """
         Get input and return sanitized InputEvent or None if no input is available.
@@ -162,7 +159,7 @@ class CursesInput(InputBackend):
         # Detect when ALT is pressed to add the alt modifier to the next character
         alt_pressed = 0
         if char == "\x1b":  # ASCII ESC
-            # Make sure we won't block when getting the next input
+            # Get the next input making sure to do it without blocking
             if not self._halfdelay:
                 self._backend._root.nodelay(True)
             # If we get input right after the escape sequence:
@@ -174,7 +171,7 @@ class CursesInput(InputBackend):
                 # ALT is detected
                 alt_pressed = 1
                 char = alt_char
-            # Restore blocking mode
+            # Restore blocking mode if neccessary
             if not self._halfdelay:
                 self._backend._root.nodelay(False)
 
@@ -211,7 +208,7 @@ class CursesInput(InputBackend):
         # Finally apply the ALT modifier if present
         if alt_pressed:
             event.add_modifier(InputEvent.MOD_ALT)
-            # If the key is uppercase we add shift modifier
+            # If the key is uppercase we add the shift modifier
             if event.key_value.isupper():
                 event.set_key(event.key_value.lower())
                 event.add_modifier(InputEvent.MOD_SHIFT)
@@ -230,7 +227,7 @@ class CursesInput(InputBackend):
             return None
 
         event = InputEvent()
-        event.set_pos(x, y)
+        event.set_mouse_pos(x, y)
 
         state = None
         for key in self._mouse_states:
