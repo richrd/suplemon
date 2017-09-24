@@ -55,6 +55,9 @@ the complete reference.
  * Ctrl + D
    > Search for next occurance or find the word the cursor is on. Adds a new cursor at each new occurance.
 
+ * Ctrl + T
+   > Trim whitespace
+
  * Alt + Arrow Key
    > Add new curor in arrow direction
 
