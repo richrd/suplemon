@@ -336,7 +336,7 @@ class UI:
                 self.header_win.addstr(0, 0, head, curses.color_pair(0) | curses.A_REVERSE)
             else:
                 self.header_win.addstr(0, 0, head, curses.color_pair(0))
-        except:
+        except curses.error as e:
             pass
         self.header_win.refresh()
 
