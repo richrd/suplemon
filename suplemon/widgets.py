@@ -1,7 +1,6 @@
 import logging
 
-from .utils import halve, divide
-from .logger import logger as logger  # TODO: fixme
+from .utils import divide
 from .screen import Screen, ScreenString
 
 

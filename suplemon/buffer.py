@@ -12,8 +12,8 @@ class Buffer(object):
     Text manipulation.
     """
 
-    def __init__(self, text=""):
-        self._newline = "\n"
+    def __init__(self, text="", newline="\n"):
+        self._newline = newline
         self._read_only = False
         self.document = Document(text, self._newline)
         self.regions = []

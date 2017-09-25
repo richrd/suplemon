@@ -35,4 +35,3 @@ def divide(n, percentages):
     if sum(sizes) < n:
         sizes[last_index] += n - sum(sizes)
     return sizes
-
