@@ -18,8 +18,8 @@
         "debug_level": 20,
         // How long curses will wait to detect ESC key
         "escdelay": 50,
-        // Wether to use special unicode symbols for decoration
-        "use_unicode_symbols": false
+        // Whether to use special unicode symbols for decoration
+        "use_unicode_symbols": true
     },
     // Editor settings
     "editor": {
@@ -96,7 +96,7 @@
             // zero width no-break space
             "\uFEFF": "\u2420"
         },
-        // Wether to visually show white space chars
+        // Whether to visually show white space chars
         "show_white_space": false,
         // Show tab indicators in whitespace
         "show_tab_indicators": true,
@@ -112,7 +112,7 @@
         "theme": "monokai",
         // Listen for mouse events
         "use_mouse": false,
-        // Wether to use copy/paste across multiple files
+        // Whether to use copy/paste across multiple files
         "use_global_buffer": true,
         // Find with regex by default
         "regex_find": false

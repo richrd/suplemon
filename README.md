@@ -144,6 +144,9 @@ To view the default keymap file run ```keymap default```
  * <kbd>Ctrl</kbd> + <kbd>D</kbd>
    > Search for next occurrence or find the word the cursor is on. Adds a new cursor at each new occurrence.
 
+ * <kbd>Ctrl</kbd> + <kbd>T</kbd>
+   > Trim whitespace
+
  * <kbd>Alt</kbd> + <kbd>Arrow Key</kbd>
    > Add new cursor in arrow direction
 

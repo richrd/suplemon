@@ -58,5 +58,6 @@
     {"keys": ["ctrl+left"],        "command": "jump_left"},
     {"keys": ["ctrl+right"],       "command": "jump_right"},
     {"keys": ["ctrl+up"],          "command": "jump_up"},
-    {"keys": ["ctrl+down"],        "command": "jump_down"}
+    {"keys": ["ctrl+down"],        "command": "jump_down"},
+    {"keys": ["ctrl+t"],           "command": "strip"}
 ]
