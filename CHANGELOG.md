@@ -8,6 +8,7 @@ Change Log
 
 - Fixed and re-enabled fancy unicode symbols.
 - Fixed typos in default configuration. Credit @1fabunicorn (#192)
+- Fixed error message when loading valid but empty config file (Fixes #196).
 
 **Implemented enhancements:**
 
