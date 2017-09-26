@@ -1,3 +1,6 @@
+# -*- encoding: utf-8
+
+import time
 
 import logging
 import suplemon.widgets as widgets
@@ -41,7 +44,8 @@ class UI(object):
         size = self.backend.output.get_size()
         self.root_widget.set_size(size)
 
-        self.footer_widget._set_text(text)
+        if text:
+            self.footer_widget._set_text(text)
         screen = self.root_widget.render()
         self.backend.output.render(screen)
 
@@ -92,7 +96,8 @@ class HeaderWidget(widgets.BaseWidget):
 
     def render(self):
         v = self.app.version
-        return Screen([[ScreenString("Suplemon v" + v)]])
+        t = time.strftime("%H:%M:%S", time.localtime())
+        return Screen([[ScreenString("Suplemon v{} {}".format(v, t))]])
 
 
 class FooterWidget(widgets.BaseWidget):
