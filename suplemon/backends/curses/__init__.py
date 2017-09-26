@@ -25,7 +25,6 @@ class CursesBackend(Backend):
         import curses
         self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
         self.input.init(curses)
-        # self.input._halfdelay = True
         self.output.init(curses)
 
     def _start(self, callback=None):

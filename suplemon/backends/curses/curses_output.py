@@ -50,12 +50,12 @@ class CursesOutput(OutputBackend):
         """Try to initialize more than the maximum amount of colors cures supports (256)"""
         # Test COLOR_PAIRS overflow
         # Only id's 1-256 work
-        # TODO: What should happen if more colors are specified by the app?
-        # Maybe we'll just ignore new colors if 256 would be exceded?
-        # Or normalize the colors to always be one of the default 256 colors
-        # That way we get the closest approximation and avoid overflowing
-        # However that would only work for foreground colors
-        # When all fg and bg combinations are combined we get 256*256
+        # TODO: What should happen if more colorpairs are specified by the app?
+        #       Maybe we'll just ignore new colors if 256 would be exceded?
+        #       Or normalize the colors to always be one of the default 256 colors
+        #       That way we get the closest approximation and avoid overflowing
+        #       However that would only work for foreground colors
+        #       When all fg and bg combinations are combined we get 256*256
 
         i = 0
         while i < 300:

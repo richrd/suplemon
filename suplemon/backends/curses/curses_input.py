@@ -180,7 +180,7 @@ class CursesInput(InputBackend):
         event = InputEvent()
 
         # Detect when ALT is pressed to add the alt modifier to the next character
-        alt_pressed = 0
+        alt_pressed = False
         if char == "\x1b":  # ASCII ESC
             # Get the next input making sure to do it without blocking
             if not self._halfdelay:
@@ -192,7 +192,7 @@ class CursesInput(InputBackend):
             alt_char = self._get_char()
             if alt_char is not None:
                 # ALT is detected
-                alt_pressed = 1
+                alt_pressed = True
                 char = alt_char
             # Restore blocking mode if necessary
             if not self._halfdelay:
