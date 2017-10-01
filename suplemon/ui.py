@@ -311,7 +311,7 @@ class UI:
         if display["show_app_name"]:
             name_str = "Suplemon Editor v{0} -".format(self.app.version)
             if self.app.config["app"]["use_unicode_symbols"]:
-                logo = "\u2688"      # Simple lemon (filled)
+                logo = "\U0001f34b"  # Fancy lemon
                 name_str = " {0} {1}".format(logo, name_str)
             head_parts.append(name_str)
 
