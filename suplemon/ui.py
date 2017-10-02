@@ -315,8 +315,9 @@ class UI:
                 name_str = " {0} {1}".format(logo, name_str)
             head_parts.append(name_str)
 
-        # Add module statuses to the status bar
-        for name in self.app.modules.modules.keys():
+        # Add module statuses to the status bar in descending order
+        module_keys = sorted(self.app.modules.modules.keys())
+        for name in module_keys:
             module = self.app.modules.modules[name]
             if module.options["status"] == "top":
                 status = module.get_status()
