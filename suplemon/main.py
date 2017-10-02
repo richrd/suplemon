@@ -434,20 +434,21 @@ class App:
 
     def find_file(self, s):
         """Return index of file matching string."""
+        # REFACTOR: Move to a helper function or implement in a module
+
         # Case insensitive matching
         s = s.lower()
-        i = 0
+
         # First match files beginning with s
-        for file in self.files:
+        for i, file in enumerate(self.files):
             if file.name.lower().startswith(s):
                 return i
-            i += 1
-        i = 0
-        # Then match files that contain s
-        for file in self.files:
+
+        # Then match any files that contain s
+        for i, file in enumerate(self.files):
             if s in file.name.lower():
                 return i
-            i += 1
+
         return -1
 
     def run_command(self, data):
