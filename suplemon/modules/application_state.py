@@ -39,7 +39,7 @@ class ApplicationState(Module):
 
     def get_hash(self, editor):
         # We don't need cryptographic security so we just use md5
-        return hashlib.md5(editor.data.encode("utf-8")).hexdigest()
+        return hashlib.md5(editor.get_data().encode("utf-8")).hexdigest()
 
     def set_file_state(self, file, state):
         """Set the state of a file."""
