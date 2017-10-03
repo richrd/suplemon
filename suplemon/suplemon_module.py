@@ -134,6 +134,9 @@ class Module:
         """Set module options."""
         self.options = options
 
+    def is_runnable(self):
+        return self.run.__func__ != Module.run.__func__
+
     def init_logging(self, name):
         """Initialize the module logger (self.logger).
 
