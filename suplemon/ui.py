@@ -8,7 +8,7 @@ import sys
 import logging
 from wcwidth import wcswidth
 
-from .prompt import Prompt, PromptBool, PromptFile
+from .prompt import Prompt, PromptBool, PromptFile, PromptAutocmp
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -468,7 +468,7 @@ class UI:
             x += len(label)+2
         self.legend_win.refresh()
 
-    def _query(self, text, initial="", cls=Prompt):
+    def _query(self, text, initial="", cls=Prompt, inst=None):
         """Ask for text input via the status bar."""
 
         # Disable render blocking
@@ -476,7 +476,10 @@ class UI:
         self.app.block_rendering = 0
 
         # Create our text input
-        self.text_input = cls(self.app, self.status_win)
+        if not inst:
+            self.text_input = cls(self.app, self.status_win)
+        else:
+            self.text_input = inst
         self.text_input.set_config(self.app.config["editor"].copy())
         self.text_input.set_input_source(self.get_input)
         self.text_input.init()
@@ -502,6 +505,12 @@ class UI:
     def query_file(self, text, initial=""):
         """Get a file path from the user."""
         result = self._query(text, initial, PromptFile)
+        return result
+
+    def query_autocmp(self, text, initial="", completions=[]):
+        """Get an arbitrary string from the user with autocomplete."""
+        prompt_inst = PromptAutocmp(self.app, self.status_win, initial_items=completions)
+        result = self._query(text, initial, inst=prompt_inst)
         return result
 
     def get_input(self, blocking=True):
