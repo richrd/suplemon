@@ -129,17 +129,19 @@ class PromptBool(Prompt):
         return False
 
 
-class PromptFile(Prompt):
-    """An input prompt with path auto completion based on Prompt."""
+class PromptAutocmp(Prompt):
+    """An input prompt with basic autocompletion."""
 
-    def __init__(self, app, window):
+    def __init__(self, app, window, initial_items=[]):
         Prompt.__init__(self, app, window)
-        # Wether the autocomplete feature is active
-        self.complete_active = 0
+        # Whether the autocomplete feature is active
+        self.complete_active = False
         # Index of last item that was autocompleted
         self.complete_index = 0
-        # Input path to use for autocompletion (stored when autocompletion is activated)
+        # Input data to use for autocompletion (stored when autocompletion is activated)
         self.complete_data = ""
+        # Default autocompletable items
+        self.complete_items = initial_items
 
     def handle_input(self, event):
         """Handle special bindings for the prompt."""
@@ -147,16 +149,16 @@ class PromptFile(Prompt):
         if self.complete_active:
             # Allow accepting completed directories with enter
             if name == "enter":
-                if os.path.isdir(self.get_data()):
+                if self.has_match():
                     self.deactivate_autocomplete()
                     return False
-            # Revert auto completion with esc
+            # Revert autocompletion with esc
             if name == "escape":
                 self.revert_autocomplete()
                 self.deactivate_autocomplete()
                 return False
         if name == "tab":
-            # Run auto completion when tab is pressed
+            # Run autocompletion when tab is pressed
             self.autocomplete()
             # Don't pass the event to the parent class
             return False
@@ -166,7 +168,7 @@ class PromptFile(Prompt):
             # Don't pass the event to the parent class
             return False
         else:
-            # If any key other than tab is pressed deactivate the auto completer
+            # If any key other than tab is pressed deactivate the autocompleter
             self.deactivate_autocomplete()
         Prompt.handle_input(self, event)
 
@@ -175,8 +177,8 @@ class PromptFile(Prompt):
         if self.complete_active:  # If the completer is active use the its initial input value
             data = self.complete_data
 
-        name = os.path.basename(data)
-        items = self.get_path_contents(data)  # Get directory listing of input path
+        name = self.get_completable_name(data)
+        items = self.get_completable_items(data)
 
         # Filter the items by name if the input path contains a name
         if name:
@@ -187,8 +189,8 @@ class PromptFile(Prompt):
             return False
 
         if not self.complete_active:
-            # Initialize the auto completor
-            self.complete_active = 1
+            # Initialize the autocompletor
+            self.complete_active = True
             self.complete_data = data
             self.complete_index = 0
         else:
@@ -205,15 +207,27 @@ class PromptFile(Prompt):
                     self.complete_index = 0
 
         item = items[self.complete_index]
-        new_data = os.path.join(os.path.dirname(data), item)
+        new_data = self.get_full_completion(data, item)
         if len(items) == 1:
             self.deactivate_autocomplete()
-        # Set the input data to the new path and move cursor to the end
+        # Set the input data to the completion and move cursor to the end
         self.set_data(new_data)
         self.end()
 
+    def get_completable_name(self, data=""):
+        return data
+
+    def get_completable_items(self, data=""):
+        return self.complete_items
+
+    def get_full_completion(self, data, item):
+        return item
+
+    def has_match(self):
+        return False
+
     def deactivate_autocomplete(self):
-        self.complete_active = 0
+        self.complete_active = False
         self.complete_index = 0
         self.complete_data = ""
 
@@ -227,6 +241,25 @@ class PromptFile(Prompt):
             return items
         name = name.lower()
         return [item for item in items if item.lower().startswith(name)]
+
+
+class PromptFile(PromptAutocmp):
+    """An input prompt with path autocompletion based on PromptAutocmp."""
+
+    def __init__(self, app, window):
+        PromptAutocmp.__init__(self, app, window)
+
+    def has_match(self):
+        return os.path.isdir(os.path.expanduser(self.get_data()))
+
+    def get_completable_name(self, data=""):
+        return os.path.basename(data)
+
+    def get_completable_items(self, data=""):
+        return self.get_path_contents(data)  # Get directory listing of input path
+
+    def get_full_completion(self, data, item):
+        return os.path.join(os.path.dirname(data), item)
 
     def get_path_contents(self, path):
         path = os.path.dirname(os.path.expanduser(path))
