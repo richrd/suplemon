@@ -552,11 +552,15 @@ class App:
 
     def query_command(self):
         """Run editor commands."""
-        modules = self.modules.modules
+        if sys.version_info[0] < 3:
+            modules = self.modules.modules.iteritems()
+        else:
+            modules = self.modules.modules.items()
+
         # Get built in operations
         completions = [oper for oper in self.operations.keys()]
         # Add runnable modules
-        completions += [name for name, m in modules.iteritems() if m.is_runnable()]
+        completions += [name for name, m in modules if m.is_runnable()]
 
         data = self.ui.query_autocmp("Command:", completions=sorted(completions))
         if not data:
