@@ -11,8 +11,8 @@ class InputEvent(object):
 
     def __init__(self):
         self._dev_id = None
-        self._x = None
-        self._y = None
+        self._mouse_x = None
+        self._mouse_y = None
         self._mouse_type = None
         self._mouse_btn = None
 
@@ -28,7 +28,7 @@ class InputEvent(object):
     def __str__(self):
         if self.is_keyboard:
             return "KEY[{} / {}, printable: {}]".format(self.to_string(), self.key_value, str(self.is_printable))
-        return "MOUSE[{},{}] {} {}".format(self._x, self._y, self._mouse_type, self._mouse_btn)
+        return "MOUSE[{},{}] {} {}".format(self._mouse_x, self._mouse_y, self._mouse_type, self._mouse_btn)
 
     def __repr__(self):
         return str(self)
@@ -37,14 +37,14 @@ class InputEvent(object):
     # Mouse Events
     #
 
-    def set_pos(self, x, y):
+    def set_mouse_pos(self, x, y):
         """Set mouse x,y position."""
-        self._x = x
-        self._y = y
+        self._mouse_x = x
+        self._mouse_y = y
 
-    def get_pos(self):
+    def get_mouse_pos(self):
         """Get mouse x,y position."""
-        return self._x, self._y
+        return self._mouse_x, self._mouse_y
 
     def set_mouse_event(self, event_type):
         self._mouse_type = event_type

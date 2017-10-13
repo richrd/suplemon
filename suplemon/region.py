@@ -1,7 +1,7 @@
 # -*- encoding: utf-8
 
 """
-Regions for cursors and selections.
+Regions for representing cursors and selections.
 """
 
 
@@ -21,9 +21,17 @@ class Regions(object):
 
 
 class Region(object):
+    """
+    A region representing a cursor or selection.
+    """
+
     def __init__(self, start=0, end=0):
-        self._start = start
-        self._end = end
+        self._start = start  # Start of the selection
+        self._end = end      # End of the selection
+
+        # Prefered X coordinate
+        # This should be set when explicitly moving on the x-axis
+        # If moving vertically the calculated x should be <= _xpos
         self._xpos = None
 
     @property
@@ -34,9 +42,12 @@ class Region(object):
     def end(self):
         return max(self._start, self._end)
 
+    def is_region(self):
+        return self._start != self._end
+
     def move(self, delta=0):
-        raise NotImplementedError
-        self.pos += delta
+        self._start += delta
+        self._end += delta
 
     def move_left(self, delta=1):
         self.move(abs(delta) * -1)

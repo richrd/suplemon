@@ -1,4 +1,6 @@
+# -*- encoding: utf-8
 
+import signal
 
 from ..base_input import InputBackend
 from ..base_input_event import InputEvent
@@ -48,6 +50,13 @@ class CursesInput(InputBackend):
         # Map curses mouse events to states
         self._mouse_states = {}
 
+        # Ctrl+C handling via SIGINT
+        self._handle_sigint = True
+        # Events queued by _sigint_handler (or possibly other sources in the future)
+        self._queued_events = []
+        # The original SIGINT handler, for restoring it when backend is stopped
+        self._original_sigint = None
+
     def _setup(self):
         self.logger.debug("CursesInput._setup()")
         self.curses.raw()
@@ -91,17 +100,23 @@ class CursesInput(InputBackend):
         self._setup()
 
         if self._halfdelay:
-            self.logger.debug("Enabling halfdelay!")
+            self.logger.debug("Enabling halfdelay")
             self.curses.halfdelay(self._halfdelay_tenths)
         if self._enable_mouse:
             self._use_mouse(1)
+        if self._handle_sigint:
+            self.logger.debug("Enabling SIGINT handler")
+            self._original_sigint = signal.getsignal(signal.SIGINT)
+            signal.signal(signal.SIGINT, self._sigint_handler)
 
         # Let curses try to handle escape sequences for special keys.
         # Its not enough, but it makes it easier to normalize the input.
         self._backend._root.keypad(True)
 
     def _stop(self):
-        pass
+        # Restore the SIGINT handler if necessary.
+        if self._handle_sigint:
+            signal.signal(signal.SIGINT, self._original_sigint)
 
     def _get_char(self):
         """
@@ -117,38 +132,39 @@ class CursesInput(InputBackend):
         except:
             return None
 
-    def get_events(self):
-        raise NotImplementedError
-
     def get_input(self):
         """
         Get input and return sanitized InputEvent or None if no input is available.
         """
+
         # Try to get input from curses
-        # We also handle KeyboardInterrupt as a special case for "ctrl+c"
-        # NOTE: Detecting KeyboardInterrupt is only reliable when using
-        #       halfdelay or blocking mode with curses.
-        try:
-            # Input is a string or int value if available, otherwise None
-            char = self._get_char()
-        except KeyboardInterrupt:
-            if self._handle_kbd_interrupt:
-                # Return a "ctrl+c" event
-                event = InputEvent()
-                event.set_key("c")
-                event.add_modifier(InputEvent.MOD_CTRL)
-                return event
-            raise
+
+        # NOTE: The method of detecting CTRL+C varies. In blocking mode curses
+        #       just gives it to us just like any other key. In halfdelay mode
+        #       it slaps us with a KeyboardInterrupt. We have two ways of
+        #       handling it (method b is used):
+        #       a) Detect the KeyboardInterrupt and return a CTRL+C event.
+        #          This isn't reliable and only works if CTRL+C was pressed
+        #          during the _get_char call but not when any other code is
+        #          running e.g. the layouting code.
+        #       b) Install a signal handler that intercepts SIGINT and pushes
+        #          a CTRL+C event to a queue. Then when get_input is called
+        #          return the oldest event from the queue if available. This
+        #          is the most reliable method.
+
+        # Check for queued events, and return the oldest one if available
+        if self._queued_events:
+            return self._queued_events.pop(0)
+
+        # Get input from curses.
+        # Char is a string or int value if available, otherwise None
+        char = self._get_char()
 
         # Return None if no input is available
         if char is None:
             return None
 
-        # Handle mouse events
-        if char == self.curses.KEY_MOUSE:
-            return self._handle_mouse()
-
-        # Handle resize event
+        # Handle resize events
         if char == self.curses.KEY_RESIZE:
             if self._backend:
                 self._backend.output.update_size()
@@ -156,13 +172,17 @@ class CursesInput(InputBackend):
             event.is_resize = True
             return event
 
+        # Handle mouse events
+        if char == self.curses.KEY_MOUSE:
+            return self._handle_mouse()
+
         # Create an empty event
         event = InputEvent()
 
         # Detect when ALT is pressed to add the alt modifier to the next character
-        alt_pressed = 0
+        alt_pressed = False
         if char == "\x1b":  # ASCII ESC
-            # Make sure we won't block when getting the next input
+            # Get the next input making sure to do it without blocking
             if not self._halfdelay:
                 self._backend._root.nodelay(True)
             # If we get input right after the escape sequence:
@@ -172,9 +192,9 @@ class CursesInput(InputBackend):
             alt_char = self._get_char()
             if alt_char is not None:
                 # ALT is detected
-                alt_pressed = 1
+                alt_pressed = True
                 char = alt_char
-            # Restore blocking mode
+            # Restore blocking mode if necessary
             if not self._halfdelay:
                 self._backend._root.nodelay(False)
 
@@ -211,7 +231,7 @@ class CursesInput(InputBackend):
         # Finally apply the ALT modifier if present
         if alt_pressed:
             event.add_modifier(InputEvent.MOD_ALT)
-            # If the key is uppercase we add shift modifier
+            # If the key is uppercase we add the shift modifier
             if event.key_value.isupper():
                 event.set_key(event.key_value.lower())
                 event.add_modifier(InputEvent.MOD_SHIFT)
@@ -230,7 +250,7 @@ class CursesInput(InputBackend):
             return None
 
         event = InputEvent()
-        event.set_pos(x, y)
+        event.set_mouse_pos(x, y)
 
         state = None
         for key in self._mouse_states:
@@ -257,3 +277,9 @@ class CursesInput(InputBackend):
                 event.set_mouse_event("wheel-down")
 
         return event
+
+    def _sigint_handler(self, signum, frame):
+        event = InputEvent()
+        event.set_key("c")
+        event.add_modifier(InputEvent.MOD_CTRL)
+        self._queued_events.append(event)

@@ -18,7 +18,7 @@ class CursesOutput(OutputBackend):
             # Might fail on vt100 terminal emulators
             self.curses.curs_set(0)
         except:
-            self.logger.warning("self.curses.curs_set(0) failed!")
+            self.logger.warning("Hiding default cursor failed!")
 
     def _update_size(self):
         y, x = self._backend._root.getmaxyx()
@@ -34,29 +34,38 @@ class CursesOutput(OutputBackend):
             self.curses.use_default_colors()
             self._setup_colors()
         else:
+            self.curses.use_default_colors()
             self.logger.debug("Term doesn't support changing colors.")
 
     def _setup_colors(self):
-        #                id,  fg,  bg
-        # self.curses.init_pair(10,  -1, -1) # -1 = default!
-        self.curses.init_pair(10,  200, -1)
+        pass
+        #                       id,  fg,  bg
+        # self.curses.init_pair(10,  -1, -1) # -1 = default
+        # self.curses.init_pair(10,  200, -1)
 
     def _has_colors(self):
         return self.curses.has_colors()
 
+    def _test_color_pairs_overflow(self):
+        """Try to initialize more than the maximum amount of colors cures supports (256)"""
         # Test COLOR_PAIRS overflow
         # Only id's 1-256 work
-        # Maybe we'll just ignore new colors if 256 would be exceded
+        # TODO: What should happen if more colorpairs are specified by the app?
+        #       Maybe we'll just ignore new colors if 256 would be exceded?
+        #       Or normalize the colors to always be one of the default 256 colors
+        #       That way we get the closest approximation and avoid overflowing
+        #       However that would only work for foreground colors
+        #       When all fg and bg combinations are combined we get 256*256
 
-        # i = 0
-        # while i < 300:
-        #     self.logger.debug("Initing color #{}".format(i))
-        #     try:
-        #         self.curses.init_pair(i, 6, 100)
-        #     except:
-        #         self.logger.debug("Failed for #{}".format(i))
-        #         break
-        #     i += 1
+        i = 0
+        while i < 300:
+            self.logger.debug("Initing color #{}".format(i))
+            try:
+                self.curses.init_pair(i, 6, 100)
+            except:
+                self.logger.debug("Failed for #{}".format(i))
+                break
+            i += 1
 
     def _stop(self):
         pass
@@ -83,11 +92,9 @@ class CursesOutput(OutputBackend):
         self._backend._root.move(0, 0)
         x = 0
         y = 0
-        self.curses.init_pair(10, -1, screen.lines[0][0].attributes._color_fg._xterm256)
         for line in screen.lines:
             for part in line:
                 attrs = self._convert_scr_attr(part.attributes)
-                attrs = attrs | self.curses.color_pair(10)
                 self.__addstr(y, x, str(part), attrs)
                 x += len(part)
             y += 1
@@ -99,8 +106,6 @@ class CursesOutput(OutputBackend):
         # freaks out whenever writing to bottom right corner.
         # Verified on Python 3.5.2
         # Ref: https://stackoverflow.com/questions/7063128/last-character-of-a-window-in-python-curses
-        # TODO: check answer comments:
-        # https://stackoverflow.com/questions/22456527/why-cant-i-addstr-to-last-row-col-in-python-curses-window
 
         try:
             self._backend._root.addstr(y, x, str(s), attrs)

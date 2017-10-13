@@ -9,26 +9,27 @@ scratch to be more flexible to work with. This will make it easier to implement
 better and more advanced features.
 
 ## Major Architectural Changes
-- Base all UI components on a shared base class with a good interface (widget)
-- Allow arbitrary ordering of UI layout/widgets
+- [X] Base all UI components on a shared base class with a good interface (widget)
+- [X] Allow arbitrary ordering of UI layout/widgets
+- [X] Separate the terminal handling from the core with abstraction
 
 
 ## Features that should be added (or at least made possible)
-- Render tab character as n spaces
-- Support selecting text (regions)
-- Per file settings (e.g. different tab width for different file types, support editorconfig)
-- Split screen view (multiple files visible at the same time)
-- Sidebar with directory tree (or anything else that's useful in a sidebar)
-- Add a dropdown for autocomplete matches
-- Proper plugin architecture (there's a lot that plugins can't do at the moment). Ultimately sublime plugins should be supported.
-- Proper event system
+- [ ] Render tab character as n spaces
+- [/] Support selecting text (regions)
+- [ ] Per file settings (e.g. different tab width for different file types, support editorconfig)
+- [X] Split screen view (multiple files visible at the same time)
+- [ ] Sidebar with directory tree (or anything else that's useful in a sidebar)
+- [ ] Add a dropdown for autocomplete matches
+- [ ] Proper plugin architecture (there's a lot that plugins can't do at the moment). Ultimately sublime plugins should be supported.
+- [ ] Proper event system
 
 
 ## Whishlist
-- Wrapping long lines
-- Code folding
-- Multi line prompts
-- A menu for different commands at the top the screen (with mouse support)
+- [ ] Wrapping long lines
+- [ ] Code folding
+- [ ] Multi line prompts
+- [ ] A menu for different commands at the top the screen (with mouse support)
 
 
 ## Tech
@@ -36,7 +37,7 @@ better and more advanced features.
 > Use assert in (API) methods to make sure args are correct
 > Use new-style classes: `class Buffer(object):`
 > Setters return true or false depending on wether value changed
-
+> Try to be more Pythonic
 
 ## Architecture
 
@@ -52,58 +53,60 @@ This is just a guideline and it's still very abstract and incomplete.
     [Initialization parameters: files, debug, etc. Defaults used otherwise.]
         |
       \ | /
-     __\|/_____________________
-    |                          |
-    | APP                      |
-    |                          |
-    |__________________________|
-        |
-        |
-        |
-        |
-     __\|/_____________________
-    |                          |
-    | LAYOUT                   |
-    |                          |
-    |__________________________|
-
-
-
-     _____________________________________________________________
-    |                                                             |
-    |                        EVENT LOOP                           |
-    |                                                             |
-    |_____________________________________________________________|
-                 |                                   |             
-                 |                                   |             
-                 |                                   |             
-                 |                                   |             
-                 |                                   |             
-                 |                                   |             
-                 |                                   |             
-         [Defered Rendering]                         |             
-                 |                                   |             
-     ____________|___________________                |             
-    |                                |               |             
-    |            RENDERER            |               |             
-    |    (Render Layout to Screen)   |               |             
-    |________________________________|               |             
-                 |                                   |             
-     ____________|___________________                |             
-    |                                |               |             
-    |             SCREEN             |               |             
-    |     (Character Cell Grid)      |        [Buffered Input]     
-    |________________________________|               |             
+     __\|/_________________________________________________________
+    |                          |                                   
+    | APP                      | > Current files
+    |                          | > Views of files
+    |__________________________| >
+        |                /|\     >
+        |               / | \    >
+        |                 |                                        
+        |                 |                                        
+        |                 |__________________________              
+     __\|/____                                       |             
+    |         |                                      |             
+    | LAYOUT  |<---------[ Focused Widget ]----------|             
+    | Widgets |                                      |             
+    |_________|                                      |             
+         |                                           |             
+         |        ___________________________________|____________ 
+         |       |                                   |            |
+         |       |           EVENT LOOP              |            |
+         |       |                                   |            |
+         |       |___________________________________+____________|
+         |       ¦                                  /|\            
+         |       ¦                                 / | \           
+    [Defered Rendering]                              |             
+                 ¦                                   |             
+     ____________¦______________                     |             
+    |                           |                    |             
+    |         RENDERER          |                    |             
+    | (Render Layout to Screen) |                    |             
+    |   See: ui.py, widgets.py  |                    |             
+    |                           |                    |             
+    |___________________________|       [      Buffered Input     ]
+                 |                      [    If backend support   ]
+     ____________|______________        [ Default backend: curses ]
+    |                           |                    |             
+    |         SCREEN            |                    |             
+    |   (Character Cell Grid)   |                    |             
+    |      See: screen.py       |                    |             
+    |                           |                    |             
+    |___________________________|                    |             
                  |                                   |             
      ____________|___________________________________|____________ 
     |            |                                   |            |
     |            |     INPUT / OUTPUT (BACKEND)      |            |
     |            |                                   |            |
+    |            |                   [Abstracted to InputEvent's] |
     |          \ | /                                 |            |
     |     ______\|/___________          _____________|_______     |
     |    |                    |        |                     |    |
-    |    |   Generic Output   |        |    Generic Input    | ---¦--- Abstracted to `InputEvent`s
+    |    |   Generic Output   |        |    Generic Input    |    |
+    |    |                    |        |                     |    |
     |    |____________________|        |_____________________|    |
+    |             |                                  |            |
+    |    [ Character Cell Grid ]                     |            |
     |             |                                  |            |
     |           \ | /                               /|\           |
     |            \|/                               / | \          |
@@ -111,15 +114,15 @@ This is just a guideline and it's still very abstract and incomplete.
     |     ________|____      _____|________      ____|_______     |
     |    |             |    |              |    |            |    |
     |    |   Curses    |    |    Urwid?    |    |    PTPY?   |    |
+    |    |  (Default)  |    |              |    |            |    |
     |    |_____________|    |______________|    |____________|    |
     |    _________|___________________________________________    |
     |                            /|\                              |
     |                             |                               |
-    |                             |                               |
     |     _______________________\|/_________________________     |
-    |    [                                                   ]    |
-    |    [                     TERMINAL                      ]    |
-    |    [___________________________________________________]    |
+    |    |                                                   |    |
+    |    |                     TERMINAL                      |    |
+    |    |___________________________________________________|    |
     |                                                             |
     |_____________________________________________________________|
 

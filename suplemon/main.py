@@ -5,9 +5,9 @@ The main class that starts and runs Suplemon.
 """
 
 
-__version__ = "0.1.90"
+__version__ = "0.2.0"
 
-# from .ui import UI
+from .ui import UI
 
 from .logger import logger
 from .backends.curses import CursesBackend
@@ -16,14 +16,14 @@ from .backends.curses import CursesBackend
 class App:
     def __init__(self, filenames=None, config_file=None):
         self.debug = 1  # TODO: default to 0
+        self.version = __version__
         self.running = 0
         self.logger = logger
-        self.logger.debug("============================================================")
         self.logger.debug("App.__init__()")
         self.logger.debug("Filenames: {}".format(filenames))
 
         self.backend = CursesBackend()
-        # self.ui = UI(self, self.backend)
+        self.ui = UI(self, self.backend)
 
     def init(self):
         self.logger.debug("App.init()")
@@ -35,25 +35,15 @@ class App:
 
         self.backend.init()
         self.backend.start(self.mainloop)
-        self.logger.debug("Backend ended.")
+        self.logger.debug("Backend stopped.")
 
     def mainloop(self):
         self.logger.debug("App.mainloop()")
 
-        # self.ui.render()
-        # while self.running:
-        #     self.ui.update()
-        # return
+        self.ui.render()
+        while self.running:
+            self.ui.update()
 
-        # Basic input testing
-        while self.running:  # Disabled
-            input = self.backend.input.get_input()
-            if input is None:
-                pass
-            else:
-                if input.key == "q":
-                    self.shutdown()
-                    break
         print("App.mainloop() END")
 
     def shutdown(self):
