@@ -18,7 +18,7 @@ Suplemon is a modern, powerful and intuitive console text editor with multi curs
 Suplemon replicates Sublime Text style functionality in the terminal with the ease of use of Nano.
 http://github.com/richrd/suplemon
 
-![Suplemon in action](http://www.suplemon.com/assets/suplemon-v0.1.51-multi-cursor-editing.gif)
+![Suplemon in action](http://bittemple.org/sites/suplemon.com/assets/suplemon-v0.1.51-multi-cursor-editing.gif)
 
 ## Features
  * Proper multi cursor editing, as in Sublime Text
