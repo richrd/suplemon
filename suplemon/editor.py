@@ -484,13 +484,12 @@ class Editor(Viewer):
         copy_buffer = []
         # Get all lines with cursors on them
         line_nums = self.get_lines_with_cursors()
-        i = 0
-        while i < len(line_nums):
+
+        for i in range(len(line_nums)):
             # Get the line
             line = self.lines[line_nums[i]]
             # Put it in our temporary buffer
             copy_buffer.append(line.get_data())
-            i += 1
         self.set_buffer(copy_buffer)
         self.store_action_state("copy")
 
@@ -502,8 +501,7 @@ class Editor(Viewer):
         line_nums = self.get_lines_with_cursors()
         # Sort from last to first (invert order)
         line_nums = line_nums[::-1]
-        i = 0
-        while i < len(line_nums):  # Iterate from last to first
+        for i in range(len(line_nums)):  # Iterate from last to first
             # Make sure we don't completely remove the last line
             if len(self.lines) == 1:
                 cut_buffer.append(self.lines[0])
@@ -517,7 +515,6 @@ class Editor(Viewer):
             cut_buffer.append(line)
             # Move all cursors below the current line up
             self.move_y_cursors(line_no, -1)
-            i += 1
         self.move_cursors()  # Make sure cursors are in valid places
         # Reverse the buffer to get correct order and store it
         self.set_buffer(cut_buffer[::-1])

@@ -126,15 +126,13 @@ class AutoDocstring(Module):
         :param line_number: Line number of the function definition.
         :return: Boolean indicating wether the function something.
         """
-        i = line_number+1
-        while i < len(editor.lines):
+        for i in range(line_number+1, len(editor.lines)):
             line = editor.get_line(i)
             data = line.get_data().strip()
             if helpers.starts(data, "def "):
                 break
             if helpers.starts(data, "return "):
                 return True
-            i += 1
         return False
 
 

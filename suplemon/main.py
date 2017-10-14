@@ -175,14 +175,12 @@ class App:
             got_input = False
 
             # Run through max 100 inputs (so the view is updated at least every 100 characters)
-            i = 0
-            while i < self.max_input:
+            for i in range(self.max_input):
                 event = self.ui.get_input(False)  # non-blocking
 
                 if not event:
                     break  # no more inputs to process at this time
 
-                i += 1
                 got_input = True
                 self.on_input(event)
 

@@ -312,11 +312,10 @@ class BaseViewer:
             return
 
         self.window.erase()
-        i = 0
         max_y = self.get_size()[1]
         max_len = self.max_line_length()
         # Iterate through visible lines
-        while i < max_y:
+        for i in range(max_y):
             x_offset = self.line_offset()
             lnum = i + self.y_scroll
             if lnum >= len(self.lines):  # Make sure we have a line to show
@@ -333,7 +332,6 @@ class BaseViewer:
             except:
                 self.logger.error("Failed rendering line #{0} @{1} DATA:'{2}'!".format(lnum+1, pos, line),
                                   exc_info=True)
-            i += 1
         self.render_cursors()
 
     def render_line_contents(self, line, pos, x_offset, max_len):
