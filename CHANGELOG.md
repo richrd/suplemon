@@ -7,6 +7,12 @@ Change Log
 **Fixed bugs:**
 
 - Fixed and re-enabled fancy unicode symbols.
+- Fixed typos in default configuration. Credit @1fabunicorn (#192)
+- Fixed error message when loading valid but empty config file (Fixes #196).
+
+**Implemented enhancements:**
+
+- Add ctrl+t shortcut for trimming whitespace
 
 
 ## [v0.1.61](https://github.com/richrd/suplemon/tree/v0.1.61) (2017-05-29) compared to previous master branch.

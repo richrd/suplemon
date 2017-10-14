@@ -48,7 +48,7 @@ class Config:
             self.logger.debug("Configuration file '{0}' doesn't exist.".format(path))
         else:
             config = self.load_config_file(path)
-        if config:
+        if config is not False:
             self.logger.debug("Loaded configuration file '{0}'".format(path))
             self.config = self.merge_defaults(config)
         else:

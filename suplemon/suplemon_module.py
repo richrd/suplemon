@@ -134,6 +134,10 @@ class Module:
         """Set module options."""
         self.options = options
 
+    def is_runnable(self):
+        cls_method = getattr(Module, "run")
+        return self.run.__module__ != cls_method.__module__
+
     def init_logging(self, name):
         """Initialize the module logger (self.logger).
 
