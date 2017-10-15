@@ -30,9 +30,9 @@ class App:
         :param str filenames[*]: Path to a file to load
         """
         self.version = __version__
-        self.inited = 0
-        self.running = 0
-        self.debug = 1
+        self.inited = False
+        self.running = False
+        self.debug = True
         self.block_rendering = False
 
         # Set default variables
@@ -110,14 +110,14 @@ class App:
         self.themes = themes.ThemeLoader(self)
 
         # Indicate that initialization is complete
-        self.inited = 1
+        self.inited = True
 
         return True
 
     def exit(self):
         """Stop the main loop and exit."""
         self.trigger_event_before("app_exit")
-        self.running = 0
+        self.running = False
 
     def run(self):
         """Run the app via the ui wrapper."""
@@ -157,7 +157,7 @@ class App:
                                 "Python 3.3 or higher."
                                 .format(version=ver))
         self.load_files()
-        self.running = 1
+        self.running = True
         self.trigger_event_after("app_loaded")
 
     def on_input(self, event):
@@ -528,14 +528,12 @@ class App:
     def toggle_fullscreen(self):
         """Toggle full screen editor."""
         display = self.config["display"]
+        show_indicators = True
         if display["show_top_bar"]:
-            display["show_top_bar"] = 0
-            display["show_bottom_bar"] = 0
-            display["show_legend"] = 0
-        else:
-            display["show_top_bar"] = 1
-            display["show_bottom_bar"] = 1
-            display["show_legend"] = 1
+            show_indicators = False
+        display["show_top_bar"] = show_indicators
+        display["show_bottom_bar"] = show_indicators
+        display["show_legend"] = show_indicators
         # Virtual curses windows need to be resized
         self.ui.resize()
 
