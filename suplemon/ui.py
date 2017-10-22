@@ -108,6 +108,13 @@ class UI:
         self.logger = logging.getLogger(__name__)
         self.warned_old_curses = 0
         self.limited_colors = True
+        self.screen = None
+        self.current_yx = None
+        self.text_input = None
+        self.header_win = None
+        self.status_win = None
+        self.editor_win = None
+        self.legend_win = None
 
     def init(self):
         """Set ESC delay and then import curses."""

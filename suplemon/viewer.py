@@ -83,6 +83,9 @@ class BaseViewer:
             "find_all": self.find_all,                    # Ctrl + A
         }
 
+        self.pygments_syntax = None  # Needs to be implemented in derived classes
+        self.lexer = None  # Needs to be implemented in derived classes
+
     def init(self):
         pass
 
@@ -233,6 +236,12 @@ class BaseViewer:
     def set_single_cursor(self, cursor):
         """Discard all cursors and place a new one."""
         self.cursors = [Cursor(cursor)]
+
+    def setup_linelight(self):
+        raise NotImplementedError("Needs to be implemented in derived classes")
+
+    def setup_highlight(self):
+        raise NotImplementedError("Needs to be implemented in derived classes")
 
     def set_file_extension(self, ext):
         """Set the file extension."""
@@ -406,6 +415,9 @@ class BaseViewer:
             if first_token:
                 first_token = False
             x_offset += len(text)
+
+    def get_line_color(self, line):
+        raise NotImplementedError("Needs to be implemented in derived classes")
 
     def render_line_linelight(self, line, pos, x_offset, max_len):
         """Render line with naive line based highlighting."""
@@ -802,6 +814,9 @@ class BaseViewer:
         what = self.app.ui.query("Find:", self.last_find)
         if what:
             self.find(what)
+
+    def store_action_state(self, state):
+        raise NotImplementedError("Needs to be implemented in derived classes")
 
     def find(self, what, findall=False):
         """Find what in data (from top to bottom). Adds a cursor when found."""

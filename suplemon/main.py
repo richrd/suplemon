@@ -44,6 +44,11 @@ class App:
         self.global_buffer = []
         self.event_bindings = {}
 
+        self.config = None
+        self.ui = None
+        self.modules = None
+        self.themes = None
+
         # Maximum amount of inputs to process at once
         self.max_input = 100
 
