@@ -14,7 +14,7 @@ class Battery(Module):
     def init(self):
         self.last_value = -1
         self.checked = time.time()
-        self.interval = 10
+        self.interval = 60  # Seconds to wait until polling again
 
     def value(self):
         """Get the battery charge percent and cache it."""

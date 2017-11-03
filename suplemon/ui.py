@@ -8,7 +8,7 @@ import sys
 import logging
 from wcwidth import wcswidth
 
-from .prompt import Prompt, PromptBool, PromptFile
+from .prompt import Prompt, PromptBool, PromptFile, PromptAutocmp
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -311,12 +311,13 @@ class UI:
         if display["show_app_name"]:
             name_str = "Suplemon Editor v{0} -".format(self.app.version)
             if self.app.config["app"]["use_unicode_symbols"]:
-                logo = "\u2688"      # Simple lemon (filled)
+                logo = "\U0001f34b"  # Fancy lemon
                 name_str = " {0} {1}".format(logo, name_str)
             head_parts.append(name_str)
 
-        # Add module statuses to the status bar
-        for name in self.app.modules.modules.keys():
+        # Add module statuses to the status bar in descending order
+        module_keys = sorted(self.app.modules.modules.keys())
+        for name in module_keys:
             module = self.app.modules.modules[name]
             if module.options["status"] == "top":
                 status = module.get_status()
@@ -467,7 +468,7 @@ class UI:
             x += len(label)+2
         self.legend_win.refresh()
 
-    def _query(self, text, initial="", cls=Prompt):
+    def _query(self, text, initial="", cls=Prompt, inst=None):
         """Ask for text input via the status bar."""
 
         # Disable render blocking
@@ -475,7 +476,10 @@ class UI:
         self.app.block_rendering = 0
 
         # Create our text input
-        self.text_input = cls(self.app, self.status_win)
+        if not inst:
+            self.text_input = cls(self.app, self.status_win)
+        else:
+            self.text_input = inst
         self.text_input.set_config(self.app.config["editor"].copy())
         self.text_input.set_input_source(self.get_input)
         self.text_input.init()
@@ -501,6 +505,12 @@ class UI:
     def query_file(self, text, initial=""):
         """Get a file path from the user."""
         result = self._query(text, initial, PromptFile)
+        return result
+
+    def query_autocmp(self, text, initial="", completions=[]):
+        """Get an arbitrary string from the user with autocomplete."""
+        prompt_inst = PromptAutocmp(self.app, self.status_win, initial_items=completions)
+        result = self._query(text, initial, inst=prompt_inst)
         return result
 
     def get_input(self, blocking=True):

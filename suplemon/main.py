@@ -279,6 +279,7 @@ class App:
         self.config.reload()
         for f in self.files:
             self.setup_editor(f.editor)
+        self.trigger_event_after("config_loaded")
         self.ui.resize()
         self.ui.refresh()
 
@@ -421,33 +422,34 @@ class App:
                 try:
                     input_str = int(lineno)
                     self.get_editor().go_to_pos(input_str)
-                except:
+                except ValueError:
                     pass
         else:
             try:
                 line_no = int(input_str)
                 self.get_editor().go_to_pos(line_no)
-            except:
+            except ValueError:
                 file_index = self.find_file(input_str)
                 if file_index != -1:
                     self.switch_to_file(file_index)
 
     def find_file(self, s):
         """Return index of file matching string."""
+        # REFACTOR: Move to a helper function or implement in a module
+
         # Case insensitive matching
         s = s.lower()
-        i = 0
+
         # First match files beginning with s
-        for file in self.files:
+        for i, file in enumerate(self.files):
             if file.name.lower().startswith(s):
                 return i
-            i += 1
-        i = 0
-        # Then match files that contain s
-        for file in self.files:
+
+        # Then match any files that contain s
+        for i, file in enumerate(self.files):
             if s in file.name.lower():
                 return i
-            i += 1
+
         return -1
 
     def run_command(self, data):
@@ -474,6 +476,7 @@ class App:
             self.modules.modules[module_name].run(self, self.get_editor(), args)
             return True
         except:
+            # Catch any error when running a module just incase
             self.set_status("Running command failed!")
             self.logger.exception("Running command failed!")
             return False
@@ -511,6 +514,7 @@ class App:
                 try:
                     val = cb(event)
                 except:
+                    # Catch all errors in callbacks just incase
                     self.logger.error("Failed running callback: {0}".format(cb), exc_info=True)
                     continue
                 if val:
@@ -549,7 +553,17 @@ class App:
 
     def query_command(self):
         """Run editor commands."""
-        data = self.ui.query("Command:")
+        if sys.version_info[0] < 3:
+            modules = self.modules.modules.iteritems()
+        else:
+            modules = self.modules.modules.items()
+
+        # Get built in operations
+        completions = [oper for oper in self.operations.keys()]
+        # Add runnable modules
+        completions += [name for name, m in modules if m.is_runnable()]
+
+        data = self.ui.query_autocmp("Command:", completions=sorted(completions))
         if not data:
             return False
         self.run_command(data)
