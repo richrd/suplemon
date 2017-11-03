@@ -1,7 +1,24 @@
 Change Log
 ==========
 
-## [v0.1.62](https://github.com/richrd/suplemon/tree/v0.1.62) (2017-08-22) compared to previous master branch.
+
+## [v0.1.63](https://github.com/richrd/suplemon/tree/v0.1.63) (2017-10-05) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.62...v0.1.63)
+
+**Implemented enhancements:**
+
+- Add autocomplete to run command prompt (fixes #171)
+- Increase battery status polling time to 60 sec (previously 10 sec)
+- Change the top bar suplemon icon to a fancy unicode lemon.
+- Add paste mode for better pasting over SSH (disables auto indentation)
+
+**Fixed bugs:**
+
+- Keep top bar statuses of modules in alphabetical order based on module name. (fixes #57)
+- Prevent restoring file state if file has changed since last time (fixes #198)
+
+
+## [v0.1.62](https://github.com/richrd/suplemon/tree/v0.1.62) (2017-09-25) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.61...v0.1.62)
 
 **Fixed bugs:**
