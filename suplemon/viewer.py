@@ -104,22 +104,18 @@ class BaseViewer:
         y, x = self.window.getmaxyx()
         return (x, y)
 
-    def get_scroll_pos(self):
-        return (self.y_scroll, self.x_scroll)
+    @property
+    def scroll_pos(self):
+        return self.y_scroll, self.x_scroll
 
-    def get_y_scroll(self):
-        return self.y_scroll
-
-    def get_x_scroll(self):
-        return self.x_scroll
+    @scroll_pos.setter
+    def scroll_pos(self, pos):
+        self.y_scroll = pos[0]
+        self.x_scroll = pos[1]
 
     def get_cursor(self):
         """Return the main cursor."""
         return self.cursors[0]
-
-    def get_cursors(self):
-        """Return list of all cursors."""
-        return self.cursors
 
     def get_first_cursor(self):
         """Get the first (primary) cursor."""
@@ -207,10 +203,6 @@ class BaseViewer:
         """
         self.config = config
         self.set_cursor_style(self.config["cursor_style"])
-
-    def set_scroll_pos(self, pos):
-        self.y_scroll = pos[0]
-        self.x_scroll = pos[1]
 
     def set_cursor_style(self, cursor_style):
         """Set cursor style.
