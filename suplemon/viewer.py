@@ -248,14 +248,6 @@ class BaseViewer:
         """Add a new cursor. Accepts a x,y tuple or a Cursor instance."""
         self.cursors.append(Cursor(cursor))
 
-    def pad_lnum(self, n):
-        """Pad line number with zeroes."""
-        # TODO: move to helpers
-        s = str(n)
-        while len(s) < self.line_offset()-1:
-            s = "0" + s
-        return s
-
     def max_line_length(self):
         """Get maximum line length that fits in the editor."""
         return self.get_size()[0]-self.line_offset()-1
@@ -325,7 +317,8 @@ class BaseViewer:
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
                 curs_color = curses.color_pair(line.number_color)
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curs_color)
+                padded_num = str(lnum+1).zfill(self.line_offset()-1)
+                self.window.addstr(i, 0, padded_num+" ", curs_color)
 
             pos = (x_offset, i)
             try:
