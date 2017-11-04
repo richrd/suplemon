@@ -61,7 +61,7 @@ class AutoComplete(Module):
         # Build list of suitable matches
         candidates = []
         for candidate in self.word_list:
-            if helpers.starts(candidate, word) and len(candidate) > len(word):
+            if candidate.startswith(word) and len(candidate) > len(word):
                 candidates.append(candidate)
         # Find the shortest match
         # TODO: implement cycling through matches

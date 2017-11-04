@@ -34,7 +34,7 @@ class AutoDocstring(Module):
         cursor = editor.get_cursor()
         line = editor.get_line(cursor.y)
         line_data = line.get_data()
-        if not helpers.starts(line_data.strip(), "def "):
+        if not line_data.strip().startswith("def "):
             app.set_status("Current line isn't a function definition.")
             return False
 
@@ -129,9 +129,9 @@ class AutoDocstring(Module):
         for i in range(line_number+1, len(editor.lines)):
             line = editor.get_line(i)
             data = line.get_data().strip()
-            if helpers.starts(data, "def "):
+            if data.startswith("def "):
                 break
-            if helpers.starts(data, "return "):
+            if data.startswith("return "):
                 return True
         return False
 
