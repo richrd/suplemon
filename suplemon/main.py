@@ -279,6 +279,7 @@ class App:
         self.config.reload()
         for f in self.files:
             self.setup_editor(f.editor)
+        self.trigger_event_after("config_loaded")
         self.ui.resize()
         self.ui.refresh()
 

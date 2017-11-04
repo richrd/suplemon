@@ -126,6 +126,10 @@ class Module:
         """Get module options."""
         return self.options
 
+    def get_status(self):
+        """Called by app when to get status bar contents."""
+        return ""
+
     def set_name(self, name):
         """Set module name."""
         self.name = name
