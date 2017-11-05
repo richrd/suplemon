@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class Upper(Module):
+    """Transform current lines to upper case."""
+
     def run(self, app, editor, args):
         line_nums = []
         for cursor in editor.cursors:

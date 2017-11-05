@@ -6,6 +6,8 @@ from suplemon.suplemon_module import Module
 
 
 class Date(Module):
+    """Shows the current date without year in the top status bar."""
+
     def get_status(self):
         s = time.strftime("%d.%m.")
         if self.app.config["app"]["use_unicode_symbols"]:

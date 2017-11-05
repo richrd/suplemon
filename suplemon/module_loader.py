@@ -23,8 +23,8 @@ class ModuleLoader:
         self.logger.debug("Loading modules...")
         dirlist = os.listdir(self.module_path)
         for item in dirlist:
-            # Skip 'hidden' dot files
-            if item[0] == ".":
+            # Skip 'hidden' dot files and files beginning with and underscore
+            if item.startswith((".", "_")):
                 continue
             parts = item.split(".")
             if len(parts) < 2:
@@ -32,8 +32,8 @@ class ModuleLoader:
             name = parts[0]
             ext = parts[-1]
 
-            # only load .py modules that don't begin with an underscore
-            if ext == "py" and name[0] != "_":
+            # only load .py modules
+            if ext == "py":
                 module = self.load_single(name)
                 if module:
                     # Load and store the module instance

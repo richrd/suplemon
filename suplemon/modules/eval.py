@@ -4,6 +4,12 @@ from suplemon.suplemon_module import Module
 
 
 class Eval(Module):
+    """
+    Evaluate a python expression.
+
+    If no expression is provided the current line(s) are treated as the expression.
+    """
+
     def run(self, app, editor, args):
         if not args:
             return self.evaluate_lines(editor)
