@@ -12,8 +12,8 @@ class Prompt(Editor):
     """An input prompt based on the Editor."""
     def __init__(self, app, window):
         Editor.__init__(self, app, window)
-        self.ready = 0
-        self.canceled = 0
+        self.ready = False
+        self.canceled = False
         self.input_func = lambda: False
         self.caption = ""
 
@@ -34,14 +34,14 @@ class Prompt(Editor):
 
     def on_ready(self):
         """Accepts the current input."""
-        self.ready = 1
+        self.ready = True
         return
 
     def on_cancel(self):
         """Cancels the input prompt."""
         self.set_data("")
-        self.ready = 1
-        self.canceled = 1
+        self.ready = True
+        self.canceled = True
         return
 
     def line_offset(self):
