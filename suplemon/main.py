@@ -533,9 +533,7 @@ class App:
     def toggle_fullscreen(self):
         """Toggle full screen editor."""
         display = self.config["display"]
-        show_indicators = True
-        if display["show_top_bar"]:
-            show_indicators = False
+        show_indicators = not display["show_top_bar"]
         display["show_top_bar"] = show_indicators
         display["show_bottom_bar"] = show_indicators
         display["show_legend"] = show_indicators
