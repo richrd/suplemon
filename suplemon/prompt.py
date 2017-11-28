@@ -129,6 +129,30 @@ class PromptBool(Prompt):
         return False
 
 
+class PromptFiltered(Prompt):
+    """An input prompt that allows intercepting and filtering input events."""
+
+    def __init__(self, app, window, handler=None):
+        Prompt.__init__(self, app, window)
+        self.prompt_handler = handler
+
+    def handle_input(self, event):
+        """Handle special bindings for the prompt."""
+        # The cancel and accept keys are kept for concistency
+        if event.key_name in ["ctrl+c", "escape"]:
+            self.on_cancel()
+            return False
+        if event.key_name == "enter":
+            self.on_ready()
+            return False
+
+        if self.prompt_handler and self.prompt_handler(self, event):
+            # If the prompt handler returns True the default action is skipped
+            return True
+
+        return Editor.handle_input(self, event)
+
+
 class PromptAutocmp(Prompt):
     """An input prompt with basic autocompletion."""
 
