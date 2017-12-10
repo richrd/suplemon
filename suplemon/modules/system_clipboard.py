@@ -12,8 +12,10 @@ class SystemClipboard(Module):
             self.clipboard_type = "xsel"
         elif self.has_pb_support():
             self.clipboard_type = "pb"
+        elif self.has_xclip_support():
+            self.clipboard_type = "xclip"
         else:
-            self.logger.warning("Can't use system clipboard. Install 'xsel' or 'pbcopy' for system clipboard support.")
+            self.logger.warning("Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.")
             return False
         self.bind_event_before("insert", self.insert)
         self.bind_event_after("copy", self.copy)
@@ -35,6 +37,8 @@ class SystemClipboard(Module):
                 command = ["xsel", "-b"]
             elif self.clipboard_type == "pb":
                 command = ["pbpaste", "-Prefer", "txt"]
+            elif self.clipboard_type == "xclip":
+                command = ["xclip", "-selection", "clipboard", "-out"]
             else:
                 return False
             data = subprocess.check_output(command, universal_newlines=True)
@@ -48,6 +52,8 @@ class SystemClipboard(Module):
                 command = ["xsel", "-i", "-b"]
             elif self.clipboard_type == "pb":
                 command = ["pbcopy"]
+            elif self.clipboard_type == "xclip":
+                command = ["xclip", "-selection", "clipboard", "-in"]
             else:
                 return False
             p = subprocess.Popen(command, stdin=subprocess.PIPE)
@@ -62,6 +68,10 @@ class SystemClipboard(Module):
 
     def has_xsel_support(self):
         output = self.get_output(["xsel", "--version"])
+        return output
+
+    def has_xclip_support(self):
+        output = self.get_output(["which", "xclip"])  # xclip -version outputs to stderr
         return output
 
     def get_output(self, cmd):
