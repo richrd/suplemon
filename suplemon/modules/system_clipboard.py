@@ -15,7 +15,8 @@ class SystemClipboard(Module):
         elif self.has_xclip_support():
             self.clipboard_type = "xclip"
         else:
-            self.logger.warning("Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.")
+            self.logger.warning(
+                "Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.")
             return False
         self.bind_event_before("insert", self.insert)
         self.bind_event_after("copy", self.copy)
