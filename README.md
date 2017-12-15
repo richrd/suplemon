@@ -81,7 +81,7 @@ No dependencies outside the Python Standard Library required.
  * Flake8
  > For showing linting for Python files.
 
- * xsel
+ * xsel or xclip
  > For system clipboard support on X Window (Linux).
 
  * pbcopy / pbpaste
