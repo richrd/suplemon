@@ -232,6 +232,16 @@ The available commands and their descriptions are:
     Function arguments are crudely parsed from the function definition
     and return statements are scanned from the function body.
 
+ * bulk_delete
+
+    Bulk delete lines and characters.
+    Asks what direction to delete in by default.
+
+    Add 'up' to delete lines above highest cursor.
+    Add 'down' to delete lines below lowest cursor.
+    Add 'left' to delete characters to the left of all cursors.
+    Add 'right' to delete characters to the right of all cursors.
+
  * comment
 
     Toggle line commenting based on current file syntax.
@@ -294,6 +304,14 @@ The available commands and their descriptions are:
  * save_all
 
     Save all currently open files. Asks for confirmation.
+
+ * sort_lines
+
+    Sort current lines.
+
+    Sorts alphabetically by default.
+    Add 'length' to sort by length.
+    Add 'reverse' to reverse the sorting.
 
  * strip
 

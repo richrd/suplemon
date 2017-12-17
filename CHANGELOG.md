@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+## [v0.1.64](https://github.com/richrd/suplemon/tree/v0.1.64) (2017-12-17) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.63...v0.1.64)
+
+**Implemented enhancements:**
+
+- Add bulk_delete and sort_lines commands.
+- Lots of code style fixes and improvements. Credit @Gnewbee
+- Add xclip support for system clipboard. Credit @LChris314
+- Added command docs to readme and help.
+
 
 ## [v0.1.63](https://github.com/richrd/suplemon/tree/v0.1.63) (2017-10-05) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.62...v0.1.63)
