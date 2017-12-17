@@ -87,7 +87,7 @@ class ModuleLoader:
             docstring = module["class"].__doc__
             docstring = "\n    " + docstring.strip()
 
-            doc = "- {0} \n{1}\n".format(name, docstring)
+            doc = " * {0}\n{1}\n".format(name, docstring)
             print(doc)
 
 
