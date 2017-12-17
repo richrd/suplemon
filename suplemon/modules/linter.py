@@ -9,6 +9,8 @@ from suplemon.suplemon_module import Module
 
 
 class Linter(Module):
+    """Linter for suplemon."""
+
     def init(self):
         self.init_logging(__name__)
 

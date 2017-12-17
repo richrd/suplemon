@@ -81,7 +81,7 @@ No dependencies outside the Python Standard Library required.
  * Flake8
  > For showing linting for Python files.
 
- * xsel
+ * xsel or xclip
  > For system clipboard support on X Window (Linux).
 
  * pbcopy / pbpaste
@@ -96,13 +96,6 @@ Suplemon is an intuitive command line text editor. It supports multiple cursors 
 It is as easy as nano, and has much of the power of Sublime Text. It also supports extensions
 to allow all kinds of customizations. To get more help hit ```Ctrl + H``` in the editor.
 Suplemon is licensed under the MIT license.
-
-## Goals
- 1. [X] Create a command line text editor with built in multi cursor support. It's awesome!
- 2. [X] Usability should be even better and easier than nano. It's on par with desktop editors.
- 3. [X] Multi cursor should be comparable to Sublime Text.
- 4. [X] Develop Suplemon with Suplemon!!! I've used Suplemon for a long time as my main
-        editor (replacing ST and nano) for all developement, Git commits and everything else.
 
 ## Configuration
 
@@ -215,6 +208,109 @@ To view the default keymap file run ```keymap default```
  * Scroll Wheel Up / Down
    > Scroll up & down.
 
+## Commands
+
+Suplemon has various add-ons that implement extra features.
+The commands can be run with <kbd>Ctrl</kbd> + <kbd>E</kbd> and the prompt has autocomplete to make running them faster.
+The available commands and their descriptions are:
+
+ * autocomplete
+
+    A simple autocompletion module.
+
+    This adds autocomplete support for the tab key. It uses a word
+    list scanned from all open files for completions. By default it suggests
+    the shortest possible match. If there are no matches, the tab action is
+    run normally.
+
+ * autodocstring
+
+    Simple module for adding docstring placeholders.
+
+    This module is intended to generate docstrings for Python functions.
+    It adds placeholders for descriptions, arguments and return data.
+    Function arguments are crudely parsed from the function definition
+    and return statements are scanned from the function body.
+
+ * comment
+
+    Toggle line commenting based on current file syntax.
+
+ * config
+
+    Shortcut for openning the config files.
+
+ * diff
+
+    View a diff of the current file compared to it's on disk version.
+
+ * eval
+
+    Evaluate a python expression and show the result in the status bar.
+
+    If no expression is provided the current line(s) are evaluated and
+    replaced with the evaluation result.
+
+ * keymap
+
+    Shortcut to openning the keymap config file.
+
+ * linter
+
+    Linter for suplemon.
+
+ * lower
+
+    Transform current lines to lower case.
+
+ * lstrip
+
+    Trim whitespace from beginning of current lines.
+
+ * paste
+
+    Toggle paste mode (helpful when pasting over SSH if auto indent is enabled)
+
+ * reload
+
+    Reload all add-on modules.
+
+ * replace_all
+
+    Replace all occurrences in all files of given text with given replacement.
+
+ * reverse
+
+    Reverse text on current line(s).
+
+ * rstrip
+
+    Trim whitespace from the end of lines.
+
+ * save
+
+    Save the current file.
+
+ * save_all
+
+    Save all currently open files. Asks for confirmation.
+
+ * strip
+
+    Trim whitespace from start and end of lines.
+
+ * tabstospaces
+
+    Convert tab characters to spaces in the entire file.
+
+ * toggle_whitespace
+
+    Toggle visually showing whitespace.
+
+ * upper
+
+    Transform current lines to upper case.
+
 
 ## Support
 
@@ -236,29 +332,6 @@ After those are installed, tests can be run via:
 
 PRs are very welcome and appreciated.
 When making PRs make sure to set the target branch to `dev`. I only push to master when releasing new versions.
-
-
-## Todo
- * [ ] Design proper API for plugins/extensions/macros
- * [ ] Documentation for v 1.0.0
-
-## Wishlist (Stuff that would be nice, but not planning to do yet. *Maybe* for 2.0.0)
- * [ ] Core
-   * [ ] Setting for enabling/disabling undo for cursor changes
-   * [ ] Selections
-   * [ ] List of recent files
-   * [X] Optionally Remember cursor positions in files (and restore when opened again)
-   * [ ] Read only viewer
-      * ~~And disable editing~~ Don't disable editing. Instead enable save as.
- * [ ] Extensions:
-   * [ ] Peer to peer colaborative editing. Could be implemented as an extension.
-   * [ ] Auto backup. Activate on n changes or every n seconds
-   * [ ] File selector, kind of like what nano has
-     * [ ] This should be implemented as an extension
-     * [ ] Could be triggered with a key binding (and/or override open file)
-     * [ ] Need to refactor App class to support views instead of just files
-     * [ ] A view could be an editor or an extension ui
-     * [ ] Extensions should be able to control both status bars and key legend
 
 
 ## Rationale

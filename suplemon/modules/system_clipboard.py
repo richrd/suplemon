@@ -6,6 +6,8 @@ from suplemon.suplemon_module import Module
 
 
 class SystemClipboard(Module):
+    """Integrates the system clipboard with suplemon."""
+
     def init(self):
         self.init_logging(__name__)
         if self.has_xsel_support():

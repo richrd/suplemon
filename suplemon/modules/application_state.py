@@ -7,6 +7,12 @@ from suplemon.suplemon_module import Module
 
 
 class ApplicationState(Module):
+    """
+    Stores the state of open files when exiting the editor and restores when files are reopened.
+
+    Cursor positions and scroll position are stored and restored.
+    """
+
     def init(self):
         self.init_logging(__name__)
         self.bind_event_after("app_loaded", self.on_load)

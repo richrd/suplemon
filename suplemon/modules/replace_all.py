@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class ReplaceAll(Module):
+    """Replace all occurrences in all files of given text with given replacement."""
+
     def run(self, app, editor, args):
         r_from = self.app.ui.query("Replace text:")
         if not r_from:

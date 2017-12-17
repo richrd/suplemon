@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class SaveAll(Module):
+    """Save all currently open files. Asks for confirmation."""
+
     def run(self, app, editor, args):
         if not self.app.ui.query_bool("Save all files?", False):
             return False

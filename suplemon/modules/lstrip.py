@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class LStrip(Module):
+    """Trim whitespace from beginning of current lines."""
+
     def run(self, app, editor, args):
         # TODO: move cursors in sync with line contents
         line_nums = editor.get_lines_with_cursors()

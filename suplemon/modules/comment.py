@@ -5,7 +5,7 @@ from suplemon.suplemon_module import Module
 
 
 class Comment(Module):
-    """Toggles line commenting based on current file syntax."""
+    """Toggle line commenting based on current file syntax."""
 
     def run(self, app, editor, args):
         """Comment the current line(s)."""
