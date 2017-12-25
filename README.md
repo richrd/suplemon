@@ -31,7 +31,7 @@ http://github.com/richrd/suplemon
  * Find, Find next and Find all (Ctrl + F, Ctrl + D, Ctrl + A)
  * Custom keyboard shortcuts (and easy-to-use defaults)
  * Mouse support
- * Restores cursor positions in when reopenning files
+ * Restores cursor and scroll positions when reopenning files
  * Extensions (easy to write your own)
  * Lots more...
 
