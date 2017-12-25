@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class Paste(Module):
+    """Toggle paste mode (helpful when pasting over SSH if auto indent is enabled)"""
+
     def init(self):
         # Flag for paste mode
         self.active = False

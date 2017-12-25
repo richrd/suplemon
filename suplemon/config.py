@@ -7,7 +7,6 @@ import os
 import json
 import logging
 
-from . import helpers
 from . import suplemon_module
 
 
@@ -161,7 +160,7 @@ class Config:
         cleaned = []
         for line in lines:
             line = line.strip()
-            if helpers.starts(line, "//") or helpers.starts(line, "#"):
+            if line.startswith(("//", "#")):
                 continue
             cleaned.append(line)
         return "\n".join(cleaned)

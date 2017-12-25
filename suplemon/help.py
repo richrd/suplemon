@@ -133,4 +133,120 @@ or convert line to uppercase). Each command can be run by pressing Ctrl + E
 and then typing the command name. Commands are extensions and are stored in
 the modules folder in the Suplemon installation.
 
+ * autocomplete
+
+    A simple autocompletion module.
+
+    This adds autocomplete support for the tab key. It uses a word
+    list scanned from all open files for completions. By default it suggests
+    the shortest possible match. If there are no matches, the tab action is
+    run normally.
+
+ * autodocstring
+
+    Simple module for adding docstring placeholders.
+
+    This module is intended to generate docstrings for Python functions.
+    It adds placeholders for descriptions, arguments and return data.
+    Function arguments are crudely parsed from the function definition
+    and return statements are scanned from the function body.
+
+ * bulk_delete
+
+    Bulk delete lines and characters.
+    Asks what direction to delete in by default.
+
+    Add 'up' to delete lines above highest cursor.
+    Add 'down' to delete lines below lowest cursor.
+    Add 'left' to delete characters to the left of all cursors.
+    Add 'right' to delete characters to the right of all cursors.
+
+ * comment
+
+    Toggle line commenting based on current file syntax.
+
+ * config
+
+    Shortcut for openning the config files.
+
+ * diff
+
+    View a diff of the current file compared to it's on disk version.
+
+ * eval
+
+    Evaluate a python expression and show the result in the status bar.
+
+    If no expression is provided the current line(s) are evaluated and
+    replaced with the evaluation result.
+
+ * keymap
+
+    Shortcut to openning the keymap config file.
+
+ * linter
+
+    Linter for suplemon.
+
+ * lower
+
+    Transform current lines to lower case.
+
+ * lstrip
+
+    Trim whitespace from beginning of current lines.
+
+ * paste
+
+    Toggle paste mode (helpful when pasting over SSH if auto indent is enabled)
+
+ * reload
+
+    Reload all add-on modules.
+
+ * replace_all
+
+    Replace all occurrences in all files of given text with given replacement.
+
+ * reverse
+
+    Reverse text on current line(s).
+
+ * rstrip
+
+    Trim whitespace from the end of lines.
+
+ * save
+
+    Save the current file.
+
+ * save_all
+
+    Save all currently open files. Asks for confirmation.
+
+ * sort_lines
+
+    Sort current lines.
+
+    Sorts alphabetically by default.
+    Add 'length' to sort by length.
+    Add 'reverse' to reverse the sorting.
+
+ * strip
+
+    Trim whitespace from start and end of lines.
+
+ * tabstospaces
+
+    Convert tab characters to spaces in the entire file.
+
+ * toggle_whitespace
+
+    Toggle visually showing whitespace.
+
+ * upper
+
+    Transform current lines to upper case.
+
+
 """

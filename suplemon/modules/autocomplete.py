@@ -10,7 +10,7 @@ class AutoComplete(Module):
     """
     A simple autocompletion module.
 
-    This module adds autocomplete support for the tab event. It uses a word
+    This adds autocomplete support for the tab key. It uses a word
     list scanned from all open files for completions. By default it suggests
     the shortest possible match. If there are no matches, the tab action is
     run normally.
@@ -61,7 +61,7 @@ class AutoComplete(Module):
         # Build list of suitable matches
         candidates = []
         for candidate in self.word_list:
-            if helpers.starts(candidate, word) and len(candidate) > len(word):
+            if candidate.startswith(word) and len(candidate) > len(word):
                 candidates.append(candidate)
         # Find the shortest match
         # TODO: implement cycling through matches

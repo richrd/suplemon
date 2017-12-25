@@ -83,6 +83,9 @@ class BaseViewer:
             "find_all": self.find_all,                    # Ctrl + A
         }
 
+        self.pygments_syntax = None  # Needs to be implemented in derived classes
+        self.lexer = None  # Needs to be implemented in derived classes
+
     def init(self):
         pass
 
@@ -101,22 +104,18 @@ class BaseViewer:
         y, x = self.window.getmaxyx()
         return (x, y)
 
-    def get_scroll_pos(self):
-        return (self.y_scroll, self.x_scroll)
+    @property
+    def scroll_pos(self):
+        return self.y_scroll, self.x_scroll
 
-    def get_y_scroll(self):
-        return self.y_scroll
-
-    def get_x_scroll(self):
-        return self.x_scroll
+    @scroll_pos.setter
+    def scroll_pos(self, pos):
+        self.y_scroll = pos[0]
+        self.x_scroll = pos[1]
 
     def get_cursor(self):
         """Return the main cursor."""
         return self.cursors[0]
-
-    def get_cursors(self):
-        """Return list of all cursors."""
-        return self.cursors
 
     def get_first_cursor(self):
         """Get the first (primary) cursor."""
@@ -205,10 +204,6 @@ class BaseViewer:
         self.config = config
         self.set_cursor_style(self.config["cursor_style"])
 
-    def set_scroll_pos(self, pos):
-        self.y_scroll = pos[0]
-        self.x_scroll = pos[1]
-
     def set_cursor_style(self, cursor_style):
         """Set cursor style.
 
@@ -234,6 +229,12 @@ class BaseViewer:
         """Discard all cursors and place a new one."""
         self.cursors = [Cursor(cursor)]
 
+    def setup_linelight(self):
+        raise NotImplementedError("Needs to be implemented in derived classes")
+
+    def setup_highlight(self):
+        raise NotImplementedError("Needs to be implemented in derived classes")
+
     def set_file_extension(self, ext):
         """Set the file extension."""
         ext = ext.lower()
@@ -246,14 +247,6 @@ class BaseViewer:
     def add_cursor(self, cursor):
         """Add a new cursor. Accepts a x,y tuple or a Cursor instance."""
         self.cursors.append(Cursor(cursor))
-
-    def pad_lnum(self, n):
-        """Pad line number with zeroes."""
-        # TODO: move to helpers
-        s = str(n)
-        while len(s) < self.line_offset()-1:
-            s = "0" + s
-        return s
 
     def max_line_length(self):
         """Get maximum line length that fits in the editor."""
@@ -312,11 +305,10 @@ class BaseViewer:
             return
 
         self.window.erase()
-        i = 0
         max_y = self.get_size()[1]
         max_len = self.max_line_length()
         # Iterate through visible lines
-        while i < max_y:
+        for i in range(max_y):
             x_offset = self.line_offset()
             lnum = i + self.y_scroll
             if lnum >= len(self.lines):  # Make sure we have a line to show
@@ -325,7 +317,8 @@ class BaseViewer:
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
                 curs_color = curses.color_pair(line.number_color)
-                self.window.addstr(i, 0, self.pad_lnum(lnum+1)+" ", curs_color)
+                padded_num = str(lnum+1).zfill(self.line_offset()-1)
+                self.window.addstr(i, 0, padded_num+" ", curs_color)
 
             pos = (x_offset, i)
             try:
@@ -333,7 +326,6 @@ class BaseViewer:
             except:
                 self.logger.error("Failed rendering line #{0} @{1} DATA:'{2}'!".format(lnum+1, pos, line),
                                   exc_info=True)
-            i += 1
         self.render_cursors()
 
     def render_line_contents(self, line, pos, x_offset, max_len):
@@ -408,6 +400,9 @@ class BaseViewer:
             if first_token:
                 first_token = False
             x_offset += len(text)
+
+    def get_line_color(self, line):
+        raise NotImplementedError("Needs to be implemented in derived classes")
 
     def render_line_linelight(self, line, pos, x_offset, max_len):
         """Render line with naive line based highlighting."""
@@ -804,6 +799,9 @@ class BaseViewer:
         what = self.app.ui.query("Find:", self.last_find)
         if what:
             self.find(what)
+
+    def store_action_state(self, state):
+        raise NotImplementedError("Needs to be implemented in derived classes")
 
     def find(self, what, findall=False):
         """Find what in data (from top to bottom). Adds a cursor when found."""

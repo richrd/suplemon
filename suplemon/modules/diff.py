@@ -7,6 +7,7 @@ from suplemon.suplemon_module import Module
 
 class Diff(Module):
     """View a diff of the current file compared to it's on disk version."""
+
     def run(self, app, editor, args):
         curr_file = app.get_file()
         curr_path = curr_file.get_path()

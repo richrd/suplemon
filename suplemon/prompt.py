@@ -12,8 +12,8 @@ class Prompt(Editor):
     """An input prompt based on the Editor."""
     def __init__(self, app, window):
         Editor.__init__(self, app, window)
-        self.ready = 0
-        self.canceled = 0
+        self.ready = False
+        self.canceled = False
         self.input_func = lambda: False
         self.caption = ""
 
@@ -34,14 +34,14 @@ class Prompt(Editor):
 
     def on_ready(self):
         """Accepts the current input."""
-        self.ready = 1
+        self.ready = True
         return
 
     def on_cancel(self):
         """Cancels the input prompt."""
         self.set_data("")
-        self.ready = 1
-        self.canceled = 1
+        self.ready = True
+        self.canceled = True
         return
 
     def line_offset(self):
@@ -127,6 +127,30 @@ class PromptBool(Prompt):
         if success:
             return self.value
         return False
+
+
+class PromptFiltered(Prompt):
+    """An input prompt that allows intercepting and filtering input events."""
+
+    def __init__(self, app, window, handler=None):
+        Prompt.__init__(self, app, window)
+        self.prompt_handler = handler
+
+    def handle_input(self, event):
+        """Handle special bindings for the prompt."""
+        # The cancel and accept keys are kept for concistency
+        if event.key_name in ["ctrl+c", "escape"]:
+            self.on_cancel()
+            return False
+        if event.key_name == "enter":
+            self.on_ready()
+            return False
+
+        if self.prompt_handler and self.prompt_handler(self, event):
+            # If the prompt handler returns True the default action is skipped
+            return True
+
+        return Editor.handle_input(self, event)
 
 
 class PromptAutocmp(Prompt):

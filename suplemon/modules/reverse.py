@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class Reverse(Module):
+    """Reverse text on current line(s)."""
+
     def run(self, app, editor, args):
         line_nums = []
         for cursor in editor.cursors:

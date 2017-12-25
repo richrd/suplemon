@@ -21,25 +21,34 @@ class ModuleLoader:
     def load(self):
         """Find and load available modules."""
         self.logger.debug("Loading modules...")
+        names = self.get_module_names()
+        for name in names:
+            module = self.load_single(name)
+            if module:
+                # Load and store the module instance
+                inst = self.load_instance(module)
+                if inst:
+                    self.modules[module[0]] = inst
+
+    def get_module_names(self):
+        """Get names of loadable modules."""
+        names = []
         dirlist = os.listdir(self.module_path)
         for item in dirlist:
-            # Skip 'hidden' dot files
-            if item[0] == ".":
+            # Skip 'hidden' dot files and files beginning with and underscore
+            if item.startswith((".", "_")):
                 continue
             parts = item.split(".")
             if len(parts) < 2:
+                # Can't find file extension
                 continue
             name = parts[0]
             ext = parts[-1]
-
-            # only load .py modules that don't begin with an underscore
-            if ext == "py" and name[0] != "_":
-                module = self.load_single(name)
-                if module:
-                    # Load and store the module instance
-                    inst = self.load_instance(module)
-                    if inst:
-                        self.modules[module[0]] = inst
+            # only load .py modules
+            if ext != "py":
+                continue
+            names.append(name)
+        return names
 
     def load_instance(self, module):
         """Initialize a module."""
@@ -64,7 +73,24 @@ class ModuleLoader:
             mod.module["status"] = False
         return name, mod.module
 
+    def extract_docs(self):
+        """Get names and docs of runnable modules and print as markdown."""
+        names = sorted(self.get_module_names())
+        for name in names:
+            name, module = self.load_single(name)
+            # Skip modules that can't be run expicitly
+            if module["class"].run.__module__ == "suplemon.suplemon_module":
+                continue
+            # Skip undocumented modules
+            if not module["class"].__doc__:
+                continue
+            docstring = module["class"].__doc__
+            docstring = "\n    " + docstring.strip()
+
+            doc = " * {0}\n{1}\n".format(name, docstring)
+            print(doc)
+
 
 if __name__ == "__main__":
     ml = ModuleLoader()
-    ml.load()
+    ml.extract_docs()

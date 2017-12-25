@@ -4,6 +4,8 @@ from suplemon.suplemon_module import Module
 
 
 class ToggleWhitespace(Module):
+    """Toggle visually showing whitespace."""
+
     def run(self, app, editor, args):
         # Toggle the boolean
         new_value = not self.app.config["editor"]["show_white_space"]

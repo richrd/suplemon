@@ -7,6 +7,7 @@ from suplemon import config
 
 class KeymapConfig(config.ConfigModule):
     """Shortcut to openning the keymap config file."""
+
     def init(self):
         self.config_name = "keymap.json"
         self.config_default_path = os.path.join(self.app.path, "config", self.config_name)

@@ -8,7 +8,7 @@ import sys
 import logging
 from wcwidth import wcswidth
 
-from .prompt import Prompt, PromptBool, PromptFile, PromptAutocmp
+from .prompt import Prompt, PromptBool, PromptFiltered, PromptFile, PromptAutocmp
 from .key_mappings import key_map
 
 # Curses can't be imported yet but we'll
@@ -108,6 +108,13 @@ class UI:
         self.logger = logging.getLogger(__name__)
         self.warned_old_curses = 0
         self.limited_colors = True
+        self.screen = None
+        self.current_yx = None
+        self.text_input = None
+        self.header_win = None
+        self.status_win = None
+        self.editor_win = None
+        self.legend_win = None
 
     def init(self):
         """Set ESC delay and then import curses."""
@@ -500,6 +507,12 @@ class UI:
     def query_bool(self, text, default=False):
         """Get a boolean from the user."""
         result = self._query(text, default, PromptBool)
+        return result
+
+    def query_filtered(self, text, initial="", handler=None):
+        """Get an arbitrary string from the user with input filtering."""
+        prompt_inst = PromptFiltered(self.app, self.status_win, handler=handler)
+        result = self._query(text, initial, inst=prompt_inst)
         return result
 
     def query_file(self, text, initial=""):

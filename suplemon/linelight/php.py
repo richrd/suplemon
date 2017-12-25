@@ -1,4 +1,3 @@
-from suplemon import helpers
 from suplemon.linelight.color_map import color_map
 
 
@@ -9,20 +8,20 @@ class Syntax:
     def get_color(self, raw_line):
         color = color_map["white"]
         line = raw_line.strip()
-        keywords = ["if", "else", "finally", "try", "catch", "foreach",
-                    "while", "continue", "pass", "break"]
-        if helpers.starts(line, ["include", "require"]):
+        keywords = ("if", "else", "finally", "try", "catch", "foreach",
+                    "while", "continue", "pass", "break")
+        if line.startswith(("include", "require")):
             color = color_map["blue"]
-        elif helpers.starts(line, ["class", "public", "private", "function"]):
+        elif line.startswith(("class", "public", "private", "function")):
             color = color_map["green"]
-        elif helpers.starts(line, "def"):
+        elif line.startswith("def"):
             color = color_map["cyan"]
-        elif helpers.starts(line, ["return"]):
+        elif line.startswith("return"):
             color = color_map["red"]
-        elif helpers.starts(line, "$"):
+        elif line.startswith("$"):
             color = color_map["cyan"]
-        elif helpers.starts(line, ["#", "//", "/*", "*/"]):
+        elif line.startswith(("#", "//", "/*", "*/")):
             color = color_map["magenta"]
-        elif helpers.starts(line, keywords):
+        elif line.startswith(keywords):
             color = color_map["yellow"]
         return color

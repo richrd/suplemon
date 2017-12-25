@@ -5,7 +5,7 @@ from suplemon.suplemon_module import Module
 
 
 class Comment(Module):
-    """Toggles line commenting based on current file syntax."""
+    """Toggle line commenting based on current file syntax."""
 
     def run(self, app, editor, args):
         """Comment the current line(s)."""
@@ -24,13 +24,13 @@ class Comment(Module):
             target = str(line).strip()
             w = helpers.whitespace(line)  # Amount of whitespace at line start
             # If the line starts with comment syntax
-            if helpers.starts(target, comment[0]):
+            if target.startswith(comment[0]):
                 # Reconstruct the whitespace and add the line
                 new_line = (" "*w) + line[w+len(comment[0]):]
                 # If comment end syntax exists
                 if comment[1]:
                     # Try to remove it from the end of the line
-                    if helpers.ends(new_line, comment[1]):
+                    if new_line.endswith(comment[1]):
                         new_line = new_line[:-1*len(comment[1])]
                 # Store the modified line
                 # editor.lines[lnum] = Line(new_line)

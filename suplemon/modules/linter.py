@@ -9,6 +9,8 @@ from suplemon.suplemon_module import Module
 
 
 class Linter(Module):
+    """Linter for suplemon."""
+
     def init(self):
         self.init_logging(__name__)
 
@@ -80,8 +82,7 @@ class Linter(Module):
             return False
 
         editor = file.get_editor()
-        line_no = 0
-        while line_no < len(editor.lines):
+        for line_no in range(len(editor.lines)):
             line = editor.lines[line_no]
             if line_no+1 in linting.keys():
                 line.linting = linting[line_no+1]
@@ -89,7 +90,6 @@ class Linter(Module):
             else:
                 line.linting = False
                 line.reset_number_color()
-            line_no += 1
 
     def get_msgs_on_line(self, editor, line_no):
         line = editor.lines[line_no]
