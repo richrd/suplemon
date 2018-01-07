@@ -102,6 +102,8 @@
         "show_tab_indicators": true,
         // Tab indicator charatrer
         "tab_indicator_character": "\u203A",
+        // Highlight current line(s)
+        "highlight_current_line": true,
         // Line numbering
         "show_line_nums": true,
         // Pad line numbers with spaces instead of zeros
