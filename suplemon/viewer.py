@@ -307,6 +307,8 @@ class BaseViewer:
         self.window.erase()
         max_y = self.get_size()[1]
         max_len = self.max_line_length()
+        lnum_len = self.line_offset() - 1
+        lnum_pad = ">" if self.config["line_nums_pad_space"] else "0"
         # Iterate through visible lines
         for i in range(max_y):
             x_offset = self.line_offset()
@@ -317,8 +319,8 @@ class BaseViewer:
             line = self.lines[lnum]
             if self.config["show_line_nums"]:
                 curs_color = curses.color_pair(line.number_color)
-                padded_num = str(lnum+1).zfill(self.line_offset()-1)
-                self.window.addstr(i, 0, padded_num+" ", curs_color)
+                padded_num = "{:{}{}d} ".format(lnum + 1, lnum_pad, lnum_len)
+                self.window.addstr(i, 0, padded_num, curs_color)
 
             pos = (x_offset, i)
             try:

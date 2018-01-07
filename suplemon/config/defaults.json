@@ -104,6 +104,8 @@
         "tab_indicator_character": "\u203A",
         // Line numbering
         "show_line_nums": true,
+        // Pad line numbers with spaces instead of zeros
+        "line_nums_pad_space": true,
         // Naive line highlighting
         "show_line_colors": true,
         // Proper syntax highlighting
