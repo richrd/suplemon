@@ -100,7 +100,9 @@
             "\uFEFF": "\u2420"
         },
         // Whether to visually show white space chars
-        "show_white_space": true,
+        "show_white_space": false,
+        // Whether to ignore theme whitespace color
+        "ignore_theme_whitespace": false,
         // Show tab indicators in whitespace
         "show_tab_indicators": true,
         // Tab indicator charatrer
@@ -139,7 +141,34 @@
         "show_legend": true,
         // Show the bottom status bar
         "show_bottom_bar": true,
-        // Invert status bar colors (switch text and background colors)
-        "invert_status_bars": false
+        // Theme for 8 colors
+        "colors_8": {
+            // Another variant for linenumbers (and maybe status_*) is black, black, bold
+            "status_top":             { "fg": "white",   "bg": "black"   },
+            "status_bottom":          { "fg": "white",   "bg": "black"   },
+            "linenumbers":            { "fg": "white",   "bg": "black"   },
+            "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
+            "editor":                 { "fg": "default", "bg": "default" },
+            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] }
+        },
+        // Theme for 88 colors
+        "colors_88": {
+            // Copy of colors_8; this needs an own default theme
+            "status_top":             { "fg": "white",   "bg": "black"   },
+            "status_bottom":          { "fg": "white",   "bg": "black"   },
+            "linenumbers":            { "fg": "white",   "bg": "black"   },
+            "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
+            "editor":                 { "fg": "default", "bg": "default" },
+            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] }
+        },
+        // Theme for 256 colors
+        "colors_256": {
+            "status_top":             { "fg": "color250", "bg": "black"   },
+            "status_bottom":          { "fg": "color250", "bg": "black"   },
+            "linenumbers":            { "fg": "color240", "bg": "black"   },
+            "linenumbers_lint_error": { "fg": "color204", "bg": "black"   },
+            "editor":                 { "fg": "default",  "bg": "default" },
+            "editor_whitespace":      { "fg": "color240", "bg": "default" }
+        }
     }
 }
