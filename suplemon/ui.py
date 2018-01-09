@@ -108,7 +108,6 @@ class UI:
     def __init__(self, app):
         self.app = app
         self.logger = logging.getLogger(__name__)
-        self.limited_colors = True
         self.screen = None
         self.current_yx = None
         self.text_input = None
