@@ -282,6 +282,7 @@ class UI:
                 self.legend_win.mvwin(y - offset_bottom, 0)
                 if self.legend_win.getmaxyx()[1] != x:
                     self.legend_win.resize(2, x)
+            self.legend_win.bkgdset(" ", self.colors.get("legend"))
 
         if self.editor_win is None:
             self.editor_win = curses.newwin(y - offset_top - offset_bottom, x, offset_top, 0)

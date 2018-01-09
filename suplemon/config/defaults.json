@@ -146,6 +146,7 @@
             // Another variant for linenumbers (and maybe status_*) is black, black, bold
             "status_top":             { "fg": "white",   "bg": "black"   },
             "status_bottom":          { "fg": "white",   "bg": "black"   },
+            "legend":                 { "fg": "white",   "bg": "black"   },
             "linenumbers":            { "fg": "white",   "bg": "black"   },
             "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
             "editor":                 { "fg": "default", "bg": "default" },
@@ -156,6 +157,7 @@
             // Copy of colors_8; this needs an own default theme
             "status_top":             { "fg": "white",   "bg": "black"   },
             "status_bottom":          { "fg": "white",   "bg": "black"   },
+            "legend":                 { "fg": "white",   "bg": "black"   },
             "linenumbers":            { "fg": "white",   "bg": "black"   },
             "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
             "editor":                 { "fg": "default", "bg": "default" },
@@ -165,6 +167,7 @@
         "colors_256": {
             "status_top":             { "fg": "color250", "bg": "black"   },
             "status_bottom":          { "fg": "color250", "bg": "black"   },
+            "legend":                 { "fg": "color250", "bg": "black"   },
             "linenumbers":            { "fg": "color240", "bg": "black"   },
             "linenumbers_lint_error": { "fg": "color204", "bg": "black"   },
             "editor":                 { "fg": "default",  "bg": "default" },
