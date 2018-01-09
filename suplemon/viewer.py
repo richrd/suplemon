@@ -1026,4 +1026,4 @@ class Viewer(BaseViewer):
             color = self.syntax.get_color(raw_line)
             if color is not None:
                 return color
-        return 0
+        return self.app.ui.colors.get_fg("editor")
