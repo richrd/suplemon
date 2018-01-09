@@ -204,7 +204,12 @@ class UI:
         try:
             curses.use_default_colors()
         except:
-            self.logger.debug("Failed to load curses default colors.")
+            self.logger.warning(
+                "Failed to load curses default colors. " +
+                "You will have no transparency or terminal defined default colors."
+            )
+            # https://docs.python.org/3/library/curses.html#curses.init_pair
+            # "[..] the 0 color pair is wired to white on black and cannot be changed"
             self.colors.set_default_fg(curses.COLOR_WHITE)
             self.colors.set_default_bg(curses.COLOR_BLACK)
 
