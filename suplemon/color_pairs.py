@@ -98,7 +98,7 @@ class ColorPairs:
             else:
                 self.logger.warning(
                     "Failed to create new color pair for " +
-                    "'%s', the terminal description for '%s' only supports up to %i color pairs" %
+                    "'%s', the terminal description for '%s' only supports up to %i color pairs." %
                     (name, curses.termname().decode("utf-8"), curses.COLOR_PAIRS)
                 )
                 color = curses.color_pair(0) | attrs
