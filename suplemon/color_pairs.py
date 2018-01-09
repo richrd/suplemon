@@ -17,7 +17,7 @@ class ColorPairs:
         self._color_count = 1
 
         # dynamic in case terminal does not support use_default_colors()
-        self._invalid = curses.COLOR_RED
+        self._invalid = curses.COLOR_WHITE if curses.COLORS < 8 else curses.COLOR_RED
         self._default_fg = -1
         self._default_bg = -1
 
