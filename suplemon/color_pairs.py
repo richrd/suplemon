@@ -88,11 +88,11 @@ class ColorPairs:
         if name in self._colors:
             # Redefine exiting color pair
             index, color, fg, bg, attrs = self._colors[name]
-            self.logger.info("Updating exiting color pair with index %i and name '%s'" % (index, name))
+            self.logger.debug("Updating exiting color pair with index %i and name '%s'" % (index, name))
         else:
             # Create new color pair
             index = self._color_count
-            self.logger.info("Creating new color pair with index %i and name '%s'" % (index, name))
+            self.logger.debug("Creating new color pair with index %i and name '%s'" % (index, name))
             if index < curses.COLOR_PAIRS:
                 self._color_count += 1
             else:
