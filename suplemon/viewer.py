@@ -955,6 +955,7 @@ class Viewer(BaseViewer):
             self.logger.error("File doesn't match API!")
             return False
         self.syntax = module.Syntax()
+        self.pygments_syntax = None
 
     def setup_highlight(self):
         """Setup Pygments based highlighting."""
