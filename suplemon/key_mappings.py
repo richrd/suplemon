@@ -177,6 +177,9 @@ key_map = {
     "KEY_SHOME": "shift+home",
     "KEY_SEND": "shift+end",
 
+    "KEY_SPREVIOUS": "shift+pageup",
+    "KEY_SNEXT": "shift+pagedown",
+
     "O2P": "shift+f1",
     "O2Q": "shift+f2",
     "O2R": "shift+f3",
