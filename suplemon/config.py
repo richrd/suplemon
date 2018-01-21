@@ -127,14 +127,18 @@ class Config:
 
     def merge_defaults(self, config):
         """Fill any missing config options with defaults."""
-        for prim_key in self.defaults.keys():
-            curr_item = self.defaults[prim_key]
-            if prim_key not in config.keys():
-                config[prim_key] = dict(curr_item)
+        return self._merge_defaults(self.defaults, config)
+
+    def _merge_defaults(self, defaults, config):
+        """Recursivley merge two dicts."""
+        for key in defaults.keys():
+            item = defaults[key]
+            if key not in config.keys():
+                config[key] = item
                 continue
-            for sec_key in curr_item.keys():
-                if sec_key not in config[prim_key].keys():
-                    config[prim_key][sec_key] = curr_item[sec_key]
+            if not isinstance(item, dict):
+                continue
+            config[key] = self._merge_defaults(item, config[key])
         return config
 
     def load_config_file(self, path):
