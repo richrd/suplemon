@@ -140,3 +140,10 @@ This is just a guideline and it's still very abstract and incomplete.
     ☠    2620 skull and crossbones
 
     ♻    267B black universal recycling symbol
+
+    ⚙    2699 gear
+    ⚠    26A0 warning sign
+    ⚬    26AC medium small white circle
+    ⛶    26F6 square four corners
+
+

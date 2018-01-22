@@ -13,10 +13,10 @@ class UI(object):
         self.app = app
         self.backend = backend
 
-        self.setup_layout()
+        # self.setup_layout()
 
         # Layout test can be used instead of setup_layout to test a more complex layout
-        # self.layout_test()
+        self.layout_test()
 
     def setup_layout(self):
         self.root_widget = widgets.VSplitWidget()
