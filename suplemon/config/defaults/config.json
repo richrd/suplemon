@@ -1,0 +1,52 @@
+// Default settings for Suplemon
+// Most settings are the same as in Sublime Text but not all Sublime Text
+// settings are supported and the defaults may be different.
+{
+    // Characters that are considered to separate words
+    "word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
+
+    // Set to false to prevent line numbers being drawn in the gutter
+    "line_numbers": true,
+
+    // The number of spaces a tab is considered equal to
+    "tab_size": 4,
+
+    // Calculates indentation automatically when pressing enter
+    "auto_indent": true,
+
+    // If enabled, will highlight any line with a caret
+    "highlight_line": false,
+
+    // Set to "none" to turn off drawing white space, "selection" to draw only the
+    // white space within the selection, and "all" to draw all white space
+    "draw_white_space": "selection",
+
+    // Set to true to removing trailing white space on save
+    "trim_trailing_white_space_on_save": false,
+
+    // Set to true to ensure the last line of the file ends in a newline
+    // character when saving
+    "ensure_newline_at_eof_on_save": false,
+
+    // Encoding used when saving new files, and files opened with an undefined
+    // encoding (e.g., plain ascii files). If a file is opened with a specific
+    // encoding (either detected or given explicitly), this setting will be
+    // ignored, and the file will be saved with the encoding it was opened
+    // with.
+    "default_encoding": "UTF-8",
+
+    // Determines what character(s) are used to terminate each line in new files.
+    // Valid values are 'system' (whatever the OS uses), 'windows' (CRLF) and
+    // 'unix' (LF only).
+    "default_line_ending": "system",
+
+    // If true, the selected text will be copied into the find panel when it's
+    // shown.
+    "find_selected_text": true,
+
+    // Makes tabs with modified files more visible
+    "highlight_modified_tabs": false,
+
+    // Display line endings in the status bar
+    "show_line_endings": false,
+}
