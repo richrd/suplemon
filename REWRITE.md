@@ -31,6 +31,7 @@ better and more advanced features.
 
 ### General
  - Use assert in (API) methods to make sure args are correct
+ - Use with for opening files
  - Use new-style classes: `class Buffer(object):`
  - Setters return true or false depending on wether value changed
  - Try to be more Pythonic
@@ -47,6 +48,8 @@ List of some libraries that are likely to be useful / necessary.
 
 ## Architecture
 
+ - [X] Separate the terminal handling from the core with abstraction
+
  - [ ] Implement core architecture (WIP)
    - [ ] Config handling (similar to sublime text and same variable names)
      - [ ] Generic config loader
@@ -60,7 +63,15 @@ List of some libraries that are likely to be useful / necessary.
    - [ ] Opened files
    - [ ] Views (multiple files or other widgets are shown at the same time)
    - [ ] Lots more...
- - [X] Separate the terminal handling from the core with abstraction
+
+ - [ ] Implement editor component architecture
+   - [ ] Create a simple generic editor that's used for all text input
+   - [ ] The simplest form should be a viewer that only supports navigation
+         but no editing
+   - [ ] Prompts should use the generic editor, without multi-cursor,
+         syntax higlighting and other fancy features
+   - [ ] Full editor should have all the bells and whistles
+
  - [ ] Create widgets and a layout engine (WIP)
    - [X] Basic widgets and layout
    - [ ] Floating widgets (for autocomplete, menus etc)
