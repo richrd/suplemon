@@ -4,6 +4,13 @@ from .utils import divide
 from .screen import Screen, ScreenString
 
 
+"""
+TODO: We might need a root widget with more authority over it's children.
+      It could just be a container for any other widget, but it should
+      keep track of the currently focused widget.
+"""
+
+
 class BaseWidget(object):
     """Base class for all widgets"""
     def __init__(self):
