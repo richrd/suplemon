@@ -66,5 +66,5 @@ class App:
             self.handle_logs()
 
     def handle_logs(self):
-          for logger_handler in self.logger.handlers:
-              logger_handler.close()
+        for logger_handler in self.logger.handlers:
+            logger_handler.close()
