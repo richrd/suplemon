@@ -52,8 +52,9 @@ List of some libraries that are likely to be useful / necessary.
 
  - [ ] Implement core architecture (WIP)
    - [ ] Config handling (similar to sublime text and same variable names)
-     - [ ] Generic config loader
-     - [ ] Core config
+     - [X] Generic config loader
+     - [X] Core confif
+     - [ ] File type (language) specific configuration
      - [ ] Key map config
    - [ ] Key config handling (similar to sublime text)
    	     { "keys": ["ctrl+left"], "command": "move", "args": {"by": "words", "forward": false} },
