@@ -10,7 +10,7 @@ from wcwidth import wcswidth
 
 from .prompt import Prompt, PromptBool, PromptFiltered, PromptFile, PromptAutocmp
 from .key_mappings import key_map
-from .color_pairs import ColorPairs
+from .color_pairs import ColorManager
 
 # Curses can't be imported yet but we'll
 # predefine it to avoid confusing flake8
@@ -149,7 +149,7 @@ class UI:
         self.logger.debug("Loading UI for terminal: {0}".format(self.termname))
 
         self.screen = curses.initscr()
-        self.setup_colors()
+        self.colors = ColorManager(self.app)
 
         curses.raw()
         curses.noecho()
@@ -181,61 +181,6 @@ class UI:
             curses.mousemask(-1)  # All events
         else:
             curses.mousemask(0)  # All events
-
-    def setup_colors(self):
-        """Initialize color support and define colors."""
-        curses.start_color()
-
-        self.logger.info(
-            "Currently running with TERM '%s' which provides %i colors and %i color pairs according to ncurses." %
-            (self.termname, curses.COLORS, curses.COLOR_PAIRS)
-        )
-
-        if curses.COLORS == 8:
-            self.logger.info("Enhanced colors not supported.")
-            self.logger.info(
-                "Depending on your terminal emulator 'export TERM=%s-256color' may help." %
-                self.termname
-            )
-            self.app.config["editor"]["theme"] = "8colors"
-
-        self.colors = ColorPairs()
-        try:
-            curses.use_default_colors()
-        except:
-            self.logger.warning(
-                "Failed to load curses default colors. " +
-                "You will have no transparency or terminal defined default colors."
-            )
-            # https://docs.python.org/3/library/curses.html#curses.init_pair
-            # "[..] the 0 color pair is wired to white on black and cannot be changed"
-            self.colors.set_default_fg(curses.COLOR_WHITE)
-            self.colors.set_default_bg(curses.COLOR_BLACK)
-
-        colors = self._get_config_colors()
-        for key in colors:
-            values = colors[key]
-            self.colors.add_translate(
-                key,
-                values.get('fg', None),
-                values.get('bg', None),
-                values.get('attribs', None)
-            )
-
-        self.app.themes.use(self.app.config["editor"]["theme"])
-
-    def _get_config_colors(self):
-        if curses.COLORS == 8:
-            return self.app.config["display"]["colors_8"]
-        elif curses.COLORS == 88:
-            return self.app.config["display"]["colors_88"]
-        elif curses.COLORS == 256:
-            return self.app.config["display"]["colors_256"]
-        else:
-            self.logger.warning(
-                "No idea how to handle a color count of %i. Defaulting to 8 colors." % curses.COLORS
-            )
-            return self.app.config["display"]["colors_8"]
 
     def setup_windows(self):
         """Initialize and layout windows."""

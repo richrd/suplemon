@@ -7,19 +7,78 @@ import curses
 import logging
 
 
-class ColorPairs:
-    def __init__(self):
-        self.logger = logging.getLogger(__name__ + "." + ColorPairs.__name__)
+class ColorManager:
+    def __init__(self, app):
+        self._app = app
+        self.logger = logging.getLogger(__name__ + "." + ColorManager.__name__)
         self._colors = dict()
 
         # color_pair(0) is hardcoded
         # https://docs.python.org/3/library/curses.html#curses.init_pair
         self._color_count = 1
+        self._invalid = curses.COLOR_WHITE if curses.COLORS < 8 else curses.COLOR_RED
 
         # dynamic in case terminal does not support use_default_colors()
-        self._invalid = curses.COLOR_WHITE if curses.COLORS < 8 else curses.COLOR_RED
         self._default_fg = -1
         self._default_bg = -1
+        self._setup_colors()
+        self._load_color_theme()
+        self._app.set_event_binding("config_loaded", "after", self._load_color_theme)
+
+    def _setup_colors(self):
+        """Initialize color support and define colors."""
+        curses.start_color()
+
+        self.termname = curses.termname().decode('utf-8')
+        self.logger.info(
+            "Currently running with TERM '%s' which provides %i colors and %i color pairs according to ncurses." %
+            (self.termname, curses.COLORS, curses.COLOR_PAIRS)
+        )
+
+        if curses.COLORS == 8:
+            self.logger.info("Enhanced colors not supported.")
+            self.logger.info(
+                "Depending on your terminal emulator 'export TERM=%s-256color' may help." %
+                self.termname
+            )
+            self._app.config["editor"]["theme"] = "8colors"
+
+        try:
+            curses.use_default_colors()
+        except:
+            self.logger.warning(
+                "Failed to load curses default colors. " +
+                "You will have no transparency or terminal defined default colors."
+            )
+            # https://docs.python.org/3/library/curses.html#curses.init_pair
+            # "[..] the 0 color pair is wired to white on black and cannot be changed"
+            self.set_default_fg(curses.COLOR_WHITE)
+            self.set_default_bg(curses.COLOR_BLACK)
+
+    def _load_color_theme(self, *args):
+        colors = self._get_config_colors()
+        for key in colors:
+            values = colors[key]
+            self.add_translate(
+                key,
+                values.get('fg', None),
+                values.get('bg', None),
+                values.get('attribs', None)
+            )
+        self._app.themes.use(self._app.config["editor"]["theme"])
+
+    def _get_config_colors(self):
+        if curses.COLORS == 8:
+            return self._app.config["display"]["colors_8"]
+        elif curses.COLORS == 88:
+            return self._app.config["display"]["colors_88"]
+        elif curses.COLORS == 256:
+            return self._app.config["display"]["colors_256"]
+        else:
+            self.logger.warning(
+                "No idea how to handle a color count of %i. Defaulting to 8 colors." % curses.COLORS
+            )
+            return self._app.config["display"]["colors_8"]
 
     def set_default_fg(self, color):
         self._default_fg = color
@@ -87,19 +146,27 @@ class ColorPairs:
         name = str(name)
         if name in self._colors:
             # Redefine exiting color pair
-            index, color, fg, bg, attrs = self._colors[name]
-            self.logger.debug("Updating exiting color pair with index %i and name '%s'" % (index, name))
+            index, color, _fg, _bg, _attrs = self._colors[name]
+            self.logger.debug(
+                "Updating exiting color pair with index %i, name '%s', fg=%i, bg=%i and attrs=%i" % (
+                    index, name, fg, bg, attrs
+                )
+            )
         else:
             # Create new color pair
             index = self._color_count
-            self.logger.debug("Creating new color pair with index %i and name '%s'" % (index, name))
+            self.logger.debug(
+                "Creating new color pair with index %i, name '%s', fg=%i, bg=%i and attrs=%i" % (
+                    index, name, fg, bg, attrs
+                )
+            )
             if index < curses.COLOR_PAIRS:
                 self._color_count += 1
             else:
                 self.logger.warning(
                     "Failed to create new color pair for " +
                     "'%s', the terminal description for '%s' only supports up to %i color pairs." %
-                    (name, curses.termname().decode("utf-8"), curses.COLOR_PAIRS)
+                    (name, self.termname, curses.COLOR_PAIRS)
                 )
                 color = curses.color_pair(0) | attrs
                 self._colors[name] = (0, color, curses.COLOR_WHITE, curses.COLOR_BLACK, attrs)
@@ -146,7 +213,7 @@ class ColorPairs:
         if color_i >= curses.COLORS:
             self.logger.warning(
                 "The terminal description for '%s' does not support more than %i colors. Specified color was %s" %
-                (curses.termname().decode("utf-8"), curses.COLORS, color)
+                (self.termname, curses.COLORS, color)
             )
             return self._invalid
 
