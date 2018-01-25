@@ -1,5 +1,6 @@
 # -*- encoding: utf-8
 
+import sys
 import signal
 
 from ..base_input import InputBackend
@@ -61,6 +62,12 @@ class CursesInput(InputBackend):
         self.logger.debug("CursesInput._setup()")
         self.curses.raw()
         self.curses.noecho()
+
+        # Disable ALT shifting keys on xterm (enable metaSendsEscape)
+        if self.curses.termname().decode("utf-8").lower() == "xterm":
+            sys.stdout.write("\x1b[?1036h")
+            sys.stdout.flush()
+
         self._mouse_states = {
             self.curses.BUTTON1_RELEASED:        {"btn": 1, "type": "up"},
             self.curses.BUTTON2_RELEASED:        {"btn": 2, "type": "up"},
