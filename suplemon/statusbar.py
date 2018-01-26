@@ -438,10 +438,10 @@ class StatusBar:
         """Render status line based on components in parts list"""
 
         if not self._changes_pending():
-            self.logger.debug("no changes")
+            # self.logger.debug("no changes")
             return
 
-        self.logger.debug("something changed, doing all the buzz")
+        # self.logger.debug("something changed, doing all the buzz")
 
         # Create a new component list and, if required, expand it
         _components = []
@@ -499,17 +499,17 @@ class StatusBar:
             if data:
                 try:
                     if component.style is not None:
-                        self.logger.debug(
-                            "Rendering data with style starting at col %i: '%s'" % (_win.getyx()[1], data)
-                        )
+                        # self.logger.debug(
+                        #    "Rendering data with style starting at col %i: '%s'" % (_win.getyx()[1], data)
+                        # )
                         _win.addstr(data, component.style)
                     else:
-                        self.logger.debug(
-                            "Rendering data without style starting at col %i: '%s'" % (_win.getyx()[1], data)
-                        )
+                        # self.logger.debug(
+                        #    "Rendering data without style starting at col %i: '%s'" % (_win.getyx()[1], data)
+                        # )
                         _win.addstr(data)
                 except curses.error as e:
-                    self.logger.debug("curses error")
+                    # self.logger.debug("curses error")
                     if index != last_index:
                         # Only care if we are not writing the last component.
                         # The reason is ncurses will always return an error on
