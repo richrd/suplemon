@@ -247,6 +247,9 @@ class StatusBarManager:
         # a change and thus invalidates the state of the bar.
         # bar.force_redraw() simply resets the internal cached size
         # of the bar which will then trigger a redraw on the next run.
+        #
+        # FIXME: rename to reset or invalidate_state or something as
+        #        this thing doesn't redraw anything.
         for bar in self._bars:
             bar.force_redraw()
 
@@ -283,6 +286,8 @@ class StatusBar:
             self._component_string = config["components"]
             self.logger.info("Components changed to '%s'" % self._component_string)
             self._load_components()
+        # FIXME: force_redraw is called twice, here and in ui.py on resize() handler
+        #        which in turn is called by main.py after emitting config_loaded event
         self.force_redraw()
         # FIXME: figure out why this is not enough
         # self.render()
@@ -301,6 +306,8 @@ class StatusBar:
 
     def force_redraw(self):
         """Force redraw on next run"""
+        # FIXME: rename to reset or invalidate_state or something as
+        #        this thing doesn't redraw anything.
         self._size = None
 
     @property

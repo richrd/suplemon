@@ -261,9 +261,7 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows()
-        # FIXME: This does unnecessary work but is required for config update bindings
         self.statusbars.force_redraw()
-        self.refresh_status()
 
     def check_resize(self):
         """Check if terminal has resized and resize if needed."""
