@@ -158,7 +158,9 @@
             "linenumbers":            { "fg": "white",   "bg": "black"   },
             "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
             "editor":                 { "fg": "default", "bg": "default" },
-            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] }
+            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] },
+            "filelist_active":        { "fg": "white",   "bg": "black"   },
+            "filelist_other":         { "fg": "black",   "bg": "black",   "attribs": [ "bold" ] }
         },
         // Theme for 88 colors
         "colors_88": {
@@ -169,7 +171,9 @@
             "linenumbers":            { "fg": "white",   "bg": "black"   },
             "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
             "editor":                 { "fg": "default", "bg": "default" },
-            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] }
+            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] },
+            "filelist_active":        { "fg": "white",   "bg": "black"   },
+            "filelist_other":         { "fg": "black",   "bg": "black",   "attribs": [ "bold" ] }
         },
         // Theme for 256 colors
         "colors_256": {
@@ -179,7 +183,9 @@
             "linenumbers":            { "fg": "color240", "bg": "black"   },
             "linenumbers_lint_error": { "fg": "color204", "bg": "black"   },
             "editor":                 { "fg": "default",  "bg": "default" },
-            "editor_whitespace":      { "fg": "color240", "bg": "default" }
+            "editor_whitespace":      { "fg": "color240", "bg": "default" },
+            "filelist_active":        { "fg": "white",    "bg": "black"   },
+            "filelist_other":         { "fg": "color240", "bg": "black"   }
         }
     }
 }
