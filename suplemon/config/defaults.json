@@ -128,19 +128,27 @@
     },
     // UI Display Settings
     "display": {
-        // Show top status bar
         "show_top_bar": true,
-        // Show app name and version in top bar
-        "show_app_name": true,
-        // Show list of open files in top bar
-        "show_file_list": true,
+        "status_top": {
+            "components": "editor_logo editor_name editor_version fill filelist fill clock",
+            "fillchar": " ",
+            "spacechar": " ",
+            "truncate": "left",
+            "default_align": "left"
+        },
+        "show_bottom_bar": true,
+        "status_bottom": {
+            "components": "app_status fill document_position Cursors cursor_count lint",
+            "fillchar": " ",
+            "spacechar": " ",
+            "truncate": "right",
+            "default_align": "left"
+        },
         // Show indicator in the file list for files that are modified
         // NOTE: if you experience performance issues, set this to false
         "show_file_modified_indicator": true,
         // Show the keyboard legend
         "show_legend": true,
-        // Show the bottom status bar
-        "show_bottom_bar": true,
         // Theme for 8 colors
         "colors_8": {
             // Another variant for linenumbers (and maybe status_*) is black, black, bold
