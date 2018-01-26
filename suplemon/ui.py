@@ -6,11 +6,11 @@ Curses user interface.
 import os
 import sys
 import logging
-from wcwidth import wcswidth
 
 from .prompt import Prompt, PromptBool, PromptFiltered, PromptFile, PromptAutocmp
 from .key_mappings import key_map
 from .color_manager_curses import ColorManager
+from .statusbar import StatusBarManager
 
 # Curses can't be imported yet but we'll
 # predefine it to avoid confusing flake8
@@ -108,6 +108,9 @@ class UI:
     def __init__(self, app):
         self.app = app
         self.logger = logging.getLogger(__name__)
+        self.statusbars = None
+        self.bar_head = None
+        self.bar_bottom = None
         self.screen = None
         self.current_yx = None
         self.text_input = None
@@ -258,6 +261,9 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows()
+        # FIXME: This does unnecessary work but is required for config update bindings
+        self.statusbars.force_redraw()
+        self.refresh_status()
 
     def check_resize(self):
         """Check if terminal has resized and resize if needed."""
@@ -268,110 +274,16 @@ class UI:
 
     def refresh_status(self):
         """Refresh status windows."""
-        if self.app.config["display"]["show_top_bar"]:
-            self.show_top_status()
+        if not self.statusbars:
+            self.statusbars = StatusBarManager(self.app)
+            # FIXME: This will not react to removal of statusbars in config without restart
+            if self.app.config["display"]["show_top_bar"]:
+                self.bar_head = self.statusbars.add(self.header_win, "status_top")
+            if self.app.config["display"]["show_bottom_bar"]:
+                self.bar_bottom = self.statusbars.add(self.status_win, "status_bottom")
+        self.statusbars.render()
         if self.app.config["display"]["show_legend"]:
             self.show_legend()
-        if self.app.config["display"]["show_bottom_bar"]:
-            self.show_bottom_status()
-
-    def show_top_status(self):
-        """Show top status row."""
-        self.header_win.erase()
-        size = self.get_size()
-        display = self.app.config["display"]
-        head_parts = []
-        if display["show_app_name"]:
-            name_str = "Suplemon Editor v{0} -".format(self.app.version)
-            if self.app.config["app"]["use_unicode_symbols"]:
-                logo = "\U0001f34b"  # Fancy lemon
-                name_str = " {0} {1}".format(logo, name_str)
-            head_parts.append(name_str)
-
-        # Add module statuses to the status bar in descending order
-        module_keys = sorted(self.app.modules.modules.keys())
-        for name in module_keys:
-            module = self.app.modules.modules[name]
-            if module.options["status"] == "top":
-                status = module.get_status()
-                if status:
-                    head_parts.append(status)
-
-        if display["show_file_list"]:
-            head_parts.append(self.file_list_str())
-
-        head = " ".join(head_parts)
-        head = head + (" " * (size[0]-wcswidth(head)-1))
-        head_width = wcswidth(head)
-        if head_width > size[0]:
-            head = head[:size[0]-head_width]
-        try:
-            self.header_win.addstr(0, 0, head)
-        except curses.error:
-            pass
-        self.header_win.refresh()
-
-    def file_list_str(self):
-        """Return rotated file list beginning at current file as a string."""
-        curr_file_index = self.app.current_file_index()
-        files = self.app.get_files()
-        file_list = files[curr_file_index:] + files[:curr_file_index]
-        str_list = []
-        no_write_symbol = ["!", "\u2715"][self.app.config["app"]["use_unicode_symbols"]]
-        is_changed_symbol = ["*", "\u2732"][self.app.config["app"]["use_unicode_symbols"]]
-        for f in file_list:
-            prepend = no_write_symbol if not f.is_writable() else ""
-            append = ""
-            if self.app.config["display"]["show_file_modified_indicator"]:
-                append += ["", is_changed_symbol][f.is_changed()]
-            fname = prepend + (f.name if f.name else "untitled") + append
-            if not str_list:
-                str_list.append("[{0}]".format(fname))
-            else:
-                str_list.append(fname)
-        return " ".join(str_list)
-
-    def show_bottom_status(self):
-        """Show bottom status line."""
-        editor = self.app.get_editor()
-        size = self.get_size()
-        cur = editor.get_cursor()
-
-        # Core status info
-        status_str = "@{0},{1} cur:{2} buf:{3}".format(
-            str(cur[0]),
-            str(cur[1]),
-            str(len(editor.cursors)),
-            str(len(editor.get_buffer()))
-        )
-
-        # Add module statuses to the status bar
-        module_str = ""
-        for name in self.app.modules.modules.keys():
-            module = self.app.modules.modules[name]
-            if module.options["status"] == "bottom":
-                module_str += " " + module.get_status()
-        status_str = module_str + " " + status_str
-
-        self.status_win.erase()
-        status = self.app.get_status()
-        extra = size[0] - len(status+status_str) - 1
-        line = status+(" "*extra)+status_str
-
-        if len(line) >= size[0]:
-            line = line[:size[0]-1]
-
-        # This thwarts a weird crash that happens when pasting a lot
-        # of data that contains line breaks into the find dialog.
-        # Should probably figure out why it happens, but it's not
-        # due to line breaks in the data nor is the data too long.
-        # Thanks curses!
-        try:
-            self.status_win.addstr(0, 0, line)
-        except:
-            self.logger.exception("Failed to show bottom status bar. Status line was: {0}".format(line))
-
-        self.status_win.refresh()
 
     def show_legend(self):
         """Show keyboard legend."""
