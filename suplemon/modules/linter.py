@@ -6,6 +6,7 @@ import threading
 import subprocess
 
 from suplemon.suplemon_module import Module
+from suplemon.statusbar import StatusComponent
 
 
 class Linter(Module):
@@ -108,6 +109,89 @@ class Linter(Module):
                 if line.linting:
                     count += 1
         return count
+
+    def status_lint(self, app):
+        return LintComponent(app, self)
+
+    def status_lintcount(self, app):
+        return LintComponentCount(app, self)
+
+    def status_lintlogo(self, app):
+        return LintComponentLogo(app, self)
+
+    def get_components(self):
+        return [
+            ("lint", self.status_lint),
+            ("lintcount", self.status_lintcount),
+            ("lintlogo", self.status_lintlogo)
+        ]
+
+
+class LintComponent(StatusComponent):
+    def __init__(self, app, lintmodule):
+        StatusComponent.__init__(self, "")
+        self.app = app
+        self._module = lintmodule
+        self._errors = 0
+
+    def compute(self):
+        editor = self.app.get_editor()
+        errors = self._module.get_msg_count(editor)
+        if errors != self._errors:
+            self._errors = errors
+            if errors > 0:
+                self.text = "Lint: %i" % errors
+            else:
+                self.text = ""
+        return self._serial
+
+
+class LintComponentCount(StatusComponent):
+    def __init__(self, app, lintmodule):
+        StatusComponent.__init__(self, "0")
+        self.app = app
+        self._module = lintmodule
+        self._errors = 0
+
+    def compute(self):
+        editor = self.app.get_editor()
+        errors = self._module.get_msg_count(editor)
+        if errors != self._errors:
+            self._errors = errors
+            self.text = str(errors)
+        return self._serial
+
+
+class LintComponentLogo(LintComponentCount):
+    def __init__(self, app, lintmodule):
+        self.app = app
+        StatusComponent.__init__(self,
+            self.app.config["modules"]["status"]["logo_char"],    # noqa E128
+            self.app.ui.colors.get_alt("lintlogo", None)
+        )
+        self._module = lintmodule
+        self._warnings = 0
+
+    def compute(self):
+        editor = self.app.get_editor()
+        warnings = self._module.get_msg_count(editor)
+        if warnings != self._warnings:
+            self._warnings = warnings
+            logo = self.app.config["modules"]["status"]["logo_char"]
+            if warnings > 0:
+                unicode = False
+                if unicode and warnings < 11:
+                    # FIXME: py2 unichr
+                    # self.text = chr(10101 + warnings) # invert + serif
+                    # self.text = chr(10111 + warnings) # not inverted
+                    self.text = chr(10121 + warnings)   # invert + sans
+                else:
+                    self.text = "{} [{}]".format(logo, warnings)
+                self.style = self.app.ui.colors.get_alt("lintlogo_warn", None)
+            else:
+                self.text = logo
+                self.style = self.app.ui.colors.get_alt("lintlogo", None)
+        return self._serial
 
 
 class BaseLint:
