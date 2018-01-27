@@ -9,7 +9,7 @@ from functools import partial
 from wcwidth import wcswidth, wcwidth
 
 
-class StatusComponent:
+class StatusComponent(object):
     """
     Base class for statusbar components
     Public API:
@@ -167,11 +167,11 @@ class StatusComponentShim(StatusComponent):
         return self._serial
 
 
-class StatusComponentFill:
+class StatusComponentFill(object):
     style = None
 
 
-class StatusComponentGenerator:
+class StatusComponentGenerator(object):
     """
     Generates StatusComponents on demand, useful for e.g. filelist.
     Provides compute() to detect changes and regenerate or modify
@@ -201,7 +201,7 @@ class StatusComponentGenerator:
         self._data[identifier] = data
 
 
-class StatusBarManager:
+class StatusBarManager(object):
     def __init__(self, app):
         self._app = app
         self._bars = []
@@ -254,7 +254,7 @@ class StatusBarManager:
             bar.force_redraw()
 
 
-class StatusBar:
+class StatusBar(object):
     def __init__(self, app, win, manager, config_name):
         self.app = app
         self._win = win
@@ -293,7 +293,9 @@ class StatusBar:
         # self.render()
 
     def _load_components(self):
-        self._components.clear()
+        # Python2 has no list.clear()
+        # self._components.clear()
+        del self._components[:]
         for name in self._component_string.split(" "):
             name_l = name.lower()
             comp = self._manager.components.get(name_l, None)
