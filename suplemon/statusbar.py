@@ -17,18 +17,20 @@ class StatusComponent(object):
         .style             => valid ncurses style or None
         .cells             => occupied terminal cell width
         .codepoints        => length of unicode codepoints
+        .priority          => higher priority == less likey to be truncated, default 1
         .compute()         => maybe recalculate attributes and return serial
         .c_align(args)     => return truncated or padded copy of .text
         .attach_data(args) => attach transient data to component
         .get_data(args)    => get previously attached transient data
     """
-    def __init__(self, text, style=None):
+    def __init__(self, text, style=None, priority=1):
         self._serial = 0
         self._data = None
-        # Causes both setters to be called
+        # Causes setters to be called
         # and self._serial being incremented
         self.text = text
         self.style = style
+        self.priority = priority
 
     @property
     def cells(self):
@@ -56,6 +58,15 @@ class StatusComponent(object):
         self._text = text
         self._cells = wcswidth(text)
         self._codepoints = len(text)
+        self._serial += 1
+
+    @property
+    def priority(self):
+        return self._priority
+
+    @priority.setter
+    def priority(self, priority):
+        self._priority = priority
         self._serial += 1
 
     def compute(self):

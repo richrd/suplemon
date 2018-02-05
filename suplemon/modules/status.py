@@ -6,9 +6,10 @@ import curses
 
 
 class AppStatusComponent(StatusComponent):
+    """ Return current app status message (no truncate) """
     def __init__(self, app):
         self.app = app
-        StatusComponent.__init__(self, "n/a")
+        StatusComponent.__init__(self, "n/a", 2)
 
     def compute(self):
         # TODO: this could have some style based
@@ -20,6 +21,7 @@ class AppStatusComponent(StatusComponent):
 
 
 class AppIndicatorDocumentLines(StatusComponent):
+    """ Return amount of lines in buffer """
     def __init__(self, app):
         self.app = app
         StatusComponent.__init__(self, "0")
@@ -34,6 +36,7 @@ class AppIndicatorDocumentLines(StatusComponent):
 
 
 class AppIndicatorDocumentPosition(StatusComponent):
+    """ Return $current_line/$amount_of_lines """
     def __init__(self, app):
         self.app = app
         StatusComponent.__init__(self, "0/0")
@@ -52,6 +55,7 @@ class AppIndicatorDocumentPosition(StatusComponent):
 
 
 class AppIndicatorDocumentPosition2(StatusComponent):
+    """ Return @$current_col,$current_line/$amount_of_lines """
     def __init__(self, app):
         self.app = app
         StatusComponent.__init__(self, "@0,0/0", curses.A_DIM)
@@ -69,6 +73,7 @@ class AppIndicatorDocumentPosition2(StatusComponent):
 
 
 class AppIndicatorCursors(StatusComponent):
+    """ Return amount of cursors """
     def __init__(self, app):
         self.app = app
         StatusComponent.__init__(self, "n/a")
@@ -83,6 +88,7 @@ class AppIndicatorCursors(StatusComponent):
 
 
 class AppIndicatorPosition(StatusComponent):
+    """ Return @$current_col,$current_line """
     def __init__(self, app):
         self.app = app
         StatusComponent.__init__(self, "n/a")
@@ -102,6 +108,7 @@ class AppIndicatorPosition(StatusComponent):
 
 
 class _AppIndicatorPositionSingle(StatusComponent):
+    """ Internal helper """
     def __init__(self, app, index):
         self.app = app
         StatusComponent.__init__(self, "n/a")
@@ -118,16 +125,19 @@ class _AppIndicatorPositionSingle(StatusComponent):
 
 
 class AppIndicatorPositionY(_AppIndicatorPositionSingle):
+    """ Return $current_line """
     def __init__(self, app):
         _AppIndicatorPositionSingle.__init__(self, app, 1)
 
 
 class AppIndicatorPositionX(_AppIndicatorPositionSingle):
+    """ Return $current_col """
     def __init__(self, app):
         _AppIndicatorPositionSingle.__init__(self, app, 0)
 
 
 class EditorLogo(StatusComponent):
+    """ Return Editor logo """
     def __init__(self, app):
         # TODO: check for config: use_unicode_symbols
         StatusComponent.__init__(self, "n/a")
@@ -142,11 +152,13 @@ class EditorLogo(StatusComponent):
 
 
 class EditorName(StatusComponent):
+    """ Return Editor name """
     def __init__(self, app):
         StatusComponent.__init__(self, "Suplemon Editor")
 
 
 class EditorVersion(StatusComponent):
+    """ Return Editor version """
     def __init__(self, app):
         version = app.version
         StatusComponent.__init__(self, "v{}".format(version))

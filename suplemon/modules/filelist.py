@@ -52,11 +52,12 @@ class FileListGenerator(StatusComponentGenerator):
                 style = self.app.ui.colors.get("filelist_active")
                 if wrap_active:
                     name = "[%s]" % name
+                yield StatusComponent(name, style, 2)
             else:
                 style = self.app.ui.colors.get("filelist_other")
                 if wrap_active and wrap_active_align:
                     name = " %s " % name
-            yield StatusComponent(name, style)
+                yield StatusComponent(name, style)
 
 
 class FileList(Module):
