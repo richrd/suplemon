@@ -25,7 +25,12 @@ class FileListGenerator(StatusComponentGenerator):
         return self._components
 
     def _generate(self):
-        """Generate (maybe rotated) file list components beginning at current file."""
+        """
+            Generate (maybe rotated) file list components beginning at current file.
+            Current file has a priority of 2 and thus is unlikely to truncate.
+            All other files have a priority of 0 and are thus below the default of 1
+            and will be truncated if the space gets low.
+        """
 
         use_unicode = self.app.config["app"]["use_unicode_symbols"]
         show_modified = self.app.config["display"]["show_file_modified_indicator"]
@@ -57,7 +62,7 @@ class FileListGenerator(StatusComponentGenerator):
                 style = self.app.ui.colors.get("filelist_other")
                 if wrap_active and wrap_active_align:
                     name = " %s " % name
-                yield StatusComponent(name, style)
+                yield StatusComponent(name, style, 0)
 
 
 class FileList(Module):

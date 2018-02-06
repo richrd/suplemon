@@ -128,6 +128,7 @@ class Linter(Module):
 
 
 class LintComponent(StatusComponent):
+    """ Return nothing or Lint: $lint_warnings """
     def __init__(self, app, lintmodule):
         StatusComponent.__init__(self, "")
         self.app = app
@@ -147,6 +148,7 @@ class LintComponent(StatusComponent):
 
 
 class LintComponentCount(StatusComponent):
+    """ Return $lint_warnings """
     def __init__(self, app, lintmodule):
         StatusComponent.__init__(self, "0")
         self.app = app
@@ -163,11 +165,13 @@ class LintComponentCount(StatusComponent):
 
 
 class LintComponentLogo(LintComponentCount):
+    """ Return Editor logo with optional lint warning count appended (no truncate) """
     def __init__(self, app, lintmodule):
         self.app = app
         StatusComponent.__init__(self,
             self.app.config["modules"]["status"]["logo_char"],    # noqa E128
-            self.app.ui.colors.get_alt("lintlogo", None)
+            self.app.ui.colors.get_alt("lintlogo", None),
+            2
         )
         self._module = lintmodule
         self._warnings = 0
@@ -179,8 +183,9 @@ class LintComponentLogo(LintComponentCount):
             self._warnings = warnings
             logo = self.app.config["modules"]["status"]["logo_char"]
             if warnings > 0:
-                unicode = False
-                if unicode and warnings < 11:
+                # TODO: Either delete or create another LintComponentUnicode
+                _unicode = False
+                if _unicode and warnings < 11:
                     # FIXME: py2 unichr
                     # self.text = chr(10101 + warnings) # invert + serif
                     # self.text = chr(10111 + warnings) # not inverted

@@ -5,7 +5,6 @@ StatusBar components and renderer.
 
 import curses
 import logging
-from functools import partial
 from wcwidth import wcswidth, wcwidth
 
 
@@ -358,47 +357,69 @@ class StatusBar(object):
         #    => ensures there is always a spacer between components
         # 2. Recalculates size
         #    => usually no spacers will be drawn if the next component is a fill
-        # 3. Removes components and/or truncates last/first component (depending on direction)
-        # 4. Returns a tuple of (new_spacing_required, [(truncate, c) for c in components])
+        # 3. Gets sorted list of priorities in use
+        # 4. Starts removing or truncating components for each priority, starting at the lowest one
+        #    => removes components and/or truncates last/first component depending on direction
+        # 5. Returns a tuple of (new_spacing_required, [(truncate, c) for c in components])
 
         # Remove fills
         components = [c for c in components if c is not StatusComponentFill]
+
+        # Calculate new overflow
         overflow = self._calc_spacing_required(components) * - 1
 
+        # Get assigned priorities
+        priorities = sorted(set(c.priority for c in components))
+
         # Move forward or backwards / truncate left or right
-        _results = []
         _truncate_right = self._truncate_right
-        if _truncate_right:
-            _iter = range(len(components) - 1, - 1, - 1)
-            _add = partial(_results.insert, 0)
-        else:
-            _iter = range(len(components))
-            _add = _results.append
-
         FILL_CHAR = self.FILL_CHAR
-        for index in _iter:
-            component = components[index]
-            if overflow <= 0:
-                # Enough truncated / add to _results
-                _add((None, component))
-                continue
-            usage = component.cells
-            if overflow > usage:
-                # Remove component / don't add to _results
-                overflow -= usage
-                overflow -= 1      # remove spacing
-            else:
-                # Dry run component truncate and add
-                # instruction how much to truncate to _results
-                truncated, _ = component.c_align(
-                    usage - overflow,
-                    start_right=_truncate_right,
-                    fillchar=FILL_CHAR
-                )
-                _add((usage - overflow, component))
-                overflow += truncated                # c_align is negative on truncate
 
-        return (overflow * - 1, _results)
+        components = [(None, c) for c in components if c is not StatusComponentFill]
+        for priority in priorities:
+            if _truncate_right:
+                _iter = range(len(components) - 1, - 1, - 1)
+            else:
+                _iter = range(len(components))
+            _delete = []
+            for index in _iter:
+                _, component = components[index]
+                if overflow <= 0:
+                    # Enough truncated
+                    break
+                if component.priority > priority:
+                    # Higher priority than what we are currently truncating
+                    continue
+                usage = component.cells
+                if overflow > usage:
+                    # Remove component
+                    overflow -= usage
+                    overflow -= 1      # remove spacing
+                    _delete.append(index)
+                else:
+                    # Dry-run component truncate and add
+                    # instruction how much to truncate to _results
+                    truncated, _ = component.c_align(
+                        usage - overflow,
+                        start_right=_truncate_right,
+                        fillchar=FILL_CHAR
+                    )
+                    components[index] = (usage - overflow, component)
+                    overflow += truncated                              # c_align is negative on truncate
+                    self.logger.debug(
+                        "Truncated component '%s' with priority %i" % (component.text, component.priority)
+                    )
+            for index in sorted(_delete)[::-1]:
+                self.logger.debug(
+                    "Removed component index %2i (%s) with priority %i" % (
+                        index, components[index][1].text, components[index][1].priority
+                    )
+                )
+                del components[index]
+            if overflow <= 0:
+                # No need to remove higher priority components
+                break
+        return (overflow * - 1, components)
 
     def _get_fill(self, fill_count, spacing_required):
         """
