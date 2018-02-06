@@ -375,7 +375,7 @@ class StatusBar(object):
         _truncate_right = self._truncate_right
         FILL_CHAR = self.FILL_CHAR
 
-        components = [(None, c) for c in components if c is not StatusComponentFill]
+        components = [(None, c) for c in components]
         for priority in priorities:
             if _truncate_right:
                 _iter = range(len(components) - 1, - 1, - 1)
