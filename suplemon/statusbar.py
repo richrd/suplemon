@@ -360,7 +360,7 @@ class StatusBar(object):
         # 3. Gets sorted list of priorities in use
         # 4. Starts removing or truncating components for each priority, starting at the lowest one
         #    => removes components and/or truncates last/first component depending on direction
-        # 5. Returns a tuple of (new_spacing_required, [(truncate, c) for c in components])
+        # 5. Returns a tuple of (new_spacing_required, [(truncate_hint, c) for c in components])
 
         # Remove fills
         components = [c for c in components if c is not StatusComponentFill]
@@ -374,7 +374,6 @@ class StatusBar(object):
         # Move forward or backwards / truncate left or right
         _truncate_right = self._truncate_right
         FILL_CHAR = self.FILL_CHAR
-
         components = [(None, c) for c in components]
         for priority in priorities:
             if _truncate_right:
@@ -383,42 +382,44 @@ class StatusBar(object):
                 _iter = range(len(components))
             _delete = []
             for index in _iter:
-                _, component = components[index]
                 if overflow <= 0:
                     # Enough truncated
                     break
+                _, component = components[index]
                 if component.priority > priority:
                     # Higher priority than what we are currently truncating
                     continue
                 usage = component.cells
                 if overflow > usage:
-                    # Remove component
+                    # Mark whole component to remove
                     overflow -= usage
                     overflow -= 1      # remove spacing
                     _delete.append(index)
-                else:
-                    # Dry-run component truncate and add
-                    # instruction how much to truncate to _results
-                    truncated, _ = component.c_align(
-                        usage - overflow,
-                        start_right=_truncate_right,
-                        fillchar=FILL_CHAR
-                    )
-                    components[index] = (usage - overflow, component)
-                    overflow += truncated                              # c_align is negative on truncate
-                    self.logger.debug(
-                        "Truncated component '%s' with priority %i" % (component.text, component.priority)
-                    )
-            for index in sorted(_delete)[::-1]:
+                    continue
+                # Dry-run component truncate and
+                # add hint how much to truncate
+                truncated, _trunc_data = component.c_align(
+                    usage - overflow,
+                    start_right=_truncate_right,
+                    fillchar=FILL_CHAR
+                )
+                components[index] = (usage - overflow, component)
+                overflow += truncated                              # c_align is negative on truncate
                 self.logger.debug(
-                    "Removed component index %2i (%s) with priority %i" % (
-                        index, components[index][1].text, components[index][1].priority
-                    )
+                    "Truncated component with priority %i: '%s' => '%s'" %
+                    (component.priority, component.text, _trunc_data)
+                )
+            for index in sorted(_delete)[::-1]:
+                # Actually remove components with index marked as delete
+                self.logger.debug(
+                    "Removing component with priority %i and index %2i (%s)" %
+                    (components[index][1].priority, index, components[index][1].text)
                 )
                 del components[index]
             if overflow <= 0:
                 # No need to remove higher priority components
                 break
+        # Return new_spacing_required + [(truncate_hint, component)]
         return (overflow * - 1, components)
 
     def _get_fill(self, fill_count, spacing_required):
