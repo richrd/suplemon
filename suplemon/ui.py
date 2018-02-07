@@ -261,6 +261,7 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows()
+        self.screen.noutrefresh()
         self.statusbars.force_redraw()
 
     def check_resize(self):
