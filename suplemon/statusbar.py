@@ -410,7 +410,7 @@ class StatusBar(object):
                     (component.priority, component.text, _trunc_data)
                 )
             for index in sorted(_delete)[::-1]:
-                # Actually remove components with index marked as delete
+                # Actually remove components
                 self.logger.debug(
                     "Removing component with priority %i and index %2i (%s)" %
                     (components[index][1].priority, index, components[index][1].text)
