@@ -41,12 +41,24 @@ class FileListGenerator(StatusComponentGenerator):
         rotate = config["rotate"]
         wrap_active = config["wrap_active"]
         wrap_active_align = config["wrap_active_align"]
+        limit = config["limit"]
+        style_other = self.app.ui.colors.get("filelist_other")
+        style_active = self.app.ui.colors.get("filelist_active")
 
         files = self.app.get_files()
         curr_file_index = self.app.current_file_index()
         curr_file = files[curr_file_index]
-        if rotate:
+        filecount = len(files)
+        if 0 < limit < filecount:
+            files = [
+                files[curr_file_index - 1],
+                files[curr_file_index],
+                files[(curr_file_index + 1) % filecount]
+            ]
+        elif rotate:
+            # TODO: allow rotate if hitting limit as well?
             files = files[curr_file_index:] + files[:curr_file_index]
+
         for f in files:
             name = f.name
             if not f.is_writable():
@@ -54,16 +66,16 @@ class FileListGenerator(StatusComponentGenerator):
             elif show_modified and f.is_changed():
                 name += is_changed_symbol
             if f == curr_file:
-                style = self.app.ui.colors.get("filelist_active")
                 if wrap_active:
                     name = "[%s]" % name
-                yield StatusComponent(name, style, 2)
+                yield StatusComponent(name, style_active, 2)
             else:
-                style = self.app.ui.colors.get("filelist_other")
                 if wrap_active and wrap_active_align:
                     name = " %s " % name
-                yield StatusComponent(name, style, 0)
+                yield StatusComponent(name, style_other, 0)
 
+        if 0 < limit < filecount:
+            yield StatusComponent("(%i more)" % (filecount - limit), style_other)
 
 class FileList(Module):
     """Show open tabs/files"""
@@ -78,7 +90,8 @@ class FileList(Module):
             "wrap_active": True,
             "wrap_active_align": False,
             "no_write": ["!", "\u2715"],
-            "is_changed": ["*", "\u2732"]
+            "is_changed": ["*", "\u2732"],
+            "limit": 0
         }
 
 
