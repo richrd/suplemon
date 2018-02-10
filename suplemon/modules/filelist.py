@@ -77,6 +77,7 @@ class FileListGenerator(StatusComponentGenerator):
         if 0 < limit < filecount:
             yield StatusComponent("(%i more)" % (filecount - limit), style_other)
 
+
 class FileList(Module):
     """Show open tabs/files"""
     def get_components(self):
