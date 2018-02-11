@@ -368,7 +368,8 @@ class UI:
         self.app.block_rendering = blocking
 
         # Invalidate state of bottom statusbar
-        self.bar_bottom.force_redraw()
+        if self.bar_bottom:
+            self.bar_bottom.force_redraw()
 
         return out
 
