@@ -40,8 +40,7 @@ class FileListGenerator(StatusComponentGenerator):
         config = self.app.config["modules"][__name__]
         no_write_symbol = config["no_write"][use_unicode]
         is_changed_symbol = config["is_changed"][use_unicode]
-        rotate = config["rotate"]
-        center = config["center"]
+        liststyle = config["liststyle"]
         wrap_active = config["wrap_active"]
         wrap_active_align = config["wrap_active_align"]
         limit = config["limit"]
@@ -51,10 +50,10 @@ class FileListGenerator(StatusComponentGenerator):
         curr_file = files[curr_file_index]
         filecount = len(files)
 
-        if rotate:
+        if liststyle == "active_front":
             # Active file on front
             files = files[curr_file_index:] + files[:curr_file_index]
-        elif center and filecount > 2:
+        elif liststyle == "active_center" and filecount > 2:
             # Active file in the middle
             if 0 < limit < filecount:
                 if limit % 2 == 0:
@@ -71,7 +70,7 @@ class FileListGenerator(StatusComponentGenerator):
             # Try starting at index 0 but ensure active file always visible
             files = files[max(0, curr_file_index - (limit - 1)):]
 
-        if not center and 0 < limit < filecount:
+        if not liststyle == "active_center" and 0 < limit < filecount:
             files = files[:limit]
 
         for f in files:
@@ -102,12 +101,17 @@ class FileList(Module):
 
     def get_default_config(self):
         return {
-            "center": False,
-            "rotate": False,
+            # liststyle = linear | active_front | active_center
+            "liststyle": "linear",
+            # enclose active file in [ ]
             "wrap_active": True,
+            # enclose non active files in spaces
             "wrap_active_align": False,
+            # symbol to prepend for write protected files
             "no_write": ["!", "\u2715"],
+            # symbol to append for changed files
             "is_changed": ["*", "\u2732"],
+            # only show up to $limit files, 0 disables limit
             "limit": 5
         }
 
