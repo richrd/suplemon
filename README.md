@@ -1,7 +1,7 @@
 Suplemon :lemon:
 ========
 
-[![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://gitter.im/richrd/suplemon](https://badges.gitter.im/richrd/suplemon.svg)](https://gitter.im/richrd/suplemon?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://webchat.freenode.net/?channels=%23suplemon](https://img.shields.io/badge/chat-on%20freenode%20%23suplemon-blue.svg)](https://webchat.freenode.net/?channels=%23suplemon)
 
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
