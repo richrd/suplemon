@@ -72,7 +72,7 @@ class AppIndicatorDocumentPosition2(StatusComponent):
         return self._serial
 
 
-class AppIndicatorCursors(StatusComponent):
+class AppIndicatorCursorCount(StatusComponent):
     """ Return amount of cursors """
     def __init__(self, app):
         self.app = app
@@ -84,6 +84,21 @@ class AppIndicatorCursors(StatusComponent):
         if cursors != self._cursors:
             self._cursors = cursors
             self.text = str(cursors)
+        return self._serial
+
+
+class AppIndicatorCursors(StatusComponent):
+    """ Return formatted amount of cursors, prefixed with 'Cursors: ' """
+    def __init__(self, app):
+        self.app = app
+        StatusComponent.__init__(self, "n/a")
+        self._cursors = None
+
+    def compute(self):
+        cursors = len(self.app.get_editor().cursors)
+        if cursors != self._cursors:
+            self._cursors = cursors
+            self.text = "Cursors: {}".format(cursors)
         return self._serial
 
 
@@ -169,7 +184,8 @@ class AppStatus(Module):
     def get_components(self):
         return [
             ("app_status", AppStatusComponent),
-            ("cursor_count", AppIndicatorCursors),
+            ("cursors", AppIndicatorCursors),
+            ("cursor_count", AppIndicatorCursorCount),
             ("cursor_position", AppIndicatorPosition),
             ("cursor_posY", AppIndicatorPositionY),
             ("cursor_posX", AppIndicatorPositionX),
