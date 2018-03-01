@@ -138,6 +138,10 @@ class Module:
         """Set module options."""
         self.options = options
 
+    def get_default_config(self):
+        """Return module default config dict"""
+        return {}
+
     def is_runnable(self):
         cls_method = getattr(Module, "run")
         return self.run.__module__ != cls_method.__module__
