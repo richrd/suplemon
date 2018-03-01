@@ -130,7 +130,7 @@
     "display": {
         "show_top_bar": true,
         "status_top": {
-            "components": "editor_logo editor_name editor_version fill filelist fill clock",
+            "components": "editor_logo editor_name editor_version fill filelist fill battery clock",
             "fillchar": " ",
             "spacechar": " ",
             "truncate": "left",
