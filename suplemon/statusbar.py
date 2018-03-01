@@ -227,12 +227,12 @@ class StatusBarManager(object):
                 # New interface
                 for name, comp in module.get_components():
                     self.components[name.lower()] = comp(self._app)
-                    self.logger.info("Module '%s' provides component '%s'." % (module_name, name))
+                    self.logger.debug("Module '%s' provides component '%s'." % (module_name, name))
             elif module.options["status"]:
                 # Old interface, use shim
                 comp = StatusComponentShim(module.get_status)
                 self.components[module_name.lower()] = comp
-                self.logger.info("Module '%s' provides old status interface. Using shim." % module_name)
+                self.logger.debug("Module '%s' provides old status interface. Using shim." % module_name)
         self.components["fill"] = StatusComponentFill
 
     def add(self, win, config_name):
@@ -294,7 +294,7 @@ class StatusBar(object):
             self._truncate_right = False
         if self._component_string != config["components"]:
             self._component_string = config["components"]
-            self.logger.info("Components changed to '%s'" % self._component_string)
+            self.logger.debug("Components changed to '%s'" % self._component_string)
             self._load_components()
         # FIXME: force_redraw is called twice, here and in ui.py on resize() handler
         #        which in turn is called by main.py after emitting config_loaded event
