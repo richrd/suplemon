@@ -10,7 +10,7 @@ from wcwidth import wcswidth
 
 from .prompt import Prompt, PromptBool, PromptFiltered, PromptFile, PromptAutocmp
 from .key_mappings import key_map
-from .color_manager import ColorManager
+from .color_manager_curses import ColorManager
 
 # Curses can't be imported yet but we'll
 # predefine it to avoid confusing flake8
