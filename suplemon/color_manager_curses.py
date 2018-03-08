@@ -7,6 +7,7 @@ import curses
 import logging
 from traceback import format_stack
 
+
 class ColorManager:
     def __init__(self, app):
         self._app = app
