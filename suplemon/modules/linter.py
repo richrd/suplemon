@@ -37,6 +37,10 @@ class Linter(Module):
     def on_loaded(self, event):
         # Lint all files in a thread since it might take a while
         thread = threading.Thread(target=self.lint_all_files, args=(event,))
+        # Use daemon mode to forcefully shutdown the thread on application exit.
+        # Python2 doesn't know the boolean daemon keyword argument to the Thread()
+        # constructor so we use the .daemon property instead.
+        thread.daemon = True
         thread.start()
 
     def mainloop(self, event):
