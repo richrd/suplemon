@@ -5,7 +5,7 @@ Manage curses color pairs
 
 import curses
 import logging
-
+from traceback import format_stack
 
 class ColorManager:
     def __init__(self, app):
@@ -16,7 +16,8 @@ class ColorManager:
         # color_pair(0) is hardcoded
         # https://docs.python.org/3/library/curses.html#curses.init_pair
         self._color_count = 1
-        self._invalid = curses.COLOR_WHITE if curses.COLORS < 8 else curses.COLOR_RED
+        self._invalid_fg = curses.COLOR_WHITE
+        self._invalid_bg = curses.COLOR_BLACK if curses.COLORS < 8 else curses.COLOR_RED
 
         # dynamic in case terminal does not support use_default_colors()
         self._default_fg = -1
@@ -52,8 +53,8 @@ class ColorManager:
             )
             # https://docs.python.org/3/library/curses.html#curses.init_pair
             # "[..] the 0 color pair is wired to white on black and cannot be changed"
-            self.set_default_fg(curses.COLOR_WHITE)
-            self.set_default_bg(curses.COLOR_BLACK)
+            self._set_default_fg(curses.COLOR_WHITE)
+            self._set_default_bg(curses.COLOR_BLACK)
 
     def _load_color_theme(self, *args):
         colors = self._get_config_colors()
@@ -80,10 +81,10 @@ class ColorManager:
             )
             return self._app.config["display"]["colors_8"]
 
-    def set_default_fg(self, color):
+    def _set_default_fg(self, color):
         self._default_fg = color
 
-    def set_default_bg(self, color):
+    def _set_default_bg(self, color):
         self._default_bg = color
 
     def _get(self, name, index=None, default=None, log_missing=True):
@@ -96,7 +97,6 @@ class ColorManager:
             return ret[index]
         return ret
 
-    # FIXME: evaluate default returns on error. none? exception? ._default_[fb]g? .invalid? hardcoded? pair(0)?
     def get(self, name):
         """ Return colorpair ORed attribs or a fallback """
         return self._get(name, index=1, default=curses.color_pair(0))
@@ -106,12 +106,12 @@ class ColorManager:
         return self._get(name, index=1, default=alt, log_missing=False)
 
     def get_fg(self, name):
-        """ Return foreground color as integer """
-        return self._get(name, index=2, default=curses.COLOR_WHITE)
+        """ Return foreground color as integer or hardcoded invalid_fg (white) as fallback """
+        return self._get(name, index=2, default=self._invalid_fg)
 
     def get_bg(self, name):
-        """ Return background color as integer """
-        return self._get(name, index=3, default=curses.COLOR_RED)
+        """ Return background color as integer or hardcoded invalid_bg (red) as fallback"""
+        return self._get(name, index=3, default=self._invalid_bg)
 
     def get_color(self, name):
         """ Alternative for get(name) """
@@ -124,31 +124,34 @@ class ColorManager:
             return (None, None, None, None)
         return ret[1:]
 
-    def contains(self, name):
+    def __contains__(self, name):
+        """ Check if a color pair with this name exists """
         return str(name) in self._colors
 
     def add_translate(self, name, fg, bg, attributes=None):
         """
             Store or update color definition.
             fg and bg can be of form "blue" or "color162".
-            attributes can be a list of attribute names like "bold" or "underline".
+            attributes can be a list of attribute names like ["bold", "underline"].
         """
         return self.add_curses(
             name,
-            self.translate_color(fg, check_for="fg"),
-            self.translate_color(bg, check_for="bg"),
-            self.translate_attributes(attributes)
+            self._translate_color(fg, usage_hint="fg"),
+            self._translate_color(bg, usage_hint="bg"),
+            self._translate_attributes(attributes)
         )
 
     def add_curses(self, name, fg, bg, attrs=0):
-        """ Store or update color definition. fg, bg and attrs must be valid curses values """
-        # FIXME: catch invalid colors, attrs,...
+        """
+            Store or update color definition.
+            fg, bg and attrs must be valid curses values.
+        """
         name = str(name)
         if name in self._colors:
-            # Redefine exiting color pair
+            # Redefine existing color pair
             index, color, _fg, _bg, _attrs = self._colors[name]
             self.logger.debug(
-                "Updating exiting color pair with index %i, name '%s', fg=%i, bg=%i and attrs=%i" % (
+                "Updating exiting curses color pair with index %i, name '%s', fg=%s, bg=%s and attrs=%s" % (
                     index, name, fg, bg, attrs
                 )
             )
@@ -156,7 +159,7 @@ class ColorManager:
             # Create new color pair
             index = self._color_count
             self.logger.debug(
-                "Creating new color pair with index %i, name '%s', fg=%i, bg=%i and attrs=%i" % (
+                "Creating new curses color pair with index %i, name '%s', fg=%s, bg=%s and attrs=%s" % (
                     index, name, fg, bg, attrs
                 )
             )
@@ -164,19 +167,33 @@ class ColorManager:
                 self._color_count += 1
             else:
                 self.logger.warning(
-                    "Failed to create new color pair for " +
+                    "Failed to create new color pair for "
                     "'%s', the terminal description for '%s' only supports up to %i color pairs." %
                     (name, self.termname, curses.COLOR_PAIRS)
                 )
-                color = curses.color_pair(0) | attrs
+                try:
+                    color = curses.color_pair(0) | attrs
+                except:
+                    self.logger.warning("Invalid attributes: '%s'" % str(attrs))
+                    color = curses.color_pair(0)
                 self._colors[name] = (0, color, curses.COLOR_WHITE, curses.COLOR_BLACK, attrs)
                 return color
-        curses.init_pair(index, fg, bg)
-        color = curses.color_pair(index) | attrs
+        try:
+            curses.init_pair(index, fg, bg)
+            color = curses.color_pair(index) | attrs
+        except Exception as e:
+            self.logger.warning(
+                "Failed to create or update curses color pair with "
+                "index %i, name '%s', fg=%s, bg=%s, attrs=%s. error was: %s" %
+                (index, name, fg, bg, str(attrs), e)
+            )
+            color = curses.color_pair(0)
+
         self._colors[name] = (index, color, fg, bg, attrs)
         return color
 
-    def translate_attributes(self, attributes):
+    def _translate_attributes(self, attributes):
+        """ Translate list of attributes into native curses format """
         if attributes is None:
             return 0
         val = 0
@@ -184,9 +201,13 @@ class ColorManager:
             val |= getattr(curses, "A_" + attrib.upper(), 0)
         return val
 
-    def translate_color(self, color, check_for=None):
+    def _translate_color(self, color, usage_hint=None):
+        """
+            Translate color name of form 'blue' or 'color252' into native curses format.
+            On error return hardcoded invalid_fg or _bg (white or red) color.
+        """
         if color is None:
-            return self._invalid
+            return self._invalid_fg if usage_hint == "fg" else self._invalid_bg
 
         color_i = getattr(curses, "COLOR_" + color.upper(), None)
         if color_i is not None:
@@ -194,27 +215,36 @@ class ColorManager:
 
         color = color.lower()
         if color == "default":
-            # FIXME: what to return if check_for is not set?
-            return self._default_fg if check_for == "fg" else self._default_bg
+            if usage_hint == "fg":
+                return self._default_fg
+            elif usage_hint == "bg":
+                return self._default_bg
+            else:
+                self.logger.warning("Default color requested without usage_hint being one of fg, bg.")
+                self.logger.warning("This is likely a bug, please report at https://github.com/richrd/suplemon/issues")
+                self.logger.warning("and include the following stacktrace.")
+                for line in format_stack()[:-1]:
+                    self.logger.warning(line.strip())
+                return self._invalid_bg
         elif color.startswith("color"):
             color_i = color[len("color"):]
         elif color.startswith("colour"):
             color_i = color[len("colour"):]
         else:
             self.logger.warning("Invalid color specified: '%s'" % color)
-            return self._invalid
+            return self._invalid_fg if usage_hint == "fg" else self._invalid_bg
 
         try:
             color_i = int(color_i)
         except:
             self.logger.warning("Invalid color specified: '%s'" % color)
-            return self._invalid
+            return self._invalid_fg if usage_hint == "fg" else self._invalid_bg
 
         if color_i >= curses.COLORS:
             self.logger.warning(
                 "The terminal description for '%s' does not support more than %i colors. Specified color was %s" %
                 (self.termname, curses.COLORS, color)
             )
-            return self._invalid
+            return self._invalid_fg if usage_hint == "fg" else self._invalid_bg
 
         return color_i
