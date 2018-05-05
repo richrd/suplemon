@@ -19,7 +19,10 @@
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Whether to use special unicode symbols for decoration
-        "use_unicode_symbols": true
+        "use_unicode_symbols": true,
+        // If your $TERM ends in -256color and this is true, 'xterm-256color'
+        // will be used instead, working around an issue with curses.
+        "imitate_256color": false
     },
     // Editor settings
     "editor": {
