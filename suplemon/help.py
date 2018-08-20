@@ -33,6 +33,9 @@ the complete reference.
  * Ctrl + Q
    > Exit
 
+ * Ctrl + W
+   > Close file or tab
+
  * Ctrl + C
    > Copy line(s) to buffer
 

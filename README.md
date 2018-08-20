@@ -42,7 +42,9 @@ http://github.com/richrd/suplemon
 ## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
+To run from source you need to install the python `wcwidth` package.
 
+    pip3 install wcwidth
     git clone https://github.com/richrd/suplemon.git
     cd suplemon
     python3 suplemon.py
@@ -114,6 +116,9 @@ To view the default keymap file run ```keymap default```
 
  * <kbd>Ctrl</kbd> + <kbd>Q</kbd>
    > Exit
+
+ * <kbd>Ctrl</kbd> + <kbd>W</kbd>
+   > Close file or tab
 
  * <kbd>Ctrl</kbd> + <kbd>C</kbd>
    > Copy line(s) to buffer
