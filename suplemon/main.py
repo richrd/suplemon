@@ -111,6 +111,9 @@ class App:
         self.modules = module_loader.ModuleLoader(self)
         self.modules.load()
 
+        # Load default module configs
+        self.config.load_module_configs()
+
         # Load themes
         self.themes = themes.ThemeLoader(self)
 

@@ -105,6 +105,17 @@ class Config:
         self.defaults = config
         return True
 
+    def load_module_configs(self):
+        module_config = {}
+        modules = self.app.modules.modules
+        for module_name in modules.keys():
+            module = modules[module_name]
+            conf = module.get_default_config()
+            module_config[module_name] = conf
+            self.logger.debug("Loading default config for module '%s': %s" % (module_name, str(conf)))
+        self.defaults["modules"] = module_config
+        self.config = self.merge_defaults(self.config)
+
     def load_default_keys(self):
         path = os.path.join(self.app.path, "config", self.default_keymap_filename)
         config = self.load_config_file(path)
