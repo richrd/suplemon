@@ -3,6 +3,7 @@
 Various helper constants and functions.
 """
 
+import os
 import re
 import sys
 import time
@@ -51,3 +52,13 @@ def whitespace(line):
             break
         i += 1
     return i
+
+
+def parse_path(path):
+    """Parse a relative path and return full directory and filename as a tuple."""
+    if path[:2] == "~" + os.sep:
+        p = os.path.expanduser("~")
+        path = os.path.join(p+os.sep, path[2:])
+    ab = os.path.abspath(path)
+    parts = os.path.split(ab)
+    return parts

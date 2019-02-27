@@ -644,20 +644,23 @@ class App:
     def save_file_as(self, file=False):
         """Save current file."""
         f = file or self.get_file()
-        name = self.ui.query_file("Save as:", f.name)
-        if not name:
+        name_input = self.ui.query_file("Save as:", f.name)
+        if not name_input:
             return False
-        if os.path.exists(name):
+
+        target_dir, name = helpers.parse_path(name_input)
+        full_path = os.path.join(target_dir, name)
+
+        if os.path.exists(full_path):
             if not self.ui.query_bool("A file or directory with that name already exists. Overwrite it?"):
                 return False
-        target_dir = os.path.dirname(name)
         if target_dir and not os.path.exists(target_dir):
             if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
                 self.logger.debug("Creating missing folders in save path.")
                 os.makedirs(target_dir)
             else:
                 return False
-        f.set_path(name)
+        f.set_path(full_path)
         # We can just overwrite the file since the user already confirmed
         return self.save_file(f, overwrite=True)
 
