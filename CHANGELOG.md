@@ -1,6 +1,27 @@
 Change Log
 ==========
 
+  ## [v0.1.65](https://github.com/richrd/suplemon/tree/v0.1.65) (2019-03-11) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.64...v0.1.65)
+
+**Fixed bugs:**
+
+- Merge all the default config into user config. Credit @Consolatis
+- Fix diff command highlighting
+- Add shift+pageup and shift+pagedown bindings
+- Reuse existing windows on resize. Credit @Consolatis
+- Replace link to gitter chat with freenode webchat. Credit @Consolatis
+- Merge default module configs into user config. Credit @Consolatis
+- Use daemon mode for lint thread to fix shutdown delay. Credit @Consolatis
+- Simple xterm-256color imitation for curses. Credit @abl
+
+**Implemented enhancements:**
+
+- Allow line number padding using spaces instead of zeros. Credit @Consolatis
+- Highlight current line(s) Credit @Consolatis
+- Add crypt module for encrypting buffers with a password
+
+
 ## [v0.1.64](https://github.com/richrd/suplemon/tree/v0.1.64) (2017-12-17) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.63...v0.1.64)
 
