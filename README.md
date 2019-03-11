@@ -1,7 +1,7 @@
 Suplemon :lemon:
 ========
 
-[![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://gitter.im/richrd/suplemon](https://badges.gitter.im/richrd/suplemon.svg)](https://gitter.im/richrd/suplemon?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://webchat.freenode.net/?channels=%23suplemon](https://img.shields.io/badge/chat-on%20freenode%20%23suplemon-blue.svg)](https://webchat.freenode.net/?channels=%23suplemon)
 
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
@@ -42,7 +42,9 @@ http://github.com/richrd/suplemon
 ## Try it!
 
 You can just clone the repo, and try Suplemon, or also install it system wide.
+To run from source you need to install the python `wcwidth` package.
 
+    pip3 install wcwidth
     git clone https://github.com/richrd/suplemon.git
     cd suplemon
     python3 suplemon.py
@@ -114,6 +116,9 @@ To view the default keymap file run ```keymap default```
 
  * <kbd>Ctrl</kbd> + <kbd>Q</kbd>
    > Exit
+
+ * <kbd>Ctrl</kbd> + <kbd>W</kbd>
+   > Close file or tab
 
  * <kbd>Ctrl</kbd> + <kbd>C</kbd>
    > Copy line(s) to buffer
@@ -249,6 +254,11 @@ The available commands and their descriptions are:
  * config
 
     Shortcut for openning the config files.
+
+ * crypt
+
+    Encrypt or decrypt the current buffer. Lets you provide a passphrase and optional salt for encryption.
+    Uses AES for encryption and scrypt for key generation.
 
  * diff
 

@@ -7,6 +7,8 @@ import os
 import time
 import logging
 
+from .helpers import parse_path
+
 
 class File:
     def __init__(self, app=None):
@@ -29,15 +31,6 @@ class File:
         """Get the full path of the file."""
         # TODO: deprecate in favour of get_path()
         return self._path()
-
-    def parse_path(self, path):
-        """Parse a relative path and return full directory and filename as a tuple."""
-        if path[:2] == "~" + os.sep:
-            p = os.path.expanduser("~")
-            path = os.path.join(p+os.sep, path[2:])
-        ab = os.path.abspath(path)
-        parts = os.path.split(ab)
-        return parts
 
     def get_name(self):
         """Get the file name."""
@@ -65,7 +58,7 @@ class File:
 
     def set_path(self, path):
         """Set the file path. Relative paths are sanitized."""
-        self.fpath, self.name = self.parse_path(path)
+        self.fpath, self.name = parse_path(path)
         self.update_editor_extension()
 
     def set_data(self, data):

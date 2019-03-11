@@ -33,6 +33,9 @@ the complete reference.
  * Ctrl + Q
    > Exit
 
+ * Ctrl + W
+   > Close file or tab
+
  * Ctrl + C
    > Copy line(s) to buffer
 
@@ -168,6 +171,11 @@ the modules folder in the Suplemon installation.
  * config
 
     Shortcut for openning the config files.
+
+ * crypt
+
+    Encrypt or decrypt the current buffer. Lets you provide a passphrase and optional salt for encryption.
+    Uses AES for encryption and scrypt for key generation.
 
  * diff
 

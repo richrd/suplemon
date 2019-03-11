@@ -6,6 +6,7 @@ Promts based on the Editor class for querying user input.
 import os
 
 from .editor import Editor
+from .line import Line
 
 
 class Prompt(Editor):
@@ -127,6 +128,14 @@ class PromptBool(Prompt):
         if success:
             return self.value
         return False
+
+
+class PromptPassword(Prompt):
+    """An input prompt for passwords based on Prompt."""
+
+    def render_line_contents(self, line, pos, x_offset, max_len):
+        obscured = Line("*" * len(line))
+        Prompt.render_line_contents(self, obscured, pos, x_offset, max_len)
 
 
 class PromptFiltered(Prompt):

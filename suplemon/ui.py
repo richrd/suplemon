@@ -106,7 +106,6 @@ class UI:
     def __init__(self, app):
         self.app = app
         self.logger = logging.getLogger(__name__)
-        self.warned_old_curses = 0
         self.limited_colors = True
         self.screen = None
         self.current_yx = None
@@ -121,6 +120,13 @@ class UI:
         global curses
         # Set ESC detection time
         os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
+        termenv = os.environ["TERM"]
+        if termenv.endswith("-256color") and self.app.config["app"].get("imitate_256color"):
+            # Curses doesn't recognize 'screen-256color' or 'tmux-256color' as 256-color terminals.
+            # These terminals all seem to be identical to xterm-256color, which is recognized.
+            # Since this might have other consequences it's hidden behind a config flag.
+            self.logger.debug("Changing terminal from '{0}' to 'xterm-256color'".format(termenv))
+            os.environ["TERM"] = "xterm-256color"
         # Now import curses, otherwise ESCDELAY won't have any effect
         import curses
         self.logger.debug("Loaded curses {0}".format(curses.version.decode()))
@@ -153,6 +159,9 @@ class UI:
             curses.curs_set(0)
         except:
             self.logger.warning("curses.curs_set(0) failed!")
+
+        if "get_wch" not in dir(self.screen):
+            self.logger.warning("Using old curses! Some keys and special characters might not work.")
 
         self.screen.keypad(1)
 
@@ -240,38 +249,59 @@ class UI:
 
         self.app.themes.use(self.app.config["editor"]["theme"])
 
-    def setup_windows(self, resize=False):
-        """Initialize windows."""
-        yx = self.screen.getmaxyx()
+    def setup_windows(self):
+        """Initialize and layout windows."""
+        # We are using curses.newwin instead of self.screen.subwin/derwin because
+        # subwindows are getting a special treatment on resize. e.g., the legend
+        # bar may automatically resize to one line if the window gets smaller.
+        # Even after doing the layout by moving the legend window into its proper
+        # place a call to resize() to restore the 2 line height will error out.
+        # This does not happen with curses.newwin().
+        #
+        # https://anonscm.debian.org/cgit/collab-maint/ncurses.git/tree/ncurses/base/resizeterm.c#n274
+        # https://anonscm.debian.org/cgit/collab-maint/ncurses.git/tree/ncurses/base/wresize.c#n87
         self.text_input = None
-        self.header_win = curses.newwin(1, yx[1], 0, 0)
-        self.status_win = curses.newwin(1, yx[1], yx[0]-1, 0)
 
-        # Test for new curses
-        if "get_wch" not in dir(self.header_win):
-            # Notify only once
-            if not self.warned_old_curses:
-                self.logger.warning("Using old curses! Some keys and special characters might not work.")
-                self.warned_old_curses = 1
+        offset_top = 0
+        offset_bottom = 0
+        y, x = self.screen.getmaxyx()
+        config = self.app.config["display"]
 
-        y_sub = 0
-        y_start = 0
-        if self.app.config["display"]["show_top_bar"]:
-            y_sub += 1
-            y_start = 1
-        if self.app.config["display"]["show_bottom_bar"]:
-            y_sub += 1
-        if self.app.config["display"]["show_legend"]:
-            y_sub += 2
-        self.editor_win = curses.newwin(yx[0]-y_sub, yx[1], y_start, 0)
-        if self.app.config["display"]["show_top_bar"]:
-            self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub+1, 0)
+        if config["show_top_bar"]:
+            offset_top += 1
+            if self.header_win is None:
+                self.header_win = curses.newwin(1, x, 0, 0)
+            elif self.header_win.getmaxyx()[1] != x:
+                # Header bar don't ever need to move
+                self.header_win.resize(1, x)
+
+        if config["show_bottom_bar"]:
+            offset_bottom += 1
+            if self.status_win is None:
+                self.status_win = curses.newwin(1, x, y - offset_bottom, 0)
+            else:
+                self.status_win.mvwin(y - offset_bottom, 0)
+                if self.status_win.getmaxyx()[1] != x:
+                    self.status_win.resize(1, x)
+
+        if config["show_legend"]:
+            offset_bottom += 2
+            if self.legend_win is None:
+                self.legend_win = curses.newwin(2, x, y - offset_bottom, 0)
+            else:
+                self.legend_win.mvwin(y - offset_bottom, 0)
+                if self.legend_win.getmaxyx()[1] != x:
+                    self.legend_win.resize(2, x)
+
+        if self.editor_win is None:
+            self.editor_win = curses.newwin(y - offset_top - offset_bottom, x, offset_top, 0)
         else:
-            self.legend_win = curses.newwin(2, yx[1], yx[0]-y_sub, 0)
-
-        if resize:
-            self.app.get_editor().resize((yx[0]-y_sub, yx[1]))
-            self.app.get_editor().move_win((y_start, 0))
+            # Not sure why editor implements this on its own
+            # and if it's a good thing or not.
+            self.app.get_editor().resize((y - offset_top - offset_bottom, x))
+            self.app.get_editor().move_win((offset_top, 0))
+            # self.editor_win.mvwin(offset_top, 0)
+            # self.editor_win.resize(y - offset_top - offset_bottom, x)
 
     def get_size(self):
         """Get terminal size."""
@@ -291,7 +321,7 @@ class UI:
             yx = self.screen.getmaxyx()
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
-        self.setup_windows(resize=True)
+        self.setup_windows()
 
     def check_resize(self):
         """Check if terminal has resized and resize if needed."""

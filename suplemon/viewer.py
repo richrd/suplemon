@@ -307,18 +307,28 @@ class BaseViewer:
         self.window.erase()
         max_y = self.get_size()[1]
         max_len = self.max_line_length()
+        lnum_len = self.line_offset() - 1
+        lnum_pad = ">" if self.config["line_nums_pad_space"] else "0"
         # Iterate through visible lines
         for i in range(max_y):
             x_offset = self.line_offset()
             lnum = i + self.y_scroll
             if lnum >= len(self.lines):  # Make sure we have a line to show
                 break
+
             # Get line for current row
             line = self.lines[lnum]
+
+            attribs = None
+            if self.config["highlight_current_line"] and self._is_current_line(i):
+                # Highlight current line by adding bold to background attribute set
+                attribs = self.window.getbkgd()
+                self.window.bkgdset(" ", attribs | curses.A_BOLD)
+
             if self.config["show_line_nums"]:
                 curs_color = curses.color_pair(line.number_color)
-                padded_num = str(lnum+1).zfill(self.line_offset()-1)
-                self.window.addstr(i, 0, padded_num+" ", curs_color)
+                padded_num = "{:{}{}d} ".format(lnum + 1, lnum_pad, lnum_len)
+                self.window.addstr(i, 0, padded_num, curs_color)
 
             pos = (x_offset, i)
             try:
@@ -326,7 +336,17 @@ class BaseViewer:
             except:
                 self.logger.error("Failed rendering line #{0} @{1} DATA:'{2}'!".format(lnum+1, pos, line),
                                   exc_info=True)
+            if attribs is not None:
+                # Restore background attribute set
+                self.window.bkgdset(" ", attribs)
+
         self.render_cursors()
+
+    def _is_current_line(self, y):
+        for cursor in self.cursors:
+            if cursor.y - self.y_scroll == y:
+                return True
+        return False
 
     def render_line_contents(self, line, pos, x_offset, max_len):
         """Render the contents of a line to the screen
@@ -935,6 +955,7 @@ class Viewer(BaseViewer):
             self.logger.error("File doesn't match API!")
             return False
         self.syntax = module.Syntax()
+        self.pygments_syntax = None
 
     def setup_highlight(self):
         """Setup Pygments based highlighting."""

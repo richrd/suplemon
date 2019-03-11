@@ -19,7 +19,10 @@
         // How long curses will wait to detect ESC key
         "escdelay": 50,
         // Whether to use special unicode symbols for decoration
-        "use_unicode_symbols": true
+        "use_unicode_symbols": true,
+        // If your $TERM ends in -256color and this is true, 'xterm-256color'
+        // will be used instead, working around an issue with curses.
+        "imitate_256color": false
     },
     // Editor settings
     "editor": {
@@ -102,8 +105,12 @@
         "show_tab_indicators": true,
         // Tab indicator charatrer
         "tab_indicator_character": "\u203A",
+        // Highlight current line(s)
+        "highlight_current_line": true,
         // Line numbering
         "show_line_nums": true,
+        // Pad line numbers with spaces instead of zeros
+        "line_nums_pad_space": true,
         // Naive line highlighting
         "show_line_colors": true,
         // Proper syntax highlighting

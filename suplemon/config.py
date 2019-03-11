@@ -105,6 +105,17 @@ class Config:
         self.defaults = config
         return True
 
+    def load_module_configs(self):
+        module_config = {}
+        modules = self.app.modules.modules
+        for module_name in modules.keys():
+            module = modules[module_name]
+            conf = module.get_default_config()
+            module_config[module_name] = conf
+            self.logger.debug("Loading default config for module '%s': %s" % (module_name, str(conf)))
+        self.defaults["modules"] = module_config
+        self.config = self.merge_defaults(self.config)
+
     def load_default_keys(self):
         path = os.path.join(self.app.path, "config", self.default_keymap_filename)
         config = self.load_config_file(path)
@@ -127,14 +138,18 @@ class Config:
 
     def merge_defaults(self, config):
         """Fill any missing config options with defaults."""
-        for prim_key in self.defaults.keys():
-            curr_item = self.defaults[prim_key]
-            if prim_key not in config.keys():
-                config[prim_key] = dict(curr_item)
+        return self._merge_defaults(self.defaults, config)
+
+    def _merge_defaults(self, defaults, config):
+        """Recursivley merge two dicts."""
+        for key in defaults.keys():
+            item = defaults[key]
+            if key not in config.keys():
+                config[key] = item
                 continue
-            for sec_key in curr_item.keys():
-                if sec_key not in config[prim_key].keys():
-                    config[prim_key][sec_key] = curr_item[sec_key]
+            if not isinstance(item, dict):
+                continue
+            config[key] = self._merge_defaults(item, config[key])
         return config
 
     def load_config_file(self, path):
