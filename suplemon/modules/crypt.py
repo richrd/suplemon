@@ -59,7 +59,7 @@ def decrypt(data, password, salt):
 
 class Crypt(Module):
     """
-    Encrypt the current buffer with a password.
+    Encrypt or decrypt the current buffer. Lets you provide a passphrase and optional salt for encryption.
     Uses AES for encryption and scrypt for key generation.
     """
 

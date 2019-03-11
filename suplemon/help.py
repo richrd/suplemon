@@ -172,6 +172,11 @@ the modules folder in the Suplemon installation.
 
     Shortcut for openning the config files.
 
+ * crypt
+
+    Encrypt or decrypt the current buffer. Lets you provide a passphrase and optional salt for encryption.
+    Uses AES for encryption and scrypt for key generation.
+
  * diff
 
     View a diff of the current file compared to it's on disk version.
