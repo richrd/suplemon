@@ -72,7 +72,10 @@ class UI(object):
         hs4.add_child(widgets.SpacerWidget(), 0)
         hs4.add_child(widgets.TestWidget(), 20)
         hs4.add_child(widgets.SpacerWidget(), 0)
-        hs4.add_child(widgets.TestWidget(), 40)
+        hs4.add_child(widgets.TestWidget(), 10)
+        hs4.add_child(widgets.TestWidget(), 10)
+        hs4.add_child(widgets.TestWidget(), 10)
+        hs4.add_child(widgets.TestWidget(), 10)
 
         vs1 = widgets.VSplitWidget()
         vs1.add_child(HeaderWidget(app=self.app), 0)

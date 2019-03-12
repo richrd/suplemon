@@ -4,8 +4,6 @@
 Basic util functions.
 """
 
-from operator import add
-
 
 def halve(n):
     """
@@ -17,10 +15,24 @@ def halve(n):
 
 
 def divide_evenly(n, divisor):
-    # TODO: Write docstring
+    """
+    Devide n into equal or almost equal items and return as list of integers.
+
+    The remainder is distributed between the first items of the returned list.
+    """
+    if n < divisor:
+        return ([1] * n) + ([0] * (divisor - n))
+
     results = ([n/divisor]*divisor)
-    results[-1] += n % divisor
-    return list(map(int, results))
+    # results[-1] += n % divisor
+    remainder = n % divisor
+    items = list(map(int, results))
+    for i in range(len(items)):
+        if not remainder:
+            break
+        items[i] += 1
+        remainder -= 1
+    return items
 
 
 def divide_by_percentages(n, percentages):
