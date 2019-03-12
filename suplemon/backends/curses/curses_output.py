@@ -6,7 +6,9 @@ class CursesOutput(OutputBackend):
     def _init(self, curses):
         self.curses = curses
         self._max_pairs = None
-        self._colors = False
+        self._colors_enabled = False
+        self._last_color_pair = -1
+        self._color_pairs = {}
 
     def _start(self):
         assert self._backend._root is not None
@@ -27,24 +29,21 @@ class CursesOutput(OutputBackend):
 
     def _start_colors(self):
         if self.curses.can_change_color():
-            self.logger.debug("Term supports changing colors.")
-            self._max_pairs = self.curses.COLOR_PAIRS
-            self.logger.debug("Max color pairs:{}".format(self.curses.COLOR_PAIRS))
-            self.curses.start_color()
-            self.curses.use_default_colors()
             self._setup_colors()
         else:
             self.curses.use_default_colors()
             self.logger.debug("Term doesn't support changing colors.")
 
     def _setup_colors(self):
-        pass
-        #                       id,  fg,  bg
-        # self.curses.init_pair(10,  -1, -1) # -1 = default
-        # self.curses.init_pair(10,  200, -1)
+        self._colors_enabled = True
+        self.logger.debug("Term supports changing colors.")
+        self._max_pairs = self.curses.COLOR_PAIRS
+        self.logger.debug("Max color pairs:{}".format(self.curses.COLOR_PAIRS))
+        self.curses.start_color()
+        self.curses.use_default_colors()
 
     def _has_colors(self):
-        return self.curses.has_colors()
+        return self._colors_enabled
 
     def _test_color_pairs_overflow(self):
         """Try to initialize more than the maximum amount of colors cures supports (256)"""
@@ -70,15 +69,44 @@ class CursesOutput(OutputBackend):
     def _stop(self):
         pass
 
+    def _get_color_pair_from_xterm(self, xterm_fg, xterm_bg):
+        # Get or initialize a curses color pair based on the xterm equivalents
+        # None is returned if the requested color can't be initialized
+        if not self._colors_enabled:
+            return None
+
+        key = (xterm_fg, xterm_bg)
+        if key in self._color_pairs.keys():
+            return self._color_pairs[key]
+
+        current_color_pair = self._last_color_pair + 1
+        try:
+            self.curses.init_pair(current_color_pair, key[0], key[1])
+            self._last_color_pair = current_color_pair
+        except self.curses.error:
+            # Can't init color pair
+            return None
+        curs_color = self.curses.color_pair(self._last_color_pair)
+        self._color_pairs[key] = curs_color
+        return curs_color
+
+    def _get_color_pair_from_attrs(self, attr):
+        return self._get_color_pair_from_xterm(attr._color_fg._xterm256, attr._color_bg._xterm256)
+
     def _convert_scr_attr(self, attr):
-        attrs = self.curses.A_NORMAL
+        curses_attr = self.curses.A_NORMAL
         if attr.is_bold():
-            attrs = attrs | self.curses.A_BOLD
+            curses_attr = curses_attr | self.curses.A_BOLD
         if attr.is_underline():
-            attrs = attrs | self.curses.A_UNDERLINE
+            curses_attr = curses_attr | self.curses.A_UNDERLINE
         if attr.is_blink():
-            attrs = attrs | self.curses.A_BLINK
-        return attrs
+            curses_attr = curses_attr | self.curses.A_BLINK
+
+        if attr._color_bg._xterm256 or attr._color_bg._xterm256:
+            color = self._get_color_pair_from_attrs(attr)
+            if color:
+                curses_attr = curses_attr | color
+        return curses_attr
 
     def _erase(self):
         self._backend._root.erase()

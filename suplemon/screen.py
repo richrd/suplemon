@@ -29,7 +29,7 @@ Attributes are:
 class Color(object):
     def __init__(self):
         self._xterm256 = -1
-        # self._random()
+        self._random()
 
     def _random(self):
         self._xterm256 = random.randrange(1, 255)
