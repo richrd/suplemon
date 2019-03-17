@@ -15,8 +15,8 @@ from .backends.curses import CursesBackend
 
 
 class App:
-    def __init__(self, filenames=None, config_file=None):
-        self.debug = 1  # TODO: default to 0
+    def __init__(self, filenames=None, config_file=None, debug=False):
+        self.debug = debug
         self.version = __version__
         self.running = 0
         self.logger = logger
@@ -55,7 +55,7 @@ class App:
         while self.running:
             self.ui.update()
 
-        print("App.mainloop() END")
+        self.logger.debug("App.mainloop() END")
 
     def shutdown(self):
         self.logger.debug("App.shutdown()")
