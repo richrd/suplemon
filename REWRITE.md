@@ -115,7 +115,7 @@ This is just a guideline and it's still very abstract and incomplete.
          |                                           |             
          |        ___________________________________|____________ 
          |       |                                   |            |
-         |       |           EVENT LOOP              |            |
+         |       |        EVENT LOOP (asyncio?)      |            |
          |       |                                   |            |
          |       |___________________________________+____________|
          |       ¦                                  /|\            
@@ -126,7 +126,7 @@ This is just a guideline and it's still very abstract and incomplete.
     |                           |                    |             
     |         RENDERER          |                    |             
     | (Render Layout to Screen) |                    |             
-    |   See: ui.py, widgets.py  |                    |             
+    |                           |                    |             
     |                           |                    |             
     |___________________________|       [      Buffered Input     ]
                  |                      [    If backend support   ]
