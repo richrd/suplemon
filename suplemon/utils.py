@@ -24,7 +24,6 @@ def divide_evenly(n, divisor):
         return ([1] * n) + ([0] * (divisor - n))
 
     results = ([n/divisor]*divisor)
-    # results[-1] += n % divisor
     remainder = n % divisor
     items = list(map(int, results))
     for i in range(len(items)):

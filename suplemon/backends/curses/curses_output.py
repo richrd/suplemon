@@ -46,16 +46,10 @@ class CursesOutput(OutputBackend):
         return self._colors_enabled
 
     def _test_color_pairs_overflow(self):
-        """Try to initialize more than the maximum amount of colors cures supports (256)"""
-        # Test COLOR_PAIRS overflow
-        # Only id's 1-256 work
-        # TODO: What should happen if more colorpairs are specified by the app?
-        #       Maybe we'll just ignore new colors if 256 would be exceded?
-        #       Or normalize the colors to always be one of the default 256 colors
-        #       That way we get the closest approximation and avoid overflowing
-        #       However that would only work for foreground colors
-        #       When all fg and bg combinations are combined we get 256*256
-
+        """
+        Try to initialize more than the maximum amount of colors curses supports (256).
+        Used for testing purpouses.
+        """
         i = 0
         while i < 300:
             self.logger.debug("Initing color #{}".format(i))
@@ -72,6 +66,9 @@ class CursesOutput(OutputBackend):
     def _get_color_pair_from_xterm(self, xterm_fg, xterm_bg):
         # Get or initialize a curses color pair based on the xterm equivalents
         # None is returned if the requested color can't be initialized
+        # NOTE: A maximum of 256 distinct color pairs can be initialized.
+        #       Any colors after that are simply ignored.
+        #       It's unlikely that the limit is reached in normal circumstances.
         if not self._colors_enabled:
             return None
 
@@ -114,15 +111,15 @@ class CursesOutput(OutputBackend):
 
     def _render(self, screen):
         # TODO: Warn if screen is bigger than terminal
-        if not screen.lines:
+        if not screen.buffer:
             return False
         self._erase()  # TODO: clear or erase?
         self._backend._root.move(0, 0)
         x = 0
         y = 0
-        for line in screen.lines:
-            for part in line:
-                attrs = self._convert_scr_attr(part.attributes)
+        for item in screen.buffer:
+            for part in item:
+                attrs = self._convert_scr_attr(part.style)
                 self.__addstr(y, x, str(part), attrs)
                 x += len(part)
             y += 1
@@ -139,6 +136,3 @@ class CursesOutput(OutputBackend):
             self._backend._root.addstr(y, x, str(s), attrs)
         except self.curses.error:
             pass  # Just meh
-            # self.logger.exception("__addstr failed!")
-            # self.logger.error("string:{}".format(s))
-            # self.logger.error("size:{}, x,y = {}, len:{}".format(self.size, (x, y), len(s)))
