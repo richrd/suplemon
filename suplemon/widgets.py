@@ -1,6 +1,6 @@
 import logging
 
-from .utils import divide
+from .utils import divide_by_percentages
 from .screen import Screen, ScreenString
 
 
@@ -98,7 +98,7 @@ class BaseSplitWidget(BaseContainerWidget):
                 remaining_size -= self.children[i].min_size[self.axis]
             i += 1
 
-        sizes = divide(remaining_size, self.percentages)
+        sizes = divide_by_percentages(remaining_size, self.percentages)
         i = 0
         for item in sizes:
             s = [None, None]

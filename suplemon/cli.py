@@ -25,7 +25,8 @@ def main():
     if app.init():
         app.run()
     else:
-        app.logger.debug("app.init() returned False, not proceeding to run.")
+        app.logger.error("FATAL: App failed to initialize.")
+        app.handle_logs()
 
 
 if __name__ == "__main__":

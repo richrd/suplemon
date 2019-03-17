@@ -10,6 +10,7 @@ __version__ = "0.2.0"
 from .ui import UI
 
 from .logger import logger
+from .config.config import ConfigLoader
 from .backends.curses import CursesBackend
 
 
@@ -22,11 +23,21 @@ class App:
         self.logger.debug("App.__init__()")
         self.logger.debug("Filenames: {}".format(filenames))
 
+        self.config = None
+        self.config_loader = ConfigLoader()
+
         self.backend = CursesBackend()
         self.ui = UI(self, self.backend)
 
     def init(self):
         self.logger.debug("App.init()")
+
+        # Load default config
+        if not self.config_loader.init():
+            return False
+
+        # Load user config
+        self.config = self.config_loader.load_user_config()
         return True
 
     def run(self):
@@ -52,5 +63,8 @@ class App:
         self.backend.stop()
 
         if self.debug:
-            for logger_handler in self.logger.handlers:
-                logger_handler.close()
+            self.handle_logs()
+
+    def handle_logs(self):
+        for logger_handler in self.logger.handlers:
+            logger_handler.close()
