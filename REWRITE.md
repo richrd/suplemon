@@ -53,7 +53,7 @@ List of some libraries that are likely to be useful / necessary.
  - [ ] Implement core architecture (WIP)
    - [ ] Config handling (similar to sublime text and same variable names)
      - [X] Generic config loader
-     - [X] Core confif
+     - [X] Core config
      - [ ] File type (language) specific configuration
      - [ ] Key map config
    - [ ] Key config handling (similar to sublime text)
