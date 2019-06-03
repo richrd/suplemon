@@ -355,12 +355,16 @@ class App:
     ###########################################################################
 
     def help(self):
-        """Open a new file with help text."""
-        f = self.default_file()
-        from . import help
-        f.set_data(help.help_text)
-        self.files.append(f)
-        self.switch_to_file(self.last_file_index())
+        """Open a new file with help text, or close it if it is open."""
+        if self.get_file().is_help:
+            self.close_file()
+        else:
+            f = self.default_file()
+            from . import help
+            f.set_data(help.help_text)
+            f.is_help = True
+            self.files.append(f)
+            self.switch_to_file(self.last_file_index())
 
     def new_file(self, path=None):
         """Open a new empty file.
