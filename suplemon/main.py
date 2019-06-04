@@ -355,16 +355,23 @@ class App:
     ###########################################################################
 
     def help(self):
-        """Open a new file with help text, or close it if it is open."""
+        """Toggle the help document.
+        - If current document is help, close it.
+        - Otherwise, if help is open, switch to it.
+        - Otherwise, open a new file with help text.
+        """
         if self.get_file().is_help:
             self.close_file()
         else:
-            f = self.default_file()
-            from . import help
-            f.set_data(help.help_text)
-            f.is_help = True
-            self.files.append(f)
-            self.switch_to_file(self.last_file_index())
+            idx = next((i for i,f in enumerate(self.files) if f.is_help), -1)
+            if idx==-1:
+                f = self.default_file()
+                from . import help
+                f.set_data(help.help_text)
+                f.is_help = True
+                self.files.append(f)
+                idx = self.last_file_index()
+            self.switch_to_file(idx)
 
     def new_file(self, path=None):
         """Open a new empty file.
