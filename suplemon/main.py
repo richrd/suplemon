@@ -363,8 +363,8 @@ class App:
         if self.get_file().is_help:
             self.close_file()
         else:
-            idx = next((i for i,f in enumerate(self.files) if f.is_help), -1)
-            if idx==-1:
+            idx = next((i for i, f in enumerate(self.files) if f.is_help), -1)
+            if idx == -1:
                 f = self.default_file()
                 from . import help
                 f.set_data(help.help_text)
