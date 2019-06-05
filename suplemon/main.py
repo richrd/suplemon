@@ -227,11 +227,7 @@ class App:
 
     def get_key_bindings(self):
         """Return the list of key bindings."""
-        bindings = {}
-        for binding in self.config.keymap:
-            for key in binding["keys"]:
-                bindings[key] = binding["command"]
-        return bindings
+        return self.config.key_bindings
 
     def get_event_bindings(self):
         """Return the dict of event bindings."""
