@@ -22,6 +22,7 @@ class File:
         self.opened = time.time()  # Time of last open
         self.editor = None
         self.writable = True
+        self.is_help = False
 
     def _path(self):
         """Get the full path of the file."""
