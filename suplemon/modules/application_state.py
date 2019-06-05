@@ -52,6 +52,10 @@ class ApplicationState(Module):
 
     def set_file_state(self, file, state):
         """Set the state of a file."""
+        cursor = file.editor.get_cursor()
+        # Only set cursor pos if it is currently the default 0,0
+        if not cursor.x and not cursor.y:
+            return
         file.editor.set_cursors(state["cursors"])
         file.editor.scroll_pos = state["scroll_pos"]
 

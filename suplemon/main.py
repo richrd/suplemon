@@ -607,15 +607,17 @@ class App:
 
     def open(self):
         """Ask for file name and try to open it."""
-        name = self.ui.query_file("Open file:")
-        if not name:
+        input_name = self.ui.query_file("Open file:")
+        if not input_name:
             return False
+        name_row_col = helpers.get_filename_cursor_pos(input_name)
+        name = name_row_col["name"]
         exists = self.file_is_open(name)
         if exists:
             self.switch_to_file(self.files.index(exists))
             return True
 
-        if not self.open_file(name):
+        if not self.open_file(**name_row_col):
             self.set_status("Failed to load '{0}'".format(name))
             return False
         self.switch_to_file(self.last_file_index())
@@ -699,32 +701,37 @@ class App:
         """Get index of current file."""
         return self.current_file
 
-    def open_file(self, filename):
+    def open_file(self, name=None, row=0, col=0):
         """Open a file."""
         file = File(self)
-        file.set_path(filename)
+        file.set_path(name)
         file.set_editor(self.new_editor())
         if not file.load():
             return False
+        file.get_editor().set_single_cursor((col, row))
+        file.get_editor().scroll_to_line(row)
         self.files.append(file)
         return True
 
     def load_files(self):
         """Try to load all files specified in arguments."""
         if self.filenames:
-            for name in self.filenames:
+            for item in self.filenames:
+                name_row_col = helpers.get_filename_cursor_pos(item)
+                name = name_row_col["name"]
                 if os.path.isdir(name):
                     continue
+                # Avoid opening duplicate files
                 if self.file_is_open(name):
                     continue
-                if not self.open_file(name):
+                if not self.open_file(**name_row_col):
                     self.new_file(name)
         # If nothing was loaded
         if not self.files:
             self.load_default()
 
     def file_is_open(self, path):
-        """Check if file is open. Returns the File object or False."""
+        """Check if file is open. Returns a File object or False."""
         for file in self.files:
             if file.path() == os.path.abspath(path):
                 return file

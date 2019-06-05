@@ -62,3 +62,26 @@ def parse_path(path):
     ab = os.path.abspath(path)
     parts = os.path.split(ab)
     return parts
+
+
+def get_filename_cursor_pos(name):
+    default = {
+        "name": name,
+        "row": 0,
+        "col": 0,
+    }
+
+    m = re.match(r"(.*?):(\d+):?(\d+)?", name)
+
+    if not m:
+        return default
+
+    groups = m.groups()
+    if not groups[0]:
+        return default
+
+    return {
+        "name": groups[0],
+        "row": abs(int(groups[1])-1) if groups[1] else 0,
+        "col": abs(int(groups[2])-1) if groups[2] else 0,
+    }
