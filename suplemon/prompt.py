@@ -298,7 +298,12 @@ class PromptFile(PromptAutocmp):
         path = os.path.dirname(os.path.expanduser(path))
         # If we get an empty path use the current directory
         if not path:
-            path = os.getcwd()
+            try:
+                path = os.getcwd()
+            except FileNotFoundError:
+                # This might happen if the cwd has been
+                # removed after starting suplemon.
+                return []
         # In case we don't have sufficent permissions
         try:
             contents = os.listdir(path)
