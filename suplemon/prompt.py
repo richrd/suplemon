@@ -9,6 +9,13 @@ from .editor import Editor
 from .line import Line
 
 
+# Python 2 compatibility
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
+
 class Prompt(Editor):
     """An input prompt based on the Editor."""
     def __init__(self, app, window):
