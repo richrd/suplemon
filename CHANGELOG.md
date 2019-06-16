@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-## [v0.2.0](https://github.com/richrd/suplemon/tree/v0.2.0) (2019-06-16) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.65...v0.2.0)
+## [v0.2.0](https://github.com/richrd/suplemon/tree/0.2.0) (2019-06-16) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.65...0.2.0)
 
 **Fixed bugs:**
 
@@ -16,8 +16,8 @@ Change Log
 - Allow opening files at specific row and column from command line.
 
 
-## [v0.1.65](https://github.com/richrd/suplemon/tree/v0.1.65) (2019-03-11) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.64...v0.1.65)
+## [v0.1.65](https://github.com/richrd/suplemon/tree/0.1.65) (2019-03-11) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.64...0.1.65)
 
 **Fixed bugs:**
 
@@ -37,8 +37,8 @@ Change Log
 - Add crypt module for encrypting buffers with a password
 
 
-## [v0.1.64](https://github.com/richrd/suplemon/tree/v0.1.64) (2017-12-17) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.63...v0.1.64)
+## [v0.1.64](https://github.com/richrd/suplemon/tree/0.1.64) (2017-12-17) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.63...0.1.64)
 
 **Implemented enhancements:**
 
@@ -48,8 +48,8 @@ Change Log
 - Added command docs to readme and help.
 
 
-## [v0.1.63](https://github.com/richrd/suplemon/tree/v0.1.63) (2017-10-05) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.62...v0.1.63)
+## [v0.1.63](https://github.com/richrd/suplemon/tree/0.1.63) (2017-10-05) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.62...0.1.63)
 
 **Implemented enhancements:**
 
@@ -64,8 +64,8 @@ Change Log
 - Prevent restoring file state if file has changed since last time (fixes #198)
 
 
-## [v0.1.62](https://github.com/richrd/suplemon/tree/v0.1.62) (2017-09-25) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.61...v0.1.62)
+## [v0.1.62](https://github.com/richrd/suplemon/tree/0.1.62) (2017-09-25) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.61...0.1.62)
 
 **Fixed bugs:**
 
@@ -78,16 +78,16 @@ Change Log
 - Add ctrl+t shortcut for trimming whitespace
 
 
-## [v0.1.61](https://github.com/richrd/suplemon/tree/v0.1.61) (2017-05-29) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.60...v0.1.61)
+## [v0.1.61](https://github.com/richrd/suplemon/tree/0.1.61) (2017-05-29) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.60...0.1.61)
 
 **Fixed bugs:**
 
 - Disable fancy unicode symbols by default. Caused problems on some terminals.
 
 
-## [v0.1.60](https://github.com/richrd/suplemon/tree/v0.1.60) (2017-03-23) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.59...v0.1.60)
+## [v0.1.60](https://github.com/richrd/suplemon/tree/0.1.60) (2017-03-23) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.59...0.1.60)
 
 **Implemented enhancements:**
 
@@ -101,8 +101,8 @@ Change Log
 - Don't print log message when opening file that doesn't exist.
 
 
-## [v0.1.59](https://github.com/richrd/suplemon/tree/v0.1.59) (2017-02-16) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.58...v0.1.59)
+## [v0.1.59](https://github.com/richrd/suplemon/tree/0.1.59) (2017-02-16) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.58...0.1.59)
 
 **Implemented enhancements:**
 
@@ -114,8 +114,8 @@ Change Log
 - Added error handling to hostname module should it fail.
 
 
-## [v0.1.58](https://github.com/richrd/suplemon/tree/v0.1.58) (2016-12-01) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.57...v0.1.58)
+## [v0.1.58](https://github.com/richrd/suplemon/tree/0.1.58) (2016-12-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.57...0.1.58)
 
 **Fixed bugs:**
 
@@ -123,8 +123,8 @@ Change Log
 - Treat .ts files the same as .js so (un)commenting .ts files works.
 
 
-## [v0.1.57](https://github.com/richrd/suplemon/tree/v0.1.57) (2016-11-01) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.56...v0.1.57)
+## [v0.1.57](https://github.com/richrd/suplemon/tree/0.1.57) (2016-11-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.56...0.1.57)
 
 **Implemented enhancements:**
 - Show all special unicode whitespace characters when "show_white_space" is set to true. This helps detecting unwanted characters in files.
@@ -139,8 +139,8 @@ Change Log
 - Fixed inputting various special characters that were ignored in some cases on Python3.
 
 
-## [v0.1.56](https://github.com/richrd/suplemon/tree/v0.1.56) (2016-08-01) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.55...v0.1.56)
+## [v0.1.56](https://github.com/richrd/suplemon/tree/0.1.56) (2016-08-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.55...0.1.56)
 
 **Implemented enhancements:**
 
@@ -163,8 +163,8 @@ Change Log
 - Normalize modifier key order in keymaps so that they are matched correctly.
 - Properly set the internal file path when saving a file under a new name.
 
-## [v0.1.55](https://github.com/richrd/suplemon/tree/v0.1.55) (2016-08-01) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.54...v0.1.55)
+## [v0.1.55](https://github.com/richrd/suplemon/tree/0.1.55) (2016-08-01) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.54...0.1.55)
 
 **Implemented enhancements:**
 
@@ -177,8 +177,8 @@ Change Log
 - Show key legend based on config instead of static defaults [\#157](https://github.com/richrd/suplemon/issues/157)
 
 
-## [v0.1.54](https://github.com/richrd/suplemon/tree/v0.1.54) (2016-07-30) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.53...v0.1.54)
+## [v0.1.54](https://github.com/richrd/suplemon/tree/0.1.54) (2016-07-30) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.53...0.1.54)
 
 **Implemented enhancements:**
 
@@ -189,8 +189,8 @@ Change Log
 - Fixed showing unwritable marker when saving file in a writable location
 
 
-## [v0.1.32](https://github.com/richrd/suplemon/tree/v0.1.32) (2015-08-12) compared to previous master branch.
-[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.31...v0.1.32)
+## [v0.1.32](https://github.com/richrd/suplemon/tree/0.1.32) (2015-08-12) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.1.31...0.1.32)
 
 **Implemented enhancements:**
 
