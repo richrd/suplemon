@@ -81,7 +81,7 @@ class Cursor:
 
         :param int delta: How much to move. Defaults to 1.
         """
-        self.y -= 1
+        self.y -= delta
         if self.y < 0:
             self.y = 0
         return

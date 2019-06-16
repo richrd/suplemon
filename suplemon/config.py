@@ -24,6 +24,7 @@ class Config:
         self.defaults = {}
         self.keymap = {}
         self.config = {}
+        self.key_bindings = {}
 
     def init(self):
         self.create_config_dir()
@@ -66,9 +67,15 @@ class Config:
         if not keymap:
             self.logger.info("Failed to load keymap file '{0}'.".format(path))
             return False
-        # Prepend the user keys to the defaults to give the user config a higher priority
-        keymap += self.keymap
-        self.keymap = self.normalize_keys(keymap)
+
+        # Build the key bindings
+        # User keymap overwrites the defaults in the bindings
+        self.keymap = self.normalize_keys(self.keymap + keymap)
+        self.key_bindings = {}
+        for binding in self.keymap:
+            for key in binding["keys"]:
+                self.key_bindings[key] = binding["command"]
+
         return True
 
     def normalize_keys(self, keymap):

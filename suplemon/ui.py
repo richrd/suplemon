@@ -20,7 +20,7 @@ class InputEvent:
     """Represents a keyboard or mouse event."""
     def __init__(self):
         self.type = None  # 'key' or 'mouse'
-        self.key_name = None
+        self.key_name = ""
         self.key_code = None
         self.is_typeable = False
         self.curses_key_name = None
