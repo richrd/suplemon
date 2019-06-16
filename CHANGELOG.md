@@ -1,7 +1,22 @@
 Change Log
 ==========
 
-  ## [v0.1.65](https://github.com/richrd/suplemon/tree/v0.1.65) (2019-03-11) compared to previous master branch.
+## [v0.2.0](https://github.com/richrd/suplemon/tree/v0.2.0) (2019-06-16) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.65...v0.2.0)
+
+**Fixed bugs:**
+
+- Fix not using the delta argument in the cursor move_up method.
+- Fix issue where mouse events in prompts could crash suplemon #247
+- Fix not being able to override default keys with user key bindings
+
+**Implemented enhancements:**
+
+- Allow help to be toggled with the help shortcut. Credit @caph1993
+- Allow opening files at specific row and column from command line.
+
+
+## [v0.1.65](https://github.com/richrd/suplemon/tree/v0.1.65) (2019-03-11) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/v0.1.64...v0.1.65)
 
 **Fixed bugs:**
