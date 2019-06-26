@@ -63,6 +63,7 @@ To install Suplemon from the repo run the setup script:
 
     suplemon # New file in the current directory
     suplemon [filename]... # Open one or more files
+    suplemon [filename:row:col]... # Open one or more files at a specific row or column (optional)
 
 
 ### Notes
