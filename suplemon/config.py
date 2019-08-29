@@ -59,14 +59,14 @@ class Config:
 
     def load_keys(self):
         path = self.keymap_path()
-        keymap = False
+        keymap = []
 
         if not os.path.exists(path):
             self.logger.debug("Keymap file '{0}' doesn't exist.".format(path))
-            keymap = self.load_config_file(path)
+        else:
+            keymap = self.load_config_file(path) or []
             if not keymap:
-                self.logger.info("Failed to load keymap file '{0}'.".format(path))
-                keymap = []
+                self.logger.warning("Failed to load keymap file '{0}'.".format(path))
 
         # Build the key bindings
         # User keymap overwrites the defaults in the bindings
