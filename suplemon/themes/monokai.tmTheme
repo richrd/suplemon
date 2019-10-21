@@ -13,7 +13,7 @@
 				<key>foreground</key>
 				<string>254</string>
 				<key>invisibles</key>
-				<string>237</string>
+				<string>236</string>
 				<key>lineHighlight</key>
 				<string>237</string>
 				<key>selection</key>
@@ -24,6 +24,28 @@
 				<string>16</string>
 				<key>selectionBorder</key>
 				<string>235</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Generic</string>
+			<key>scope</key>
+			<string>generic</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>254</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Punctuation</string>
+			<key>scope</key>
+			<string>punctuation</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>254</string>
 			</dict>
 		</dict>
 		<dict>
@@ -52,7 +74,7 @@
 			<key>name</key>
 			<string>Number</string>
 			<key>scope</key>
-			<string>constant.numeric</string>
+			<string>constant.numeric, constant.language</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -136,6 +158,17 @@
 			<key>name</key>
 			<string>Class name</string>
 			<key>scope</key>
+			<string>entity.name</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>118</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Class name</string>
+			<key>scope</key>
 			<string>entity.name.class</string>
 			<key>settings</key>
 			<dict>
@@ -195,6 +228,19 @@
 				<string>italic</string>
 				<key>foreground</key>
 				<string>214</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Error</string>
+			<key>scope</key>
+			<string>invalid</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>161</string>
 			</dict>
 		</dict>
 	</array>
