@@ -3,7 +3,7 @@ import re
 from setuptools import setup
 
 version = re.search(
-    '^__version__\s*=\s*"([^"]*)"',
+    r'^__version__\s*=\s*"([^"]*)"',
     open("suplemon/main.py").read(),
     re.M
     ).group(1)
