@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+
+## [v0.2.1](https://github.com/richrd/suplemon/tree/0.2.1) (2019-08-29) compared to previous master branch.
+[Full Changelog](https://github.com/richrd/suplemon/compare/0.2.0...0.2.1)
+
+**Fixed bugs:**
+
+- Fix a bug introduced by 0.2.0, where key bindings weren't set up if the user key config file was missing.
+
 ## [v0.2.0](https://github.com/richrd/suplemon/tree/0.2.0) (2019-06-16) compared to previous master branch.
 [Full Changelog](https://github.com/richrd/suplemon/compare/0.1.65...0.2.0)
 
