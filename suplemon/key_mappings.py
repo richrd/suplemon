@@ -100,10 +100,6 @@ key_map = {
     "^Y": "ctrl+y",
     "^Z": "ctrl+z",  # Conflicts with suspend
 
-    544: "ctrl+left",
-    559: "ctrl+right",
-    565: "ctrl+up",
-    524: "ctrl+down",
     "kLFT5": "ctrl+left",
     "kRIT5": "ctrl+right",
     "kUP5": "ctrl+up",
