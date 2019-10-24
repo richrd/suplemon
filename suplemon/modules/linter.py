@@ -207,8 +207,8 @@ class JsLint(BaseLint):
                 parts = line.split(", ")
                 if len(parts) < 3:
                     continue
-                line_no = int(re.sub("\D", "", parts[0]))
-                char_no = int(re.sub("\D", "", parts[1]))
+                line_no = int(re.sub(r"\D", "", parts[0]))
+                char_no = int(re.sub(r"\D", "", parts[1]))
                 data = parts[2]
                 err_code = None
                 if line_no not in linting.keys():
