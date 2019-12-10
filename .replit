@@ -1,2 +1,2 @@
 language = "nodejs"
-run = ""
+run = "python suplemon.py"
