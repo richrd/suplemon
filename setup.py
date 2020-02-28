@@ -20,6 +20,7 @@ setup(name="Suplemon",
       package_data={"": files},
       include_package_data=True,
       install_requires=[
+          "pyperclip",
           "pygments",
           "wcwidth",
           "windows-curses; platform_system=='Windows'"
