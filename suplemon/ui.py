@@ -120,7 +120,7 @@ class UI:
         global curses
         # Set ESC detection time
         os.environ["ESCDELAY"] = str(self.app.config["app"]["escdelay"])
-        termenv = os.environ["TERM"]
+        termenv = os.environ.get("TERM", "")
         if termenv.endswith("-256color") and self.app.config["app"].get("imitate_256color"):
             # Curses doesn't recognize 'screen-256color' or 'tmux-256color' as 256-color terminals.
             # These terminals all seem to be identical to xterm-256color, which is recognized.
