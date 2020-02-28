@@ -47,6 +47,7 @@ key_map = {
     "KEY_ENTER": "enter",
     "\n": "enter",
     "^J": "enter",
+    "^M": "enter",
     343: "shift+enter",
 
     curses.KEY_BACKSPACE: "backspace",
