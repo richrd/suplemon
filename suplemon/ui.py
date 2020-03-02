@@ -5,6 +5,7 @@ Curses user interface.
 
 import os
 import sys
+import platform
 import logging
 from wcwidth import wcswidth
 
@@ -199,7 +200,10 @@ class UI:
         # curses.init_pair(10, -1, -1) # Default (white on black)
         # Colors for xterm (not xterm-256color)
         # Dark Colors
-        curses.init_pair(0, curses.COLOR_BLACK, bg)      # 0 Black
+
+        if platform.system() != 'Windows':
+            # it raises an exception on windows, cf https://github.com/zephyrproject-rtos/windows-curses/issues/10
+            curses.init_pair(0, curses.COLOR_BLACK, bg)      # 0 Black
         curses.init_pair(1, curses.COLOR_RED, bg)        # 1 Red
         curses.init_pair(2, curses.COLOR_GREEN, bg)      # 2 Green
         curses.init_pair(3, curses.COLOR_YELLOW, bg)     # 3 Yellow
@@ -230,7 +234,9 @@ class UI:
                 # TODO: Define RGB for these to avoid getting
                 # different results in different terminals
                 # xterm-256color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
-                curses.init_pair(0, 242, bg)  # 0 Black
+                if platform.system() != 'Windows':
+                    # it raises an exception on windows, cf https://github.com/zephyrproject-rtos/windows-curses/issues/10
+                    curses.init_pair(0, 242, bg)  # 0 Black
                 curses.init_pair(1, 204, bg)  # 1 Red
                 curses.init_pair(2, 119, bg)  # 2 Green
                 curses.init_pair(3, 221, bg)  # 3 Yellow
