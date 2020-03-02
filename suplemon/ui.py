@@ -326,7 +326,7 @@ class UI:
         if yx is None:
             yx = self.screen.getmaxyx()
         self.screen.erase()
-        curses.resizeterm(yx[0], yx[1])
+        curses.resize_term(yx[0], yx[1])
         self.setup_windows()
 
     def check_resize(self):
