@@ -46,7 +46,7 @@
         "punctuation": " (){}[]<>$@!%'\"=+-/*.:,;_\n\r",
         // Character to use to visualize end of line
         "line_end_char": "",
-        // White space characters and their visual matches
+        // White space characters and their visual representations
         "white_space_map": {
             // Null byte as null symbol
             "\u0000": "\u2400",
@@ -100,7 +100,7 @@
             "\uFEFF": "\u2420"
         },
         // Whether to visually show white space chars
-        "show_white_space": false,
+        "show_white_space": true,
         // Show tab indicators in whitespace
         "show_tab_indicators": true,
         // Tab indicator charatrer

@@ -66,21 +66,22 @@ class BaseViewer:
 
         # Runnable methods
         self.operations = {
-            "arrow_right": self.arrow_right,              # Arrow Right
-            "arrow_left": self.arrow_left,                # Arrow Left
-            "arrow_up": self.arrow_up,                    # Arrow Up
-            "arrow_down": self.arrow_down,                # Arrow Down
-            "jump_left": self.jump_left,                  # Ctrl + Left
-            "jump_right": self.jump_right,                # Ctrl + Right
-            "jump_up": self.jump_up,                      # Ctrl + Up
-            "jump_down": self.jump_down,                  # Ctrl + Down
-            "page_up": self.page_up,                      # Page Up
-            "page_down": self.page_down,                  # Page Down
-            "home": self.home,                            # Home
-            "end": self.end,                              # End
-            "find": self.find_query,                      # Ctrl + F
-            "find_next": self.find_next,                  # Ctrl + D
-            "find_all": self.find_all,                    # Ctrl + A
+            "arrow_right": self.arrow_right,
+            "arrow_left": self.arrow_left,
+            "arrow_up": self.arrow_up,
+            "arrow_down": self.arrow_down,
+            "jump_left": self.jump_left,
+            "jump_right": self.jump_right,
+            "jump_up": self.jump_up,
+            "jump_down": self.jump_down,
+            "page_up": self.page_up,
+            "page_down": self.page_down,
+            "home": self.home,
+            "end": self.end,
+            "find": self.find_query,
+            "find_next": self.find_next,
+            "find_all": self.find_all,
+            "scroll_lines": self.scroll_lines,
         }
 
         self.pygments_syntax = None  # Needs to be implemented in derived classes
@@ -111,7 +112,7 @@ class BaseViewer:
     @scroll_pos.setter
     def scroll_pos(self, pos):
         self.y_scroll = pos[0]
-        self.x_scroll = pos[1]
+        self.x_scroll = pos[1] if pos[1] >= 0 else 0
 
     def get_cursor(self):
         """Return the main cursor."""
@@ -408,6 +409,8 @@ class BaseViewer:
             else:
                 # Color with pygments
                 settings = self.app.themes.get_scope(scope)
+                if not settings:
+                    self.logger.info("Theme settings for scope '{0}' of word '{1}' not found.".format(scope, token[1]))
                 pair = scope_to_pair.get(scope)
                 if settings and pair is not None:
                     fg = int(settings.get("foreground") or -1)
@@ -520,6 +523,11 @@ class BaseViewer:
     ###########################################################################
     # Scrolling
     ###########################################################################
+
+    def scroll_lines(self, amount=1):
+        self.y_scroll += -amount
+        if self.y_scroll < 0:
+            self.y_scroll = 0
 
     def scroll_up(self):
         """Scroll view up if neccesary."""
@@ -661,23 +669,31 @@ class BaseViewer:
         # Try match a key to a method and call it
 
         key_bindings = self.get_key_bindings()
-        operation = None
+
+        binding = None
         if key in key_bindings:
-            operation = key_bindings[key]
+            binding = key_bindings[key]
         elif name in key_bindings:
-            operation = key_bindings[name]
-        if operation:
-            self.run_operation(operation)
+            binding = key_bindings[name]
+
+        if binding:
+            args = binding["args"] if "args" in binding else {}
+            self.run_operation(binding["command"], args)
             return True
+
         return False
 
-    def run_operation(self, operation):
+    def run_operation(self, operation, args={}):
         """Run an editor core operation."""
         if operation in self.operations:
             cancel = self.app.trigger_event_before(operation)
             if cancel:
                 return False
-            result = self.operations[operation]()
+            try:
+                result = self.operations[operation](**args)
+            except TypeError:
+                self.logger.exception("Invalid arguments for key binding!")
+                return False
             self.app.trigger_event_after(operation)
             return result
         return False
@@ -804,14 +820,14 @@ class BaseViewer:
                         break
         self.move_cursors()
 
-    def jump_up(self):
-        """Jump up 3 lines."""
-        self.move_cursors((0, -3))
+    def jump_up(self, lines=3):
+        """Jump up n lines, defaults to 3."""
+        self.move_cursors((0, lines * -1))
         self.scroll_up()
 
-    def jump_down(self):
-        """Jump down 3 lines."""
-        self.move_cursors((0, 3))
+    def jump_down(self, lines=3):
+        """Jump down n lines, defaults to 3."""
+        self.move_cursors((0, lines))
         self.scroll_down()
 
     def find_query(self):
@@ -894,14 +910,16 @@ class BaseViewer:
         what = self.last_find
         if what == "":
             cursor = self.get_cursor()
-            search = "^([\w\-]+)"
+            search = r"\b\w+\b"
             line = self.lines[cursor.y][cursor.x:]
             matches = re.match(search, line)
+
             if matches:
                 what = matches.group(0)
             else:
                 if line:
                     what = line[0]
+
             # Escape the data if regex is enabled
             if self.config["regex_find"]:
                 what = re.escape(what)
@@ -974,6 +992,7 @@ class Viewer(BaseViewer):
         if ext in self.extension_map:
             ext = self.extension_map[ext]  # Use it
         try:
+            # TODO: improve lexer detection via pygments
             self.pygments_syntax = pygments.lexers.get_lexer_by_name(ext)
             self.logger.debug("Loaded Pygments lexer '{0}'.".format(ext))
         except:

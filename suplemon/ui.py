@@ -387,11 +387,11 @@ class UI:
         no_write_symbol = ["!", "\u2715"][self.app.config["app"]["use_unicode_symbols"]]
         is_changed_symbol = ["*", "\u2732"][self.app.config["app"]["use_unicode_symbols"]]
         for f in file_list:
-            prepend = [no_write_symbol, ""][f.is_writable()]
+            prepend = no_write_symbol if not f.is_writable() else ""
             append = ""
             if self.app.config["display"]["show_file_modified_indicator"]:
                 append += ["", is_changed_symbol][f.is_changed()]
-            fname = prepend + f.name + append
+            fname = prepend + (f.name if f.name else "untitled") + append
             if not str_list:
                 str_list.append("[{0}]".format(fname))
             else:
@@ -449,12 +449,13 @@ class UI:
         """Show keyboard legend."""
         # Only the most important commands are displayed in the legend
         legend_commands = [
-            ("save_file", "Save"),
+            ("save", "Save"),
             ("save_file_as", "Save as"),
             ("reload_file", "Reload"),
             ("undo", "Undo"),
             ("redo", "Redo"),
-            ("open", "Open"),
+            ("prompt_open_file", "Open"),
+            ("close", "Close"),
             ("copy", "Copy"),
             ("cut", "Cut"),
             ("insert", "Paste"),
@@ -467,7 +468,7 @@ class UI:
             ("run_command", "Run command"),
             ("toggle_mouse", "Mouse mode"),
             ("help", "Help"),
-            ("ask_exit", "Exit"),
+            ("exit", "Exit"),
         ]
 
         # Get the key bindings for the commands

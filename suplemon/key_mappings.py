@@ -120,6 +120,10 @@ key_map = {
     "O5R": "ctrl+f3",
     "O5S": "ctrl+f4",
 
+    "KEY_F(25)": "ctrl+f1",
+    "KEY_F(26)": "ctrl+f2",
+    "KEY_F(27)": "ctrl+f3",
+    "KEY_F(28)": "ctrl+f4",
     "KEY_F(29)": "ctrl+f5",
     "KEY_F(30)": "ctrl+f6",
     "KEY_F(31)": "ctrl+f7",
@@ -149,6 +153,10 @@ key_map = {
     "kPRV3": "alt+pageup",
     "kNXT3": "alt+pagedown",
 
+    "KEY_F(49)": "alt+f1",
+    "KEY_F(50)": "alt+f2",
+    "KEY_F(51)": "alt+f3",
+    "KEY_F(52)": "alt+f4",
     "KEY_F(53)": "alt+f5",
     "KEY_F(54)": "alt+f6",
     "KEY_F(55)": "alt+f7",
@@ -181,6 +189,10 @@ key_map = {
     "O2R": "shift+f3",
     "O2S": "shift+f4",
 
+    "KEY_F(13)": "shift+f1",
+    "KEY_F(14)": "shift+f2",
+    "KEY_F(15)": "shift+f3",
+    "KEY_F(16)": "shift+f4",
     "KEY_F(17)": "shift+f5",
     "KEY_F(18)": "shift+f6",
     "KEY_F(19)": "shift+f7",
@@ -210,15 +222,28 @@ key_map = {
     "kEND4": "shift+alt+end",
 
 
-    # Control + Shift
-    "kUP6": "ctrl+shift+up",
-    "kDN6": "ctrl+shift+down",
-    "kLFT6": "ctrl+shift+left",
-    "kRIT6": "ctrl+shift+right",
+    # Shift + Control
+    "KEY_F(37)": "shift+ctrl+f1",
+    "KEY_F(38)": "shift+ctrl+f2",
+    "KEY_F(39)": "shift+ctrl+f3",
+    "KEY_F(40)": "shift+ctrl+f4",
+    "KEY_F(41)": "shift+ctrl+f5",
+    "KEY_F(42)": "shift+ctrl+f6",
+    "KEY_F(43)": "shift+ctrl+f7",
+    "KEY_F(44)": "shift+ctrl+f8",
+    "KEY_F(45)": "shift+ctrl+f9",
+    "KEY_F(46)": "shift+ctrl+f10",
+    "KEY_F(47)": "shift+ctrl+f11",
+    "KEY_F(48)": "shift+ctrl+f12",
 
-    "kDC6": "ctrl+shift+delete",
-    "kHOM6": "ctrl+shift+home",
-    "kEND6": "ctrl+shift+end",
+    "kUP6": "shift+ctrl+up",
+    "kDN6": "shift+ctrl+down",
+    "kLFT6": "shift+ctrl+left",
+    "kRIT6": "shift+ctrl+right",
+
+    "kDC6": "shift+ctrl+delete",
+    "kHOM6": "shift+ctrl+home",
+    "kEND6": "shift+ctrl+end",
 
 
     # Control + Alt

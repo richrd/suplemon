@@ -35,9 +35,11 @@ class Lexer:
             pygments.token.Name.Builtin:               "constant.language",
             pygments.token.Name.Builtin.Pseudo:        "constant.language",
             pygments.token.Name.Namespace:             "constant.language",
+            pygments.token.Name.Exception:             "entity.name.type",
 
             pygments.token.Literal.String:             "string",
             pygments.token.Literal.String.Doc:         "string",
+            pygments.token.Literal.String.Single:      "string",
             pygments.token.Literal.String.Double:      "string",
             pygments.token.Literal.String.Regex:       "string",
             pygments.token.Literal.String.Backtick:    "string",
@@ -81,8 +83,6 @@ class Lexer:
 
             if token in self.token_map.keys():
                 scope = self.token_map[token]
-            else:
-                self.logger.warning("Token '{0}' for word '{1}' not found in token_map.".format(token, word[1]))
 
             scopes.append((scope, word[1]))
         return scopes

@@ -22,10 +22,10 @@ class Linter(Module):
         # Show linting messages in status bar
         self.bind_event_after("mainloop", self.mainloop)
         # Re-lint current file when appropriate
-        self.bind_event_after("save_file", self.lint_current_file)
+        self.bind_event_after("save", self.lint_current_file)
         self.bind_event_after("save_file_as", self.lint_current_file)
         self.bind_event_after("reload_file", self.lint_current_file)
-        self.bind_event_after("open_file", self.lint_current_file)
+        self.bind_event_after("open", self.lint_current_file)
 
     def run(self, app, editor, args):
         """Run the linting command."""

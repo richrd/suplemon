@@ -22,7 +22,7 @@ __version__ = "0.2.1"
 
 
 class App:
-    def __init__(self, filenames=None, config_file=None):
+    def __init__(self, filenames=None, config_file=None, log_level=None):
         """
         Handle App initialization
 
@@ -33,6 +33,7 @@ class App:
         self.inited = False
         self.running = False
         self.debug = True
+        self.log_level = log_level
         self.block_rendering = False
 
         # Set default variables
@@ -61,16 +62,15 @@ class App:
         # Define core operations
         self.operations = {
             "help": self.help,
-            "save_file": self.save_file,
+            "save": self.save_file,
             "run_command": self.query_command,
             "go_to": self.go_to,
-            "open": self.open,
-            "close_file": self.close_file,
+            "prompt_open_file": self.open,
+            "close": self.close_file,
             "new_file": self.new_file,
             "exit": self.ask_exit,
-            "ask_exit": self.ask_exit,
-            "prev_file": self.prev_file,
-            "next_file": self.next_file,
+            "prev_view": self.prev_file,
+            "next_view": self.next_file,
             "save_file_as": self.save_file_as,
             "reload_file": self.reload_file,
             "toggle_mouse": self.toggle_mouse,
@@ -99,6 +99,8 @@ class App:
         # Configure logger
         self.debug = self.config["app"]["debug"]
         debug_level = self.config["app"]["debug_level"]
+        if self.log_level is not None:
+            debug_level = self.log_level
         self.logger.debug("Setting debug_level to {0}.".format(debug_level))
         self.logger.setLevel(debug_level)
         [handler.setLevel(debug_level) for handler in self.logger.handlers]
@@ -312,17 +314,25 @@ class App:
         """
         key_bindings = self.get_key_bindings()
 
-        operation = None
+        binding = None
+        args = {}
         if event.key_name in key_bindings.keys():
-            operation = key_bindings[event.key_name]
+            binding = key_bindings[event.key_name]
         elif event.key_code in key_bindings.keys():
-            operation = key_bindings[event.key_code]
+            binding = key_bindings[event.key_code]
 
-        if operation in self.operations.keys():
-            self.run_operation(operation)
+        if not binding:
+            return False
+
+        if "args" in binding:
+            args = binding["args"]
+
+        if binding["command"] in self.operations.keys():
+            self.run_operation(binding["command"], args)
             return True
-        elif operation in self.modules.modules.keys():
-            self.run_module(operation)
+        elif binding["command"] in self.modules.modules.keys():
+            # TODO: check how to deal with args for modules
+            self.run_module(binding["command"])
 
         return False
 
@@ -494,21 +504,22 @@ class App:
             self.logger.exception("Running command failed!")
             return False
 
-    def run_operation(self, operation):
+    def run_operation(self, operation, args={}):
         """Run an app core operation."""
-        # Support arbitrary callables. TODO: deprecate
-        if hasattr(operation, "__call__"):
-            return operation()
-
         if operation in self.operations.keys():
             cancel = self.trigger_event_before(operation)
             if not cancel:
-                result = self.operations[operation]()
+                try:
+                    result = self.operations[operation](**args)
+                except TypeError:
+                    self.logger.exception("Invalid key binding arguments for command '{0}'!".format(operation))
+                    return False
             self.trigger_event_after(operation)
             return result
         elif operation in self.modules.modules.keys():
             cancel = self.trigger_event_before(operation)
             if not cancel:
+                # TODO: check how to deal with args for modules
                 result = self.modules.modules[operation].run(self, self.get_editor(), "")
             self.trigger_event_after(operation)
             return result
