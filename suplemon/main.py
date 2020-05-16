@@ -331,8 +331,7 @@ class App:
             self.run_operation(binding["command"], args)
             return True
         elif binding["command"] in self.modules.modules.keys():
-            # TODO: check how to deal with args for modules
-            self.run_module(binding["command"])
+            self.run_module(binding["command"], args)
 
         return False
 
@@ -396,8 +395,8 @@ class App:
     def ask_exit(self):
         """Exit if no unsaved changes, else make sure the user really wants to exit."""
         if self.unsaved_changes():
-            yes = self.ui.query_bool("Exit?")
-            if yes:
+            confirmed = self.ui.query_bool("You have unsaved changes, exit anyway?")
+            if confirmed:
                 self.exit()
                 return True
             return False
