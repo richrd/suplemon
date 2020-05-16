@@ -677,7 +677,12 @@ class App:
         if target_dir and not os.path.exists(target_dir):
             if self.ui.query_bool("The path doesn't exist, do you want to create it?"):
                 self.logger.debug("Creating missing folders in save path.")
-                os.makedirs(target_dir)
+                try:
+                    os.makedirs(target_dir)
+                except OSError:
+                    self.logger.exception("Couldn't create directories!")
+                    self.ui.set_status("Couldn't create directories!")
+                    return False
             else:
                 return False
         f.set_path(full_path)
