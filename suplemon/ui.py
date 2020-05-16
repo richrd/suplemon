@@ -93,11 +93,12 @@ class InputEvent:
 
     def __str__(self):
         parts = [
-            str(self.type),
-            str(self.key_name),
-            str(self.key_code),
-            str(self.mouse_code),
-            str(self.mouse_pos)
+            "type=" + str(self.type),
+            "key_name=" + str(self.key_name),
+            "key_code=" + str(self.key_code),
+            "curses_key_name=" + str(self.curses_key_name),
+            "mouse_code=" + str(self.mouse_code),
+            "mouse_pos=" + str(self.mouse_pos),
         ]
         return " ".join(parts)
 
