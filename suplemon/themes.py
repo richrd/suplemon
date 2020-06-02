@@ -49,6 +49,7 @@ scope_to_pair = {
     "entity.name.filename.find-in-files": 52,
     "keyword.control": 53,
     "entity.name.type": 54,
+    "string.interpolated": 55,
 }
 
 

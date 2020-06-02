@@ -72,6 +72,17 @@
 		</dict>
 		<dict>
 			<key>name</key>
+			<string>String Interpolated</string>
+			<key>scope</key>
+			<string>string.interpolated</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>135</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
 			<string>Number</string>
 			<key>scope</key>
 			<string>constant.numeric, constant.language</string>
