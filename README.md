@@ -20,7 +20,7 @@ Suplemon replicates Sublime Text style functionality in the terminal with the ea
 http://github.com/richrd/suplemon
 
 
-![Suplemon in action](https://user-images.githubusercontent.com/3417292/104489827-c1f09b00-55d8-11eb-95db-c063c0396725.png)
+![Suplemon in action](https://i.imgur.com/pdKvKsN.gif)
 
 ## Features
  * Proper multi cursor editing, as in Sublime Text
