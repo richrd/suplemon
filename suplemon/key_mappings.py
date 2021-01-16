@@ -47,11 +47,13 @@ key_map = {
     "KEY_ENTER": "enter",
     "\n": "enter",
     "^J": "enter",
+    "^M": "enter",
     343: "shift+enter",
 
     curses.KEY_BACKSPACE: "backspace",
     "KEY_BACKSPACE": "backspace",
     "^?": "backspace",
+    "^H": "backspace", # on Windows
 
     curses.KEY_DC: "delete",
     curses.KEY_HOME: "home",
@@ -80,7 +82,7 @@ key_map = {
     "^E": "ctrl+e",
     "^F": "ctrl+f",
     "^G": "ctrl+g",
-    "^H": "ctrl+h",
+    # "^H": "ctrl+h",  # Conflicts with 'backspace' on Windows
     # "^I": "ctrl+i",  # Conflicts with 'tab'
     # "^J": "ctrl+j",  # Conflicts with 'enter'
     "^K": "ctrl+k",
