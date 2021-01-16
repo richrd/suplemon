@@ -9,7 +9,7 @@ class Date(Module):
     """Shows the current date without year in the top status bar."""
 
     def get_status(self):
-        s = time.strftime("%d.%m.")
+        s = time.strftime("%Y-%m-%d")
         if self.app.config["app"]["use_unicode_symbols"]:
             return "" + s
         return s

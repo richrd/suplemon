@@ -93,11 +93,12 @@ class InputEvent:
 
     def __str__(self):
         parts = [
-            str(self.type),
-            str(self.key_name),
-            str(self.key_code),
-            str(self.mouse_code),
-            str(self.mouse_pos)
+            "type=" + str(self.type),
+            "key_name=" + str(self.key_name),
+            "key_code=" + str(self.key_code),
+            "curses_key_name=" + str(self.curses_key_name),
+            "mouse_code=" + str(self.mouse_code),
+            "mouse_pos=" + str(self.mouse_pos),
         ]
         return " ".join(parts)
 
@@ -241,10 +242,10 @@ class UI:
                 curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
                 curses.init_pair(9, 8, bg)   # 8 Gray (Whitespace color)
             except:
-                self.logger.warning("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
+                self.logger.info("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
                 self.app.config["editor"]["theme"] = "8colors"
         else:
-            self.logger.warning("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.")
+            self.logger.info("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.")
             self.app.config["editor"]["theme"] = "8colors"
 
         self.app.themes.use(self.app.config["editor"]["theme"])
@@ -387,11 +388,11 @@ class UI:
         no_write_symbol = ["!", "\u2715"][self.app.config["app"]["use_unicode_symbols"]]
         is_changed_symbol = ["*", "\u2732"][self.app.config["app"]["use_unicode_symbols"]]
         for f in file_list:
-            prepend = [no_write_symbol, ""][f.is_writable()]
+            prepend = no_write_symbol if not f.is_writable() else ""
             append = ""
             if self.app.config["display"]["show_file_modified_indicator"]:
                 append += ["", is_changed_symbol][f.is_changed()]
-            fname = prepend + f.name + append
+            fname = prepend + (f.name if f.name else "untitled") + append
             if not str_list:
                 str_list.append("[{0}]".format(fname))
             else:
@@ -449,12 +450,13 @@ class UI:
         """Show keyboard legend."""
         # Only the most important commands are displayed in the legend
         legend_commands = [
-            ("save_file", "Save"),
+            ("save", "Save"),
             ("save_file_as", "Save as"),
             ("reload_file", "Reload"),
             ("undo", "Undo"),
             ("redo", "Redo"),
-            ("open", "Open"),
+            ("prompt_open_file", "Open"),
+            ("close", "Close"),
             ("copy", "Copy"),
             ("cut", "Cut"),
             ("insert", "Paste"),
@@ -467,7 +469,7 @@ class UI:
             ("run_command", "Run command"),
             ("toggle_mouse", "Mouse mode"),
             ("help", "Help"),
-            ("ask_exit", "Exit"),
+            ("exit", "Exit"),
         ]
 
         # Get the key bindings for the commands

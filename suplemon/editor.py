@@ -60,31 +60,31 @@ class Editor(Viewer):
     def init(self):
         Viewer.init(self)
         operations = {
-            "backspace": self.backspace,                  # Backspace
-            "delete": self.delete,                        # Delete
-            "insert": self.insert,                        # Insert
-            "enter": self.enter,                          # Enter
-            "tab": self.tab,                              # Tab
-            "untab": self.untab,                          # Shift + Tab
-            "escape": self.escape,                        # Escape
-            "single_selection": self.single_selection,    # Escape
-            "clear_last_find": self.clear_last_find,      # Escape
-            "new_cursor_up": self.new_cursor_up,          # Alt + Up
-            "new_cursor_down": self.new_cursor_down,      # Alt + Down
-            "new_cursor_left": self.new_cursor_left,      # Alt + Left
-            "new_cursor_right": self.new_cursor_right,    # Alt + Right
-            "page_up": self.page_up,                      # Page Up
-            "page_down": self.page_down,                  # Page Down
-            "push_up": self.push_up,                      # Alt + Page Up
-            "push_down": self.push_down,                  # Alt + Page Down
-            "undo": self.undo,                            # F5
-            "redo": self.redo,                            # F6
-            "toggle_line_nums": self.toggle_line_nums,    # F9
-            "toggle_line_ends": self.toggle_line_ends,    # F10
-            "toggle_highlight": self.toggle_highlight,    # F11
-            "copy": self.copy,                            # Ctrl + C
-            "cut": self.cut,                              # Ctrl + X
-            "duplicate_line": self.duplicate_line,        # Ctrl + W
+            "backspace": self.backspace,
+            "delete": self.delete,
+            "insert": self.insert,
+            "enter": self.enter,
+            "tab": self.tab,
+            "untab": self.untab,
+            "escape": self.escape,
+            "single_selection": self.single_selection,
+            "clear_last_find": self.clear_last_find,
+            "new_cursor_up": self.new_cursor_up,
+            "new_cursor_down": self.new_cursor_down,
+            "new_cursor_left": self.new_cursor_left,
+            "new_cursor_right": self.new_cursor_right,
+            "page_up": self.page_up,
+            "page_down": self.page_down,
+            "swap_line_up": self.swap_line_up,
+            "swap_line_down": self.swap_line_down,
+            "undo": self.undo,
+            "redo": self.redo,
+            "toggle_line_nums": self.toggle_line_nums,
+            "toggle_line_ends": self.toggle_line_ends,
+            "toggle_highlight": self.toggle_highlight,
+            "copy": self.copy,
+            "cut": self.cut,
+            "duplicate_line": self.duplicate_line,
         }
         for key in operations.keys():
             self.operations[key] = operations[key]
@@ -411,7 +411,7 @@ class Editor(Viewer):
             self.lines.insert(at, Line(line))
         self.move_y_cursors(at, len(lines))
 
-    def push_up(self):
+    def swap_line_up(self):
         """Move current lines up by one line."""
         used_y = []
         curs = sorted(self.cursors, key=lambda c: (c[1], c[0]))
@@ -426,10 +426,10 @@ class Editor(Viewer):
             self.lines[cursor.y] = old
         self.move_cursors((0, -1))
         self.scroll_up()
-        # Add a restore point if previous action != push_up
-        self.store_action_state("push_up")
+        # Add a restore point if previous action != swap_line_up
+        self.store_action_state("swap_line_up")
 
-    def push_down(self):
+    def swap_line_down(self):
         """Move current lines down by one line."""
         used_y = []
         curs = reversed(sorted(self.cursors, key=lambda c: (c[1], c[0])))
@@ -445,8 +445,8 @@ class Editor(Viewer):
 
         self.move_cursors((0, 1))
         self.scroll_down()
-        # Add a restore point if previous action != push_down
-        self.store_action_state("push_down")
+        # Add a restore point if previous action != swap_line_down
+        self.store_action_state("swap_line_down")
 
     def tab(self):
         """Indent lines."""

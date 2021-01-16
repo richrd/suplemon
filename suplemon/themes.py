@@ -13,6 +13,7 @@ except:
 from . import hex2xterm
 
 # Map scope name to its color pair index
+# Numbers don't matter but must be unique
 scope_to_pair = {
     "global": 21,
     "comment": 22,
@@ -46,6 +47,9 @@ scope_to_pair = {
     "markup.changed": 50,
     "constant.numeric.line-number.find-in-files - match": 51,
     "entity.name.filename.find-in-files": 52,
+    "keyword.control": 53,
+    "entity.name.type": 54,
+    "string.interpolated": 55,
 }
 
 
@@ -158,13 +162,13 @@ class ThemeLoader:
         return d
 
     def parse_array(self, node):
-        l = []
+        new_arr = []
         for child in node:
             value = self.parse(child)
             if value is not None:
-                l.append(value)
+                new_arr.append(value)
 
-        return l
+        return new_arr
 
     def parse_text(self, node):
         # If the node text is a hex color convert it to an xterm equivalent

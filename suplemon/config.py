@@ -64,17 +64,18 @@ class Config:
         if not os.path.exists(path):
             self.logger.debug("Keymap file '{0}' doesn't exist.".format(path))
         else:
-            keymap = self.load_config_file(path) or []
-            if not keymap:
+            loaded_keymap = self.load_config_file(path)
+            if loaded_keymap is False:
                 self.logger.warning("Failed to load keymap file '{0}'.".format(path))
-
+            else:
+                keymap = loaded_keymap
         # Build the key bindings
         # User keymap overwrites the defaults in the bindings
         self.keymap = self.normalize_keys(self.keymap + keymap)
         self.key_bindings = {}
         for binding in self.keymap:
             for key in binding["keys"]:
-                self.key_bindings[key] = binding["command"]
+                self.key_bindings[key] = binding
 
         return True
 
