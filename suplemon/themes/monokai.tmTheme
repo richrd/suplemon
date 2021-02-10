@@ -13,7 +13,7 @@
 				<key>foreground</key>
 				<string>254</string>
 				<key>invisibles</key>
-				<string>237</string>
+				<string>236</string>
 				<key>lineHighlight</key>
 				<string>237</string>
 				<key>selection</key>
@@ -24,6 +24,28 @@
 				<string>16</string>
 				<key>selectionBorder</key>
 				<string>235</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Generic</string>
+			<key>scope</key>
+			<string>generic</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>254</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Punctuation</string>
+			<key>scope</key>
+			<string>punctuation</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>254</string>
 			</dict>
 		</dict>
 		<dict>
@@ -50,16 +72,26 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Number</string>
+			<string>String Interpolated</string>
 			<key>scope</key>
-			<string>constant.numeric</string>
+			<string>string.interpolated</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
 				<string>135</string>
 			</dict>
 		</dict>
-
+		<dict>
+			<key>name</key>
+			<string>Number</string>
+			<key>scope</key>
+			<string>constant.numeric, constant.language</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>135</string>
+			</dict>
+		</dict>
 		<dict>
 			<key>name</key>
 			<string>Built-in constant</string>
@@ -103,7 +135,18 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>161</string>
+				<string>197</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Keyword Control</string>
+			<key>scope</key>
+			<string>keyword.control</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>197</string>
 			</dict>
 		</dict>
 		<dict>
@@ -136,13 +179,24 @@
 			<key>name</key>
 			<string>Class name</string>
 			<key>scope</key>
+			<string>entity.name</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>155</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Class name</string>
+			<key>scope</key>
 			<string>entity.name.class</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>
 				<string>italic</string>
 				<key>foreground</key>
-				<string>118</string>
+				<string>155</string>
 			</dict>
 		</dict>
 		<dict>
@@ -150,6 +204,19 @@
 			<string>Tag name</string>
 			<key>scope</key>
 			<string>entity.name.tag</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>81</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Tag name type</string>
+			<key>scope</key>
+			<string>entity.name.type</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>
@@ -168,7 +235,20 @@
 				<key>fontStyle</key>
 				<string>italic underline</string>
 				<key>foreground</key>
-				<string>118</string>
+				<string>155</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Inherited class</string>
+			<key>scope</key>
+			<string>entity.other.attribute-name</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic underline</string>
+				<key>foreground</key>
+				<string>155</string>
 			</dict>
 		</dict>
 		<dict>
@@ -181,7 +261,7 @@
 				<key>fontStyle</key>
 				<string>italic</string>
 				<key>foreground</key>
-				<string>118</string>
+				<string>155</string>
 			</dict>
 		</dict>
 		<dict>
@@ -195,6 +275,19 @@
 				<string>italic</string>
 				<key>foreground</key>
 				<string>214</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>Error</string>
+			<key>scope</key>
+			<string>invalid</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>italic</string>
+				<key>foreground</key>
+				<string>197</string>
 			</dict>
 		</dict>
 	</array>
