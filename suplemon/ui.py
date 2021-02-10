@@ -393,7 +393,10 @@ class UI:
                 append += ["", is_changed_symbol][f.is_changed()]
             fname = prepend + f.name + append
             if not str_list:
-                str_list.append("[{0}]".format(fname))
+                if f.name:
+                    str_list.append("[{0}]".format(fname))
+                else:
+                    str_list.append("[Untitled]")
             else:
                 str_list.append(fname)
         return " ".join(str_list)
