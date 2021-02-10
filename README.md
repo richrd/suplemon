@@ -2,7 +2,6 @@ Suplemon :lemon:
 ========
 
 [![Build Status](https://travis-ci.org/richrd/suplemon.svg?branch=master)](https://travis-ci.org/richrd/suplemon) [![Join the chat at https://webchat.freenode.net/?channels=%23suplemon](https://img.shields.io/badge/chat-on%20freenode%20%23suplemon-blue.svg)](https://webchat.freenode.net/?channels=%23suplemon)
-[![Run on Repl.it](https://repl.it/badge/github/richrd/suplemon)](https://repl.it/github/richrd/suplemon)
 
           ___________   _________  ___     ______________________________   ___
          /  _____/  /  /  /  _   \/  /\   /  ______/        /  ___   /   | /  /\
