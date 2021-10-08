@@ -90,10 +90,10 @@ class Linter(Module):
             line = editor.lines[line_no]
             if line_no+1 in linting.keys():
                 line.linting = linting[line_no+1]
-                line.set_number_color(1)
+                line.set_state("lint_error")
             else:
                 line.linting = False
-                line.reset_number_color()
+                line.reset_state()
 
     def get_msgs_on_line(self, editor, line_no):
         line = editor.lines[line_no]

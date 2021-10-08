@@ -327,8 +327,12 @@ class BaseViewer:
                 self.window.bkgdset(" ", attribs | curses.A_BOLD)
 
             if self.config["show_line_nums"]:
-                curs_color = curses.color_pair(line.number_color)
                 padded_num = "{:{}{}d} ".format(lnum + 1, lnum_pad, lnum_len)
+                curs_color = self.app.ui.colors.get("linenumbers")
+                if line.state:
+                    state_style = self.app.ui.colors.get_alt("linenumbers_" + line.state, None)
+                    if state_style is not None:
+                        curs_color = state_style
                 self.window.addstr(i, 0, padded_num, curs_color)
 
             pos = (x_offset, i)
@@ -394,14 +398,16 @@ class BaseViewer:
                 break
             scope = token[0]
             text = self.replace_whitespace(token[1])
-            if token[1].isspace() and not self.app.ui.limited_colors:
-                pair = 9  # Default to gray text on normal background
-                settings = self.app.themes.get_scope("global")
-                if settings and settings.get("invisibles"):
-                    fg = int(settings.get("invisibles") or -1)
-                    bg = int(settings.get("background") or -1)
-                    curses.init_pair(pair, fg, bg)
-                curs_color = curses.color_pair(pair)
+            if token[1].isspace():
+                curs_color = self.app.ui.colors.get("editor_whitespace")
+                if not self.config["ignore_theme_whitespace"]:
+                    settings = self.app.themes.get_scope("global")
+                    if settings and settings.get("invisibles"):
+                        curs_color = self.app.ui.colors.get_alt("syntax_pyg_whitespace", None)
+                        if curs_color is None:
+                            fg = int(settings.get("invisibles") or self.app.ui.colors.get_fg("editor"))
+                            bg = int(settings.get("background") or self.app.ui.colors.get_bg("editor"))
+                            curs_color = self.app.ui.colors.add_curses("syntax_pyg_whitespace", fg, bg)
                 # Only add tab indicators to the inital whitespace
                 if first_token and self.config["show_tab_indicators"]:
                     text = self.add_tab_indicators(text)
@@ -413,10 +419,12 @@ class BaseViewer:
                     self.logger.info("Theme settings for scope '{0}' of word '{1}' not found.".format(scope, token[1]))
                 pair = scope_to_pair.get(scope)
                 if settings and pair is not None:
-                    fg = int(settings.get("foreground") or -1)
-                    bg = int(settings.get("background") or -1)
-                    curses.init_pair(pair, fg, bg)
-                    curs_color = curses.color_pair(pair)
+                    pair = "syntax_pyg_%s" % pair
+                    curs_color = self.app.ui.colors.get_alt(pair, None)
+                    if curs_color is None:
+                        fg = int(settings.get("foreground") or self.app.ui.colors.get_fg("editor"))
+                        bg = int(settings.get("background") or self.app.ui.colors.get_bg("editor"))
+                        curs_color = self.app.ui.colors.add_curses(pair, fg, bg)
                     self.window.addstr(y, x_offset, text, curs_color)
                 else:
                     self.window.addstr(y, x_offset, text)
@@ -432,7 +440,11 @@ class BaseViewer:
         y = pos[1]
         line_data = line.get_data()
         line_data = self._prepare_line_for_rendering(line_data, max_len)
-        curs_color = curses.color_pair(self.get_line_color(line))
+        pair_fg = self.get_line_color(line)
+        pair = "syntax_ll_%s" % pair_fg
+        curs_color = self.app.ui.colors.get_alt(pair, None)
+        if curs_color is None:
+            curs_color = self.app.ui.colors.add_curses(pair, pair_fg, self.app.ui.colors.get_bg("editor"))
         self.window.addstr(y, x_offset, line_data, curs_color)
 
     def render_line_normal(self, line, pos, x_offset, max_len):
@@ -1014,4 +1026,4 @@ class Viewer(BaseViewer):
             color = self.syntax.get_color(raw_line)
             if color is not None:
                 return color
-        return 0
+        return self.app.ui.colors.get_fg("editor")
