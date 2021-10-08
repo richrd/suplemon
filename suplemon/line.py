@@ -10,7 +10,7 @@ class Line:
             data = data.data
         self.data = data
         self.x_scroll = 0
-        self.number_color = 8
+        self.state = None
 
     def __getitem__(self, i):
         return self.data[i]
@@ -38,8 +38,8 @@ class Line:
             data = data.get_data()
         self.data = data
 
-    def set_number_color(self, color):
-        self.number_color = color
+    def set_state(self, state):
+        self.state = state
 
     def find(self, what, start=0):
         return self.data.find(what, start)
@@ -47,5 +47,5 @@ class Line:
     def strip(self, *args):
         return self.data.strip(*args)
 
-    def reset_number_color(self):
-        self.number_color = 8
+    def reset_state(self):
+        self.state = None

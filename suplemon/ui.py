@@ -6,10 +6,11 @@ Curses user interface.
 import os
 import sys
 import logging
-from wcwidth import wcswidth
 
 from .prompt import Prompt, PromptBool, PromptFiltered, PromptFile, PromptAutocmp
 from .key_mappings import key_map
+from .color_manager_curses import ColorManager
+from .statusbar import StatusBarManager
 
 # Curses can't be imported yet but we'll
 # predefine it to avoid confusing flake8
@@ -107,7 +108,9 @@ class UI:
     def __init__(self, app):
         self.app = app
         self.logger = logging.getLogger(__name__)
-        self.limited_colors = True
+        self.statusbars = None
+        self.bar_head = None
+        self.bar_bottom = None
         self.screen = None
         self.current_yx = None
         self.text_input = None
@@ -145,11 +148,11 @@ class UI:
     def load(self, *args):
         """Setup curses."""
         # Log the terminal type
-        termname = curses.termname().decode("utf-8")
-        self.logger.debug("Loading UI for terminal: {0}".format(termname))
+        self.termname = curses.termname().decode("utf-8")
+        self.logger.debug("Loading UI for terminal: {0}".format(self.termname))
 
         self.screen = curses.initscr()
-        self.setup_colors()
+        self.colors = ColorManager(self.app)
 
         curses.raw()
         curses.noecho()
@@ -182,74 +185,6 @@ class UI:
         else:
             curses.mousemask(0)  # All events
 
-    def setup_colors(self):
-        """Initialize color support and define colors."""
-        curses.start_color()
-        try:
-            curses.use_default_colors()
-        except:
-            self.logger.warning("Failed to load curses default colors. You could try 'export TERM=xterm-256color'.")
-            return False
-
-        # Default foreground color (could also be set to curses.COLOR_WHITE)
-        fg = -1
-        # Default background color (could also be set to curses.COLOR_BLACK)
-        bg = -1
-
-        # This gets colors working in TTY's as well as terminal emulators
-        # curses.init_pair(10, -1, -1) # Default (white on black)
-        # Colors for xterm (not xterm-256color)
-        # Dark Colors
-        curses.init_pair(0, curses.COLOR_BLACK, bg)      # 0 Black
-        curses.init_pair(1, curses.COLOR_RED, bg)        # 1 Red
-        curses.init_pair(2, curses.COLOR_GREEN, bg)      # 2 Green
-        curses.init_pair(3, curses.COLOR_YELLOW, bg)     # 3 Yellow
-        curses.init_pair(4, curses.COLOR_BLUE, bg)       # 4 Blue
-        curses.init_pair(5, curses.COLOR_MAGENTA, bg)    # 5 Magenta
-        curses.init_pair(6, curses.COLOR_CYAN, bg)       # 6 Cyan
-        curses.init_pair(7, fg, bg)                      # 7 White on Black
-        curses.init_pair(8, fg, curses.COLOR_BLACK)      # 8 White on Black (Line number color)
-
-        # Set color for whitespace
-        # Fails on default Ubuntu terminal with $TERM=xterm (max 8 colors)
-        # TODO: Smarter implementation for custom colors
-        try:
-            curses.init_pair(9, 8, bg)                   # Gray (Whitespace color)
-            self.limited_colors = False
-        except:
-            # Try to revert the color
-            self.limited_colors = True
-            try:
-                curses.init_pair(9, fg, bg)              # Try to revert color if possible
-            except:
-                # Reverting failed
-                self.logger.error("Failed to set and revert extra colors.")
-
-        # Nicer shades of same colors (if supported)
-        if curses.can_change_color():
-            try:
-                # TODO: Define RGB for these to avoid getting
-                # different results in different terminals
-                # xterm-256color chart http://www.calmar.ws/vim/256-xterm-24bit-rgb-color-chart.html
-                curses.init_pair(0, 242, bg)  # 0 Black
-                curses.init_pair(1, 204, bg)  # 1 Red
-                curses.init_pair(2, 119, bg)  # 2 Green
-                curses.init_pair(3, 221, bg)  # 3 Yellow
-                curses.init_pair(4, 69, bg)   # 4 Blue
-                curses.init_pair(5, 171, bg)  # 5 Magenta
-                curses.init_pair(6, 81, bg)   # 6 Cyan
-                curses.init_pair(7, 15, bg)   # 7 White
-                curses.init_pair(8, 8, curses.COLOR_BLACK)  # 8 Gray on Black (Line number color)
-                curses.init_pair(9, 8, bg)   # 8 Gray (Whitespace color)
-            except:
-                self.logger.info("Enhanced colors failed to load. You could try 'export TERM=xterm-256color'.")
-                self.app.config["editor"]["theme"] = "8colors"
-        else:
-            self.logger.info("Enhanced colors not supported. You could try 'export TERM=xterm-256color'.")
-            self.app.config["editor"]["theme"] = "8colors"
-
-        self.app.themes.use(self.app.config["editor"]["theme"])
-
     def setup_windows(self):
         """Initialize and layout windows."""
         # We are using curses.newwin instead of self.screen.subwin/derwin because
@@ -262,7 +197,6 @@ class UI:
         # https://anonscm.debian.org/cgit/collab-maint/ncurses.git/tree/ncurses/base/resizeterm.c#n274
         # https://anonscm.debian.org/cgit/collab-maint/ncurses.git/tree/ncurses/base/wresize.c#n87
         self.text_input = None
-
         offset_top = 0
         offset_bottom = 0
         y, x = self.screen.getmaxyx()
@@ -275,6 +209,7 @@ class UI:
             elif self.header_win.getmaxyx()[1] != x:
                 # Header bar don't ever need to move
                 self.header_win.resize(1, x)
+            self.header_win.bkgdset(" ", self.colors.get("status_top"))
 
         if config["show_bottom_bar"]:
             offset_bottom += 1
@@ -284,6 +219,7 @@ class UI:
                 self.status_win.mvwin(y - offset_bottom, 0)
                 if self.status_win.getmaxyx()[1] != x:
                     self.status_win.resize(1, x)
+            self.status_win.bkgdset(" ", self.colors.get("status_bottom"))
 
         if config["show_legend"]:
             offset_bottom += 2
@@ -293,6 +229,7 @@ class UI:
                 self.legend_win.mvwin(y - offset_bottom, 0)
                 if self.legend_win.getmaxyx()[1] != x:
                     self.legend_win.resize(2, x)
+            self.legend_win.bkgdset(" ", self.colors.get("legend"))
 
         if self.editor_win is None:
             self.editor_win = curses.newwin(y - offset_top - offset_bottom, x, offset_top, 0)
@@ -303,6 +240,7 @@ class UI:
             self.app.get_editor().move_win((offset_top, 0))
             # self.editor_win.mvwin(offset_top, 0)
             # self.editor_win.resize(y - offset_top - offset_bottom, x)
+        self.editor_win.bkgdset(" ", self.colors.get("editor"))
 
     def get_size(self):
         """Get terminal size."""
@@ -323,6 +261,8 @@ class UI:
         self.screen.erase()
         curses.resizeterm(yx[0], yx[1])
         self.setup_windows()
+        self.screen.noutrefresh()
+        self.statusbars.force_redraw()
 
     def check_resize(self):
         """Check if terminal has resized and resize if needed."""
@@ -333,118 +273,16 @@ class UI:
 
     def refresh_status(self):
         """Refresh status windows."""
-        if self.app.config["display"]["show_top_bar"]:
-            self.show_top_status()
+        if not self.statusbars:
+            self.statusbars = StatusBarManager(self.app)
+            # FIXME: This will not react to removal of statusbars in config without restart
+            if self.app.config["display"]["show_top_bar"]:
+                self.bar_head = self.statusbars.add(self.header_win, "status_top")
+            if self.app.config["display"]["show_bottom_bar"]:
+                self.bar_bottom = self.statusbars.add(self.status_win, "status_bottom")
+        self.statusbars.render()
         if self.app.config["display"]["show_legend"]:
             self.show_legend()
-        if self.app.config["display"]["show_bottom_bar"]:
-            self.show_bottom_status()
-
-    def show_top_status(self):
-        """Show top status row."""
-        self.header_win.erase()
-        size = self.get_size()
-        display = self.app.config["display"]
-        head_parts = []
-        if display["show_app_name"]:
-            name_str = "Suplemon Editor v{0} -".format(self.app.version)
-            if self.app.config["app"]["use_unicode_symbols"]:
-                logo = "\U0001f34b"  # Fancy lemon
-                name_str = " {0} {1}".format(logo, name_str)
-            head_parts.append(name_str)
-
-        # Add module statuses to the status bar in descending order
-        module_keys = sorted(self.app.modules.modules.keys())
-        for name in module_keys:
-            module = self.app.modules.modules[name]
-            if module.options["status"] == "top":
-                status = module.get_status()
-                if status:
-                    head_parts.append(status)
-
-        if display["show_file_list"]:
-            head_parts.append(self.file_list_str())
-
-        head = " ".join(head_parts)
-        head = head + (" " * (size[0]-wcswidth(head)-1))
-        head_width = wcswidth(head)
-        if head_width > size[0]:
-            head = head[:size[0]-head_width]
-        try:
-            if self.app.config["display"]["invert_status_bars"]:
-                self.header_win.addstr(0, 0, head, curses.color_pair(0) | curses.A_REVERSE)
-            else:
-                self.header_win.addstr(0, 0, head, curses.color_pair(0))
-        except curses.error:
-            pass
-        self.header_win.refresh()
-
-    def file_list_str(self):
-        """Return rotated file list beginning at current file as a string."""
-        curr_file_index = self.app.current_file_index()
-        files = self.app.get_files()
-        file_list = files[curr_file_index:] + files[:curr_file_index]
-        str_list = []
-        no_write_symbol = ["!", "\u2715"][self.app.config["app"]["use_unicode_symbols"]]
-        is_changed_symbol = ["*", "\u2732"][self.app.config["app"]["use_unicode_symbols"]]
-        for f in file_list:
-            prepend = no_write_symbol if not f.is_writable() else ""
-            append = ""
-            if self.app.config["display"]["show_file_modified_indicator"]:
-                append += ["", is_changed_symbol][f.is_changed()]
-            fname = prepend + (f.name if f.name else "untitled") + append
-            if not str_list:
-                str_list.append("[{0}]".format(fname))
-            else:
-                str_list.append(fname)
-        return " ".join(str_list)
-
-    def show_bottom_status(self):
-        """Show bottom status line."""
-        editor = self.app.get_editor()
-        size = self.get_size()
-        cur = editor.get_cursor()
-
-        # Core status info
-        status_str = "@{0},{1} cur:{2} buf:{3}".format(
-            str(cur[0]),
-            str(cur[1]),
-            str(len(editor.cursors)),
-            str(len(editor.get_buffer()))
-        )
-
-        # Add module statuses to the status bar
-        module_str = ""
-        for name in self.app.modules.modules.keys():
-            module = self.app.modules.modules[name]
-            if module.options["status"] == "bottom":
-                module_str += " " + module.get_status()
-        status_str = module_str + " " + status_str
-
-        self.status_win.erase()
-        status = self.app.get_status()
-        extra = size[0] - len(status+status_str) - 1
-        line = status+(" "*extra)+status_str
-
-        if len(line) >= size[0]:
-            line = line[:size[0]-1]
-
-        if self.app.config["display"]["invert_status_bars"]:
-            attrs = curses.color_pair(0) | curses.A_REVERSE
-        else:
-            attrs = curses.color_pair(0)
-
-        # This thwarts a weird crash that happens when pasting a lot
-        # of data that contains line breaks into the find dialog.
-        # Should probably figure out why it happens, but it's not
-        # due to line breaks in the data nor is the data too long.
-        # Thanks curses!
-        try:
-            self.status_win.addstr(0, 0, line, attrs)
-        except:
-            self.logger.exception("Failed to show bottom status bar. Status line was: {0}".format(line))
-
-        self.status_win.refresh()
 
     def show_legend(self):
         """Show keyboard legend."""
@@ -528,6 +366,10 @@ class UI:
 
         # Restore render blocking
         self.app.block_rendering = blocking
+
+        # Invalidate state of bottom statusbar
+        if self.bar_bottom:
+            self.bar_bottom.force_redraw()
 
         return out
 

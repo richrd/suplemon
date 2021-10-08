@@ -100,7 +100,9 @@
             "\uFEFF": "\u2420"
         },
         // Whether to visually show white space chars
-        "show_white_space": true,
+        "show_white_space": false,
+        // Whether to ignore theme whitespace color
+        "ignore_theme_whitespace": false,
         // Show tab indicators in whitespace
         "show_tab_indicators": true,
         // Tab indicator charatrer
@@ -126,20 +128,67 @@
     },
     // UI Display Settings
     "display": {
-        // Show top status bar
         "show_top_bar": true,
-        // Show app name and version in top bar
-        "show_app_name": true,
-        // Show list of open files in top bar
-        "show_file_list": true,
+        "status_top": {
+            "components": "editor_logo editor_name editor_version fill filelist fill battery clock",
+            "fillchar": " ",
+            "spacechar": " ",
+            "truncate": "left",
+            "default_align": "left"
+        },
+        "show_bottom_bar": true,
+        "status_bottom": {
+            "components": "app_status fill document_position cursors lint",
+            "fillchar": " ",
+            "spacechar": " ",
+            "truncate": "right",
+            "default_align": "left"
+        },
         // Show indicator in the file list for files that are modified
         // NOTE: if you experience performance issues, set this to false
         "show_file_modified_indicator": true,
         // Show the keyboard legend
         "show_legend": true,
-        // Show the bottom status bar
-        "show_bottom_bar": true,
-        // Invert status bar colors (switch text and background colors)
-        "invert_status_bars": false
+        // Theme for 8 colors
+        "colors_8": {
+            // Another variant for linenumbers (and maybe status_*) is black, black, bold
+            "status_top":             { "fg": "white",   "bg": "black"   },
+            "status_bottom":          { "fg": "white",   "bg": "black"   },
+            "legend":                 { "fg": "white",   "bg": "black"   },
+            "linenumbers":            { "fg": "white",   "bg": "black"   },
+            "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
+            "editor":                 { "fg": "default", "bg": "default" },
+            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] },
+            "filelist_active":        { "fg": "white",   "bg": "black"   },
+            "filelist_other":         { "fg": "black",   "bg": "black",   "attribs": [ "bold" ] },
+            "lintlogo_warn":          { "fg": "red",     "bg": "black"   }
+        },
+        // Theme for 88 colors
+        "colors_88": {
+            // Copy of colors_8; this needs an own default theme
+            "status_top":             { "fg": "white",   "bg": "black"   },
+            "status_bottom":          { "fg": "white",   "bg": "black"   },
+            "legend":                 { "fg": "white",   "bg": "black"   },
+            "linenumbers":            { "fg": "white",   "bg": "black"   },
+            "linenumbers_lint_error": { "fg": "red",     "bg": "black"   },
+            "editor":                 { "fg": "default", "bg": "default" },
+            "editor_whitespace":      { "fg": "black",   "bg": "default", "attribs": [ "bold" ] },
+            "filelist_active":        { "fg": "white",   "bg": "black"   },
+            "filelist_other":         { "fg": "black",   "bg": "black",   "attribs": [ "bold" ] },
+            "lintlogo_warn":          { "fg": "red",     "bg": "black"   }
+        },
+        // Theme for 256 colors
+        "colors_256": {
+            "status_top":             { "fg": "color250", "bg": "black"   },
+            "status_bottom":          { "fg": "color250", "bg": "black"   },
+            "legend":                 { "fg": "color250", "bg": "black"   },
+            "linenumbers":            { "fg": "color240", "bg": "black"   },
+            "linenumbers_lint_error": { "fg": "color204", "bg": "black"   },
+            "editor":                 { "fg": "default",  "bg": "default" },
+            "editor_whitespace":      { "fg": "color240", "bg": "default" },
+            "filelist_active":        { "fg": "white",    "bg": "black"   },
+            "filelist_other":         { "fg": "color240", "bg": "black"   },
+            "lintlogo_warn":          { "fg": "color204", "bg": "black"   }
+        }
     }
 }
