@@ -16,9 +16,11 @@ class SystemClipboard(Module):
             self.clipboard_type = "pb"
         elif self.has_xclip_support():
             self.clipboard_type = "xclip"
+        elif self.has_termux_api_support():
+            self.clipboard_type = "termux-api"
         else:
             self.logger.warning(
-                "Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.")
+                "Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.\nOn Termux, install 'termux-api' for system clipboard support.")
             return False
         self.bind_event_before("insert", self.insert)
         self.bind_event_after("copy", self.copy)
@@ -42,6 +44,8 @@ class SystemClipboard(Module):
                 command = ["pbpaste", "-Prefer", "txt"]
             elif self.clipboard_type == "xclip":
                 command = ["xclip", "-selection", "clipboard", "-out"]
+            elif self.clipboard_type == "termux-api":
+                command = ["termux-clipboard-get"]
             else:
                 return False
             data = subprocess.check_output(command, universal_newlines=True)
@@ -57,6 +61,8 @@ class SystemClipboard(Module):
                 command = ["pbcopy"]
             elif self.clipboard_type == "xclip":
                 command = ["xclip", "-selection", "clipboard", "-in"]
+            elif self.clipboard_type == "termux-api":
+                command = ["termux-clipboard-set"]
             else:
                 return False
             p = subprocess.Popen(command, stdin=subprocess.PIPE)
@@ -75,6 +81,11 @@ class SystemClipboard(Module):
 
     def has_xclip_support(self):
         output = self.get_output(["which", "xclip"])  # xclip -version outputs to stderr
+        return output
+
+    def has_termux_api_support(self):
+        output = self.get_output(["which", "termux-clipboard-get"])
+        output += self.get_output(["which", "termux-clipboard-set"])
         return output
 
     def get_output(self, cmd):
