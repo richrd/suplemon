@@ -16,27 +16,48 @@ class SystemClipboard(Module):
         system() == 'Windows' and
         self.which("powershell")
         ):
-            self.clipboard_type = "powershell"
+            self.clipboard = {
+                "get": ["powershell.exe", "-noprofile", "-command", "Get-Clipboard"],
+                "set": ["powershell.exe", "-noprofile", "-command", "Set-Clipboard"]
+            }
         elif (
         system() == 'Linux' and
         self.which("powershell") and
         os.path.isfile('/proc/version')
         ):
             if "microsoft" in open('/proc/version', 'r').read().lower():
-                self.clipboard_type = "powershell"
+                self.clipboard = {
+                    "get": ["powershell.exe", "-noprofile", "-command", "Get-Clipboard"],
+                    "set": ["powershell.exe", "-noprofile", "-command", "Set-Clipboard"]
+                }
         elif (
         os.environ.get("WAYLAND_DISPLAY") and
         self.which("wl-copy")
         ):
-            self.clipboard_type = "wl"
+            self.clipboard = {
+                "get": ["wl-paste", "-n"],
+                "set": ["wl-copy"]
+            }
         elif self.which("xsel"):
-            self.clipboard_type = "xsel"
+            self.clipboard = {
+                "get": ["xsel", "-b"],
+                "set": ["xsel", "-i", "-b"]
+            }
         elif self.which("pbcopy"):
-            self.clipboard_type = "pb"
+            self.clipboard = {
+                "get": ["pbpaste", "-Prefer", "txt"],
+                "set": ["pbcopy"]
+            }
         elif self.which("xclip"):
-            self.clipboard_type = "xclip"
+            self.clipboard = {
+                "get": ["xclip", "-selection", "clipboard", "-out"],
+                "set": ["xclip", "-selection", "clipboard", "-in"]
+            }
         elif self.which("termux-clipboard-get"):
-            self.clipboard_type = "termux"
+            self.clipboard = {
+                "get": ["termux-clipboard-get"],
+                "set": ["termux-clipboard-set"]
+            }
         else:
             self.logger.warning(
                 "Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.\nOn Termux, install 'termux-api' for system clipboard support.")
@@ -57,42 +78,14 @@ class SystemClipboard(Module):
 
     def get_clipboard(self):
         try:
-            if self.clipboard_type == "powershell":
-                command = ["powershell.exe", "-noprofile", "-command", "Get-Clipboard"]
-            elif self.clipboard_type == "wl":
-                command = ["wl-paste", "-n"]
-            elif self.clipboard_type == "xsel":
-                command = ["xsel", "-b"]
-            elif self.clipboard_type == "pb":
-                command = ["pbpaste", "-Prefer", "txt"]
-            elif self.clipboard_type == "xclip":
-                command = ["xclip", "-selection", "clipboard", "-out"]
-            elif self.clipboard_type == "termux":
-                command = ["termux-clipboard-get"]
-            else:
-                return False
-            data = subprocess.check_output(command, universal_newlines=True)
+            data = subprocess.check_output(self.clipboard["get"], universal_newlines=True)
             return data
         except:
             return False
 
     def set_clipboard(self, data):
         try:
-            if self.clipboard_type == "powershell":
-                command = ["powershell.exe", "-noprofile", "-command", "Set-Clipboard"]
-            elif self.clipboard_type == "wl":
-                command = ["wl-copy"]
-            elif self.clipboard_type == "xsel":
-                command = ["xsel", "-i", "-b"]
-            elif self.clipboard_type == "pb":
-                command = ["pbcopy"]
-            elif self.clipboard_type == "xclip":
-                command = ["xclip", "-selection", "clipboard", "-in"]
-            elif self.clipboard_type == "termux":
-                command = ["termux-clipboard-set"]
-            else:
-                return False
-            p = subprocess.Popen(command, stdin=subprocess.PIPE)
+            p = subprocess.Popen(self.clipboard["set"], stdin=subprocess.PIPE)
             out, err = p.communicate(input=bytes(data, "utf-8"))
             return out
         except:
