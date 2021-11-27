@@ -1,6 +1,8 @@
 # -*- encoding: utf-8
 
+import os
 import subprocess
+from platform import system
 
 from suplemon.suplemon_module import Module
 
@@ -10,15 +12,55 @@ class SystemClipboard(Module):
 
     def init(self):
         self.init_logging(__name__)
-        if self.has_xsel_support():
-            self.clipboard_type = "xsel"
-        elif self.has_pb_support():
-            self.clipboard_type = "pb"
-        elif self.has_xclip_support():
-            self.clipboard_type = "xclip"
+        if (
+        system() == 'Windows' and
+        self.which("powershell")
+        ):
+            self.clipboard = {
+                "get": ["powershell.exe", "-noprofile", "-command", "Get-Clipboard"],
+                "set": ["powershell.exe", "-noprofile", "-command", "Set-Clipboard"]
+            }
+        elif (
+        system() == 'Linux' and
+        self.which("powershell") and
+        os.path.isfile('/proc/version')
+        ):
+            if "microsoft" in open('/proc/version', 'r').read().lower():
+                self.clipboard = {
+                    "get": ["powershell.exe", "-noprofile", "-command", "Get-Clipboard"],
+                    "set": ["powershell.exe", "-noprofile", "-command", "Set-Clipboard"]
+                }
+        elif (
+        os.environ.get("WAYLAND_DISPLAY") and
+        self.which("wl-copy")
+        ):
+            self.clipboard = {
+                "get": ["wl-paste", "-n"],
+                "set": ["wl-copy"]
+            }
+        elif self.which("xsel"):
+            self.clipboard = {
+                "get": ["xsel", "-b"],
+                "set": ["xsel", "-i", "-b"]
+            }
+        elif self.which("pbcopy"):
+            self.clipboard = {
+                "get": ["pbpaste", "-Prefer", "txt"],
+                "set": ["pbcopy"]
+            }
+        elif self.which("xclip"):
+            self.clipboard = {
+                "get": ["xclip", "-selection", "clipboard", "-out"],
+                "set": ["xclip", "-selection", "clipboard", "-in"]
+            }
+        elif self.which("termux-clipboard-get"):
+            self.clipboard = {
+                "get": ["termux-clipboard-get"],
+                "set": ["termux-clipboard-set"]
+            }
         else:
             self.logger.warning(
-                "Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.")
+                "Can't use system clipboard. Install 'xsel' or 'pbcopy' or 'xclip' for system clipboard support.\nOn Termux, install 'termux-api' for system clipboard support.")
             return False
         self.bind_event_before("insert", self.insert)
         self.bind_event_after("copy", self.copy)
@@ -36,54 +78,39 @@ class SystemClipboard(Module):
 
     def get_clipboard(self):
         try:
-            if self.clipboard_type == "xsel":
-                command = ["xsel", "-b"]
-            elif self.clipboard_type == "pb":
-                command = ["pbpaste", "-Prefer", "txt"]
-            elif self.clipboard_type == "xclip":
-                command = ["xclip", "-selection", "clipboard", "-out"]
-            else:
-                return False
-            data = subprocess.check_output(command, universal_newlines=True)
+            data = subprocess.check_output(self.clipboard["get"], universal_newlines=True)
             return data
         except:
             return False
 
     def set_clipboard(self, data):
         try:
-            if self.clipboard_type == "xsel":
-                command = ["xsel", "-i", "-b"]
-            elif self.clipboard_type == "pb":
-                command = ["pbcopy"]
-            elif self.clipboard_type == "xclip":
-                command = ["xclip", "-selection", "clipboard", "-in"]
-            else:
-                return False
-            p = subprocess.Popen(command, stdin=subprocess.PIPE)
+            p = subprocess.Popen(self.clipboard["set"], stdin=subprocess.PIPE)
             out, err = p.communicate(input=bytes(data, "utf-8"))
             return out
         except:
             return False
 
-    def has_pb_support(self):
-        output = self.get_output(["which", "pbcopy"])
-        return output
+    def which(self, program): # https://stackoverflow.com/a/379535
+        def is_exe(fpath):
+            return os.path.exists(fpath) and os.access(fpath, os.X_OK) and os.path.isfile(fpath)
 
-    def has_xsel_support(self):
-        output = self.get_output(["xsel", "--version"])
-        return output
+        def ext_candidates(fpath):
+            yield fpath
+            for ext in os.environ.get("PATHEXT", "").split(os.pathsep):
+                yield fpath + ext
 
-    def has_xclip_support(self):
-        output = self.get_output(["which", "xclip"])  # xclip -version outputs to stderr
-        return output
-
-    def get_output(self, cmd):
-        try:
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        except (OSError, EnvironmentError):  # can't use FileNotFoundError in Python 2
-            return False
-        out, err = process.communicate()
-        return out
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                exe_file = os.path.join(path, program)
+                for candidate in ext_candidates(exe_file):
+                    if is_exe(candidate):
+                        return candidate
+        return False
 
 
 module = {
